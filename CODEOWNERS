@@ -1,0 +1,19 @@
+# Global owners
+* @meetpin-team
+
+# Database and security
+scripts/ @meetpin-team @security-team
+lib/auth.ts @meetpin-team @security-team
+lib/supabaseClient.ts @meetpin-team @security-team
+
+# API routes
+src/app/api/ @meetpin-team @backend-team
+
+# Payment related
+lib/payments/ @meetpin-team @backend-team
+src/app/api/payments/ @meetpin-team @backend-team
+
+# Legal and documentation
+README.md @meetpin-team @docs-team
+docs/ @meetpin-team @docs-team
+src/app/(public)/legal/ @meetpin-team @legal-team

@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  
+  /* Brand colors */
+  --primary: #10b981;
+  --primary-deep: #059669;
+  --boost: #f59e0b;
+  --accent: #f97316;
+  --text-muted: #6b7280;
+  --bg-soft: #f3f4f6;
+  
+  /* Category colors */
+  --category-drink: #e11d48;
+  --category-exercise: #3b82f6;
+  --category-other: #8b5cf6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
+  --color-boost: var(--boost);
+  --color-accent: var(--accent);
+  --color-text-muted: var(--text-muted);
+  --color-bg-soft: var(--bg-soft);
+  --color-category-drink: var(--category-drink);
+  --color-category-exercise: var(--category-exercise);
+  --color-category-other: var(--category-other);
+  --font-sans: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* 모바일 우선 반응형 */
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
