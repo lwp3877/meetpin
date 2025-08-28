@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /chat/
+Disallow: /profile
+Disallow: /requests
+
+# Sitemap
+Sitemap: https://meetpin.app/sitemap.xml
