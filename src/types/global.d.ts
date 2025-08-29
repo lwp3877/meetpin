@@ -52,7 +52,7 @@ export interface Room {
   // Relations (populated when needed)
   host?: User
   participants_count?: number
-  user_request_status?: 'pending' | 'approved' | 'rejected' | null
+  user_request_status?: 'pending' | 'accepted' | 'rejected' | null
   is_host?: boolean
 }
 
@@ -78,7 +78,7 @@ export interface JoinRequest {
   room_id: string
   requester_uid: string
   message?: string
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'accepted' | 'rejected'
   created_at: string
   updated_at: string
   
@@ -218,7 +218,7 @@ export type Required<T, K extends keyof T> = T & Required<Pick<T, K>>
 export type AgeRange = '20s_early' | '20s_late' | '30s_early' | '30s_late' | '40s' | '50s+'
 export type Category = 'drink' | 'exercise' | 'other'
 export type RoomStatus = 'active' | 'cancelled' | 'completed'
-export type RequestStatus = 'pending' | 'approved' | 'rejected'
+export type RequestStatus = 'pending' | 'accepted' | 'rejected'
 
 // =============================================================================
 // 외부 라이브러리 타입 확장

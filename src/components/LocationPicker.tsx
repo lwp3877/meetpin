@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { loadKakaoMaps, coordToAddress } from '@/lib/kakao'
 
 // Kakao Maps 타입 정의
 declare global {
@@ -32,38 +33,15 @@ export default function LocationPicker({
     place_text: string
   } | null>(null)
 
-  // Kakao Maps SDK 동적 로드
+  // Kakao Maps SDK 로드
   useEffect(() => {
-    // 이미 로드된 경우 체크
-    if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(() => {
+    loadKakaoMaps()
+      .then(() => {
         setIsKakaoLoaded(true)
       })
-      return
-    }
-
-    // 스크립트 동적 로드
-    const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&autoload=false&libraries=services`
-    
-    script.onload = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          setIsKakaoLoaded(true)
-        })
-      }
-    }
-    
-    document.head.appendChild(script)
-
-    return () => {
-      const existingScript = document.querySelector(`script[src*="dapi.kakao.com"]`)
-      if (existingScript && existingScript.parentNode) {
-        existingScript.parentNode.removeChild(existingScript)
-      }
-    }
+      .catch((error) => {
+        console.error('Kakao Maps 로드 실패:', error)
+      })
   }, [])
 
   // 지도 초기화
@@ -105,43 +83,24 @@ export default function LocationPicker({
       })
       markerRef.current = marker
 
-      // Geocoder를 사용하여 주소 가져오기 (안전한 체크 추가)
-      if (kakao.maps.services && kakao.maps.services.Geocoder) {
-        // HTTPS 강제 사용을 위한 설정 시도
-        if (kakao.maps.services.Geocoder.prototype._request) {
-          const originalRequest = kakao.maps.services.Geocoder.prototype._request
-          kakao.maps.services.Geocoder.prototype._request = function(url: string, ...args: any[]) {
-            // HTTP를 HTTPS로 변경
-            const httpsUrl = url.replace('http://dapi.kakao.com', 'https://dapi.kakao.com')
-            return originalRequest.call(this, httpsUrl, ...args)
-          }
-        }
-        
-        const geocoder = new kakao.maps.services.Geocoder()
-        geocoder.coord2Address(lng, lat, (result: any, status: any) => {
-          let place_text = `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`
-          
-          if (status === kakao.maps.services.Status.OK && result[0]) {
-            const addr = result[0].address
-            if (addr) {
-              place_text = addr.address_name || place_text
-            }
-          }
-
+      // 주소 변환 시도
+      coordToAddress(lat, lng)
+        .then((address) => {
           setSelectedLocation({
             lat,
             lng,
-            place_text
+            place_text: address
           })
         })
-      } else {
-        // Geocoder가 없으면 좌표만 사용
-        setSelectedLocation({
-          lat,
-          lng,
-          place_text: `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`
+        .catch((error) => {
+          console.warn('주소 변환 실패:', error)
+          // 주소 변환에 실패하면 좌표로 표시
+          setSelectedLocation({
+            lat,
+            lng,
+            place_text: `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`
+          })
         })
-      }
     })
 
     return () => {

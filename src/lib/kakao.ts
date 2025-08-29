@@ -38,38 +38,68 @@ export function isKakaoMapsLoaded(): boolean {
   return typeof kakao !== 'undefined' && kakao.maps
 }
 
+// 전역 로딩 상태 관리
+let isLoading = false
+let loadPromise: Promise<void> | null = null
+
 /**
- * Kakao Maps API를 동적으로 로드
+ * Kakao Maps API를 동적으로 로드 (전역 상태 관리)
  */
-export function loadKakaoMaps(apiKey: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // 이미 로드된 경우
-    if (isKakaoMapsLoaded()) {
-      resolve()
-      return
-    }
+export function loadKakaoMaps(apiKey?: string): Promise<void> {
+  // 이미 로드된 경우
+  if (isKakaoMapsLoaded()) {
+    return Promise.resolve()
+  }
 
-    // 이미 로딩 중인 경우
+  // 이미 로딩 중인 경우
+  if (loadPromise) {
+    return loadPromise
+  }
+
+  // API 키 확인
+  const key = apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
+  if (!key) {
+    return Promise.reject(new Error('Kakao Maps API 키가 설정되지 않았습니다'))
+  }
+
+  // 로딩 시작
+  isLoading = true
+  loadPromise = new Promise((resolve, reject) => {
+    // 이미 kakao 객체가 있는 경우
     if (typeof kakao !== 'undefined' && kakao.maps) {
-      kakao.maps.load(resolve)
+      kakao.maps.load(() => {
+        isLoading = false
+        resolve()
+      })
       return
     }
 
-    // 스크립트 동적 로드
+    // 스크립트 동적 로드 (services와 clusterer 라이브러리 모두 포함)
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&libraries=services&autoload=false`
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services,clusterer&autoload=false`
+    
     script.onload = () => {
-      if (kakao && kakao.maps) {
-        kakao.maps.load(resolve)
+      if (window.kakao && window.kakao.maps) {
+        window.kakao.maps.load(() => {
+          isLoading = false
+          resolve()
+        })
       } else {
+        isLoading = false
         reject(new Error('Kakao Maps API 로드 실패'))
       }
     }
-    script.onerror = () => reject(new Error('Kakao Maps API 스크립트 로드 실패'))
+    
+    script.onerror = () => {
+      isLoading = false
+      reject(new Error('Kakao Maps API 스크립트 로드 실패'))
+    }
     
     document.head.appendChild(script)
   })
+
+  return loadPromise
 }
 
 /**

@@ -17,11 +17,19 @@ export default function PageTransition({
   duration = 300,
   type = 'fade'
 }: PageTransitionProps) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true) // 초기값을 true로 변경
   const [isEntering, setIsEntering] = useState(true)
+  const [isMounted, setIsMounted] = useState(false) // 마운트 상태 추가
   const pathname = usePathname()
 
+  // 클라이언트에서만 애니메이션 활성화
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) return // 마운트되지 않았으면 애니메이션 건너뛰기
+    
     setIsVisible(false)
     setIsEntering(true)
     
@@ -31,9 +39,11 @@ export default function PageTransition({
     }, 50)
 
     return () => clearTimeout(timer)
-  }, [pathname])
+  }, [pathname, isMounted])
 
   const getTransitionClasses = () => {
+    if (!isMounted) return '' // 마운트되지 않았으면 애니메이션 없음
+    
     const baseClasses = `transition-all duration-${duration} ease-out`
     
     switch (type) {
@@ -85,20 +95,28 @@ export function CardAnimation({
   delay?: number
   className?: string
 }) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true) // 초기값을 true로 변경
+  const [isMounted, setIsMounted] = useState(false) // 마운트 상태 추가
 
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) return
+    
+    setIsVisible(false)
     const timer = setTimeout(() => {
       setIsVisible(true)
     }, delay)
 
     return () => clearTimeout(timer)
-  }, [delay])
+  }, [delay, isMounted])
 
   return (
     <div
-      className={`transition-all duration-500 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      className={`${isMounted ? 'transition-all duration-500 ease-out' : ''} ${
+        isMounted && isVisible ? 'opacity-100 translate-y-0' : isMounted ? 'opacity-0 translate-y-4' : ''
       } ${className}`}
     >
       {children}
@@ -279,25 +297,33 @@ export function BounceIn({
   delay?: number
   className?: string
 }) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(true) // 초기값을 true로 변경
+  const [isMounted, setIsMounted] = useState(false) // 마운트 상태 추가
 
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) return
+    
+    setIsVisible(false)
     const timer = setTimeout(() => {
       setIsVisible(true)
     }, delay)
 
     return () => clearTimeout(timer)
-  }, [delay])
+  }, [delay, isMounted])
 
   return (
     <div
-      className={`transition-all duration-600 ease-out ${
-        isVisible 
+      className={`${isMounted ? 'transition-all duration-600 ease-out' : ''} ${
+        isMounted && isVisible 
           ? 'opacity-100 translate-y-0 scale-100' 
-          : 'opacity-0 translate-y-8 scale-95'
+          : isMounted ? 'opacity-0 translate-y-8 scale-95' : ''
       } ${className}`}
       style={{
-        transitionTimingFunction: isVisible ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' : undefined
+        transitionTimingFunction: isMounted && isVisible ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' : undefined
       }}
     >
       {children}

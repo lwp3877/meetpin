@@ -6,9 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import { brandColors } from '@/lib/brand'
-// import { brandMessages } from '@/lib/brand' // 현재 사용하지 않음
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
+import { Send } from 'lucide-react'
 
 // 메시지 타입
 interface Message {
@@ -362,43 +361,49 @@ export default function ChatPanel({
       </div>
 
       {/* 메시지 입력 */}
-      <form onSubmit={handleSubmit(sendMessage)} className="border-t border-gray-200 p-4">
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <textarea
-              {...register('text')}
-              ref={textareaRef}
-              placeholder="메시지를 입력하세요... (Shift+Enter: 줄바꿈)"
-              rows={1}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              onInput={adjustTextareaHeight}
-              onKeyPress={handleKeyPress}
-              disabled={isSending}
-            />
-            {errors.text && (
-              <p className="mt-1 text-xs text-red-600">{errors.text.message}</p>
-            )}
+      <div className="border-t border-white/20 dark:border-slate-700/30 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm p-4">
+        <form onSubmit={handleSubmit(sendMessage)}>
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <div className="relative">
+                <textarea
+                  {...register('text')}
+                  ref={textareaRef}
+                  placeholder="메시지를 입력하세요..."
+                  rows={1}
+                  className="w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-2xl resize-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-lg transition-all duration-200"
+                  onInput={adjustTextareaHeight}
+                  onKeyPress={handleKeyPress}
+                  disabled={isSending}
+                />
+                <div className="absolute right-3 bottom-3 text-xs text-gray-400 dark:text-gray-500">
+                  {messageText?.length || 0}/1000
+                </div>
+              </div>
+              {errors.text && (
+                <p className="mt-2 text-xs text-red-600 dark:text-red-400">{errors.text.message}</p>
+              )}
+            </div>
+            <Button
+              type="submit"
+              disabled={!messageText?.trim() || isSending}
+              className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-lg p-3 rounded-2xl transition-all duration-200 hover:scale-105"
+            >
+              {isSending ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </Button>
           </div>
-          <Button
-            type="submit"
-            disabled={!messageText?.trim() || isSending}
-            className="px-4 py-2 self-end"
-            style={{ backgroundColor: brandColors.primary }}
-          >
-            {isSending ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              '전송'
-            )}
-          </Button>
-        </div>
-        
-        {/* 도움말 */}
-        <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-          <span>Shift+Enter로 줄바꿈</span>
-          <span>{messageText?.length || 0}/1000</span>
-        </div>
-      </form>
+          
+          {/* 도움말 */}
+          <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <span>Shift+Enter로 줄바꿈</span>
+            <span>전송은 Enter 키로 합니다</span>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

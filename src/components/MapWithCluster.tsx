@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { brandColors, getCategoryDisplay } from '@/lib/brand'
 import { parseBBox, createBBoxFromBounds, calculateDistance } from '@/lib/bbox'
+import { loadKakaoMaps } from '@/lib/kakao'
 
 // Kakao Maps 타입 정의
 declare global {
@@ -54,51 +55,18 @@ export default function MapWithCluster({
   const infoWindowRef = useRef<any>(null)
   const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
 
-  // Kakao Maps SDK 동적 로드
+  // Kakao Maps SDK 로드
   useEffect(() => {
-    console.log('MapWithCluster: 시작 - 동적 스크립트 로딩')
+    console.log('MapWithCluster: Kakao Maps SDK 로딩 시작')
     
-    // 이미 로드된 경우 체크
-    if (window.kakao && window.kakao.maps) {
-      console.log('Kakao SDK 이미 로드됨')
-      window.kakao.maps.load(() => {
+    loadKakaoMaps()
+      .then(() => {
         console.log('Kakao Maps SDK 로드 완료!')
         setIsKakaoLoaded(true)
       })
-      return
-    }
-
-    // 스크립트 동적 로드
-    const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
-    console.log('사용할 Kakao API 키:', kakaoKey)
-    
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&libraries=clusterer&autoload=false`
-    console.log('스크립트 URL:', script.src)
-    script.onload = () => {
-      console.log('Kakao SDK 스크립트 로드됨')
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          console.log('Kakao Maps SDK 로드 완료!')
-          setIsKakaoLoaded(true)
-        })
-      }
-    }
-    script.onerror = (error) => {
-      console.error('Kakao SDK 로드 실패:', error)
-    }
-    
-    document.head.appendChild(script)
-    console.log('Kakao SDK 스크립트 태그 추가됨')
-
-    return () => {
-      // 클린업: 스크립트 태그 제거
-      const existingScript = document.querySelector(`script[src*="dapi.kakao.com"]`)
-      if (existingScript) {
-        document.head.removeChild(existingScript)
-      }
-    }
+      .catch((error) => {
+        console.error('Kakao Maps 로드 실패:', error)
+      })
   }, [])
 
   // 지도 초기화

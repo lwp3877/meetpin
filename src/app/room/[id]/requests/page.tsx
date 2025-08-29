@@ -10,7 +10,7 @@ import toast from 'react-hot-toast'
 
 interface Request {
   id: string
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'accepted' | 'rejected'
   created_at: string
   updated_at: string
   message?: string
@@ -95,7 +95,7 @@ export default function RoomRequestsPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          status: action === 'approve' ? 'approved' : 'rejected',
+          status: action === 'approve' ? 'accepted' : 'rejected',
           reason
         }),
       })
@@ -339,11 +339,11 @@ export default function RoomRequestsPage() {
                           </span>
                           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                             request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            request.status === 'accepted' ? 'bg-green-100 text-green-800' :
                             'bg-red-100 text-red-800'
                           }`}>
                             {request.status === 'pending' ? '⏳ 대기 중' :
-                             request.status === 'approved' ? '✅ 승인됨' :
+                             request.status === 'accepted' ? '✅ 승인됨' :
                              '❌ 거절됨'}
                           </span>
                         </div>
@@ -413,7 +413,7 @@ export default function RoomRequestsPage() {
             </div>
             <div className="bg-white rounded-lg p-4 border border-gray-100">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{requests.filter(r => r.status === 'approved').length}</div>
+                <div className="text-2xl font-bold text-green-600">{requests.filter(r => r.status === 'accepted').length}</div>
                 <div className="text-sm text-gray-600">승인됨</div>
               </div>
             </div>

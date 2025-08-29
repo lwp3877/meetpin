@@ -15,6 +15,7 @@ async function getRoom(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const user = await getAuthenticatedUser(request)
   const supabase = await createServerSupabaseClient()
   const { id } = await parseUrlParams(context)
   
@@ -38,7 +39,7 @@ async function getRoom(
     throw new ApiError('방을 찾을 수 없습니다', 404)
   }
   
-  // 현재 참가 요청 수 조회
+  // 현재 참가자 수 조회 (호스트 포함)
   const { count: requestCount } = await supabase
     .from('requests')
     .select('*', { count: 'exact', head: true })
@@ -46,8 +47,11 @@ async function getRoom(
     .eq('status', 'accepted')
   
   return createSuccessResponse({
-    ...(room as any),
-    current_people: (requestCount || 0) + 1, // 호스트 포함
+    room: {
+      ...(room as any),
+      participants_count: (requestCount || 0) + 1, // 호스트 포함
+      is_host: (room as any).host_uid === user.id
+    }
   })
 }
 
@@ -120,7 +124,7 @@ async function deleteRoom(
   // 방 소유자 확인
   const { data: room } = await supabase
     .from('rooms')
-    .select('host_uid, status')
+    .select('host_uid')
     .eq('id', id)
     .single()
   
@@ -128,24 +132,15 @@ async function deleteRoom(
     throw new ApiError('방을 삭제할 권한이 없습니다', 403)
   }
   
-  // 이미 진행 중인 방은 삭제 대신 비활성화
-  if ((room as any).status === 'active') {
-    // 진행중인 매칭이나 수락된 요청이 있는지 확인
-    const { count: acceptedCount } = await supabase
-      .from('requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('room_id', id)
-      .eq('status', 'accepted')
-    
-    if (acceptedCount && acceptedCount > 0) {
-      // 수락된 요청이 있으면 비활성화만
-      await (supabase as any)
-        .from('rooms')
-        .update({ status: 'inactive' })
-        .eq('id', id)
-      
-      return createSuccessResponse(null, '방이 비활성화되었습니다')
-    }
+  // 참가자 매칭이 존재하면 삭제 불가
+  const { count: acceptedCount } = await supabase
+    .from('requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('room_id', id)
+    .eq('status', 'accepted')
+  
+  if (acceptedCount && acceptedCount > 0) {
+    throw new ApiError('참가자가 있는 모임은 삭제할 수 없습니다', 400)
   }
   
   // 실제 삭제 (CASCADE로 관련 데이터도 함께 삭제됨)

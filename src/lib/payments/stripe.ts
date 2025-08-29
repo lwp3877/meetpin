@@ -229,6 +229,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
           }
         }
         
+        // DB 업데이트는 웹훅 라우트에서 처리하도록 데이터만 반환
         return {
           type: event.type,
           roomId: metadata.roomId,

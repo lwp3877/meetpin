@@ -12,7 +12,9 @@ import {
 
 // 요청 상태 업데이트 스키마
 const updateRequestSchema = z.object({
-  status: z.enum(['accepted', 'rejected']),
+  status: z.enum(['approved', 'accepted', 'rejected']).transform(val => 
+    val === 'approved' ? 'accepted' : val
+  ),
 })
 
 // PATCH /api/requests/[id] - 참가 요청 상태 변경 (수락/거절)
@@ -36,8 +38,7 @@ async function updateRequest(
         id,
         host_uid,
         max_people,
-        start_at,
-        status
+        start_at
       )
     `)
     .eq('id', id)
@@ -58,9 +59,10 @@ async function updateRequest(
     throw new ApiError('이미 처리된 요청입니다')
   }
   
-  // 방이 활성 상태인지 확인
-  if (requestWithRoom.room.status !== 'active') {
-    throw new ApiError('비활성화된 방의 요청은 처리할 수 없습니다')
+  // 방 시작 시간이 지나지 않았는지 확인
+  const startTime = new Date(requestWithRoom.room.start_at)
+  if (new Date() > startTime) {
+    throw new ApiError('이미 시작된 방의 요청은 처리할 수 없습니다')
   }
   
   // 수락하는 경우 추가 검증

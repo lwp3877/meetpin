@@ -33,7 +33,6 @@ async function getRooms(request: NextRequest) {
         age_range
       )
     `)
-    .eq('status', 'open')
     .eq('visibility', 'public')
     .gte('start_at', new Date().toISOString()) // 미래 시간만
     .gte('lat', bbox.south)
@@ -64,7 +63,6 @@ async function getRooms(request: NextRequest) {
   let countQuery = supabase
     .from('rooms')
     .select('id', { count: 'exact', head: true })
-    .eq('status', 'open')
     .eq('visibility', 'public')
     .gte('start_at', new Date().toISOString())
     .gte('lat', bbox.south)
@@ -118,6 +116,7 @@ async function createRoom(request: NextRequest) {
       {
         host_uid: user.id,
         title: roomData.title,
+        description: roomData.description,
         category: roomData.category,
         lat: roomData.lat,
         lng: roomData.lng,

@@ -1,5 +1,7 @@
 /* src/lib/mockData.ts */
 // 개발용 Mock 데이터 - Supabase 설정 전까지 임시 사용
+// 주의: 이 파일은 개발 모드에서만 사용되며, 프로덕션 빌드에서는 사용되지 않습니다.
+// useAuth.tsx에서 isDevelopmentMode 조건으로 사용됩니다.
 
 export const mockUser = {
   id: 'mock-user-123',

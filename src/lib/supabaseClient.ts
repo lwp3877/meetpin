@@ -263,17 +263,45 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'meetpin-auth',
+      storageKey: 'meetpin-supabase-auth-token',
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'meetpin-web',
+      },
     },
   })
   
   return _browserClient
 }
 
-// 서버용 클라이언트 - 현재 사용하지 않음 (빌드 에러 방지)
-export function createServerSupabaseClient() {
-  return createBrowserSupabaseClient()
+// 서버용 클라이언트 (쿠키 기반 인증)
+export async function createServerSupabaseClient() {
+  const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
+  
+  // Next.js 서버 환경에서 쿠키 접근
+  const { cookies } = await import('next/headers')
+  const cookieStore = await cookies()
+  
+  return createServerClient<Database>(url, key, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        } catch {
+          // 쿠키 설정 실패는 무시 (읽기 전용 모드)
+        }
+      },
+    },
+  })
 }
 
 // 서버 환경변수 검증 (관리자용)
