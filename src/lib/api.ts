@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/auth'
-import { checkIPRateLimit, checkUserRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
+import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
 
 // Simple in-memory rate limiting store
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
@@ -100,13 +100,14 @@ export async function parseAndValidateBody<T>(
     const body = await request.json()
     return schema.parse(body)
   } catch (error: any) {
-    if (error.name === 'ZodError') {
+    if (error.name === 'ZodError' && error.errors && Array.isArray(error.errors)) {
       const message = error.errors.map((e: any) => 
         `${e.path.join('.')}: ${e.message}`
       ).join(', ')
       throw new ApiError(`입력 데이터가 올바르지 않습니다: ${message}`, 400, 'VALIDATION_ERROR')
     }
-    throw new ApiError('잘못된 JSON 형식입니다', 400, 'INVALID_JSON')
+    console.error('Parse error:', error)
+    throw new ApiError('요청 데이터 처리 중 오류가 발생했습니다', 400, 'PARSE_ERROR')
   }
 }
 
@@ -291,7 +292,7 @@ export const apiUtils = {
     createErrorResponse(message, 429, 'RATE_LIMIT_EXCEEDED'),
 }
 
-export default {
+const apiUtilsCollection = {
   ApiError,
   createSuccessResponse,
   createErrorResponse,
@@ -306,5 +307,6 @@ export default {
   withUserRateLimit,
   withErrorHandling,
   createMethodRouter,
-  utils: apiUtils,
 }
+
+export default apiUtilsCollection

@@ -1,6 +1,5 @@
 /* src/components/ui/LoadingSpinner.tsx */
 import React from 'react'
-import { brandColors } from '@/lib/brand'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'

@@ -98,7 +98,7 @@ export const isTest = process.env.NODE_ENV === 'test'
 // 디버그 모드
 export const isDebugMode = isDevelopment && process.env.DEBUG?.includes('meetpin')
 
-export default {
+const flagsConfig = {
   flags,
   config,
   utils: {
@@ -111,3 +111,5 @@ export default {
     isDebugMode,
   },
 }
+
+export default flagsConfig

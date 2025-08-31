@@ -1,7 +1,7 @@
 /* 파일경로: src/app/map/page.tsx */
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import MapWithCluster from '@/components/MapWithCluster'
@@ -30,6 +30,14 @@ import {
 } from 'lucide-react'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
 import { toast } from 'sonner'
+
+// 서울 기본 영역 상수
+const DEFAULT_BOUNDS = {
+  south: 37.4563,
+  west: 126.8226,
+  north: 37.6761,
+  east: 127.1836,
+}
 
 interface Room {
   id: string
@@ -70,15 +78,7 @@ export default function MapPage() {
     east: number
   } | null
   
-  const [currentBounds, setCurrentBounds] = useState<BBox>(null)
 
-  // 서울 기본 영역
-  const DEFAULT_BOUNDS = {
-    south: 37.4563,
-    west: 126.8226,
-    north: 37.6761,
-    east: 127.1836,
-  }
 
   // 방 목록 로드
   const loadRooms = useCallback(async (bbox?: BBox) => {
@@ -115,8 +115,8 @@ export default function MapPage() {
   }, [selectedCategory])
 
   // 지도 영역 변경 시 방 목록 업데이트 (debounced)
-  const debouncedLoadRooms = useCallback(
-    debounce((bbox: BBox) => {
+  const debouncedLoadRooms = useMemo(
+    () => debounce((bbox: BBox) => {
       if (bbox) {
         loadRooms(bbox)
       }
@@ -125,7 +125,6 @@ export default function MapPage() {
   )
 
   const handleBoundsChanged = useCallback((bbox: BBox) => {
-    setCurrentBounds(bbox)
     if (bbox && 
         bbox.south < bbox.north && 
         bbox.west < bbox.east) {
@@ -135,14 +134,14 @@ export default function MapPage() {
 
   // 방 클릭 핸들러
   const handleRoomClick = (room: Room) => {
-    trackFeatureUsage('ENABLE_ADVANCED_SEARCH', 'room_clicked')
+    trackFeatureUsage()
     router.push(`/room/${room.id}`)
   }
 
   // 카테고리 변경
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)
-    trackFeatureUsage('ENABLE_ADVANCED_SEARCH', `category_${category}`)
+    trackFeatureUsage()
   }
 
   // 내 주변 버튼 핸들러
@@ -172,10 +171,9 @@ export default function MapPage() {
         east: longitude + margin
       }
 
-      setCurrentBounds(bounds)
       await loadRooms(bounds)
       toast.success('내 주변 모임을 찾았습니다')
-      trackFeatureUsage('ENABLE_LOCATION_FILTER', 'near_me_used')
+      trackFeatureUsage()
     } catch (error) {
       console.error('Location error:', error)
       toast.error('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요')
@@ -190,7 +188,7 @@ export default function MapPage() {
   // 검색 핸들러
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    trackFeatureUsage('ENABLE_ADVANCED_SEARCH', 'search_used')
+    trackFeatureUsage()
   }
 
   // 필터링된 방 목록 계산
@@ -261,62 +259,73 @@ export default function MapPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-500/10 via-blue-500/5 to-purple-500/10 dark:from-emerald-900/20 dark:via-blue-900/10 dark:to-purple-900/20">
       {/* Enhanced Header */}
-      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/20 sticky top-0 z-50">
-        <div className="px-4 py-3">
+      <header className="bg-gradient-to-r from-white/95 via-emerald-50/50 to-white/95 dark:from-gray-900/95 dark:via-emerald-950/50 dark:to-gray-900/95 backdrop-blur-xl border-b border-emerald-200/30 dark:border-emerald-800/30 sticky top-0 z-50 shadow-lg shadow-emerald-500/5">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
               <Button
                 variant="ghost"
                 onClick={() => router.push('/')}
-                className="flex items-center space-x-2 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 p-2 rounded-xl"
+                className="group flex items-center space-x-3 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 p-3 rounded-2xl transition-all duration-300"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-lg">📍</span>
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl">📍</span>
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  밋핀
-                </span>
+                <div>
+                  <span className="text-xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    밋핀
+                  </span>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                    지도에서 만나요
+                  </div>
+                </div>
               </Button>
             </div>
 
             {/* Enhanced Search Bar */}
             {isFeatureEnabled('ENABLE_ADVANCED_SEARCH') && (
-              <div className="flex-1 max-w-lg mx-4">
-                <div className="relative">
-                  <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <div className="flex-1 max-w-xl mx-6">
+                <div className="relative group">
+                  <Search className="w-5 h-5 text-emerald-500 dark:text-emerald-400 absolute left-4 top-1/2 transform -translate-y-1/2 transition-all group-focus-within:scale-110" />
                   <Input
                     type="text"
-                    placeholder="모임 제목이나 장소 검색..."
+                    placeholder="모임 제목이나 장소를 검색해보세요..."
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="pl-10 bg-gray-100/80 dark:bg-gray-800/80 border-0 rounded-full text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-gray-700 transition-all backdrop-blur-sm"
+                    className="pl-12 pr-10 py-3 bg-white/80 dark:bg-gray-800/80 border-2 border-emerald-200/50 dark:border-emerald-800/50 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-400 focus:bg-white dark:focus:bg-gray-700 transition-all backdrop-blur-sm shadow-lg shadow-emerald-500/5 font-medium placeholder:text-gray-500"
                   />
-                  {searchQuery && (
+                  {searchQuery ? (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-all text-gray-400 hover:text-red-500"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-4 w-4" />
                     </Button>
+                  ) : (
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                      <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg">
+                        ⌘K
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
             {/* Right Actions */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               {/* Near Me Button */}
               <Button
                 onClick={handleNearMe}
                 variant="outline"
                 size="sm"
-                className="bg-white/80 dark:bg-gray-800/80 border-emerald-300 dark:border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-200"
+                className="group bg-white/90 dark:bg-gray-800/90 border-2 border-emerald-300 dark:border-emerald-600 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:border-emerald-500 dark:hover:border-emerald-400 transition-all duration-300 rounded-xl px-3 py-2 shadow-md hover:shadow-lg backdrop-blur-sm"
               >
-                <Navigation className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">내 주변</span>
+                <Navigation className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                <span className="hidden sm:inline font-semibold">내 주변</span>
               </Button>
               
               <ThemeToggle />
@@ -326,13 +335,13 @@ export default function MapPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-2 rounded-full transition-all ${
+                className={`group p-3 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg ${
                   showFilters 
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' 
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 shadow-emerald-500/20' 
+                    : 'bg-white/90 dark:bg-gray-800/90 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
-                <SlidersHorizontal className="w-5 h-5" />
+                <SlidersHorizontal className={`w-5 h-5 transition-transform ${showFilters ? 'rotate-180' : 'group-hover:scale-110'}`} />
               </Button>
 
               {/* User Profile */}
@@ -340,9 +349,9 @@ export default function MapPage() {
                 <Button
                   variant="ghost"
                   onClick={() => router.push('/profile')}
-                  className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="group flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg bg-white/90 dark:bg-gray-800/90"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-xs text-white font-bold shadow">
+                  <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-sm text-white font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
                     {user.email?.[0].toUpperCase()}
                   </div>
                 </Button>
@@ -350,7 +359,7 @@ export default function MapPage() {
                 <Button
                   onClick={() => router.push('/auth/login')}
                   size="sm"
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg hover:shadow-emerald-500/25 transition-all duration-300 rounded-xl px-4 py-2 font-semibold"
                 >
                   로그인
                 </Button>
@@ -360,45 +369,56 @@ export default function MapPage() {
               <Button
                 onClick={handleCreateRoom}
                 size="sm"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:scale-105 transition-transform"
+                className="group bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-purple-500/25 hover:scale-105 transition-all duration-300 rounded-xl px-4 py-2 font-bold"
               >
-                <Plus className="w-4 h-4 mr-1" />
-                방 만들기
+                <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                <span className="hidden sm:inline">방 만들기</span>
+                <span className="sm:hidden">생성</span>
               </Button>
             </div>
           </div>
 
           {/* Enhanced Filters Panel */}
           {showFilters && (
-            <Card className="mt-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-0 shadow-2xl">
-              <CardContent className="p-6">
-                <div className="grid md:grid-cols-4 gap-6">
+            <Card className="mt-6 bg-gradient-to-br from-white/98 to-emerald-50/50 dark:from-gray-900/98 dark:to-emerald-950/50 backdrop-blur-xl border-2 border-emerald-200/30 dark:border-emerald-800/30 shadow-2xl shadow-emerald-500/10 rounded-2xl animate-in slide-in-from-top-2 duration-300">
+              <CardContent className="p-8">
+                <div className="grid md:grid-cols-4 gap-8">
                   {/* Category Filter */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-                      <Filter className="w-4 h-4 mr-2" />
+                  <div className="space-y-4">
+                    <label className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center">
+                      <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mr-3">
+                        <Filter className="w-3 h-3 text-white" />
+                      </div>
                       카테고리
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       {[
-                        { key: 'all', label: '전체', emoji: '🌐', color: 'bg-gray-100 dark:bg-gray-700' },
-                        { key: 'drink', label: '술', emoji: '🍻', color: 'bg-amber-100 dark:bg-amber-900/30' },
-                        { key: 'exercise', label: '운동', emoji: '💪', color: 'bg-red-100 dark:bg-red-900/30' },
-                        { key: 'other', label: '기타', emoji: '✨', color: 'bg-purple-100 dark:bg-purple-900/30' },
+                        { key: 'all', label: '전체', emoji: '🌐', color: 'from-gray-400 to-gray-500' },
+                        { key: 'drink', label: '술', emoji: '🍻', color: 'from-amber-400 to-orange-500' },
+                        { key: 'exercise', label: '운동', emoji: '💪', color: 'from-red-400 to-pink-500' },
+                        { key: 'other', label: '기타', emoji: '✨', color: 'from-purple-400 to-indigo-500' },
                       ].map(category => (
                         <Button
                           key={category.key}
-                          variant={selectedCategory === category.key ? "default" : "ghost"}
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleCategoryChange(category.key)}
-                          className={`${
+                          className={`group p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
                             selectedCategory === category.key 
-                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg scale-105' 
-                              : `${category.color} hover:shadow-md dark:text-gray-200`
-                          } transition-all duration-200`}
+                              ? `bg-gradient-to-r ${category.color} text-white shadow-lg shadow-emerald-500/25` 
+                              : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-md'
+                          }`}
                         >
-                          <span className="mr-2">{category.emoji}</span>
-                          {category.label}
+                          <div className="text-center space-y-1">
+                            <div className={`text-lg ${selectedCategory === category.key ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
+                              {category.emoji}
+                            </div>
+                            <div className={`text-xs font-semibold ${
+                              selectedCategory === category.key ? 'text-white' : 'text-gray-700 dark:text-gray-300'
+                            }`}>
+                              {category.label}
+                            </div>
+                          </div>
                         </Button>
                       ))}
                     </div>
@@ -563,35 +583,36 @@ export default function MapPage() {
       </div>
 
       {/* Enhanced Bottom Navigation */}
-      <nav className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-t border-white/20 dark:border-gray-700/20">
-        <div className="flex justify-around py-3">
-          <Button variant="ghost" className="flex flex-col items-center py-2 space-y-1">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
-              <MapPin className="w-4 h-4 text-white" />
+      <nav className="bg-gradient-to-r from-white/95 via-emerald-50/30 to-white/95 dark:from-gray-900/95 dark:via-emerald-950/30 dark:to-gray-900/95 backdrop-blur-xl border-t-2 border-emerald-200/30 dark:border-emerald-800/30 shadow-2xl shadow-emerald-500/5">
+        <div className="flex justify-around py-4 px-6">
+          <Button variant="ghost" className="group flex flex-col items-center py-3 space-y-2 transition-all duration-300">
+            <div className="relative w-12 h-12 bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 rounded-full flex items-center justify-center shadow-xl shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
+              <MapPin className="w-5 h-5 text-white" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
             </div>
-            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">지도</span>
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">지도</span>
           </Button>
           
           <Button 
             variant="ghost"
             onClick={() => router.push('/requests')}
-            className="flex flex-col items-center py-2 space-y-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="group flex flex-col items-center py-3 space-y-2 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 rounded-2xl transition-all duration-300 hover:scale-105"
           >
-            <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-              <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-md group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:shadow-lg transition-all duration-300">
+              <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">요청함</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 font-medium transition-colors">요청함</span>
           </Button>
           
           <Button 
             variant="ghost"
             onClick={() => router.push('/profile')}
-            className="flex flex-col items-center py-2 space-y-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="group flex flex-col items-center py-3 space-y-2 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 rounded-2xl transition-all duration-300 hover:scale-105"
           >
-            <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-md group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 group-hover:shadow-lg transition-all duration-300">
+              <User className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">프로필</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 font-medium transition-colors">프로필</span>
           </Button>
         </div>
       </nav>

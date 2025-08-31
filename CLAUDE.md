@@ -46,33 +46,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Strict TypeScript configuration with enhanced type safety
    - Global type definitions in `src/types/global.d.ts`
 
+## Current Project Status (최신 상태)
+
+### ✅ Completed Fixes & Improvements
+- **인증 시스템**: 개발 모드에서 Mock 데이터 지원으로 Supabase 없이도 개발 가능
+- **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
+- **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
+- **TypeScript 컴파일**: 0개 타입 오류로 완전 안정화
+- **ESLint 검사**: 0개 경고로 코드 품질 최적화
+- **단위 테스트**: 49/49 테스트 모두 통과
+- **프로덕션 빌드**: 최적화된 번들 생성 성공
+- **개발 서버**: localhost:3000에서 안정적 실행 (포트 설정 가능)
+
+### 🔧 Development Mode Features
+- **Mock Authentication**: `admin@meetpin.com` / `123456`로 테스트 로그인
+- **Sample Data**: 서울 지역 기준 샘플 모임 데이터
+- **API Mocking**: 실제 Supabase 없이도 모든 API 동작
+- **Error Handling**: 개발 친화적 오류 메시지
+
 ## Development Commands
 
 ```bash
-# Development
-pnpm dev          # Start development server
+# Development Environment
+pnpm dev          # Start development server (localhost:3000, use --port 3001 for alt port)
 pnpm build        # Production build
-pnpm typecheck    # TypeScript type checking
-pnpm lint         # ESLint checking
-pnpm lint:fix     # Auto-fix linting issues
+pnpm start        # Start production server
+pnpm preview      # Build and preview production version
 
-# Testing
-pnpm test         # Run Jest unit tests (49 tests)
+# Code Quality & Type Safety
+pnpm typecheck    # TypeScript type checking (0 errors expected)
+pnpm lint         # ESLint checking (0 warnings expected) 
+pnpm lint:fix     # Auto-fix linting issues
+pnpm format       # Format code with Prettier
+pnpm format:check # Check code formatting
+
+# Testing Suite
+pnpm test         # Run Jest unit tests (49/49 passing)
 pnpm test:watch   # Run tests in watch mode
 pnpm e2e          # Run Playwright E2E tests
 pnpm e2e:ui       # Run E2E tests with UI
 pnpm playwright:install # Install Playwright browsers
 
-# Database
-pnpm db:migrate   # Reminder to run scripts/migrate.sql
-pnpm db:rls       # Reminder to run scripts/rls.sql  
-pnpm db:seed      # Reminder to run scripts/seed.sql
+# Database Operations (Manual)
+pnpm db:migrate   # Reminder to run scripts/migrate.sql in Supabase
+pnpm db:rls       # Reminder to run scripts/rls.sql in Supabase
+pnpm db:seed      # Reminder to run scripts/seed.sql in Supabase
 
-# Quality & Validation
-pnpm repo:doctor  # Run typecheck + lint + build (comprehensive check)
-pnpm format       # Format code with Prettier
-pnpm format:check # Check code formatting
-pnpm preview      # Build and preview production version
+# Quality Assurance
+pnpm repo:doctor  # Comprehensive check: typecheck + lint + build
+pnpm approve-builds # Approve package build requirements
+
+# Package Management
+pnpm store prune  # Clean package cache
+npx kill-port 3000 # Kill process on port 3000 if needed (or 3001 for alt port)
 ```
 
 ## Database Schema & Migration
@@ -195,6 +221,7 @@ Centralized in `src/lib/brand.ts`:
 - Use `rateLimit(key, limit, windowMs)` for protecting endpoints
 - Use `ApiError` class for structured error handling with status codes
 - Import paths use `@/` prefix resolving to `src/`
+- **CRITICAL**: All authentication functions check `isDevelopmentMode` for Mock support
 
 ### Page Structure
 - All application pages are in `src/app/` using Next.js 15 App Router
@@ -214,15 +241,20 @@ Centralized in `src/lib/brand.ts`:
 - RLS policies handle data access control automatically
 - User blocking relationships affect data visibility bidirectionally
 
-### Testing
-- Jest unit tests cover utilities and business logic (49 tests passing)
-- Tests located in `__tests__/` directory
-- Run single test: `pnpm test -- __tests__/lib/zodSchemas.test.ts`
-- Critical flows: signup → room creation → matching → chat
+### Testing Strategy
+- **Jest Unit Tests**: 49/49 tests passing, covering utilities and business logic
+- **Test Location**: `__tests__/` directory with comprehensive coverage
+- **Single Test Run**: `pnpm test -- __tests__/lib/zodSchemas.test.ts`
+- **Critical User Flows**: signup → room creation → matching → chat
+- **E2E Testing**: Playwright for end-to-end browser testing
+- **Development Testing**: Mock data enables full feature testing without external services
 
 ### Project Quality Standards
-- TypeScript strict mode enabled with enhanced type safety
-- All builds must pass: `pnpm repo:doctor` (typecheck + lint + build)
-- 49/49 tests must pass
-- Korean UI text and error messages throughout
-- Mobile-first responsive design
+- **TypeScript**: Strict mode with 0 compilation errors
+- **ESLint**: 0 warnings with comprehensive rules
+- **Code Coverage**: High coverage across utility functions
+- **Build Verification**: `pnpm repo:doctor` must pass completely
+- **Performance**: Optimized bundle size and runtime performance
+- **Internationalization**: Korean UI text and error messages throughout
+- **Design**: Mobile-first responsive design with accessibility considerations
+- **Security**: RLS policies, input validation, rate limiting, and user blocking systems

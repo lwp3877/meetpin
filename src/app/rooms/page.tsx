@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
-import { brandMessages, getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/brand'
 import toast from 'react-hot-toast'
 
 interface Room {

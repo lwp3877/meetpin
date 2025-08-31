@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { roomUpdateSchema } from '@/lib/zodSchemas'
+import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
 import {
   createMethodRouter,
   getAuthenticatedUser,
   parseAndValidateBody,
   parseUrlParams,
   createSuccessResponse,
-  ApiError
+  ApiError,
+  apiUtils
 } from '@/lib/api'
 
 // GET /api/rooms/[id] - 특정 방 상세 조회
@@ -15,9 +17,27 @@ async function getRoom(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
-  const supabase = await createServerSupabaseClient()
+  const user = await getAuthenticatedUser()
   const { id } = await parseUrlParams(context)
+  
+  // 개발 모드에서는 Mock 데이터 사용
+  if (isDevelopmentMode) {
+    const room = mockRooms.find(r => r.id === id)
+    if (!room) {
+      return apiUtils.error('방을 찾을 수 없습니다', 404)
+    }
+    
+    return apiUtils.success({
+      room: {
+        ...room,
+        host: room.profiles, // profiles를 host로 매핑
+        participants_count: Math.floor(Math.random() * room.max_people) + 1, // 랜덤 참가자 수
+        is_host: room.profiles.nickname === '관리자'
+      }
+    })
+  }
+  
+  const supabase = await createServerSupabaseClient()
   
   // 방 정보와 호스트 정보 함께 조회
   const { data: room, error } = await supabase
@@ -60,7 +80,7 @@ async function updateRoom(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id } = await parseUrlParams(context)
   
@@ -117,7 +137,7 @@ async function deleteRoom(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id } = await parseUrlParams(context)
   

@@ -2,8 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import EnhancedButton, { ButtonPresets } from '@/components/ui/EnhancedButton'
+import EnhancedButton from '@/components/ui/EnhancedButton'
 import { ModalAnimation, CardAnimation } from '@/components/ui/PageTransition'
 import Toast from '@/components/ui/Toast'
 import { useAuth } from '@/lib/useAuth'
@@ -32,7 +31,6 @@ interface ReferralModalProps {
 
 export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps) {
   const [referralData, setReferralData] = useState<ReferralData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [copiedText, setCopiedText] = useState('')
 
   // 임시 데이터 (실제로는 API에서 가져와야 함)
@@ -61,7 +59,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
       setCopiedText('code')
       Toast.success('추천 코드가 복사되었습니다!')
       setTimeout(() => setCopiedText(''), 2000)
-    } catch (err) {
+    } catch {
       Toast.error('복사에 실패했습니다')
     }
   }
@@ -74,7 +72,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
       setCopiedText('link')
       Toast.success('추천 링크가 복사되었습니다!')
       setTimeout(() => setCopiedText(''), 2000)
-    } catch (err) {
+    } catch {
       Toast.error('복사에 실패했습니다')
     }
   }
@@ -92,7 +90,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
       try {
         await navigator.share(shareData)
         Toast.success('공유되었습니다!')
-      } catch (err) {
+      } catch {
         // 사용자가 공유를 취소한 경우
       }
     } else {

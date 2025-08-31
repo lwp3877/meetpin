@@ -1,7 +1,7 @@
 /* src/app/room/[id]/edit/page.tsx */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
@@ -51,7 +51,7 @@ export default function EditRoomPage() {
   const roomId = params?.id as string
 
   // 방 정보 로드
-  const loadRoom = async () => {
+  const loadRoom = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -77,7 +77,7 @@ export default function EditRoomPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [roomId])
 
   // 방 수정 제출
   const handleSubmit = async (data: RoomFormData) => {
@@ -153,7 +153,7 @@ export default function EditRoomPage() {
     if (roomId) {
       loadRoom()
     }
-  }, [roomId])
+  }, [roomId, loadRoom])
 
   // 인증 체크
   if (authLoading || loading) {

@@ -14,7 +14,7 @@ import {
 
 // GET /api/requests - 내 요청 목록 또는 내 방의 요청 목록 조회
 async function getRequests(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { searchParams } = new URL(request.url)
   
@@ -85,7 +85,7 @@ async function getRequests(request: NextRequest) {
 
 // POST /api/requests - 참가 요청 생성
 async function createRequest(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   
   // Rate limiting (사용자별)

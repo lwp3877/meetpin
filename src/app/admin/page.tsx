@@ -53,100 +53,7 @@ export default function AdminPage() {
   const router = useRouter()
   const supabase = createBrowserSupabaseClient()
 
-  const checkAdminAccess = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      
-      // 개발 모드에서는 관리자 권한 우회 (데모 목적)
-      if (isDevelopmentMode) {
-        const mockUser = {
-          id: 'admin-dev',
-          nickname: '개발자 관리자',
-          role: 'admin',
-          email: 'admin@meetpin.dev'
-        }
-        setCurrentUser(mockUser)
-        await loadMockData()
-        return
-      }
-      
-      // 실제 Supabase 로그인 확인
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      if (authError || !user) {
-        router.push('/')
-        return
-      }
-
-      // 프로필 조회로 admin 권한 확인
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('uid', user.id)
-        .single()
-
-      if (profileError || !profile || (profile as any).role !== 'admin') {
-        setError('관리자 권한이 없습니다.')
-        return
-      }
-
-      setCurrentUser({ ...user, ...(profile as any) })
-      await loadAdminData()
-      
-    } catch (err: any) {
-      setError(err.message || '권한 확인 중 오류가 발생했습니다.')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [router, supabase])
-
-  const loadMockData = async () => {
-    // Mock 데이터 생성
-    const mockStats: AdminStats = {
-      totalUsers: 127,
-      totalRooms: 43,
-      totalMatches: 89,
-      totalReports: 5,
-      pendingReports: 2,
-      activeRooms: 18
-    }
-    
-    const mockUsers: User[] = [
-      {
-        uid: '1',
-        nickname: '김철수',
-        age_range: '20s_late',
-        role: 'user',
-        created_at: new Date().toISOString(),
-        email: 'user1@test.com'
-      },
-      {
-        uid: '2', 
-        nickname: '이영희',
-        age_range: '30s_early',
-        role: 'admin',
-        created_at: new Date().toISOString(),
-        email: 'admin@test.com'
-      }
-    ]
-    
-    const mockReports: Report[] = [
-      {
-        id: '1',
-        reason: '부적절한 언어 사용',
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        reporter_profile: { nickname: '김철수' },
-        target_profile: { nickname: '박민수' },
-        rooms: { title: '강남 맛집 투어' }
-      }
-    ]
-    
-    setStats(mockStats)
-    setUsers(mockUsers)
-    setReports(mockReports)
-  }
-
-  const loadAdminData = async () => {
+  const loadAdminData = useCallback(async () => {
     try {
       // 통계 데이터 로드
       const [usersRes, roomsRes, matchesRes, reportsRes] = await Promise.all([
@@ -204,7 +111,101 @@ export default function AdminPage() {
       console.error('Admin data load error:', err)
       setError('데이터 로드 중 오류가 발생했습니다.')
     }
+  }, [supabase])
+
+  const checkAdminAccess = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      
+      // 개발 모드에서는 관리자 권한 우회 (데모 목적)
+      if (isDevelopmentMode) {
+        const mockUser = {
+          id: 'admin-dev',
+          nickname: '개발자 관리자',
+          role: 'admin',
+          email: 'admin@meetpin.dev'
+        }
+        setCurrentUser(mockUser)
+        await loadMockData()
+        return
+      }
+      
+      // 실제 Supabase 로그인 확인
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        router.push('/')
+        return
+      }
+
+      // 프로필 조회로 admin 권한 확인
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('uid', user.id)
+        .single()
+
+      if (profileError || !profile || (profile as any).role !== 'admin') {
+        setError('관리자 권한이 없습니다.')
+        return
+      }
+
+      setCurrentUser({ ...user, ...(profile as any) })
+      await loadAdminData()
+      
+    } catch (err: any) {
+      setError(err.message || '권한 확인 중 오류가 발생했습니다.')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [router, supabase, loadAdminData])
+
+  const loadMockData = async () => {
+    // Mock 데이터 생성
+    const mockStats: AdminStats = {
+      totalUsers: 127,
+      totalRooms: 43,
+      totalMatches: 89,
+      totalReports: 5,
+      pendingReports: 2,
+      activeRooms: 18
+    }
+    
+    const mockUsers: User[] = [
+      {
+        uid: '1',
+        nickname: '김철수',
+        age_range: '20s_late',
+        role: 'user',
+        created_at: new Date().toISOString(),
+        email: 'user1@test.com'
+      },
+      {
+        uid: '2', 
+        nickname: '이영희',
+        age_range: '30s_early',
+        role: 'admin',
+        created_at: new Date().toISOString(),
+        email: 'admin@test.com'
+      }
+    ]
+    
+    const mockReports: Report[] = [
+      {
+        id: '1',
+        reason: '부적절한 언어 사용',
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        reporter_profile: { nickname: '김철수' },
+        target_profile: { nickname: '박민수' },
+        rooms: { title: '강남 맛집 투어' }
+      }
+    ]
+    
+    setStats(mockStats)
+    setUsers(mockUsers)
+    setReports(mockReports)
   }
+
 
   useEffect(() => {
     checkAdminAccess()

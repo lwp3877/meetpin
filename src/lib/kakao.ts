@@ -3,28 +3,6 @@
 // Kakao Maps API 관련 타입과 유틸리티
 
 // 기본 타입 정의
-interface KakaoLatLng {
-  getLat(): number
-  getLng(): number
-}
-
-interface KakaoMapOptions {
-  center: { lat: number; lng: number }
-  level: number
-}
-
-interface KakaoMap {
-  setCenter(latlng: KakaoLatLng): void
-  getCenter(): KakaoLatLng
-  setLevel(level: number): void
-  getLevel(): number
-  getBounds(): any
-  relayout(): void
-}
-
-interface KakaoMapEvent {
-  getLatLng(): KakaoLatLng
-}
 
 // Kakao Maps API 전역 변수 타입 정의
 declare global {
@@ -39,7 +17,6 @@ export function isKakaoMapsLoaded(): boolean {
 }
 
 // 전역 로딩 상태 관리
-let isLoading = false
 let loadPromise: Promise<void> | null = null
 
 /**
@@ -63,12 +40,10 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
   }
 
   // 로딩 시작
-  isLoading = true
   loadPromise = new Promise((resolve, reject) => {
     // 이미 kakao 객체가 있는 경우
     if (typeof kakao !== 'undefined' && kakao.maps) {
       kakao.maps.load(() => {
-        isLoading = false
         resolve()
       })
       return
@@ -82,17 +57,14 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     script.onload = () => {
       if (window.kakao && window.kakao.maps) {
         window.kakao.maps.load(() => {
-          isLoading = false
           resolve()
         })
       } else {
-        isLoading = false
         reject(new Error('Kakao Maps API 로드 실패'))
       }
     }
     
     script.onerror = () => {
-      isLoading = false
       reject(new Error('Kakao Maps API 스크립트 로드 실패'))
     }
     
@@ -210,7 +182,7 @@ export const DEFAULT_MAP_OPTIONS = {
   level: 3,
 }
 
-export default {
+const kakaoUtils = {
   isLoaded: isKakaoMapsLoaded,
   load: loadKakaoMaps,
   coordToAddress,
@@ -219,3 +191,5 @@ export default {
   SEOUL_CENTER,
   DEFAULT_MAP_OPTIONS,
 }
+
+export default kakaoUtils

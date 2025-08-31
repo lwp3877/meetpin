@@ -282,7 +282,7 @@ export const sanitizedTextSchema = z.string()
 export const requestSchema = createRequestSchema
 export const boostSchema = stripeCheckoutSchema
 
-export default {
+const schemas = {
   // 기본 스키마
   category: categorySchema,
   ageRange: ageRangeSchema,
@@ -316,3 +316,5 @@ export default {
   containsForbiddenWords,
   filterForbiddenWords,
 }
+
+export default schemas

@@ -1,7 +1,8 @@
 /* src/components/ChatPanel.tsx */
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -24,13 +25,6 @@ interface Message {
   }
 }
 
-// 매칭 정보 타입
-interface Match {
-  id: string
-  room_id: string
-  host_uid: string
-  guest_uid: string
-}
 
 // 메시지 폼 스키마
 const messageFormSchema = z.object({
@@ -53,7 +47,6 @@ export default function ChatPanel({
   onClose,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([])
-  const [match, setMatch] = useState<Match | null>(null)
   const [otherUser, setOtherUser] = useState<{ nickname: string; avatar_url?: string } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
@@ -76,7 +69,7 @@ export default function ChatPanel({
   const messageText = watch('text')
 
   // 메시지 로드
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -93,7 +86,6 @@ export default function ChatPanel({
       }
 
       setMessages(result.data.messages || [])
-      setMatch(result.data.match)
 
       // 상대방 정보 조회
       if (result.data.match) {
@@ -117,7 +109,7 @@ export default function ChatPanel({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [matchId, currentUserId, supabase])
 
   // 메시지 전송
   const sendMessage = async (data: MessageFormData) => {
@@ -201,7 +193,7 @@ export default function ChatPanel({
   // 컴포넌트 마운트 시 메시지 로드
   useEffect(() => {
     loadMessages()
-  }, [matchId])
+  }, [matchId, loadMessages])
 
   // 새 메시지가 추가되면 스크롤
   useEffect(() => {
@@ -278,10 +270,12 @@ export default function ChatPanel({
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex items-center">
           {otherUser?.avatar_url ? (
-            <img
+            <Image
               src={otherUser.avatar_url}
               alt={otherUser.nickname}
-              className="w-8 h-8 rounded-full mr-3"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full mr-3 object-cover"
             />
           ) : (
             <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 flex items-center justify-center">
@@ -324,10 +318,12 @@ export default function ChatPanel({
                   {!isMyMessage && (
                     <div className="flex items-center mb-1">
                       {message.sender?.avatar_url ? (
-                        <img
+                        <Image
                           src={message.sender.avatar_url}
                           alt={message.sender.nickname}
-                          className="w-5 h-5 rounded-full mr-2"
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 rounded-full mr-2 object-cover"
                         />
                       ) : (
                         <div className="w-5 h-5 rounded-full bg-gray-200 mr-2"></div>

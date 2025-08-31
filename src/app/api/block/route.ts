@@ -18,7 +18,7 @@ const blockActionSchema = z.object({
 
 // POST /api/block - 사용자 차단/해제
 async function handleBlockAction(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   
   // Rate limiting (사용자별 차단 액션 제한: 1분에 5개)
@@ -97,7 +97,7 @@ async function handleBlockAction(request: NextRequest) {
 
 // GET /api/block - 차단한 사용자 목록 조회
 async function getBlockedUsers(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { searchParams } = new URL(request.url)
   

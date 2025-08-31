@@ -86,13 +86,32 @@ export default function NewRoomPage() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* 안내 메시지 */}
         <CardAnimation delay={0} className="mb-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              어떤 모임을 만들까요?
-            </h2>
-            <p className="text-gray-600">
-              지도에서 핀을 찍고, 근처 사람들과 함께할 모임을 만들어보세요!
-            </p>
+          <div className="bg-gradient-to-br from-white to-emerald-50 dark:from-gray-900 dark:to-emerald-950 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-emerald-200/50 dark:border-emerald-800/50">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full mx-auto flex items-center justify-center shadow-lg">
+                <span className="text-3xl animate-bounce">🎯</span>
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                어떤 모임을 만들까요?
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md mx-auto leading-relaxed">
+                지도에서 핀을 찍고, 근처 사람들과 함께할 <span className="font-semibold text-emerald-600 dark:text-emerald-400">특별한 모임</span>을 만들어보세요!
+              </p>
+              <div className="flex justify-center items-center gap-6 text-sm text-gray-500 dark:text-gray-400 pt-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-emerald-500">✓</span>
+                  무료로 시작
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-blue-500">✓</span>
+                  간편한 관리
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-purple-500">✓</span>
+                  즉시 매칭
+                </div>
+              </div>
+            </div>
           </div>
         </CardAnimation>
 

@@ -1,8 +1,9 @@
 /* src/app/room/[id]/requests/page.tsx */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
 import { getCategoryDisplay } from '@/lib/brand'
@@ -48,7 +49,7 @@ export default function RoomRequestsPage() {
   const roomId = params?.id as string
 
   // 방 정보와 요청 목록 로드
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -84,7 +85,7 @@ export default function RoomRequestsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [roomId])
 
   // 요청 처리 (승인/거절)
   const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', reason?: string) => {
@@ -150,7 +151,7 @@ export default function RoomRequestsPage() {
     if (roomId) {
       loadData()
     }
-  }, [roomId])
+  }, [roomId, loadData])
 
   // 인증 체크
   if (authLoading || loading) {
@@ -203,7 +204,6 @@ export default function RoomRequestsPage() {
 
   const categoryDisplay = getCategoryDisplay(room.category)
   const pendingRequests = requests.filter(r => r.status === 'pending')
-  const processedRequests = requests.filter(r => r.status !== 'pending')
   const filteredRequests = activeTab === 'pending' ? pendingRequests : requests
   const remainingSlots = room.max_people - room.participants_count
 
@@ -317,10 +317,12 @@ export default function RoomRequestsPage() {
                     <div className="flex items-start flex-1">
                       <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mr-4 shadow-lg">
                         {request.user.avatar_url ? (
-                          <img
+                          <Image
                             src={request.user.avatar_url}
                             alt={request.user.nickname}
-                            className="w-full h-full rounded-full"
+                            width={48}
+                            height={48}
+                            className="w-full h-full rounded-full object-cover"
                           />
                         ) : (
                           <span className="text-white font-bold">

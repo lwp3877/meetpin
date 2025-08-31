@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#10B981" />
         <link rel="icon" href="/icons/meetpin.svg" type="image/svg+xml" />

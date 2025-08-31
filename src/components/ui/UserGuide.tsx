@@ -1,7 +1,7 @@
 /* src/components/ui/UserGuide.tsx */
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import EnhancedButton from '@/components/ui/EnhancedButton'
 import Toast from '@/components/ui/Toast'
 
@@ -27,7 +27,7 @@ export function Tooltip({
   const triggerRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
 
-  const updatePosition = () => {
+  const updatePosition = useCallback(() => {
     if (!triggerRef.current || !tooltipRef.current) return
 
     const triggerRect = triggerRef.current.getBoundingClientRect()
@@ -75,13 +75,13 @@ export function Tooltip({
       left: `${left}px`,
       zIndex: 1000
     })
-  }
+  }, [position])
 
   useEffect(() => {
     if (isVisible) {
       updatePosition()
     }
-  }, [isVisible, position])
+  }, [isVisible, updatePosition])
 
   const handleShow = () => {
     if (!disabled) {

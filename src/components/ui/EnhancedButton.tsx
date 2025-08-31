@@ -1,6 +1,5 @@
 /* src/components/ui/EnhancedButton.tsx */
 import React from 'react'
-import { brandColors } from '@/lib/brand'
 
 interface EnhancedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success' | 'warning'

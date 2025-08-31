@@ -240,7 +240,6 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
       }
       
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
         // Payment Intent에서 추가 처리가 필요한 경우
         return {
           type: event.type,
@@ -249,7 +248,6 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
       }
       
       case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
         return {
           type: event.type,
           success: false,
@@ -410,7 +408,7 @@ export async function createBoostCheckoutSession({
   }
 }
 
-export default {
+const stripeUtils = {
   stripe,
   products: boostProducts,
   createCheckoutSession,
@@ -425,3 +423,5 @@ export default {
   createRefund,
   getPaymentDetails,
 }
+
+export default stripeUtils

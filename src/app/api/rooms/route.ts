@@ -4,10 +4,10 @@ import { createMethodRouter, parseQueryParams, parsePaginationParams, withRateLi
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/zodSchemas'
 import { parseBBoxParam } from '@/lib/bbox'
+import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
 
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
-  const supabase = await createServerSupabaseClient()
   const searchParams = parseQueryParams(request)
   const { page, limit, offset } = parsePaginationParams(searchParams)
   
@@ -19,7 +19,56 @@ async function getRooms(request: NextRequest) {
     return apiUtils.validation('bbox 파라미터가 필요합니다 (형식: south,west,north,east)')
   }
   
-  // 카테고리 필터
+  // 개발 모드에서는 Mock 데이터 사용
+  if (isDevelopmentMode) {
+    // 카테고리 필터
+    const category = searchParams.get('category')
+    const validCategories = ['drink', 'exercise', 'other']
+    
+    // Mock 데이터 필터링
+    let filteredRooms = mockRooms.filter(room => {
+      // BBox 범위 내 체크
+      return room.lat >= bbox.south && 
+             room.lat <= bbox.north && 
+             room.lng >= bbox.west && 
+             room.lng <= bbox.east
+    })
+    
+    // 카테고리 필터 적용
+    if (category && validCategories.includes(category)) {
+      filteredRooms = filteredRooms.filter(room => room.category === category)
+    }
+    
+    // 정렬: boost_until이 있는 것 먼저, 그 다음 생성일
+    filteredRooms.sort((a, b) => {
+      if (a.boost_until && !b.boost_until) return -1
+      if (!a.boost_until && b.boost_until) return 1
+      if (a.boost_until && b.boost_until) {
+        return new Date(b.boost_until).getTime() - new Date(a.boost_until).getTime()
+      }
+      return new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+    })
+    
+    // 페이지네이션 적용
+    const total = filteredRooms.length
+    const paginatedRooms = filteredRooms.slice(offset, offset + limit)
+    
+    return apiUtils.success({
+      rooms: paginatedRooms,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: offset + limit < total,
+        hasPrev: page > 1,
+      },
+      bbox,
+    })
+  }
+  
+  // 프로덕션에서는 실제 DB 쿼리 수행
+  const supabase = await createServerSupabaseClient()
   const category = searchParams.get('category')
   const validCategories = ['drink', 'exercise', 'other']
   
@@ -97,6 +146,32 @@ async function getRooms(request: NextRequest) {
 // POST /api/rooms - 방 생성
 async function createRoom(request: NextRequest) {
   const user = await getAuthenticatedUser()
+  
+  // 개발 모드에서는 간단한 파싱만 하고 Mock 응답 반환
+  if (isDevelopmentMode) {
+    const rawBody = await request.text()
+    const roomData = JSON.parse(rawBody)
+    const newRoom = {
+      id: `mock-room-${Date.now()}`,
+      host_uid: user.id,
+      title: roomData.title,
+      description: roomData.description,
+      category: roomData.category,
+      lat: roomData.lat,
+      lng: roomData.lng,
+      place_text: roomData.place_text,
+      start_at: roomData.start_at,
+      max_people: roomData.max_people,
+      fee: roomData.fee,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      boost_until: null,
+    }
+    
+    return apiUtils.success({ room: newRoom })
+  }
+
+  // 프로덕션에서는 정상적인 스키마 검증 수행
   const roomData = await parseAndValidateBody(request, createRoomSchema)
   const supabase = await createServerSupabaseClient()
   

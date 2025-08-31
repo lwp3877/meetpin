@@ -15,7 +15,7 @@ import {
 import { isFeatureEnabled } from '@/lib/features'
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme } = useTheme()
 
   if (!isFeatureEnabled('ENABLE_DARK_MODE')) {
     return null

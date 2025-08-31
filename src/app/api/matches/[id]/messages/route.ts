@@ -30,7 +30,7 @@ async function getMessages(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id: matchId } = await parseUrlParams(context)
   const { searchParams } = new URL(request.url)
@@ -107,7 +107,7 @@ async function createMessage(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id: matchId } = await parseUrlParams(context)
   

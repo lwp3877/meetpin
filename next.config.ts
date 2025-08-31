@@ -1,11 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
+          // Disable service workers
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
           {
             key: 'Content-Security-Policy',
             value: [
@@ -21,6 +27,19 @@ const nextConfig: NextConfig = {
               "form-action 'self'",
               "frame-ancestors 'none'",
             ].join('; '),
+          },
+          // Prevent caching issues
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
           },
         ],
       },

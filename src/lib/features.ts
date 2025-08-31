@@ -67,16 +67,10 @@ export const isFeatureEnabled = (feature: keyof FeatureFlags): boolean => {
   return getFeatures()[feature]
 }
 
-// Development helpers
+// Development helpers (disabled to prevent console spam)
 export const logFeatureFlags = () => {
-  if (process.env.NODE_ENV === 'development') {
-    console.group('🚀 Feature Flags')
-    const features = getFeatures()
-    Object.entries(features).forEach(([key, value]) => {
-      console.log(`${key}: ${value ? '✅' : '❌'}`)
-    })
-    console.groupEnd()
-  }
+  // Disabled in all environments to prevent console noise
+  return
 }
 
 // A/B testing helper
@@ -93,12 +87,10 @@ export const getVariant = (testName: string, variants: string[]): string => {
   return variants[0] // default to first variant on server
 }
 
-// Growth tracking
-export const trackFeatureUsage = (feature: keyof FeatureFlags, action: string) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`📊 Feature Usage: ${feature} - ${action}`)
-  }
-  
+// Growth tracking (disabled to prevent console spam)
+export const trackFeatureUsage = () => {
+  // Disabled in all environments to prevent console noise
+  return
   // In production, this would send to analytics
   // Example: analytics.track('feature_usage', { feature, action })
 }

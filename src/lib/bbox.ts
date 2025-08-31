@@ -201,7 +201,7 @@ export function calculateDistance(point1: Point, point2: Point): number {
 export const parseBBox = parseBBoxParam
 export const createBBoxFromBounds = createBBoxAroundPoint
 
-export default {
+const bboxUtils = {
   parse: parseBBoxParam,
   toParam: bboxToParam,
   inBBox,
@@ -217,3 +217,5 @@ export default {
     SEOUL: SEOUL_BBOX,
   },
 }
+
+export default bboxUtils

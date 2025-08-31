@@ -1,6 +1,7 @@
 /* src/components/RequestCard.tsx */
 'use client'
 
+import Image from 'next/image'
 import { brandColors, getCategoryDisplay } from '@/lib/brand'
 import { Button } from '@/components/ui/button'
 
@@ -45,7 +46,6 @@ interface RequestCardProps {
 
 export default function RequestCard({
   request,
-  currentUserId,
   viewType,
   onAccept,
   onReject,
@@ -199,10 +199,12 @@ export default function RequestCard({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             {otherUser.avatar_url ? (
-              <img
+              <Image
                 src={otherUser.avatar_url}
                 alt={otherUser.nickname}
-                className="w-10 h-10 rounded-full mr-3"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full mr-3 object-cover"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-gray-200 mr-3 flex items-center justify-center">

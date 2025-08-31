@@ -163,7 +163,7 @@ export const tailwindColors = {
   },
 }
 
-export default {
+const brandConfig = {
   colors: brandColors,
   messages: brandMessages,
   categories: {
@@ -178,3 +178,5 @@ export default {
     getAgeRangeDisplay,
   },
 }
+
+export default brandConfig

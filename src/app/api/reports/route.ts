@@ -22,7 +22,7 @@ const createReportSchema = z.object({
 
 // POST /api/reports - 신고 생성
 async function createReport(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   
   // Rate limiting (사용자별 신고 생성 제한: 10분에 3개)
@@ -123,7 +123,7 @@ async function createReport(request: NextRequest) {
 
 // GET /api/reports - 신고 목록 조회 (관리자 전용)
 async function getReports(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   
   // 관리자 권한 확인
   if (user.role !== 'admin') {

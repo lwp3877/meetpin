@@ -3,10 +3,9 @@
 
 'use client'
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
-import { User } from '@supabase/supabase-js'
+import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
-import { mockLogin, mockSignUp, mockUser, isDevelopmentMode } from '@/lib/mockData'
+import { mockLogin, mockSignUp, isDevelopmentMode } from '@/lib/mockData'
 
 // 확장된 사용자 타입
 export interface AppUser {
@@ -40,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   // 현재 사용자 정보 가져오기
-  const getCurrentUser = async (): Promise<AppUser | null> => {
+  const getCurrentUser = useCallback(async (): Promise<AppUser | null> => {
     if (isDevelopmentMode) {
       const stored = localStorage.getItem('meetpin_user')
       return stored ? JSON.parse(stored) : null
@@ -74,10 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Failed to get current user:', error)
       return null
     }
-  }
+  }, [])
 
   // 사용자 정보 새로고침
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     setLoading(true)
     try {
       const currentUser = await getCurrentUser()
@@ -85,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [getCurrentUser])
 
   // 이메일 로그인
   const signIn = async (email: string, password: string) => {
@@ -102,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const supabase = createBrowserSupabaseClient()
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -122,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string, nickname: string, ageRange: string) => {
     if (isDevelopmentMode) {
       try {
-        const result = await mockSignUp(email, password, nickname, ageRange)
+        await mockSignUp(email, password, nickname, ageRange)
         return { success: true }
       } catch (error: any) {
         return { success: false, error: error.message }
@@ -131,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const supabase = createBrowserSupabaseClient()
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -233,7 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return () => subscription.unsubscribe()
     }
-  }, [])
+  }, [refreshUser])
 
   const contextValue: AuthContextType = {
     user,
@@ -355,7 +354,7 @@ export function useRequireAdmin() {
   return { user, loading }
 }
 
-export default {
+const authHooks = {
   AuthProvider,
   useAuth,
   withAuth,
@@ -363,3 +362,5 @@ export default {
   useRequireAuth,
   useRequireAdmin,
 }
+
+export default authHooks

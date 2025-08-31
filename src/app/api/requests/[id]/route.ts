@@ -22,7 +22,7 @@ async function updateRequest(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id } = await parseUrlParams(context)
   
@@ -154,7 +154,7 @@ async function deleteRequest(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const { id } = await parseUrlParams(context)
   

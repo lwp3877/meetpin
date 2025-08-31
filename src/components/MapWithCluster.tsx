@@ -3,7 +3,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { brandColors, getCategoryDisplay } from '@/lib/brand'
-import { parseBBox, createBBoxFromBounds, calculateDistance } from '@/lib/bbox'
 import { loadKakaoMaps } from '@/lib/kakao'
 
 // Kakao Maps 타입 정의
@@ -78,18 +77,29 @@ export default function MapWithCluster({
     const mapOption = {
       center: new kakao.maps.LatLng(center.lat, center.lng),
       level: level,
+      draggable: true, // 드래그 가능
+      scrollwheel: true, // 휠 줌 가능
+      disableDoubleClick: false, // 더블클릭 줌 가능
+      keyboardShortcuts: true, // 키보드 단축키 활성화
     }
 
     // 지도 생성
     const map = new kakao.maps.Map(mapContainerRef.current, mapOption)
     mapRef.current = map
 
+    // 지도 컨트롤 추가
+    const mapTypeControl = new kakao.maps.MapTypeControl()
+    map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT)
+
+    const zoomControl = new kakao.maps.ZoomControl()
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT)
+
     // 클러스터러 생성
     const clusterer = new kakao.maps.MarkerClusterer({
       map: map,
       averageCenter: true,
       minLevel: 2,
-      disableClickZoom: true,
+      disableClickZoom: false, // 클러스터 클릭 줌 활성화
       styles: [{
         width: '40px',
         height: '40px',
@@ -99,6 +109,7 @@ export default function MapWithCluster({
         textAlign: 'center',
         fontWeight: 'bold',
         lineHeight: '40px',
+        fontSize: '12px'
       }]
     })
     clustererRef.current = clusterer
@@ -109,32 +120,39 @@ export default function MapWithCluster({
     })
     infoWindowRef.current = infoWindow
 
-    // 지도 경계 변경 이벤트
+    // 지도 경계 변경 이벤트 (디바운싱 추가)
     if (onBoundsChanged) {
-      kakao.maps.event.addListener(map, 'bounds_changed', () => {
-        const bounds = map.getBounds()
-        const southwest = bounds.getSouthWest()
-        const northeast = bounds.getNorthEast()
-        
-        const bbox = {
-          south: southwest.getLat(),
-          west: southwest.getLng(),
-          north: northeast.getLat(),
-          east: northeast.getLng(),
-        }
-        
-        // bbox 유효성 검사: south < north && west < east
-        // 그리고 최소 크기를 가져야 함 (0.001도 = 약 100m)
-        const minSize = 0.001
-        if (bbox.south < bbox.north && 
-            bbox.west < bbox.east &&
-            (bbox.north - bbox.south) > minSize &&
-            (bbox.east - bbox.west) > minSize) {
-          onBoundsChanged(bbox)
-        } else {
-          console.warn('Invalid or too small bbox detected, skipping:', bbox)
-        }
-      })
+      let boundsChangeTimeout: NodeJS.Timeout
+      
+      const handleBoundsChange = () => {
+        clearTimeout(boundsChangeTimeout)
+        boundsChangeTimeout = setTimeout(() => {
+          const bounds = map.getBounds()
+          const southwest = bounds.getSouthWest()
+          const northeast = bounds.getNorthEast()
+          
+          const bbox = {
+            south: southwest.getLat(),
+            west: southwest.getLng(),
+            north: northeast.getLat(),
+            east: northeast.getLng(),
+          }
+          
+          // bbox 유효성 검사: south < north && west < east
+          // 그리고 최소 크기를 가져야 함 (0.001도 = 약 100m)
+          const minSize = 0.001
+          if (bbox.south < bbox.north && 
+              bbox.west < bbox.east &&
+              (bbox.north - bbox.south) > minSize &&
+              (bbox.east - bbox.west) > minSize) {
+            onBoundsChanged(bbox)
+          }
+        }, 300) // 300ms 디바운싱
+      }
+
+      // 드래그가 끝났을 때만 이벤트 발생
+      kakao.maps.event.addListener(map, 'dragend', handleBoundsChange)
+      kakao.maps.event.addListener(map, 'zoom_changed', handleBoundsChange)
     }
 
     return () => {
@@ -145,7 +163,28 @@ export default function MapWithCluster({
         infoWindowRef.current.close()
       }
     }
-  }, [isKakaoLoaded])
+  }, [isKakaoLoaded]) // center, level, onBoundsChanged 제거하여 불필요한 재초기화 방지
+
+  // center나 level이 변경되었을 때만 지도 이동
+  useEffect(() => {
+    if (!mapRef.current || !window.kakao) return
+    
+    const { kakao } = window
+    const currentCenter = mapRef.current.getCenter()
+    const currentLevel = mapRef.current.getLevel()
+    
+    // center가 변경되었을 때만 이동
+    if (Math.abs(currentCenter.getLat() - center.lat) > 0.001 || 
+        Math.abs(currentCenter.getLng() - center.lng) > 0.001) {
+      const newCenter = new kakao.maps.LatLng(center.lat, center.lng)
+      mapRef.current.panTo(newCenter)
+    }
+    
+    // level이 변경되었을 때만 줌 조정
+    if (currentLevel !== level) {
+      mapRef.current.setLevel(level)
+    }
+  }, [center.lat, center.lng, level])
 
   // 마커 생성 및 업데이트
   const updateMarkers = useCallback(() => {
@@ -163,8 +202,8 @@ export default function MapWithCluster({
       const isSelected = selectedRoomId === room.id
       const isBoosted = room.boost_until && new Date(room.boost_until) > new Date()
 
-      // 마커 이미지 생성
-      const markerImageSrc = `data:image/svg+xml;base64,${btoa(`
+      // 마커 이미지 생성 (btoa 대신 encodeURIComponent 사용)
+      const svgContent = `
         <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 0C7.164 0 0 7.164 0 16C0 24.836 16 40 16 40S32 24.836 32 16C32 7.164 24.836 0 16 0Z" 
                 fill="${isSelected ? brandColors.accent : isBoosted ? brandColors.boost : categoryDisplay.color}"/>
@@ -173,7 +212,8 @@ export default function MapWithCluster({
             ${categoryDisplay.emoji}
           </text>
         </svg>
-      `)}`
+      `
+      const markerImageSrc = `data:image/svg+xml,${encodeURIComponent(svgContent)}`
       
       const markerImage = new kakao.maps.MarkerImage(
         markerImageSrc,

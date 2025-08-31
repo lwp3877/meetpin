@@ -18,7 +18,6 @@ export default function PageTransition({
   type = 'fade'
 }: PageTransitionProps) {
   const [isVisible, setIsVisible] = useState(true) // 초기값을 true로 변경
-  const [isEntering, setIsEntering] = useState(true)
   const [isMounted, setIsMounted] = useState(false) // 마운트 상태 추가
   const pathname = usePathname()
 
@@ -31,11 +30,9 @@ export default function PageTransition({
     if (!isMounted) return // 마운트되지 않았으면 애니메이션 건너뛰기
     
     setIsVisible(false)
-    setIsEntering(true)
     
     const timer = setTimeout(() => {
       setIsVisible(true)
-      setIsEntering(false)
     }, 50)
 
     return () => clearTimeout(timer)

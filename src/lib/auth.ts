@@ -1,13 +1,19 @@
 /* src/lib/auth.ts */
-import { NextRequest } from 'next/server'
+// import { NextRequest } from 'next/server'
 import { User } from '@supabase/supabase-js'
 import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabaseClient'
 import { ApiError } from '@/lib/api'
+import { isDevelopmentMode, mockUser } from '@/lib/mockData'
 
 /**
  * 인증된 사용자 정보 가져오기
  */
-export async function getAuthenticatedUser(request?: NextRequest): Promise<User> {
+export async function getAuthenticatedUser(): Promise<User> {
+  // 개발 모드에서는 Mock 사용자 반환
+  if (isDevelopmentMode) {
+    return mockUser as unknown as User
+  }
+
   const supabase = await createServerSupabaseClient()
   
   const { data: { user }, error } = await supabase.auth.getUser()
@@ -309,7 +315,7 @@ export async function getUserStats() {
   return data
 }
 
-export default {
+const authUtils = {
   getAuthenticatedUser,
   requireAuth,
   requireAdmin,
@@ -327,3 +333,5 @@ export default {
   checkEmailVerification,
   getUserStats,
 }
+
+export default authUtils

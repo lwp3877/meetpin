@@ -195,7 +195,7 @@ export function createRateLimiter(
   type: RateLimitType,
   getIdentifier: (req: any) => string = (req) => req.ip || 'unknown'
 ) {
-  return (req: any, res: any, next?: Function) => {
+  return (req: any, res: any, next?: (...args: any[]) => void) => {
     const identifier = getIdentifier(req)
     const allowed = checkTypedRateLimit(identifier, type)
     
@@ -218,7 +218,7 @@ export function createRateLimiter(
   }
 }
 
-export default {
+const rateLimitUtils = {
   check: checkRateLimit,
   checkTyped: checkTypedRateLimit,
   checkIP: checkIPRateLimit,
@@ -231,3 +231,5 @@ export default {
   createLimiter: createRateLimiter,
   limits: defaultLimits,
 }
+
+export default rateLimitUtils

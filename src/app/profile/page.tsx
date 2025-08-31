@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 // import EnhancedButton, { ButtonPresets } from '@/components/ui/EnhancedButton'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
 import PageTransition from '@/components/ui/PageTransition'
@@ -13,10 +14,12 @@ import { ReferralModal } from '@/components/ui/ReferralSystem'
 import { useAuth } from '@/lib/useAuth'
 
 export default function ProfilePage() {
-  const { user, loading, updateProfile, signOut } = useAuth()
+  const { user, loading, updateProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showReferralModal, setShowReferralModal] = useState(false)
+  const [, setProfileImage] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     nickname: '',
     age_range: '',
@@ -44,6 +47,32 @@ export default function ProfilePage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 파일 크기 체크 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      Toast.error('파일 크기는 5MB 이하여야 합니다')
+      return
+    }
+
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      Toast.error('이미지 파일만 업로드할 수 있습니다')
+      return
+    }
+
+    setProfileImage(file)
+    
+    // 미리보기 URL 생성
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleSaveProfile = async () => {
@@ -85,13 +114,6 @@ export default function ProfilePage() {
     }
   }
 
-  const handleSignOut = async () => {
-    if (window.confirm('정말 로그아웃하시겠습니까?')) {
-      await signOut()
-      Toast.success('로그아웃되었습니다')
-      router.push('/')
-    }
-  }
 
   const ageRanges = [
     { value: '20s_early', label: '20대 초반' },
@@ -141,12 +163,36 @@ export default function ProfilePage() {
             {/* Avatar with gradient ring */}
             <div className="relative mx-auto w-28 h-28 mb-6">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500 rounded-full p-1">
-                <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-4xl text-white font-bold">
-                    {user.nickname ? user.nickname.charAt(0).toUpperCase() : '?'}
-                  </span>
+                <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center overflow-hidden">
+                  {previewUrl || user.avatar_url ? (
+                    <Image 
+                      src={previewUrl || user.avatar_url || ''} 
+                      alt="프로필 사진" 
+                      width={112}
+                      height={112}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span className="text-4xl text-white font-bold">
+                      {user.nickname ? user.nickname.charAt(0).toUpperCase() : '?'}
+                    </span>
+                  )}
                 </div>
               </div>
+              
+              {/* Camera button for editing */}
+              {isEditing && (
+                <label className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full border-2 border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-md">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <span className="text-lg">📷</span>
+                </label>
+              )}
+              
               {/* Status indicator */}
               <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                 <span className="text-xs">✓</span>

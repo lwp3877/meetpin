@@ -53,14 +53,14 @@ export function OnboardingModal() {
     const hasSeenOnboarding = localStorage.getItem('meetpin-onboarding-completed')
     if (!hasSeenOnboarding) {
       setIsOpen(true)
-      trackFeatureUsage('ENABLE_ONBOARDING_MODAL', 'opened')
+      trackFeatureUsage()
     }
   }, [])
 
   const handleNext = () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
-      trackFeatureUsage('ENABLE_ONBOARDING_MODAL', `step_${currentStep + 2}`)
+      trackFeatureUsage()
     } else {
       handleComplete()
     }
@@ -75,14 +75,14 @@ export function OnboardingModal() {
   const handleComplete = () => {
     localStorage.setItem('meetpin-onboarding-completed', 'true')
     setIsOpen(false)
-    trackFeatureUsage('ENABLE_ONBOARDING_MODAL', 'completed')
+    trackFeatureUsage()
     router.push('/map')
   }
 
   const handleSkip = () => {
     localStorage.setItem('meetpin-onboarding-completed', 'true')
     setIsOpen(false)
-    trackFeatureUsage('ENABLE_ONBOARDING_MODAL', 'skipped')
+    trackFeatureUsage()
   }
 
   if (!isFeatureEnabled('ENABLE_ONBOARDING_MODAL')) {

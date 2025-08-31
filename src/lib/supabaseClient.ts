@@ -306,7 +306,7 @@ export async function createServerSupabaseClient() {
 
 // 서버 환경변수 검증 (관리자용)
 function validateServerEnvVars() {
-  const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
+  const { supabaseUrl: url } = validateEnvVars()
   
   if (!supabaseServiceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations')
@@ -330,7 +330,7 @@ export function getSupabaseAdmin() {
             persistSession: false,
           },
         })
-      } catch (error) {
+      } catch {
         console.warn('Failed to create admin client, falling back to browser client')
         return createBrowserSupabaseClient()
       }
@@ -417,7 +417,7 @@ export function handleSupabaseError(error: any): never {
   throw error
 }
 
-export default {
+const supabaseConfig = {
   createBrowserClient: createBrowserSupabaseClient,
   createServerClient: createServerSupabaseClient,
   admin: supabaseAdmin,
@@ -427,3 +427,5 @@ export default {
     handleSupabaseError,
   },
 }
+
+export default supabaseConfig

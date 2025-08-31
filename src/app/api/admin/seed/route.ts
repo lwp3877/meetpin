@@ -1,5 +1,4 @@
 /* src/app/api/admin/seed/route.ts */
-import { NextRequest } from 'next/server'
 import { createMethodRouter, apiUtils, requireAdmin } from '@/lib/api'
 import { supabaseAdmin } from '@/lib/supabaseClient'
 

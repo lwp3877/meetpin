@@ -7,7 +7,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createServerSupabaseClient()
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   const { id: roomId } = await parseUrlParams(context)
 
   // 방 존재 및 호스트 확인

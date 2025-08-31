@@ -12,7 +12,7 @@ import {
 
 // POST /api/payments/stripe/checkout - Stripe Checkout 세션 생성
 async function createCheckoutSession(request: NextRequest) {
-  const user = await getAuthenticatedUser(request)
+  const user = await getAuthenticatedUser()
   
   // 요청 본문 검증
   const { room_id, days } = await parseAndValidateBody(request, boostSchema)
