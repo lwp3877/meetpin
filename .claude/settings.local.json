@@ -35,7 +35,9 @@
       "Bash(pnpm playwright install:*)",
       "Bash(if exist .next rmdir /s /q .next)",
       "Bash(if exist node_modules\\.cache rmdir /s /q node_modules\\.cache)",
-      "Bash(set PORT=3000)"
+      "Bash(set PORT=3000)",
+      "Bash(git rev-parse:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
