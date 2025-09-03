@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/zodSchemas'
 import { parseBBoxParam } from '@/lib/bbox'
 import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
+// 강제 업데이트: 2025-09-03 15:30
 
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
