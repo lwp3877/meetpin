@@ -60,7 +60,10 @@
       "WebFetch(domain:127.0.0.1)",
       "WebFetch(domain:xnrqfkecpabucnoxxtwa.supabase.co)",
       "Bash(pnpm start:*)",
-      "WebFetch(domain:meetpin-weld.vercel.app)"
+      "WebFetch(domain:meetpin-weld.vercel.app)",
+      "mcp__github__list_commits",
+      "WebFetch(domain:vercel.com)",
+      "Bash(git remote get-url origin)"
     ],
     "deny": [],
     "ask": []
