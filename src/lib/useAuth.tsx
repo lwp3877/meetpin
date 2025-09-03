@@ -6,9 +6,11 @@
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import { mockLogin, mockSignUp } from '@/lib/mockData'
+import { BUILD_VERSION } from '@/lib/buildBuster'
 
 // Mock 모드 강제 활성화 (임시)
 const isDevelopmentMode = true
+console.log('🔥 useAuth 로딩됨 - 빌드:', BUILD_VERSION)
 
 // 확장된 사용자 타입
 export interface AppUser {
