@@ -100,65 +100,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [getCurrentUser])
 
-  // 이메일 로그인
+  // 이메일 로그인 - Mock 모드만 사용
   const signIn = async (email: string, password: string) => {
-    if (isDevelopmentMode) {
-      try {
-        const result = await mockLogin(email, password)
-        localStorage.setItem('meetpin_user', JSON.stringify(result.user))
-        setUser(result.user as AppUser)
-        return { success: true }
-      } catch (error: any) {
-        return { success: false, error: error.message }
-      }
-    }
-
+    // SUPABASE 완전 제거 - Mock만 사용
     try {
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
-      await refreshUser()
+      const result = await mockLogin(email, password)
+      localStorage.setItem('meetpin_user', JSON.stringify(result.user))
+      setUser(result.user as AppUser)
       return { success: true }
     } catch (error: any) {
       return { success: false, error: error.message }
     }
   }
 
-  // 이메일 회원가입
+  // 이메일 회원가입 - Mock 모드만 사용
   const signUp = async (email: string, password: string, nickname: string, ageRange: string) => {
-    if (isDevelopmentMode) {
-      try {
-        await mockSignUp(email, password, nickname, ageRange)
-        return { success: true }
-      } catch (error: any) {
-        return { success: false, error: error.message }
-      }
-    }
-
+    // SUPABASE 완전 제거 - Mock만 사용
     try {
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nickname,
-            age_range: ageRange,
-          }
-        }
-      })
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
+      await mockSignUp(email, password, nickname, ageRange)
       return { success: true }
     } catch (error: any) {
       return { success: false, error: error.message }
