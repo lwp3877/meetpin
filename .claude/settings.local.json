@@ -63,7 +63,11 @@
       "WebFetch(domain:meetpin-weld.vercel.app)",
       "mcp__github__list_commits",
       "WebFetch(domain:vercel.com)",
-      "Bash(git remote get-url origin)"
+      "Bash(git remote get-url origin)",
+      "mcp__github__get_file_contents",
+      "Bash(git reset:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(git show:*)"
     ],
     "deny": [],
     "ask": []
