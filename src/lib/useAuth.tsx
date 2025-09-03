@@ -5,7 +5,10 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
-import { mockLogin, mockSignUp, isDevelopmentMode } from '@/lib/mockData'
+import { mockLogin, mockSignUp } from '@/lib/mockData'
+
+// Mock 모드 강제 활성화 (임시)
+const isDevelopmentMode = true
 
 // 확장된 사용자 타입
 export interface AppUser {
