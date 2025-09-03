@@ -291,3 +291,48 @@ Centralized in `src/lib/brand.ts`:
 - **Internationalization**: Korean-first UI with proper text handling
 - **Mobile-first**: Responsive design with touch-optimized interactions
 - **Security**: Multi-layer protection (RLS, validation, rate limiting, blocking)
+
+## Production Deployment
+
+### Current Deployment Status
+- **Platform**: Vercel (meetpin-weld.vercel.app)
+- **Git Integration**: Automatic deployment from GitHub main branch
+- **Build Status**: Latest version 1.0.2-force-update with comprehensive cache invalidation
+- **Environment**: Production environment variables configured in Vercel dashboard
+
+### Deployment Architecture
+- **Frontend**: Next.js deployed to Vercel with automatic optimization
+- **Database**: Supabase PostgreSQL with RLS policies active
+- **CDN**: Vercel Edge Network for static assets
+- **Domain**: Custom domain available through Vercel configuration
+
+### Build Cache Management
+Critical for production deployments due to aggressive CDN caching:
+- **Build Buster System**: `src/lib/buildBuster.ts` contains version identifiers for cache invalidation
+- **Version Bumping**: Update `package.json` version to trigger new builds
+- **Force Update Pattern**: Create dummy files (like `FORCE_UPDATE.txt`) to ensure all files are refreshed
+- **Cache Headers**: Vercel automatically handles cache invalidation for new deployments
+
+### Production Environment Variables
+All environment variables must be configured in Vercel dashboard:
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- Kakao Maps: `NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY`
+- Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+- App: `SITE_URL` (set to production domain)
+
+### Development vs Production Modes
+- **Development Mode**: Uses Mock authentication and sample data
+- **Production Mode**: Full Supabase integration with real authentication
+- **Feature Flags**: `src/lib/flags.ts` controls environment-specific features
+- **Build Detection**: `isDevelopmentMode` flag determines runtime behavior
+
+### Troubleshooting Production Issues
+Common production deployment issues and solutions:
+1. **Cache Issues**: Old JavaScript bundles served despite code changes
+   - Solution: Update `buildBuster.ts` and bump `package.json` version
+2. **Authentication Errors**: Supabase connection issues in production
+   - Solution: Verify environment variables and consider Mock mode fallback
+3. **Build Failures**: TypeScript or linting errors preventing deployment
+   - Solution: Run `pnpm repo:doctor` locally before pushing
+4. **Git Synchronization**: Local changes not reflecting in deployment
+   - Solution: Ensure all changes are committed and pushed to GitHub main branch
