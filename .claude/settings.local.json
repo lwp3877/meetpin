@@ -67,7 +67,8 @@
       "mcp__github__get_file_contents",
       "Bash(git reset:*)",
       "WebFetch(domain:api.github.com)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(pnpm audit:*)"
     ],
     "deny": [],
     "ask": []
