@@ -66,6 +66,11 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
 # App
 SITE_URL=http://localhost:3000
+
+# 개발/Mock 모드 설정 (중요!)
+# Mock 모드: Supabase 없이 로컬 데이터만 사용 (개발 시 편리)
+# 프로덕션: 실제 Supabase 연동 (배포 시 필수)
+NEXT_PUBLIC_FORCE_MOCK=true  # 개발 시: true, 배포 시: false
 ```
 
 ### 3. 데이터베이스 설정
@@ -187,12 +192,43 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 6. **지도 로딩**: 카카오맵 JavaScript 키 확인
 7. **데이터베이스**: Supabase 연결 및 RLS 정책 확인
 
+### 🔧 개발 모드 vs 프로덕션 모드 전환
+
+#### 개발 모드 (Mock 모드)
+- **설정**: `.env.local`에 `NEXT_PUBLIC_FORCE_MOCK=true` 추가
+- **특징**: Supabase 없이도 로컬에서 완전한 테스트 가능
+- **테스트 계정**: `admin@meetpin.com` / `123456`
+- **샘플 데이터**: 서울 중심 가짜 모임 데이터 자동 로딩
+
+#### 프로덕션 모드
+- **설정**: `.env.local`에 `NEXT_PUBLIC_FORCE_MOCK=false` (또는 삭제)
+- **특징**: 실제 Supabase, Stripe, 카카오맵 연동
+- **필수 환경 변수**: 모든 API 키가 실제 값이어야 함
+- **데이터베이스 설정**: scripts/ 폴더의 SQL 파일들을 Supabase에서 실행 필요
+
+#### 빠른 전환 방법
+
+**Mock → 프로덕션 전환:**
+```bash
+# .env.local 파일에서
+NEXT_PUBLIC_FORCE_MOCK=false  # true → false로 변경
+pnpm dev  # 서버 재시작
+```
+
+**프로덕션 → Mock 전환:**
+```bash
+# .env.local 파일에서  
+NEXT_PUBLIC_FORCE_MOCK=true   # false → true로 변경
+pnpm dev  # 서버 재시작
+```
+
 ### 개발 모드 특징
 
 - 🔧 **Mock 인증**: 실제 Supabase 없이도 개발 가능
 - 📱 **테스트 계정**: `admin@meetpin.com` / `123456`
 - 🗺️ **지도 테스트**: 서울 중심으로 샘플 데이터 표시
 - ⚡ **빠른 시작**: 최소한의 설정으로 바로 개발 시작
+- 🔒 **보안**: localStorage 기반 인증 (개발 전용)
 
 ### 도움이 필요하시면
 

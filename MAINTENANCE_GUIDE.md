@@ -308,6 +308,10 @@ cat eslint.config.mjs
 #### 개발 환경 (.env.local)
 ```env
 NODE_ENV=development
+# Mock 모드 설정 (중요!)
+NEXT_PUBLIC_FORCE_MOCK=true  # true = Mock 모드, false = 프로덕션 모드
+
+# Mock 모드일 때는 아래 키들이 없어도 동작
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_key
@@ -315,6 +319,31 @@ NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=your_kakao_key
 STRIPE_SECRET_KEY=your_stripe_secret
 STRIPE_WEBHOOK_SECRET=your_webhook_secret
 SITE_URL=http://localhost:3000
+```
+
+### 💡 개발/프로덕션 모드 전환
+
+#### Mock 모드 (개발 시 권장)
+```bash
+# .env.local 파일에서
+NEXT_PUBLIC_FORCE_MOCK=true
+
+# 특징:
+# - Supabase 없이도 완전 동작
+# - 테스트 계정: admin@meetpin.com / 123456
+# - 가짜 데이터로 모든 기능 테스트 가능
+# - localStorage 기반 인증
+```
+
+#### 프로덕션 모드 (실제 서비스 연결)
+```bash
+# .env.local 파일에서
+NEXT_PUBLIC_FORCE_MOCK=false  # 또는 삭제
+
+# 필수 요구사항:
+# - 모든 API 키가 실제 값이어야 함
+# - Supabase 데이터베이스 설정 완료
+# - scripts/ 폴더의 SQL 파일들 실행 완료
 ```
 
 #### 프로덕션 환경

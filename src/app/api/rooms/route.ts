@@ -5,8 +5,6 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/zodSchemas'
 import { parseBBoxParam } from '@/lib/bbox'
 import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
-// 강제 업데이트: 2025-09-03 15:30
-
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
   const searchParams = parseQueryParams(request)
@@ -20,9 +18,8 @@ async function getRooms(request: NextRequest) {
     return apiUtils.validation('bbox 파라미터가 필요합니다 (형식: south,west,north,east)')
   }
   
-  // 개발 모드에서는 Mock 데이터 사용 (강제 활성화)
-  console.log('🔥 API isDevelopmentMode:', isDevelopmentMode, 'mockRooms length:', mockRooms?.length)
-  if (true || isDevelopmentMode) {
+  // 개발 모드에서는 Mock 데이터 사용
+  if (isDevelopmentMode) {
     // 카테고리 필터
     const category = searchParams.get('category')
     const validCategories = ['drink', 'exercise', 'other']

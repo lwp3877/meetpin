@@ -5,25 +5,15 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
-import { mockLogin, mockSignUp } from '@/lib/mockData'
-import { BUILD_VERSION } from '@/lib/buildBuster'
+import * as authService from '@/lib/authService'
 
-// Mock 모드 강제 활성화 (임시)
-const isDevelopmentMode = true
-console.log('🔥 useAuth 로딩됨 - 빌드:', BUILD_VERSION)
-
-// 확장된 사용자 타입
-export interface AppUser {
-  id: string
-  email: string
-  nickname?: string
-  role: 'user' | 'admin'
-  age_range?: string
-  avatar_url?: string
-  intro?: string
-  referral_code?: string
-  created_at: string
+// 개발 모드에서 로그 출력
+if (authService.isDevelopmentMode()) {
+  authService.logAuthState('useAuth hook initialized')
 }
+
+// 타입을 authService에서 re-export
+export type AppUser = authService.AuthUser
 
 export interface AuthContextType {
   user: AppUser | null
@@ -43,52 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // 현재 사용자 정보 가져오기 (지연 로딩 최적화)
+  // 현재 사용자 정보 가져오기 (authService로 위임)
   const getCurrentUser = useCallback(async (): Promise<AppUser | null> => {
-    if (isDevelopmentMode) {
-      const stored = localStorage.getItem('meetpin_user')
-      return stored ? JSON.parse(stored) : null
-    }
-
-    try {
-      // Supabase 클라이언트를 지연 생성하여 초기 로딩 성능 향상
-      const supabase = createBrowserSupabaseClient()
-      
-      // 타임아웃을 설정하여 무한 대기 방지
-      const authPromise = supabase.auth.getUser()
-      const timeoutPromise = new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Auth timeout')), 10000)
-      )
-      
-      const { data: { user: authUser }, error } = await Promise.race([
-        authPromise, 
-        timeoutPromise
-      ]) as any
-      
-      if (error || !authUser) return null
-
-      // 프로필 정보 가져오기
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('uid', authUser.id)
-        .single()
-
-      return {
-        id: authUser.id,
-        email: authUser.email || '',
-        nickname: (profile as any)?.nickname,
-        role: ((profile as any)?.role as 'user' | 'admin') || 'user',
-        age_range: (profile as any)?.age_range,
-        avatar_url: (profile as any)?.avatar_url,
-        intro: (profile as any)?.intro,
-        referral_code: (profile as any)?.referral_code,
-        created_at: (profile as any)?.created_at || authUser.created_at,
-      }
-    } catch (error) {
-      console.error('Failed to get current user:', error)
-      return null
-    }
+    return await authService.getCurrentUser()
   }, [])
 
   // 사용자 정보 새로고침
@@ -102,79 +49,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [getCurrentUser])
 
-  // 이메일 로그인 - Mock 모드만 사용
+  // 이메일 로그인 (authService로 위임)
   const signIn = async (email: string, password: string) => {
-    // SUPABASE 완전 제거 - Mock만 사용
-    try {
-      const result = await mockLogin(email, password)
-      localStorage.setItem('meetpin_user', JSON.stringify(result.user))
-      setUser(result.user as AppUser)
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
+    const result = await authService.signInWithEmail(email, password)
+    if (result.success) {
+      await refreshUser()
     }
+    return result
   }
 
-  // 이메일 회원가입 - Mock 모드만 사용
-  const signUp = async (email: string, password: string, nickname: string, ageRange: string) => {
-    // SUPABASE 완전 제거 - Mock만 사용
-    try {
-      await mockSignUp(email, password, nickname, ageRange)
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
-    }
+  // 이메일 회원가입 (authService로 위임)
+  const signUp = async (
+    email: string,
+    password: string,
+    nickname: string,
+    ageRange: string
+  ) => {
+    return await authService.signUpWithEmail(email, password, nickname, ageRange)
   }
 
-  // 로그아웃
+  // 로그아웃 (authService로 위임)
   const signOut = async () => {
-    if (isDevelopmentMode) {
-      localStorage.removeItem('meetpin_user')
-      setUser(null)
-      return
-    }
-
-    const supabase = createBrowserSupabaseClient()
-    await supabase.auth.signOut()
+    await authService.signOut()
     setUser(null)
   }
 
-  // 프로필 업데이트
+  // 프로필 업데이트 (authService로 위임)
   const updateProfile = async (updates: Partial<AppUser>) => {
-    if (isDevelopmentMode) {
-      const stored = localStorage.getItem('meetpin_user')
-      if (stored) {
-        const user = JSON.parse(stored)
-        const updatedUser = { ...user, ...updates }
-        localStorage.setItem('meetpin_user', JSON.stringify(updatedUser))
-        setUser(updatedUser)
-        return { success: true }
-      }
-      return { success: false, error: '사용자를 찾을 수 없습니다' }
-    }
-
-    try {
-      const supabase = createBrowserSupabaseClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      
-      if (!authUser) {
-        return { success: false, error: '인증되지 않은 사용자입니다' }
-      }
-
-      const { error } = await (supabase as any)
-        .from('profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('uid', authUser.id)
-
-      if (error) {
-        return { success: false, error: error.message }
-      }
-
+    const result = await authService.updateUserProfile(updates)
+    if (result.success) {
       await refreshUser()
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
     }
+    return result
   }
 
   // 초기 로드 및 인증 상태 변경 감지
@@ -189,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth()
 
-    if (isDevelopmentMode) {
+    if (authService.isDevelopmentMode()) {
       // localStorage 변경 감지 (개발 모드)
       const handleStorageChange = () => {
         if (mounted) {

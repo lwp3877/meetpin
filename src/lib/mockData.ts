@@ -610,5 +610,7 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
   }
 }
 
-// 개발자 모드 강제 활성화 (임시)
-export const isDevelopmentMode = true // process.env.NODE_ENV !== 'production'
+// 환경변수 기반으로 개발 모드 결정
+export const isDevelopmentMode = 
+  process.env.NEXT_PUBLIC_FORCE_MOCK === 'true' || 
+  process.env.NODE_ENV !== 'production'
