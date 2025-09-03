@@ -654,18 +654,24 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Legal Links */}
+            {/* Company & Support Links */}
             <div className="text-center md:text-right space-y-4">
-              <h3 className="text-lg font-semibold text-gray-200">정책 및 약관</h3>
+              <h3 className="text-lg font-semibold text-gray-200">회사 & 지원</h3>
               <div className="space-y-2">
-                <Link href="/legal/terms" className="block text-gray-400 hover:text-emerald-400 transition-colors">
+                <Link href="/about" className="block text-gray-400 hover:text-emerald-400 transition-colors">
+                  회사 소개
+                </Link>
+                <Link href="/help" className="block text-gray-400 hover:text-emerald-400 transition-colors">
+                  도움말 & FAQ
+                </Link>
+                <Link href="/contact" className="block text-gray-400 hover:text-emerald-400 transition-colors">
+                  문의하기
+                </Link>
+                <Link href="/legal/terms" className="block text-gray-400 hover:text-emerald-400 transition-colors text-sm">
                   이용약관
                 </Link>
-                <Link href="/legal/privacy" className="block text-gray-400 hover:text-emerald-400 transition-colors">
+                <Link href="/legal/privacy" className="block text-gray-400 hover:text-emerald-400 transition-colors text-sm">
                   개인정보처리방침
-                </Link>
-                <Link href="/legal/location" className="block text-gray-400 hover:text-emerald-400 transition-colors">
-                  위치정보이용약관
                 </Link>
               </div>
             </div>
