@@ -4,10 +4,19 @@ import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/auth'
 import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
 
-// Simple in-memory rate limiting store
+/**
+ * 간단한 인메모리 레이트 리미팅 스토어
+ * 실제 운영에서는 Redis 등의 외부 스토어를 사용하는 것을 권장
+ */
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
 
-// Simple rate limiting function with key-based limits
+/**
+ * 간단한 키 기반 레이트 리미팅 함수
+ * @param key - 리미트를 적용할 고유 키 (예: IP주소, 사용자ID 등)
+ * @param limit - 제한할 요청 수
+ * @param windowMs - 제한 시간 윈도우 (밀리초)
+ * @returns 요청이 허용되면 true, 제한에 걸리면 false
+ */
 export function rateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now()
   const record = rateLimitStore.get(key)
@@ -29,15 +38,26 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
 // Re-export auth functions for compatibility
 export { getAuthenticatedUser, requireAdmin } from '@/lib/auth'
 
-// 통일된 API 응답 타입 ({ok, data, code, message})
+/**
+ * 통일된 API 응답 타입
+ * 모든 API 엔드포인트는 이 형식으로 응답을 반환해야 함
+ * @template T - 응답 데이터의 타입
+ */
 export interface ApiResponse<T = any> {
+  /** 요청 성공 여부 */
   ok: boolean
+  /** 응답 데이터 (성공 시) */
   data?: T
+  /** 에러 코드 (실패 시) */
   code?: string
+  /** 사용자에게 표시할 메시지 */
   message?: string
 }
 
-// API 에러 클래스
+/**
+ * 구조화된 API 에러 클래스
+ * HTTP 상태 코드와 에러 코드를 포함하여 일관된 에러 처리 제공
+ */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -49,7 +69,14 @@ export class ApiError extends Error {
   }
 }
 
-// 성공 응답 생성
+/**
+ * 표준화된 성공 응답을 생성합니다
+ * @template T - 응답 데이터의 타입
+ * @param data - 반환할 데이터
+ * @param message - 성공 메시지 (선택사항)
+ * @param status - HTTP 상태 코드 (기본값: 200)
+ * @returns NextResponse 객체
+ */
 export function createSuccessResponse<T>(
   data?: T,
   message?: string,
@@ -62,7 +89,13 @@ export function createSuccessResponse<T>(
   }, { status })
 }
 
-// 에러 응답 생성
+/**
+ * 표준화된 에러 응답을 생성합니다
+ * @param error - 에러 메시지 또는 Error 객체
+ * @param status - HTTP 상태 코드 (기본값: 400)
+ * @param code - 에러 코드 (선택사항)
+ * @returns NextResponse 객체
+ */
 export function createErrorResponse(
   error: string | Error,
   status: number = 400,

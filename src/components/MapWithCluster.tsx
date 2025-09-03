@@ -56,11 +56,8 @@ export default function MapWithCluster({
 
   // Kakao Maps SDK 로드
   useEffect(() => {
-    console.log('MapWithCluster: Kakao Maps SDK 로딩 시작')
-    
     loadKakaoMaps()
       .then(() => {
-        console.log('Kakao Maps SDK 로드 완료!')
         setIsKakaoLoaded(true)
       })
       .catch((error) => {
@@ -163,7 +160,7 @@ export default function MapWithCluster({
         infoWindowRef.current.close()
       }
     }
-  }, [isKakaoLoaded]) // center, level, onBoundsChanged 제거하여 불필요한 재초기화 방지
+  }, [isKakaoLoaded, center.lat, center.lng, level, onBoundsChanged]) // 모든 의존성 추가
 
   // center나 level이 변경되었을 때만 지도 이동
   useEffect(() => {

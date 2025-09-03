@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // 현재 사용자 정보 가져오기
+  // 현재 사용자 정보 가져오기 (지연 로딩 최적화)
   const getCurrentUser = useCallback(async (): Promise<AppUser | null> => {
     if (isDevelopmentMode) {
       const stored = localStorage.getItem('meetpin_user')
@@ -46,8 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      // Supabase 클라이언트를 지연 생성하여 초기 로딩 성능 향상
       const supabase = createBrowserSupabaseClient()
-      const { data: { user: authUser }, error } = await supabase.auth.getUser()
+      
+      // 타임아웃을 설정하여 무한 대기 방지
+      const authPromise = supabase.auth.getUser()
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Auth timeout')), 10000)
+      )
+      
+      const { data: { user: authUser }, error } = await Promise.race([
+        authPromise, 
+        timeoutPromise
+      ]) as any
       
       if (error || !authUser) return null
 
@@ -204,8 +215,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 초기 로드 및 인증 상태 변경 감지
   useEffect(() => {
+    let mounted = true
+    
     const initializeAuth = async () => {
-      await refreshUser()
+      if (mounted) {
+        await refreshUser()
+      }
     }
 
     initializeAuth()
@@ -213,15 +228,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isDevelopmentMode) {
       // localStorage 변경 감지 (개발 모드)
       const handleStorageChange = () => {
-        refreshUser()
+        if (mounted) {
+          refreshUser()
+        }
       }
       
       window.addEventListener('storage', handleStorageChange)
-      return () => window.removeEventListener('storage', handleStorageChange)
+      return () => {
+        mounted = false
+        window.removeEventListener('storage', handleStorageChange)
+      }
     } else {
       // Supabase 인증 상태 변경 감지
       const supabase = createBrowserSupabaseClient()
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!mounted) return
+        
         if (event === 'SIGNED_OUT') {
           setUser(null)
         } else if (session?.user) {
@@ -230,9 +252,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false)
       })
 
-      return () => subscription.unsubscribe()
+      return () => {
+        mounted = false
+        subscription.unsubscribe()
+      }
     }
-  }, [refreshUser])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const contextValue: AuthContextType = {
     user,

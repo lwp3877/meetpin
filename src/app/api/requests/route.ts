@@ -1,6 +1,22 @@
-import { NextRequest } from 'next/server'
+/**
+ * 참가 요청 API
+ * 모임 참가 요청을 생성하고 조회하는 기능을 제공합니다.
+ * 
+ * 주요 기능:
+ * - GET: 사용자의 참가 요청 목록 또는 호스트가 받은 요청 목록 조회
+ * - POST: 새로운 참가 요청 생성
+ * 
+ * 보안 기능:
+ * - 레이트 리미팅 적용 (사용자별 요청 생성 제한)
+ * - 인증된 사용자만 접근 가능
+ * - 자신의 방에는 참가 요청 불가
+ * - 방 시작 1시간 전까지만 요청 가능
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { requestSchema } from '@/lib/zodSchemas'
+import { isDevelopmentMode } from '@/lib/mockData'
 import {
   createMethodRouter,
   getAuthenticatedUser,
@@ -86,7 +102,6 @@ async function getRequests(request: NextRequest) {
 // POST /api/requests - 참가 요청 생성
 async function createRequest(request: NextRequest) {
   const user = await getAuthenticatedUser()
-  const supabase = await createServerSupabaseClient()
   
   // Rate limiting (사용자별)
   if (!rateLimit(`create-request:${user.id}`, 20, 60000)) {
@@ -96,19 +111,36 @@ async function createRequest(request: NextRequest) {
   // 요청 본문 검증
   const requestData = await parseAndValidateBody(request, requestSchema)
   
+  if (isDevelopmentMode) {
+    // 개발 모드에서는 성공 응답 반환
+    const mockRequest = {
+      id: `req-${Date.now()}`,
+      room_id: requestData.room_id,
+      requester_uid: user.id,
+      message: requestData.message || null,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    
+    return NextResponse.json({
+      ok: true,
+      data: mockRequest,
+      message: '참가 요청이 전송되었습니다'
+    })
+  }
+  
+  const supabase = await createServerSupabaseClient()
+  
   // 방 존재 여부 및 상태 확인
   const { data: room, error: roomError } = await supabase
     .from('rooms')
-    .select('id, host_uid, status, max_people, start_at')
+    .select('id, host_uid, max_people, start_at')
     .eq('id', requestData.room_id)
     .single()
   
   if (roomError || !room) {
     throw new ApiError('방을 찾을 수 없습니다', 404)
-  }
-  
-  if ((room as any).status !== 'active') {
-    throw new ApiError('참가할 수 없는 방입니다')
   }
   
   if ((room as any).host_uid === user.id) {

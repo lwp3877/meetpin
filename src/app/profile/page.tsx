@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-// import EnhancedButton, { ButtonPresets } from '@/components/ui/EnhancedButton'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
 import PageTransition from '@/components/ui/PageTransition'
 import Toast from '@/components/ui/Toast'
 import { ReferralModal } from '@/components/ui/ReferralSystem'
-// import { brandMessages } from '@/lib/brand'
+import { EnhancedProfile } from '@/components/ui/EnhancedProfile'
+import { ProfileImageUploader } from '@/components/ui/ProfileImageUploader'
 import { useAuth } from '@/lib/useAuth'
 
 export default function ProfilePage() {
@@ -18,8 +18,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showReferralModal, setShowReferralModal] = useState(false)
-  const [, setProfileImage] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     nickname: '',
     age_range: '',
@@ -42,6 +41,7 @@ export default function ProfilePage() {
         age_range: user.age_range || '',
         intro: user.intro || ''
       })
+      setCurrentAvatarUrl(user.avatar_url || null)
     }
   }, [user])
 
@@ -49,30 +49,10 @@ export default function ProfilePage() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // 파일 크기 체크 (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      Toast.error('파일 크기는 5MB 이하여야 합니다')
-      return
-    }
-
-    // 파일 타입 체크
-    if (!file.type.startsWith('image/')) {
-      Toast.error('이미지 파일만 업로드할 수 있습니다')
-      return
-    }
-
-    setProfileImage(file)
-    
-    // 미리보기 URL 생성
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setPreviewUrl(e.target?.result as string)
-    }
-    reader.readAsDataURL(file)
+  const handleAvatarChanged = (newAvatarUrl: string | null) => {
+    setCurrentAvatarUrl(newAvatarUrl)
+    // useAuth의 user 상태도 업데이트하면 더 좋지만, 
+    // 다음 페이지 로드시 최신 정보가 반영됩니다
   }
 
   const handleSaveProfile = async () => {
@@ -164,9 +144,9 @@ export default function ProfilePage() {
             <div className="relative mx-auto w-28 h-28 mb-6">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500 rounded-full p-1">
                 <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {previewUrl || user.avatar_url ? (
+                  {currentAvatarUrl ? (
                     <Image 
-                      src={previewUrl || user.avatar_url || ''} 
+                      src={currentAvatarUrl} 
                       alt="프로필 사진" 
                       width={112}
                       height={112}
@@ -179,19 +159,6 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              
-              {/* Camera button for editing */}
-              {isEditing && (
-                <label className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full border-2 border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-md">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <span className="text-lg">📷</span>
-                </label>
-              )}
               
               {/* Status indicator */}
               <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -268,83 +235,102 @@ export default function ProfilePage() {
 
         {/* Profile Form */}
         {isEditing && (
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 mb-6 border border-white/50">
-            <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">✨ 프로필 편집</h3>
-          
-            <div className="space-y-6">
-              {/* Email (Read-only) */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">
-                  📧 이메일
-                </label>
-                <div className="w-full px-5 py-4 bg-gray-100 border-2 border-gray-200 rounded-2xl text-gray-600 font-medium">
-                  {user.email}
+          <div className="space-y-6">
+            {/* Profile Image Uploader */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/50">
+              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">📷 프로필 사진 변경</h3>
+              <ProfileImageUploader
+                currentAvatarUrl={currentAvatarUrl || undefined}
+                onAvatarChanged={handleAvatarChanged}
+                size="large"
+                showRandomGenerator={true}
+              />
+            </div>
+
+            {/* Profile Details Form */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/50">
+              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">✨ 기본 정보 편집</h3>
+            
+              <div className="space-y-6">
+                {/* Email (Read-only) */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    📧 이메일
+                  </label>
+                  <div className="w-full px-5 py-4 bg-gray-100 border-2 border-gray-200 rounded-2xl text-gray-600 font-medium">
+                    {user.email}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">이메일은 변경할 수 없어요</p>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">이메일은 변경할 수 없어요</p>
-              </div>
 
-              {/* Nickname */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">
-                  ✨ 닉네임 *
-                </label>
-                <input
-                  type="text"
-                  value={formData.nickname}
-                  onChange={(e) => handleInputChange('nickname', e.target.value)}
-                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all text-gray-800 font-medium placeholder:text-gray-400"
-                  placeholder="멋진 닉네임을 입력하세요"
-                  maxLength={20}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-xs text-gray-500">다른 사용자에게 보여질 이름이에요</p>
-                  <p className="text-xs text-gray-400 font-mono">
-                    {formData.nickname.length}/20
-                  </p>
+                {/* Nickname */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    ✨ 닉네임 *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nickname}
+                    onChange={(e) => handleInputChange('nickname', e.target.value)}
+                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all text-gray-800 font-medium placeholder:text-gray-400"
+                    placeholder="멋진 닉네임을 입력하세요"
+                    maxLength={20}
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-500">다른 사용자에게 보여질 이름이에요</p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      {formData.nickname.length}/20
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Age Range */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">
-                  🎂 연령대 *
-                </label>
-                <select
-                  value={formData.age_range}
-                  onChange={(e) => handleInputChange('age_range', e.target.value)}
-                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all bg-white text-gray-800 font-medium"
-                >
-                  <option value="">연령대를 선택하세요</option>
-                  {ageRanges.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {/* Age Range */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    🎂 연령대 *
+                  </label>
+                  <select
+                    value={formData.age_range}
+                    onChange={(e) => handleInputChange('age_range', e.target.value)}
+                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all bg-white text-gray-800 font-medium"
+                  >
+                    <option value="">연령대를 선택하세요</option>
+                    {ageRanges.map((range) => (
+                      <option key={range.value} value={range.value}>
+                        {range.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* Introduction */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">
-                  💭 자기소개
-                </label>
-                <textarea
-                  value={formData.intro}
-                  onChange={(e) => handleInputChange('intro', e.target.value)}
-                  rows={4}
-                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all resize-none text-gray-800 font-medium placeholder:text-gray-400"
-                  placeholder="자신을 소개해주세요! 어떤 모임을 좋아하는지, 취미가 무엇인지 알려주세요."
-                  maxLength={500}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-xs text-gray-500">다른 사용자가 참고할 수 있어요</p>
-                  <p className="text-xs text-gray-400 font-mono">
-                    {formData.intro.length}/500
-                  </p>
+                {/* Introduction */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-3">
+                    💭 자기소개
+                  </label>
+                  <textarea
+                    value={formData.intro}
+                    onChange={(e) => handleInputChange('intro', e.target.value)}
+                    rows={4}
+                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all resize-none text-gray-800 font-medium placeholder:text-gray-400"
+                    placeholder="자신을 소개해주세요! 어떤 모임을 좋아하는지, 취미가 무엇인지 알려주세요."
+                    maxLength={500}
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-gray-500">다른 사용자가 참고할 수 있어요</p>
+                    <p className="text-xs text-gray-400 font-mono">
+                      {formData.intro.length}/500
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Enhanced Profile Stats */}
+        {!isEditing && (
+          <EnhancedProfile className="mb-6" />
         )}
 
         {/* Action Menu */}
@@ -429,6 +415,26 @@ export default function ProfilePage() {
               </svg>
             </div>
           </div>
+
+          {/* Notification Settings */}
+          <Link href="/settings/notifications" className="block">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/50 hover:shadow-xl transition-all transform hover:scale-105">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                    <span className="text-xl">🔔</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">알림 설정</div>
+                    <div className="text-sm text-gray-600">푸시 알림 및 소식 설정</div>
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </Link>
 
           {/* Admin Panel (관리자만) */}
           {user.role === 'admin' && (

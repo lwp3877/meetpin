@@ -4,14 +4,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
 import { getCategoryDisplay } from '@/lib/brand'
 import toast from 'react-hot-toast'
 import { MapPin, Clock, Users, DollarSign, Star, Edit, ArrowLeft, Navigation, Heart, Share2 } from 'lucide-react'
+import { RealtimeChatModal } from '@/components/ui/RealtimeChatModal'
+import { BoostModal } from '@/components/ui/BoostModal'
 
 interface Room {
   id: string
@@ -45,6 +44,8 @@ export default function RoomDetailPage() {
   const [room, setRoom] = useState<Room | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [requesting, setRequesting] = useState(false)
+  const [showHostMessageModal, setShowHostMessageModal] = useState(false)
+  const [showBoostModal, setShowBoostModal] = useState(false)
 
   const fetchRoom = useCallback(async () => {
     if (!params?.id) return
@@ -96,7 +97,7 @@ export default function RoomDetailPage() {
       } else {
         toast.error(result.message || '참가 신청에 실패했습니다')
       }
-    } catch (error: any) {
+    } catch {
       toast.error('참가 신청 중 오류가 발생했습니다')
     } finally {
       setRequesting(false)
@@ -348,7 +349,7 @@ export default function RoomDetailPage() {
               </div>
               <div className="flex flex-col space-y-3">
                 <button 
-                  onClick={() => toast.success('메시지 기능은 준비 중입니다!')}
+                  onClick={() => setShowHostMessageModal(true)}
                   className="px-6 py-3 bg-gradient-to-r from-primary to-emerald-600 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
                 >
                   호스트에게 메시지
@@ -368,18 +369,24 @@ export default function RoomDetailPage() {
         {room.is_host ? (
           <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white/95 to-transparent dark:from-slate-900 dark:via-slate-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-slate-700/50">
             <div className="container mx-auto max-w-4xl">
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <button
                   onClick={() => router.push(`/room/${room.id}/requests`)}
                   className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
                 >
-                  📝 신청 내역 보기
+                  📝 신청 내역
                 </button>
                 <button
                   onClick={handleEditRoom}
                   className="flex-1 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
                 >
-                  ⚙️ 모임 수정
+                  ⚙️ 수정
+                </button>
+                <button
+                  onClick={() => setShowBoostModal(true)}
+                  className="flex-1 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105 hover:-translate-y-1"
+                >
+                  {isBoosted ? '🚀 부스트 중' : '⭐ 부스트'}
                 </button>
               </div>
               <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-3">
@@ -441,6 +448,33 @@ export default function RoomDetailPage() {
         {/* Bottom Spacing for Fixed Button */}
         <div className="h-32"></div>
       </div>
+      
+      {/* Realtime Chat Modal */}
+      {room && (
+        <RealtimeChatModal
+          isOpen={showHostMessageModal}
+          onClose={() => setShowHostMessageModal(false)}
+          hostName={room.host.nickname}
+          hostAvatar={room.host.avatar_url}
+          hostId={room.host.id}
+          roomId={room.id}
+        />
+      )}
+      
+      {/* Boost Modal */}
+      {room && (
+        <BoostModal
+          isOpen={showBoostModal}
+          onClose={() => setShowBoostModal(false)}
+          roomId={room.id}
+          roomTitle={room.title}
+          onBoostSuccess={() => {
+            setShowBoostModal(false)
+            // 페이지 새로고침으로 부스트 상태 업데이트
+            fetchRoom()
+          }}
+        />
+      )}
     </div>
   )
 }

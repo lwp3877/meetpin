@@ -67,7 +67,6 @@ export interface Database {
           fee: number
           visibility: 'public' | 'private'
           boost_until: string | null
-          status: 'active' | 'inactive' | 'completed'
           created_at: string
           updated_at: string
         }
@@ -84,7 +83,6 @@ export interface Database {
           fee?: number
           visibility?: 'public' | 'private'
           boost_until?: string | null
-          status?: 'active' | 'inactive' | 'completed'
           created_at?: string
           updated_at?: string
         }
@@ -101,7 +99,6 @@ export interface Database {
           fee?: number
           visibility?: 'public' | 'private'
           boost_until?: string | null
-          status?: 'active' | 'inactive' | 'completed'
           created_at?: string
           updated_at?: string
         }
@@ -208,6 +205,38 @@ export interface Database {
           reason?: string
           status?: 'pending' | 'reviewed' | 'resolved'
           created_at?: string
+        }
+      }
+      host_messages: {
+        Row: {
+          id: string
+          room_id: string
+          sender_uid: string
+          receiver_uid: string
+          text: string
+          is_read: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          room_id: string
+          sender_uid: string
+          receiver_uid: string
+          text: string
+          is_read?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          room_id?: string
+          sender_uid?: string
+          receiver_uid?: string
+          text?: string
+          is_read?: boolean
+          created_at?: string
+          updated_at?: string
         }
       }
       blocked_users: {
@@ -372,6 +401,10 @@ export type MessageUpdate = Database['public']['Tables']['messages']['Update']
 export type Report = Database['public']['Tables']['reports']['Row']
 export type ReportInsert = Database['public']['Tables']['reports']['Insert']
 export type ReportUpdate = Database['public']['Tables']['reports']['Update']
+
+export type HostMessage = Database['public']['Tables']['host_messages']['Row']
+export type HostMessageInsert = Database['public']['Tables']['host_messages']['Insert']
+export type HostMessageUpdate = Database['public']['Tables']['host_messages']['Update']
 
 export type BlockedUser = Database['public']['Tables']['blocked_users']['Row']
 export type BlockedUserInsert = Database['public']['Tables']['blocked_users']['Insert']

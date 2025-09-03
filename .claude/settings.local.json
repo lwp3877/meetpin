@@ -37,9 +37,40 @@
       "Bash(if exist node_modules\\.cache rmdir /s /q node_modules\\.cache)",
       "Bash(set PORT=3000)",
       "Bash(git rev-parse:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(claude mcp install:*)",
+      "Bash(npx:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp:*)",
+      "Bash(claude doctor)",
+      "Read(C:\\Users\\이원표/**)",
+      "Read(C:\\Users\\이원표/**)",
+      "Read(C:\\Users\\이원표/**)",
+      "Read(C:\\Users\\이원표/**)",
+      "mcp__filesystem__directory_tree",
+      "mcp__filesystem__list_directory",
+      "Bash(set PORT=3001)",
+      "Bash(timeout 15 pnpm dev)",
+      "Bash(timeout:*)",
+      "Bash(pnpm playwright test:*)",
+      "Read(\\/**)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:127.0.0.1)",
+      "WebFetch(domain:xnrqfkecpabucnoxxtwa.supabase.co)",
+      "Bash(pnpm start:*)",
+      "WebFetch(domain:meetpin-weld.vercel.app)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github",
+    "fetch",
+    "postgres",
+    "filesystem",
+    "playwright"
+  ]
 }

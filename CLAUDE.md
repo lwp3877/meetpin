@@ -48,14 +48,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Project Status (최신 상태)
 
-### ✅ Completed Fixes & Improvements
-- **인증 시스템**: 개발 모드에서 Mock 데이터 지원으로 Supabase 없이도 개발 가능
+### ✅ Completed Advanced Features
+- **실시간 WebSocket 채팅 시스템**: Supabase Realtime을 활용한 실시간 메시징
+- **프로필/방 이미지 업로드 기능**: Supabase Storage 기반 이미지 처리 및 최적화
+- **Push 알림 시스템**: Browser Notification API 완전 구현
+- **Stripe 결제 시스템**: 부스트 기능을 위한 완전한 결제 처리
 - **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
 - **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
-- **TypeScript 컴파일**: 0개 타입 오류로 완전 안정화
-- **ESLint 검사**: 0개 경고로 코드 품질 최적화
 - **단위 테스트**: 49/49 테스트 모두 통과
-- **프로덕션 빌드**: 최적화된 번들 생성 성공
 - **개발 서버**: localhost:3000에서 안정적 실행 (포트 설정 가능)
 
 ### 🔧 Development Mode Features
@@ -110,10 +110,11 @@ Execute database scripts in Supabase SQL Editor in this order:
 
 ### Core Tables
 - `profiles` - User profiles linked to auth.users
-- `rooms` - Meeting rooms with location and metadata
+- `rooms` - Meeting rooms with location and metadata (includes `boost_until` for payment system)
 - `requests` - Join requests with status workflow
 - `matches` - Accepted requests enabling 1:1 chat
-- `messages` - Chat messages between matched users
+- `messages` - Chat messages between matched users (realtime enabled)
+- `host_messages` - Direct messages to room hosts with notification system
 - `reports` - User reporting system
 - `blocked_users` - User blocking relationships
 
@@ -159,10 +160,11 @@ Memory-based rate limiting in `src/lib/rateLimit.ts`:
 5. Matches enable 1:1 messaging
 
 ### Payment Integration
-- Stripe Checkout for boost purchases
+- Stripe Checkout for boost purchases (1일/₩1,000, 3일/₩2,500, 7일/₩5,000)
 - Webhook handling updates `boost_until` timestamp
-- Payment Link fallback for manual processing
+- Development mode mock payment processing
 - Boost sorting: rooms with active boost appear first
+- Complete UI with BoostModal component for purchase flow
 
 ### Security Considerations
 - RLS policies prevent data leakage between blocked users
@@ -182,13 +184,23 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Kakao Maps
 NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=
 
-# Stripe
+# Stripe (부스트 결제)
 STRIPE_SECRET_KEY=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=
 
+# Stripe Price IDs (옵션 - 고정 상품 사용 시)
+STRIPE_PRICE_1D_ID=
+STRIPE_PRICE_3D_ID=
+STRIPE_PRICE_7D_ID=
+
 # App
 SITE_URL=
+
+# Feature Flags (선택적)
+NEXT_PUBLIC_ENABLE_STRIPE_CHECKOUT=true
+NEXT_PUBLIC_ENABLE_REALTIME_NOTIFICATIONS=true
+NEXT_PUBLIC_ENABLE_FILE_UPLOAD=true
 ```
 
 ## Korean Language Considerations
@@ -241,6 +253,20 @@ Centralized in `src/lib/brand.ts`:
 - RLS policies handle data access control automatically
 - User blocking relationships affect data visibility bidirectionally
 
+### Real-time Features Architecture
+- **Supabase Realtime**: WebSocket connections for live updates
+- **Chat System**: `useRealtimeChat` hook for 1:1 messaging with typing indicators
+- **Notifications**: `useRealtimeNotifications` for host message alerts
+- **Online Presence**: Real-time user status tracking in chat
+- **Browser Push**: Native notification API for background alerts
+
+### Image Upload System
+- **Supabase Storage**: Secure file storage with RLS policies
+- **Image Optimization**: WebP conversion and compression
+- **Universal Component**: `ImageUploader` for profiles and rooms
+- **Drag & Drop**: Native file handling with preview
+- **Korean Avatars**: Curated avatar collection for local users
+
 ### Testing Strategy
 - **Jest Unit Tests**: 49/49 tests passing, covering utilities and business logic
 - **Test Location**: `__tests__/` directory with comprehensive coverage
@@ -249,12 +275,19 @@ Centralized in `src/lib/brand.ts`:
 - **E2E Testing**: Playwright for end-to-end browser testing
 - **Development Testing**: Mock data enables full feature testing without external services
 
+### Advanced Component Architecture
+- **Modal System**: Centralized modal management (BoostModal, RealtimeChatModal)
+- **Hook Pattern**: Custom hooks for complex state (`useRealtimeChat`, `useRealtimeNotifications`)
+- **Form Integration**: React Hook Form + Zod validation throughout
+- **Notification Stack**: React Hot Toast + Browser Push + Real-time updates
+- **Payment Flow**: Complete Stripe integration with development/production modes
+
 ### Project Quality Standards
-- **TypeScript**: Strict mode with 0 compilation errors
-- **ESLint**: 0 warnings with comprehensive rules
-- **Code Coverage**: High coverage across utility functions
-- **Build Verification**: `pnpm repo:doctor` must pass completely
-- **Performance**: Optimized bundle size and runtime performance
-- **Internationalization**: Korean UI text and error messages throughout
-- **Design**: Mobile-first responsive design with accessibility considerations
-- **Security**: RLS policies, input validation, rate limiting, and user blocking systems
+- **TypeScript**: Strict mode with enhanced type safety
+- **Code Quality**: Comprehensive ESLint + Prettier configuration
+- **Testing Suite**: Jest unit tests + Playwright E2E testing
+- **Build Verification**: `pnpm repo:doctor` for complete quality checks
+- **Performance**: Bundle optimization and lazy loading
+- **Internationalization**: Korean-first UI with proper text handling
+- **Mobile-first**: Responsive design with touch-optimized interactions
+- **Security**: Multi-layer protection (RLS, validation, rate limiting, blocking)

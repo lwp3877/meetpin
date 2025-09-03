@@ -1,6 +1,22 @@
 /* src/lib/brand.ts */
-// 밋핀 브랜드 시스템 - 색상, 메시지, 카테고리 배지
+/**
+ * 밋핀 브랜드 시스템
+ * 앱 전체에서 일관된 색상, 메시지, UI 요소를 제공합니다.
+ * 
+ * 사용 예시:
+ * ```typescript
+ * import { brandColors, brandMessages, getCategoryDisplay } from '@/lib/brand'
+ * 
+ * const primaryColor = brandColors.primary
+ * const appName = brandMessages.appName
+ * const drinkCategory = getCategoryDisplay('drink')
+ * ```
+ */
 
+/**
+ * 브랜드 색상 팔레트
+ * 모든 UI 컴포넌트에서 일관된 색상 사용을 위한 색상 정의
+ */
 export const brandColors = {
   // Primary colors
   primary: '#10B981',

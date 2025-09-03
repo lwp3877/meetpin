@@ -122,6 +122,15 @@ export const createMessageSchema = z.object({
     .trim(),
 })
 
+// 호스트 메시지 생성 스키마
+export const createHostMessageSchema = z.object({
+  roomId: uuidSchema,
+  message: z.string()
+    .min(1, '메시지를 입력해주세요')
+    .max(1000, '메시지는 1000자 이하여야 합니다')
+    .trim(),
+})
+
 // 신고 생성 스키마
 export const createReportSchema = z.object({
   target_uid: uuidSchema,
@@ -237,6 +246,7 @@ export type CreateRequest = z.infer<typeof createRequestSchema>
 export type UpdateRequest = z.infer<typeof updateRequestSchema>
 export type RequestAction = z.infer<typeof requestActionSchema>
 export type CreateMessage = z.infer<typeof createMessageSchema>
+export type CreateHostMessage = z.infer<typeof createHostMessageSchema>
 export type CreateReport = z.infer<typeof createReportSchema>
 export type UpdateReport = z.infer<typeof updateReportSchema>
 export type BlockUser = z.infer<typeof blockUserSchema>
@@ -299,6 +309,7 @@ const schemas = {
   updateRequest: updateRequestSchema,
   requestAction: requestActionSchema,
   createMessage: createMessageSchema,
+  createHostMessage: createHostMessageSchema,
   createReport: createReportSchema,
   updateReport: updateReportSchema,
   blockUser: blockUserSchema,

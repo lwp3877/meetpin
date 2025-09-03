@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import MapWithCluster from '@/components/MapWithCluster'
+import DynamicMap from '@/components/DynamicMap'
 import { debounce } from '@/lib/debounce'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
 import { toast } from 'sonner'
+import { HostMessageNotifications } from '@/components/ui/HostMessageNotifications'
 
 // 서울 기본 영역 상수
 const DEFAULT_BOUNDS = {
@@ -330,6 +331,13 @@ export default function MapPage() {
               
               <ThemeToggle />
               
+              {/* Host Message Notifications */}
+              <HostMessageNotifications
+                onMessageClick={(message) => {
+                  toast.success(`${message.sender?.nickname}님의 메시지를 확인했습니다`)
+                }}
+              />
+              
               {/* Filter Toggle */}
               <Button
                 variant="ghost"
@@ -514,7 +522,7 @@ export default function MapPage() {
             </CardContent>
           </Card>
         ) : (
-          <MapWithCluster
+          <DynamicMap
             rooms={filteredRooms}
             center={{ lat: 37.5665, lng: 126.978 }}
             level={3}
