@@ -1,3 +1,5 @@
-Deployment trigger: 2025-09-03 10:20 - Force new deployment
+Deployment trigger: 2025-09-03 10:21 - FORCE CACHE INVALIDATION v1.1.0
 New pages added: about, help, contact, not-found
 Enterprise-grade UI/UX improvements completed
+VERSION UPDATE: 1.1.0-enterprise-ui
+CACHE BUSTER: 20250903-102122
