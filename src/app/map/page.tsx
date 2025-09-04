@@ -27,7 +27,8 @@ import {
   DollarSign,
   Filter,
   X,
-  Navigation
+  Navigation,
+  LogOut
 } from 'lucide-react'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
 import { toast } from 'sonner'
@@ -60,7 +61,7 @@ interface Room {
 }
 
 export default function MapPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const router = useRouter()
   const [rooms, setRooms] = useState<Room[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -185,6 +186,17 @@ export default function MapPage() {
   // 방 생성 페이지로 이동
   const handleCreateRoom = () => {
     router.push('/room/new')
+  }
+
+  // 로그아웃 핸들러
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      toast.success('성공적으로 로그아웃되었습니다')
+      router.push('/auth/login')
+    } catch (error) {
+      toast.error('로그아웃 중 오류가 발생했습니다')
+    }
   }
 
   // 검색 핸들러
@@ -353,17 +365,31 @@ export default function MapPage() {
                 <SlidersHorizontal className={`w-5 h-5 transition-transform ${showFilters ? 'rotate-180' : 'group-hover:scale-110'}`} />
               </Button>
 
-              {/* User Profile */}
+              {/* User Profile & Logout */}
               {user ? (
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push('/profile')}
-                  className="group flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg bg-white/90 dark:bg-gray-800/90"
-                >
-                  <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-sm text-white font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    {user.email?.[0].toUpperCase()}
-                  </div>
-                </Button>
+                <div className="flex items-center space-x-2">
+                  {/* Profile Button */}
+                  <Button
+                    variant="ghost"
+                    onClick={() => router.push('/profile')}
+                    className="group flex items-center space-x-2 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg bg-white/90 dark:bg-gray-800/90"
+                  >
+                    <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-sm text-white font-bold shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      {user.email?.[0].toUpperCase()}
+                    </div>
+                  </Button>
+                  
+                  {/* Logout Button */}
+                  <Button
+                    variant="ghost"
+                    onClick={handleSignOut}
+                    size="sm"
+                    className="group p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-all duration-300 shadow-md hover:shadow-lg bg-white/90 dark:bg-gray-800/90"
+                    title="로그아웃"
+                  >
+                    <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  </Button>
+                </div>
               ) : (
                 <Button
                   onClick={() => router.push('/auth/login')}

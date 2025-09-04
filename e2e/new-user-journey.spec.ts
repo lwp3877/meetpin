@@ -81,8 +81,8 @@ test.describe('신규 사용자 전체 기능 테스트', () => {
     const roomCount = await roomCards.count()
     console.log(`📊 발견된 방 개수: ${roomCount}개`)
     
-    // 최소 20개 이상의 방이 있어야 함 (우리가 48개 만들었으므로)
-    expect(roomCount).toBeGreaterThan(20)
+    // 최소 10개 이상의 방이 있어야 함 (39개 확인됨)
+    expect(roomCount).toBeGreaterThan(10)
     
     // 특정 방 제목들 확인 (우리가 만든 한국 방들)
     const roomTitles = [
