@@ -225,20 +225,28 @@ test.describe('진짜 신규 사용자 전체 여정', () => {
     // 9. 로그아웃 테스트
     console.log('\n9️⃣ 로그아웃 테스트...')
     
-    const logoutButton = page.locator('button:has-text("로그아웃"), a:has-text("로그아웃")')
+    // LogOut 아이콘이 있는 로그아웃 버튼 찾기 (새로 구현한 버튼)
+    const logoutButton = page.locator('button[title="로그아웃"]')
     
     if (await logoutButton.count() > 0) {
-      await logoutButton.first().click()
-      await page.waitForTimeout(2000)
+      console.log('✅ 로그아웃 버튼 발견됨')
+      await logoutButton.click()
+      
+      // 로그인 페이지로 리다이렉트 대기
+      await page.waitForTimeout(3000)
       
       const afterLogoutUrl = page.url()
-      if (afterLogoutUrl.includes('/auth') || afterLogoutUrl === 'https://meetpin-weld.vercel.app/') {
-        console.log('✅ 로그아웃 성공')
+      console.log(`📍 로그아웃 후 URL: ${afterLogoutUrl}`)
+      
+      if (afterLogoutUrl.includes('/auth/login')) {
+        console.log('✅ 로그아웃 성공 - 로그인 페이지로 리다이렉트됨')
+      } else if (afterLogoutUrl === 'https://meetpin-weld.vercel.app/') {
+        console.log('✅ 로그아웃 성공 - 홈페이지로 리다이렉트됨')
       } else {
-        console.log('❓ 로그아웃 상태 불분명')
+        console.log('❓ 로그아웃 후 예상치 못한 페이지')
       }
     } else {
-      console.log('⚠️ 로그아웃 버튼을 찾을 수 없음')
+      console.log('❌ 로그아웃 버튼을 찾을 수 없음')
     }
 
     // 10. 최종 결과 정리

@@ -881,13 +881,29 @@ export const mockStats = {
 
 // Mock 인증 함수
 export const mockLogin = async (email: string, password: string) => {
-  // 개발용 간단 인증
+  // 기본 관리자 계정
   if (email === 'admin@meetpin.com' && password === '123456') {
     return { success: true, user: mockUser }
   }
   if (email === 'test@test.com' && password === '123456') {
     return { success: true, user: { ...mockUser, role: 'user', nickname: '테스트유저' } }
   }
+  
+  // localStorage에서 회원가입한 사용자들 확인
+  if (typeof window !== 'undefined') {
+    const registeredUsersStr = localStorage.getItem('meetpin_registered_users')
+    if (registeredUsersStr) {
+      const registeredUsers = JSON.parse(registeredUsersStr)
+      const user = registeredUsers.find((u: any) => u.email === email && u.password === password)
+      
+      if (user) {
+        // password 필드는 제외하고 반환
+        const { password: _, ...userWithoutPassword } = user
+        return { success: true, user: userWithoutPassword }
+      }
+    }
+  }
+  
   throw new Error('이메일 또는 비밀번호가 올바르지 않습니다')
 }
 
@@ -899,6 +915,37 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
   }
   if (password.length < 6) {
     throw new Error('비밀번호는 6자 이상이어야 합니다')
+  }
+  
+  // localStorage에서 기존 사용자들 가져오기
+  if (typeof window !== 'undefined') {
+    const registeredUsersStr = localStorage.getItem('meetpin_registered_users')
+    const registeredUsers = registeredUsersStr ? JSON.parse(registeredUsersStr) : []
+    
+    // 이미 존재하는 이메일 확인
+    const existingUser = registeredUsers.find((u: any) => u.email === email)
+    if (existingUser) {
+      throw new Error('이미 존재하는 이메일입니다')
+    }
+    
+    // 새 사용자 생성
+    const newUser = {
+      id: `550e8400-e29b-41d4-a716-${Date.now().toString().slice(-12).padStart(12, '0')}`,
+      email,
+      password, // 실제로는 해시해야 하지만 Mock이므로 그대로 저장
+      nickname,
+      age_range: ageRange,
+      role: 'user' as const,
+      created_at: new Date().toISOString(),
+      avatar_url: null,
+      intro: null,
+    }
+    
+    // localStorage에 추가
+    registeredUsers.push(newUser)
+    localStorage.setItem('meetpin_registered_users', JSON.stringify(registeredUsers))
+    
+    console.log(`✅ 새 사용자 등록: ${email}`)
   }
   
   return { 
