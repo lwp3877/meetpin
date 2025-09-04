@@ -30,7 +30,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   const [isOpen, setIsOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // 알림 목록 가져오기
   const fetchNotifications = async () => {
@@ -154,6 +154,13 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         if (intervalRef.current) {
           clearInterval(intervalRef.current)
         }
+      }
+    }
+    
+    return () => {
+      // cleanup when user is null
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
       }
     }
   }, [user])
