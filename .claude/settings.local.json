@@ -71,7 +71,8 @@
       "Bash(pnpm audit:*)",
       "Bash(if [ -f \"src/lib/buildBuster.ts\" ])",
       "Bash(else echo \"buildBuster.ts not found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "mcp__github__create_or_update_file"
     ],
     "deny": [],
     "ask": []
