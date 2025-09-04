@@ -915,4 +915,4 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
 }
 
 // Mock 모드는 개발환경에서만 사용 - 프로덕션 완전 비활성화
-export const isDevelopmentMode = false
+export const isDevelopmentMode = true

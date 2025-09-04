@@ -1,6 +1,6 @@
 {
   "name": "meetpin",
-  "version": "1.2.0-enhanced-mock-data",
+  "version": "1.2.1-mock-data-fix",
   "description": "지도에서 방을 만들어 근처 사람들과 만나고, 새로운 인연을 만들어보세요",
   "keywords": [
     "nextjs",
