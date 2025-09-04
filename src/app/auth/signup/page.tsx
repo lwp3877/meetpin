@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { brandMessages } from '@/lib/brand'
 import { useAuth } from '@/lib/useAuth'
+import { SocialLogin } from '@/components/social-login'
 import toast from 'react-hot-toast'
 
 export default function SignUpPage() {
@@ -128,6 +129,25 @@ export default function SignUpPage() {
 
         {/* Sign Up Form */}
         <div className="bg-white rounded-xl shadow-xl p-8 border border-gray-100 backdrop-blur-sm">
+          
+          {/* Social Login */}
+          <SocialLogin 
+            type="signup" 
+            disabled={isLoading}
+            onSuccess={() => {
+              toast.success('소셜 가입이 완료되었습니다!')
+              router.push('/map')
+            }}
+          />
+
+          {/* Divider */}
+          <div className="relative flex items-center my-6">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-sm text-gray-500 bg-white px-2">
+              또는 이메일로 가입
+            </span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
           <form onSubmit={handleEmailSignUp} className="space-y-4">
             {/* Email */}
             <div>
@@ -291,8 +311,30 @@ export default function SignUpPage() {
           </Link>
         </div>
 
+        {/* Special Offer */}
+        <div className="mt-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-xl p-6 text-white shadow-xl border border-yellow-300">
+          <div className="text-center mb-4">
+            <div className="text-3xl mb-2">🎁</div>
+            <h3 className="text-xl font-bold mb-2">
+              신규 가입 특별 혜택!
+            </h3>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-4">
+              <div className="text-2xl font-bold mb-2">프리미엄 부스트 3일 무료</div>
+              <div className="text-sm opacity-90">
+                ✨ 내 모임이 상단에 노출되어 더 많은 사람들이 볼 수 있어요
+              </div>
+              <div className="text-sm opacity-90 mt-1">
+                💰 일반 가격: 2,500원 → <span className="font-bold line-through">무료</span>
+              </div>
+            </div>
+            <div className="text-sm">
+              지금 가입하면 자동으로 적용됩니다!
+            </div>
+          </div>
+        </div>
+
         {/* Benefits */}
-        <div className="mt-8 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-6 border border-primary/20">
+        <div className="mt-6 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl p-6 border border-primary/20">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
             🎉 밋핀과 함께하면
           </h3>
@@ -314,6 +356,12 @@ export default function SignUpPage() {
                 <span className="text-white text-sm">✓</span>
               </div>
               <span className="text-sm text-gray-700">안전하고 검증된 사용자들과의 만남</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-white text-sm">🎁</span>
+              </div>
+              <span className="text-sm text-gray-700 font-medium">신규 가입 시 프리미엄 부스트 3일 무료!</span>
             </div>
           </div>
         </div>

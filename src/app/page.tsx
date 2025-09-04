@@ -1,6 +1,7 @@
 /* 파일경로: src/app/page.tsx */
 'use client'
 
+
 import { useAuth } from '@/lib/useAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -13,7 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { ChevronLeft, ChevronRight, MapPin, Users, Calendar, Star } from 'lucide-react'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
 
-// Mock data for recommendation slider
+// Enhanced mock data for recommendation slider
 const FEATURED_ROOMS = [
   {
     id: '1',
@@ -26,7 +27,11 @@ const FEATURED_ROOMS = [
     time: '오늘 19:00',
     host: '미나💕',
     isBoost: true,
-    rating: 4.8
+    rating: 4.8,
+    tags: ['맛집투어', '새로운친구', '강남'],
+    description: '강남 유명 맛집 3곳을 돌며 맛있는 음식과 술을 즐겨요!',
+    hostAge: '20대 후반',
+    joinCount: 15
   },
   {
     id: '2', 
@@ -39,7 +44,11 @@ const FEATURED_ROOMS = [
     time: '내일 08:00',
     host: '지훈💪',
     isBoost: false,
-    rating: 4.9
+    rating: 4.9,
+    tags: ['건강한취미', '아침운동', '한강'],
+    description: '상쾌한 아침, 한강에서 함께 러닝하며 건강을 챙겨요!',
+    hostAge: '30대 초반',
+    joinCount: 23
   },
   {
     id: '3',
@@ -52,7 +61,45 @@ const FEATURED_ROOMS = [
     time: '이번 주말',
     host: '소영☕',
     isBoost: false,
-    rating: 4.7
+    rating: 4.7,
+    tags: ['카페투어', '감성충전', '홍대'],
+    description: '홍대 분위기 좋은 카페 3곳을 돌며 여유로운 시간을!',
+    hostAge: '20대 초반',
+    joinCount: 8
+  },
+  {
+    id: '4',
+    title: '🎬 CGV 영화관람',
+    category: 'other',
+    location: '강남 CGV',
+    participants: 2,
+    maxParticipants: 4,
+    fee: 15000,
+    time: '이번주 토요일',
+    host: '영화매니아',
+    isBoost: true,
+    rating: 4.6,
+    tags: ['영화관람', '주말여가', '강남'],
+    description: '화제의 신작 영화를 함께 보고 리뷰를 나눠요!',
+    hostAge: '30대 후반',
+    joinCount: 12
+  },
+  {
+    id: '5',
+    title: '🏀 농구 한 게임',
+    category: 'exercise',
+    location: '올림픽공원',
+    participants: 6,
+    maxParticipants: 8,
+    fee: 0,
+    time: '오늘 오후 3시',
+    host: '농구왕김치',
+    isBoost: false,
+    rating: 4.5,
+    tags: ['농구', '팀스포츠', '올림픽공원'],
+    description: '실력 상관없이 재미있게 농구 한 게임 어때요?',
+    hostAge: '20대 중반',
+    joinCount: 31
   }
 ]
 
@@ -168,6 +215,24 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* First-time visitor incentive banner */}
+      {!user && (
+        <div className="sticky top-16 z-40 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white py-3 px-4 shadow-lg">
+          <div className="container mx-auto text-center">
+            <div className="flex items-center justify-center space-x-2 text-sm font-semibold">
+              <span className="animate-pulse">🎁</span>
+              <span>첫 가입 시 프리미엄 부스트 3일 무료!</span>
+              <span className="animate-pulse">✨</span>
+              <Button asChild size="sm" variant="ghost" className="ml-4 bg-white/20 hover:bg-white/30 text-white border-white/30">
+                <Link href="/auth/signup">
+                  지금 가입하기
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className={`space-y-8 transform transition-all duration-1000 ${showWelcome ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -255,8 +320,52 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Quick Access Category Buttons */}
+          <div className="mt-12">
+            <h3 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-gray-200">
+              어떤 모임을 찾고 계신가요? 🎯
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+              <Card className="group cursor-pointer bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800 hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    onClick={() => router.push('/drink')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">🍻</div>
+                  <h4 className="font-bold text-orange-700 dark:text-orange-300 text-lg mb-2">술친구 찾기</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">혼자 마시기 아쉬운 날</p>
+                  <Badge className="mt-2 bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300">
+                    2,847개 모임
+                  </Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="group cursor-pointer bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-emerald-200 dark:border-emerald-800 hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    onClick={() => router.push('/exercise')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">💪</div>
+                  <h4 className="font-bold text-emerald-700 dark:text-emerald-300 text-lg mb-2">운동메이트</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">함께 운동하고 건강해져요</p>
+                  <Badge className="mt-2 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                    3,245개 모임
+                  </Badge>
+                </CardContent>
+              </Card>
+
+              <Card className="group cursor-pointer bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800 hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    onClick={() => router.push('/hobby')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">✨</div>
+                  <h4 className="font-bold text-purple-700 dark:text-purple-300 text-lg mb-2">취미친구</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">같은 취미를 가진 사람들과</p>
+                  <Badge className="mt-2 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
+                    2,156개 모임
+                  </Badge>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
           {/* Enhanced CTA Buttons */}
-          <div className="mt-12 space-y-6">
+          <div className="mt-8 space-y-6">
             {user ? (
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button
@@ -342,59 +451,85 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="relative max-w-md mx-auto">
-            <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl overflow-hidden">
+          <div className="relative max-w-lg mx-auto">
+            <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-0 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300">
               <CardContent className="p-0">
-                <div className="relative aspect-[4/3] bg-gradient-to-br from-emerald-500/20 to-teal-500/20 dark:from-emerald-800/30 dark:to-teal-800/30 p-6 flex flex-col justify-between">
+                <div className="relative aspect-[5/4] bg-gradient-to-br from-emerald-500/20 to-teal-500/20 dark:from-emerald-800/30 dark:to-teal-800/30 p-6 flex flex-col justify-between">
                   {/* Boost Badge */}
                   {FEATURED_ROOMS[currentSlide].isBoost && (
                     <div className="absolute top-4 right-4">
-                      <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg">
+                      <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg animate-pulse">
                         <Star className="h-3 w-3 mr-1" />
                         부스트
                       </Badge>
                     </div>
                   )}
 
-                  {/* Category Badge */}
+                  {/* Category Badge & Rating */}
                   <div className="flex justify-between items-start">
-                    <Badge variant="secondary" className="bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200">
+                    <Badge variant="secondary" className="bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 shadow-md">
                       {FEATURED_ROOMS[currentSlide].category === 'drink' ? '🍻 술' :
                        FEATURED_ROOMS[currentSlide].category === 'exercise' ? '💪 운동' : '✨ 기타'}
                     </Badge>
-                    <div className="flex items-center text-yellow-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="ml-1 text-sm font-semibold">
+                    <div className="flex items-center bg-white/90 dark:bg-gray-800/90 rounded-full px-2 py-1 shadow-md">
+                      <Star className="h-4 w-4 fill-current text-yellow-500" />
+                      <span className="ml-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
                         {FEATURED_ROOMS[currentSlide].rating}
                       </span>
                     </div>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                    {FEATURED_ROOMS[currentSlide].title}
-                  </h3>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                      {FEATURED_ROOMS[currentSlide].title}
+                    </h3>
+                    {/* Join Count Badge */}
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline" className="text-xs bg-white/80 dark:bg-gray-800/80 border-emerald-300 text-emerald-700 dark:text-emerald-300">
+                        지금까지 {FEATURED_ROOMS[currentSlide].joinCount}명이 참여했어요
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-6 space-y-4">
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {FEATURED_ROOMS[currentSlide].description}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {FEATURED_ROOMS[currentSlide].tags?.map((tag, index) => (
+                      <Badge 
+                        key={index}
+                        variant="secondary" 
+                        className="text-xs px-2 py-1 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700"
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+
                   {/* Location & Time */}
                   <div className="space-y-2">
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <MapPin className="h-4 w-4 mr-2 text-emerald-500" />
-                      <span className="text-sm">{FEATURED_ROOMS[currentSlide].location}</span>
+                      <span className="text-sm font-medium">{FEATURED_ROOMS[currentSlide].location}</span>
                     </div>
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Calendar className="h-4 w-4 mr-2 text-blue-500" />
-                      <span className="text-sm">{FEATURED_ROOMS[currentSlide].time}</span>
+                      <span className="text-sm font-medium">{FEATURED_ROOMS[currentSlide].time}</span>
                     </div>
                   </div>
 
                   {/* Stats */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Users className="h-4 w-4 mr-2 text-purple-500" />
-                      <span className="text-sm">
-                        {FEATURED_ROOMS[currentSlide].participants}/{FEATURED_ROOMS[currentSlide].maxParticipants}명 참여
+                      <span className="text-sm font-medium">
+                        {FEATURED_ROOMS[currentSlide].participants}/{FEATURED_ROOMS[currentSlide].maxParticipants}명
                       </span>
                     </div>
                     <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
@@ -402,20 +537,29 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Host */}
-                  <div className="text-center pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">호스트: </span>
-                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {FEATURED_ROOMS[currentSlide].host}
-                    </span>
+                  {/* Host Info */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {FEATURED_ROOMS[currentSlide].host[0]}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                          {FEATURED_ROOMS[currentSlide].host}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {FEATURED_ROOMS[currentSlide].hostAge}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* CTA */}
+                  {/* Enhanced CTA */}
                   <Button 
                     onClick={handleCTAClick}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
-                    참여하러 가기
+                    🚀 지금 참여하기
                   </Button>
                 </div>
               </CardContent>

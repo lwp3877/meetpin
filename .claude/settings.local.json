@@ -68,7 +68,10 @@
       "Bash(git reset:*)",
       "WebFetch(domain:api.github.com)",
       "Bash(git show:*)",
-      "Bash(pnpm audit:*)"
+      "Bash(pnpm audit:*)",
+      "Bash(if [ -f \"src/lib/buildBuster.ts\" ])",
+      "Bash(else echo \"buildBuster.ts not found\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

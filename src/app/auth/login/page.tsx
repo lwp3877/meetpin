@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { brandMessages } from '@/lib/brand'
 import { useAuth } from '@/lib/useAuth'
 import { isDevelopmentMode } from '@/lib/mockData'
+import { SocialLogin } from '@/components/social-login'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
@@ -87,6 +88,26 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="bg-white rounded-xl shadow-xl p-8 border border-gray-100 backdrop-blur-sm">
+          
+          {/* Social Login */}
+          <SocialLogin 
+            type="login" 
+            disabled={isLoading}
+            onSuccess={() => {
+              toast.success('소셜 로그인이 완료되었습니다!')
+              router.push('/map')
+            }}
+          />
+
+          {/* Divider */}
+          <div className="relative flex items-center my-6">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-sm text-gray-500 bg-white px-2">
+              또는 이메일로 로그인
+            </span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+          
           {/* 개발자용 임시 로그인 정보 */}
           {isDevelopmentMode && (
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">

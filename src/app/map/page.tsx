@@ -1,6 +1,7 @@
 /* 파일경로: src/app/map/page.tsx */
 'use client'
 
+
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
