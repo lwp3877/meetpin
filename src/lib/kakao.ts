@@ -33,8 +33,8 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     return loadPromise
   }
 
-  // API 키 확인
-  const key = apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
+  // API 키 확인 (프로덕션에서 하드코딩된 키 사용)
+  const key = apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
   if (!key) {
     return Promise.reject(new Error('Kakao Maps API 키가 설정되지 않았습니다'))
   }
