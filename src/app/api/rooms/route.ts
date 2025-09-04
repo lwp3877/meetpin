@@ -4,7 +4,8 @@ import { createMethodRouter, parseQueryParams, parsePaginationParams, withRateLi
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/zodSchemas'
 import { parseBBoxParam } from '@/lib/bbox'
-import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
+import { mockRooms } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/flags'
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
   const searchParams = parseQueryParams(request)
