@@ -38,6 +38,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       }
       
       localStorage.setItem('meetpin_user', JSON.stringify(mockKakaoUser))
+      document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockKakaoUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Kakao login error:', error)
@@ -69,6 +70,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       }
       
       localStorage.setItem('meetpin_user', JSON.stringify(mockGoogleUser))
+      document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockGoogleUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Google login error:', error)
@@ -100,6 +102,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       }
       
       localStorage.setItem('meetpin_user', JSON.stringify(mockNaverUser))
+      document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockNaverUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Naver login error:', error)

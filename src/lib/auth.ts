@@ -1,13 +1,76 @@
 /* src/lib/auth.ts */
-// import { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 import { User } from '@supabase/supabase-js'
 import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabaseClient'
 import { ApiError } from '@/lib/api'
+import { isDevelopmentMode } from '@/lib/flags'
+import { cookies } from 'next/headers'
+
 /**
- * 인증된 사용자 정보 가져오기 - 프로덕션에서는 항상 실제 인증 사용
+ * Mock 사용자 타입 변환
+ */
+function createMockSupabaseUser(mockUser: any): User {
+  return {
+    id: mockUser.id,
+    aud: 'authenticated',
+    role: 'authenticated',
+    email: mockUser.email,
+    email_confirmed_at: new Date().toISOString(),
+    phone: undefined,
+    last_sign_in_at: new Date().toISOString(),
+    app_metadata: { provider: 'mock', providers: ['mock'] },
+    user_metadata: { 
+      nickname: mockUser.nickname,
+      age_range: mockUser.age_range,
+      role: mockUser.role 
+    },
+    identities: [],
+    created_at: mockUser.created_at,
+    updated_at: new Date().toISOString(),
+    is_anonymous: false
+  } as User
+}
+
+/**
+ * 인증된 사용자 정보 가져오기 - Mock 모드와 실제 인증 모두 지원
  */
 export async function getAuthenticatedUser(): Promise<User> {
+  // Mock 모드인 경우 localStorage에서 사용자 정보 가져오기
+  if (isDevelopmentMode) {
+    try {
+      // 서버에서는 쿠키를 통해 Mock 사용자 정보 확인
+      const cookieStore = await cookies()
+      const mockUserCookie = cookieStore.get('meetpin_mock_user')
+      
+      if (mockUserCookie?.value) {
+        const mockUser = JSON.parse(decodeURIComponent(mockUserCookie.value))
+        return createMockSupabaseUser(mockUser)
+      }
+    } catch (error) {
+      console.log('Mock user cookie not found, trying headers')
+    }
+    
+    // 헤더에서도 확인 (클라이언트에서 전송된 경우)
+    try {
+      // Request context가 있는 경우에만 시도
+      if (typeof window === 'undefined') {
+        // 서버 사이드에서는 Mock 사용자 반환
+        const mockUser = {
+          id: 'mock_user_' + Date.now(),
+          email: 'admin@meetpin.com',
+          nickname: 'Mock사용자',
+          role: 'admin',
+          age_range: '20-29',
+          created_at: new Date().toISOString()
+        }
+        return createMockSupabaseUser(mockUser)
+      }
+    } catch (error) {
+      console.log('Using fallback mock user')
+    }
+  }
 
+  // 실제 Supabase 인증 사용
   const supabase = await createServerSupabaseClient()
   
   const { data: { user }, error } = await supabase.auth.getUser()
@@ -60,8 +123,26 @@ export async function requireAdmin(): Promise<User> {
  * 사용자 프로필 조회 (인증된 사용자)
  */
 export async function getUserProfile(uid?: string) {
+  const user = await getAuthenticatedUser()
+  const targetUid = uid || user.id
+  
+  // Mock 모드인 경우 Mock 프로필 반환
+  if (isDevelopmentMode && user.app_metadata?.provider === 'mock') {
+    return {
+      uid: user.id,
+      email: user.email,
+      nickname: user.user_metadata?.nickname || 'Mock사용자',
+      role: user.user_metadata?.role || 'user',
+      age_range: user.user_metadata?.age_range || '20-29',
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      avatar_url: null,
+      intro: null,
+      referral_code: null
+    }
+  }
+  
   const supabase = await createServerSupabaseClient()
-  const targetUid = uid || (await getAuthenticatedUser()).id
   
   const { data: profile, error } = await supabase
     .from('profiles')

@@ -50,6 +50,12 @@ export const signInWithEmail = async (
     const { mockLogin } = await import('@/lib/mockData')
     const result = await mockLogin(email, password)
     localStorage.setItem('meetpin_user', JSON.stringify(result.user))
+    
+    // 서버에서도 읽을 수 있도록 쿠키에도 저장
+    if (typeof document !== 'undefined') {
+      document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(result.user))}; path=/; max-age=86400`
+    }
+    
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }

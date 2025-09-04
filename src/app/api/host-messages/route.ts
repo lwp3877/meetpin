@@ -1,9 +1,10 @@
 /* src/app/api/host-messages/route.ts */
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
+import { ApiError, ApiResponse, rateLimit } from '@/lib/api'
+import { getAuthenticatedUser } from '@/lib/auth'
 import { createHostMessageSchema } from '@/lib/zodSchemas'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/flags'
 
 // 호스트 메시지 전송
 export async function POST(req: NextRequest) {
