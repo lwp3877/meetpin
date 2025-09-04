@@ -21,9 +21,9 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     
     try {
       if (isDevelopmentMode) {
-        // Mock implementation for development
-        toast.success('카카오 로그인은 곧 지원 예정입니다!')
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // Development mode - show mock message
+        toast.success('개발 모드: 카카오 로그인 시뮬레이션')
+        await new Promise(resolve => setTimeout(resolve, 1000))
         if (onSuccess) onSuccess()
         return
       }
@@ -53,9 +53,9 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     
     try {
       if (isDevelopmentMode) {
-        // Mock implementation for development
-        toast.success('구글 로그인은 곧 지원 예정입니다!')
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // Development mode - show mock message
+        toast.success('개발 모드: 구글 로그인 시뮬레이션')
+        await new Promise(resolve => setTimeout(resolve, 1000))
         if (onSuccess) onSuccess()
         return
       }
@@ -85,16 +85,15 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     
     try {
       if (isDevelopmentMode) {
-        // Mock implementation for development
-        toast.success('네이버 로그인은 곧 지원 예정입니다!')
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        // Development mode - show mock message
+        toast.success('개발 모드: 네이버 로그인 시뮬레이션')
+        await new Promise(resolve => setTimeout(resolve, 1000))
         if (onSuccess) onSuccess()
         return
       }
 
-      // For production, Naver is not yet supported by Supabase
-      // Would need custom implementation
-      toast.error('네이버 로그인은 아직 준비 중입니다. 다른 방법을 이용해주세요.')
+      // For production, Naver is not supported by Supabase yet
+      toast.error('네이버 로그인은 준비 중입니다. 카카오/구글 로그인을 이용해주세요.')
     } catch (error: any) {
       console.error('Naver login error:', error)
       toast.error('네이버 로그인 중 오류가 발생했습니다')

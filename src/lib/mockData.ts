@@ -610,7 +610,5 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
   }
 }
 
-// 환경변수 기반으로 개발 모드 결정
-export const isDevelopmentMode = 
-  process.env.NEXT_PUBLIC_FORCE_MOCK === 'true' || 
-  process.env.NODE_ENV !== 'production'
+// Mock 모드는 개발환경에서만 사용 - 프로덕션 완전 비활성화
+export const isDevelopmentMode = false
