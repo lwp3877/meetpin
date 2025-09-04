@@ -4,6 +4,8 @@
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
+import { isDevelopmentMode } from '@/lib/flags'
 
 interface SocialLoginProps {
   type?: 'login' | 'signup'
@@ -18,16 +20,29 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('kakao')
     
     try {
-      // Mock implementation - 실제 환경에서는 카카오 SDK 사용
-      toast.success('카카오 로그인은 곧 지원 예정입니다!')
-      // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      if (onSuccess) {
-        onSuccess()
+      if (isDevelopmentMode) {
+        // Mock implementation for development
+        toast.success('카카오 로그인은 곧 지원 예정입니다!')
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        if (onSuccess) onSuccess()
+        return
       }
-    } catch {
-      toast.error('카카오 로그인에 실패했습니다')
+
+      // Production Supabase OAuth
+      const supabase = createBrowserSupabaseClient()
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+      
+      if (error) {
+        toast.error('카카오 로그인에 실패했습니다: ' + error.message)
+      }
+    } catch (error: any) {
+      console.error('Kakao login error:', error)
+      toast.error('카카오 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)
     }
@@ -37,16 +52,29 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('google')
     
     try {
-      // Mock implementation - 실제 환경에서는 Google OAuth 사용
-      toast.success('구글 로그인은 곧 지원 예정입니다!')
-      // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      if (onSuccess) {
-        onSuccess()
+      if (isDevelopmentMode) {
+        // Mock implementation for development
+        toast.success('구글 로그인은 곧 지원 예정입니다!')
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        if (onSuccess) onSuccess()
+        return
       }
-    } catch {
-      toast.error('구글 로그인에 실패했습니다')
+
+      // Production Supabase OAuth
+      const supabase = createBrowserSupabaseClient()
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+      
+      if (error) {
+        toast.error('구글 로그인에 실패했습니다: ' + error.message)
+      }
+    } catch (error: any) {
+      console.error('Google login error:', error)
+      toast.error('구글 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)
     }
@@ -56,16 +84,20 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('naver')
     
     try {
-      // Mock implementation - 실제 환경에서는 네이버 로그인 API 사용
-      toast.success('네이버 로그인은 곧 지원 예정입니다!')
-      // Simulate loading time
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      if (onSuccess) {
-        onSuccess()
+      if (isDevelopmentMode) {
+        // Mock implementation for development
+        toast.success('네이버 로그인은 곧 지원 예정입니다!')
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        if (onSuccess) onSuccess()
+        return
       }
-    } catch {
-      toast.error('네이버 로그인에 실패했습니다')
+
+      // For production, Naver is not yet supported by Supabase
+      // Would need custom implementation
+      toast.error('네이버 로그인은 아직 준비 중입니다. 다른 방법을 이용해주세요.')
+    } catch (error: any) {
+      console.error('Naver login error:', error)
+      toast.error('네이버 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)
     }

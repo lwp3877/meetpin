@@ -23,10 +23,11 @@ export interface AuthResult {
   error?: string
 }
 
+import { isDevelopmentMode as _isDevelopmentMode } from '@/lib/flags'
+
 // Mock 모드 여부를 결정하는 함수
 export const isDevelopmentMode = (): boolean => {
-  return process.env.NEXT_PUBLIC_FORCE_MOCK === 'true' || 
-         process.env.NODE_ENV !== 'production'
+  return _isDevelopmentMode
 }
 
 // 현재 인증된 사용자 정보 가져오기
