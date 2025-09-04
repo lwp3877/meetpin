@@ -19,6 +19,15 @@ export const koreanAvatars = {
     'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', // 단발 여성
     'https://images.unsplash.com/photo-1494790108755-2616b9ee3cde?w=150&h=150&fit=crop&crop=face', // 자연스러운 여성
     'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face', // 프로페셔널 여성
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', // 웃는 여성
+    'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face', // 캐주얼한 여성
+    'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=150&h=150&fit=crop&crop=face', // 친근한 여성
+    'https://images.unsplash.com/photo-1557555187-23d685287bc3?w=150&h=150&fit=crop&crop=face', // 세련된 여성
+    'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&h=150&fit=crop&crop=face', // 활발한 여성
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop&crop=face', // 밝은 여성
+    'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face', // 지적인 여성
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face', // 우아한 여성
+    'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=150&fit=crop&crop=face', // 모던한 여성
   ]
 }
 

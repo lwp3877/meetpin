@@ -55,6 +55,87 @@ export const mockUsers = [
     created_at: '2024-02-15T11:20:00Z',
     avatar_url: koreanAvatars.male[2], // 미소짓는 한국 남성
   },
+  // 추가 여성 사용자들
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440006',
+    nickname: '박서연',
+    age_range: '20s_early',
+    role: 'user',
+    created_at: '2024-03-01T09:30:00Z',
+    avatar_url: koreanAvatars.female[2], // 미소짓는 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440007',
+    nickname: '김소희',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-03-05T14:15:00Z',
+    avatar_url: koreanAvatars.female[3], // 단발 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440008',
+    nickname: '이지민',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-03-10T16:20:00Z',
+    avatar_url: koreanAvatars.female[4], // 자연스러운 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440009',
+    nickname: '윤하나',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-03-15T11:45:00Z',
+    avatar_url: koreanAvatars.female[5], // 프로페셔널 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440010',
+    nickname: '강민지',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-03-20T13:30:00Z',
+    avatar_url: koreanAvatars.female[6], // 웃는 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440011',
+    nickname: '조예린',
+    age_range: '20s_early',
+    role: 'user',
+    created_at: '2024-03-25T15:10:00Z',
+    avatar_url: koreanAvatars.female[7], // 캐주얼한 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440012',
+    nickname: '한수지',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-03-28T10:20:00Z',
+    avatar_url: koreanAvatars.female[8], // 친근한 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440013',
+    nickname: '송다은',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-04-01T12:40:00Z',
+    avatar_url: koreanAvatars.female[9], // 세련된 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440014',
+    nickname: '임유진',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-04-05T14:55:00Z',
+    avatar_url: koreanAvatars.female[10], // 활발한 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440015',
+    nickname: '최애리',
+    age_range: '30s_late',
+    role: 'user',
+    created_at: '2024-04-10T09:25:00Z',
+    avatar_url: koreanAvatars.female[11], // 밝은 여성
+  },
 ]
 
 // 현재 시간 기준으로 진행 중인 방들을 생성
@@ -531,6 +612,229 @@ export const mockRooms = [
     profiles: {
       nickname: '맥주브루어',
       avatar_url: koreanAvatars.female[3],
+      age_range: '30s_late',
+    }
+  },
+  
+  // 여성 호스트들의 다양한 모임들 추가
+  {
+    id: '550e8400-e29b-41d4-a716-446655440036',
+    title: '압구정 브런치 카페 투어 🥐',
+    category: 'other' as const,
+    lat: 37.5272,
+    lng: 127.0286,
+    place_text: '압구정역 브런치 카페',
+    start_at: getUpcomingDate(26), // 모레 아침
+    max_people: 4,
+    fee: 30000,
+    boost_until: getBoostDate(8), // 8시간 동안 부스트
+    profiles: {
+      nickname: '박서연',
+      avatar_url: koreanAvatars.female[2],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440037',
+    title: '한남동 갤러리 투어 🎨',
+    category: 'other' as const,
+    lat: 37.5342,
+    lng: 127.0024,
+    place_text: '한남동 갤러리',
+    start_at: getUpcomingDate(49), // 3일 후 오후
+    max_people: 6,
+    fee: 20000,
+    boost_until: null,
+    profiles: {
+      nickname: '김소희',
+      avatar_url: koreanAvatars.female[3],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440038',
+    title: '이태원 국제 요리 클래스 👩‍🍳',
+    category: 'other' as const,
+    lat: 37.5349,
+    lng: 126.9947,
+    place_text: '이태원 쿠킹 스튜디오',
+    start_at: getUpcomingDate(67), // 4일 후 저녁
+    max_people: 8,
+    fee: 45000,
+    boost_until: getBoostDate(12), // 12시간 동안 부스트
+    profiles: {
+      nickname: '이지민',
+      avatar_url: koreanAvatars.female[4],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440039',
+    title: '서촌 한옥마을 산책 🏠',
+    category: 'other' as const,
+    lat: 37.5816,
+    lng: 126.9675,
+    place_text: '서촌 한옥마을',
+    start_at: getUpcomingDate(35), // 모레 오후
+    max_people: 5,
+    fee: 0,
+    boost_until: null,
+    profiles: {
+      nickname: '윤하나',
+      avatar_url: koreanAvatars.female[5],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440040',
+    title: '강남 플라워 클래스 💐',
+    category: 'other' as const,
+    lat: 37.5048,
+    lng: 127.0266,
+    place_text: '강남역 플라워샵',
+    start_at: getUpcomingDate(53), // 3일 후 저녁
+    max_people: 6,
+    fee: 35000,
+    boost_until: getBoostDate(6), // 6시간 동안 부스트
+    profiles: {
+      nickname: '강민지',
+      avatar_url: koreanAvatars.female[6],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440041',
+    title: '홍대 댄스 클래스 💃',
+    category: 'exercise' as const,
+    lat: 37.5563,
+    lng: 126.9236,
+    place_text: '홍대 댄스 스튜디오',
+    start_at: getUpcomingDate(29), // 모레 저녁
+    max_people: 10,
+    fee: 20000,
+    boost_until: getBoostDate(10), // 10시간 동안 부스트
+    profiles: {
+      nickname: '조예린',
+      avatar_url: koreanAvatars.female[7],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440042',
+    title: '성수 베이커리 투어 🧁',
+    category: 'other' as const,
+    lat: 37.5440,
+    lng: 127.0563,
+    place_text: '성수동 베이커리 카페',
+    start_at: getUpcomingDate(56), // 3일 후 오후
+    max_people: 4,
+    fee: 25000,
+    boost_until: null,
+    profiles: {
+      nickname: '한수지',
+      avatar_url: koreanAvatars.female[8],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440043',
+    title: '청담 스파 & 웰니스 🧖‍♀️',
+    category: 'other' as const,
+    lat: 37.5173,
+    lng: 127.0602,
+    place_text: '청담동 스파',
+    start_at: getUpcomingDate(87), // 5일 후 오후
+    max_people: 4,
+    fee: 80000,
+    boost_until: getBoostDate(24), // 24시간 동안 부스트
+    profiles: {
+      nickname: '송다은',
+      avatar_url: koreanAvatars.female[9],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440044',
+    title: '여의도 야경 크루즈 🌃',
+    category: 'other' as const,
+    lat: 37.5294,
+    lng: 126.9248,
+    place_text: '여의도 한강공원',
+    start_at: getUpcomingDate(76), // 5일 후 저녁
+    max_people: 8,
+    fee: 35000,
+    boost_until: getBoostDate(15), // 15시간 동안 부스트
+    profiles: {
+      nickname: '임유진',
+      avatar_url: koreanAvatars.female[10],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440045',
+    title: '건대 보드게임 카페 🎲',
+    category: 'other' as const,
+    lat: 37.5403,
+    lng: 127.0696,
+    place_text: '건대입구역 보드게임 카페',
+    start_at: getUpcomingDate(22), // 내일 저녁
+    max_people: 6,
+    fee: 15000,
+    boost_until: null,
+    profiles: {
+      nickname: '최애리',
+      avatar_url: koreanAvatars.female[11],
+      age_range: '30s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440046',
+    title: '삼청동 한복 체험 👘',
+    category: 'other' as const,
+    lat: 37.5855,
+    lng: 126.9838,
+    place_text: '삼청동 한복대여점',
+    start_at: getUpcomingDate(92), // 6일 후 오전
+    max_people: 5,
+    fee: 25000,
+    boost_until: getBoostDate(20), // 20시간 동안 부스트
+    profiles: {
+      nickname: '박서연',
+      avatar_url: koreanAvatars.female[12],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440047',
+    title: '마포 수제 케이크 만들기 🍰',
+    category: 'other' as const,
+    lat: 37.5420,
+    lng: 126.9520,
+    place_text: '마포구 베이킹 클래스',
+    start_at: getUpcomingDate(65), // 4일 후 오후
+    max_people: 8,
+    fee: 40000,
+    boost_until: getBoostDate(8), // 8시간 동안 부스트
+    profiles: {
+      nickname: '송다은',
+      avatar_url: koreanAvatars.female[13],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440048',
+    title: '노량진 야시장 투어 🌮',
+    category: 'other' as const,
+    lat: 37.5142,
+    lng: 126.9422,
+    place_text: '노량진 컵밥거리',
+    start_at: getUpcomingDate(39), // 3일 후 저녁
+    max_people: 6,
+    fee: 20000,
+    boost_until: null,
+    profiles: {
+      nickname: '최애리',
+      avatar_url: koreanAvatars.female[14],
       age_range: '30s_late',
     }
   }

@@ -73,7 +73,10 @@
       "Bash(else echo \"buildBuster.ts not found\")",
       "Bash(fi)",
       "mcp__github__create_or_update_file",
-      "WebFetch(domain:meetpin-git-main-meetpins-projects.vercel.app)"
+      "WebFetch(domain:meetpin-git-main-meetpins-projects.vercel.app)",
+      "Bash(pnpm playwright:*)",
+      "Bash(node:*)",
+      "Bash(pnpm exec:*)"
     ],
     "deny": [],
     "ask": []
