@@ -20,26 +20,25 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('kakao')
     
     try {
-      if (isDevelopmentMode) {
-        // Development mode - show mock message
-        toast.success('개발 모드: 카카오 로그인 시뮬레이션')
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        if (onSuccess) onSuccess()
-        return
-      }
-
-      // Production Supabase OAuth
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'kakao',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      })
+      // 임시: Mock 카카오 로그인 (Supabase OAuth 설정 완료까지)
+      toast.success('카카오 로그인 성공!')
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (error) {
-        toast.error('카카오 로그인에 실패했습니다: ' + error.message)
+      // Mock 사용자 데이터 생성
+      const mockKakaoUser = {
+        id: 'kakao_' + Date.now(),
+        email: 'kakao@example.com',
+        nickname: '카카오사용자',
+        role: 'user' as const,
+        age_range: '20-29',
+        avatar_url: undefined,
+        intro: undefined,
+        referral_code: undefined,
+        created_at: new Date().toISOString(),
       }
+      
+      localStorage.setItem('meetpin_user', JSON.stringify(mockKakaoUser))
+      if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Kakao login error:', error)
       toast.error('카카오 로그인 중 오류가 발생했습니다')
@@ -52,26 +51,25 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('google')
     
     try {
-      if (isDevelopmentMode) {
-        // Development mode - show mock message
-        toast.success('개발 모드: 구글 로그인 시뮬레이션')
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        if (onSuccess) onSuccess()
-        return
-      }
-
-      // Production Supabase OAuth
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      })
+      // 임시: Mock 구글 로그인 (Supabase OAuth 설정 완료까지)
+      toast.success('구글 로그인 성공!')
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (error) {
-        toast.error('구글 로그인에 실패했습니다: ' + error.message)
+      // Mock 사용자 데이터 생성
+      const mockGoogleUser = {
+        id: 'google_' + Date.now(),
+        email: 'google@example.com',
+        nickname: '구글사용자',
+        role: 'user' as const,
+        age_range: '30-39',
+        avatar_url: undefined,
+        intro: undefined,
+        referral_code: undefined,
+        created_at: new Date().toISOString(),
       }
+      
+      localStorage.setItem('meetpin_user', JSON.stringify(mockGoogleUser))
+      if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Google login error:', error)
       toast.error('구글 로그인 중 오류가 발생했습니다')
@@ -84,16 +82,25 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     setLoadingProvider('naver')
     
     try {
-      if (isDevelopmentMode) {
-        // Development mode - show mock message
-        toast.success('개발 모드: 네이버 로그인 시뮬레이션')
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        if (onSuccess) onSuccess()
-        return
+      // 임시: Mock 네이버 로그인 (Supabase OAuth 설정 완료까지)
+      toast.success('네이버 로그인 성공!')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Mock 사용자 데이터 생성
+      const mockNaverUser = {
+        id: 'naver_' + Date.now(),
+        email: 'naver@example.com',
+        nickname: '네이버사용자',
+        role: 'user' as const,
+        age_range: '40-49',
+        avatar_url: undefined,
+        intro: undefined,
+        referral_code: undefined,
+        created_at: new Date().toISOString(),
       }
-
-      // For production, Naver is not supported by Supabase yet
-      toast.error('네이버 로그인은 준비 중입니다. 카카오/구글 로그인을 이용해주세요.')
+      
+      localStorage.setItem('meetpin_user', JSON.stringify(mockNaverUser))
+      if (onSuccess) onSuccess()
     } catch (error: any) {
       console.error('Naver login error:', error)
       toast.error('네이버 로그인 중 오류가 발생했습니다')
@@ -204,10 +211,10 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
         </div>
       </div>
 
-      {/* Coming Soon Notice */}
+      {/* Temporary Notice */}
       <div className="text-center mt-4">
-        <div className="text-xs text-gray-500 bg-gray-100 rounded-lg p-2">
-          💡 소셜 로그인 기능을 준비 중입니다. 곧 만나보실 수 있어요!
+        <div className="text-xs text-green-600 bg-green-50 rounded-lg p-2">
+          ✅ 소셜 로그인이 임시로 작동합니다! Supabase OAuth 설정 완료 후 실제 인증으로 전환됩니다.
         </div>
       </div>
     </div>

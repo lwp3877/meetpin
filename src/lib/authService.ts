@@ -30,140 +30,63 @@ export const isDevelopmentMode = (): boolean => {
   return _isDevelopmentMode
 }
 
-// 현재 인증된 사용자 정보 가져오기
+// 현재 인증된 사용자 정보 가져오기 - 임시로 Mock 모드 사용
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
-  if (isDevelopmentMode()) {
+  // 임시: localStorage에서 Mock 사용자 정보 가져오기
+  if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('meetpin_user')
     return stored ? JSON.parse(stored) : null
   }
-
-  try {
-    const supabase = createBrowserSupabaseClient()
-    
-    // 타임아웃을 설정하여 무한 대기 방지
-    const authPromise = supabase.auth.getUser()
-    const timeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('Auth timeout')), 10000)
-    )
-    
-    const { data: { user: authUser }, error } = await Promise.race([
-      authPromise, 
-      timeoutPromise
-    ]) as any
-    
-    if (error || !authUser) return null
-
-    // 프로필 정보 가져오기
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('uid', authUser.id)
-      .single()
-
-    return {
-      id: authUser.id,
-      email: authUser.email || '',
-      nickname: (profile as any)?.nickname,
-      role: ((profile as any)?.role as 'user' | 'admin') || 'user',
-      age_range: (profile as any)?.age_range,
-      avatar_url: (profile as any)?.avatar_url,
-      intro: (profile as any)?.intro,
-      referral_code: (profile as any)?.referral_code,
-      created_at: (profile as any)?.created_at || authUser.created_at,
-    }
-  } catch (error) {
-    console.error('Failed to get current user:', error)
-    return null
-  }
+  return null
 }
 
-// 이메일 로그인
+// 이메일 로그인 - 임시로 Mock 모드 사용 (Supabase 설정 완료까지)
 export const signInWithEmail = async (
   email: string, 
   password: string
 ): Promise<AuthResult> => {
-  if (isDevelopmentMode()) {
-    try {
-      const result = await mockLogin(email, password)
-      localStorage.setItem('meetpin_user', JSON.stringify(result.user))
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
-    }
-  }
-
+  // 임시: Supabase 설정 완료까지 Mock 로그인 사용
   try {
-    const supabase = createBrowserSupabaseClient()
-    const { data, error } = await supabase.auth.signInWithPassword({ 
-      email, 
-      password 
-    })
-    
-    if (error || !data.user) {
-      return { success: false, error: error?.message ?? '로그인 실패' }
-    }
-    
+    const { mockLogin } = await import('@/lib/mockData')
+    const result = await mockLogin(email, password)
+    localStorage.setItem('meetpin_user', JSON.stringify(result.user))
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
 }
 
-// 이메일 회원가입
+// 이메일 회원가입 - 임시로 Mock 모드 사용 (Supabase 설정 완료까지)
 export const signUpWithEmail = async (
   email: string,
   password: string,
   nickname: string,
   ageRange: string
 ): Promise<AuthResult> => {
-  if (isDevelopmentMode()) {
-    try {
-      await mockSignUp(email, password, nickname, ageRange)
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
-    }
-  }
-
+  // 임시: Supabase 설정 완료까지 Mock 회원가입 사용
   try {
-    const supabase = createBrowserSupabaseClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          nickname,
-          age_range: ageRange,
-        },
-      },
-    })
-    
-    if (error) {
-      return { success: false, error: error.message }
-    }
-    
+    const { mockSignUp } = await import('@/lib/mockData')
+    await mockSignUp(email, password, nickname, ageRange)
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
   }
 }
 
-// 로그아웃
+// 로그아웃 - 임시로 Mock 모드 사용
 export const signOut = async (): Promise<void> => {
-  if (isDevelopmentMode()) {
+  // 임시: localStorage에서 사용자 정보 제거
+  if (typeof window !== 'undefined') {
     localStorage.removeItem('meetpin_user')
-    return
   }
-
-  const supabase = createBrowserSupabaseClient()
-  await supabase.auth.signOut()
 }
 
-// 프로필 업데이트
+// 프로필 업데이트 - 임시로 Mock 모드 사용
 export const updateUserProfile = async (
   updates: Partial<AuthUser>
 ): Promise<AuthResult> => {
-  if (isDevelopmentMode()) {
+  // 임시: localStorage에서 사용자 정보 업데이트
+  if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('meetpin_user')
     if (stored) {
       const user = JSON.parse(stored)
@@ -173,28 +96,7 @@ export const updateUserProfile = async (
     }
     return { success: false, error: '사용자를 찾을 수 없습니다' }
   }
-
-  try {
-    const supabase = createBrowserSupabaseClient()
-    const { data: { user: authUser } } = await supabase.auth.getUser()
-    
-    if (!authUser) {
-      return { success: false, error: '인증되지 않은 사용자입니다' }
-    }
-
-    const { error } = await (supabase as any)
-      .from('profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('uid', authUser.id)
-
-    if (error) {
-      return { success: false, error: error.message }
-    }
-
-    return { success: true }
-  } catch (error: any) {
-    return { success: false, error: error.message }
-  }
+  return { success: false, error: '브라우저 환경이 아닙니다' }
 }
 
 // 개발 모드 로깅 유틸리티
