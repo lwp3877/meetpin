@@ -33,21 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // 현재 사용자 정보 가져오기 (authService로 위임)
-  const getCurrentUser = useCallback(async (): Promise<AppUser | null> => {
-    return await authService.getCurrentUser()
-  }, [])
-
   // 사용자 정보 새로고침
   const refreshUser = useCallback(async () => {
     setLoading(true)
     try {
-      const currentUser = await getCurrentUser()
+      const currentUser = await authService.getCurrentUser()
       setUser(currentUser)
     } finally {
       setLoading(false)
     }
-  }, [getCurrentUser])
+  }, []) // No dependencies needed - authService.getCurrentUser is stable
 
   // 이메일 로그인 (authService로 위임)
   const signIn = async (email: string, password: string) => {
@@ -89,7 +84,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     const initializeAuth = async () => {
       if (mounted) {
-        await refreshUser()
+        setLoading(true)
+        try {
+          const currentUser = await authService.getCurrentUser()
+          if (mounted) {
+            setUser(currentUser)
+          }
+        } finally {
+          if (mounted) {
+            setLoading(false)
+          }
+        }
       }
     }
 
@@ -97,9 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (authService.isDevelopmentMode()) {
       // localStorage 변경 감지 (개발 모드)
-      const handleStorageChange = () => {
+      const handleStorageChange = async () => {
         if (mounted) {
-          refreshUser()
+          const currentUser = await authService.getCurrentUser()
+          setUser(currentUser)
         }
       }
       
@@ -117,9 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'SIGNED_OUT') {
           setUser(null)
         } else if (session?.user) {
-          await refreshUser()
+          const currentUser = await authService.getCurrentUser()
+          if (mounted) {
+            setUser(currentUser)
+          }
         }
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       })
 
       return () => {
@@ -127,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         subscription.unsubscribe()
       }
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // No dependencies needed - we're using authService.getCurrentUser directly
 
   const contextValue: AuthContextType = {
     user,
