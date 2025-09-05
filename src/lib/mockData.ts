@@ -136,6 +136,96 @@ export const mockUsers = [
     created_at: '2024-04-10T09:25:00Z',
     avatar_url: koreanAvatars.female[11], // 밝은 여성
   },
+  // 추가 남성 사용자들
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440016',
+    nickname: '강태준',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-04-15T11:30:00Z',
+    avatar_url: koreanAvatars.male[3], // 젊은 한국 남성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440017',
+    nickname: '오민석',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-04-20T14:20:00Z',
+    avatar_url: koreanAvatars.male[4], // 캐주얼 남성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440018',
+    nickname: '신동욱',
+    age_range: '30s_late',
+    role: 'user',
+    created_at: '2024-04-25T16:45:00Z',
+    avatar_url: koreanAvatars.male[5], // 성숙한 남성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440019',
+    nickname: '류준형',
+    age_range: '20s_early',
+    role: 'user',
+    created_at: '2024-05-01T09:15:00Z',
+    avatar_url: koreanAvatars.male[7], // 활기찬 남성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440020',
+    nickname: '홍지훈',
+    age_range: '40s',
+    role: 'user',
+    created_at: '2024-05-05T13:40:00Z',
+    avatar_url: koreanAvatars.male[8], // 중년 남성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440021',
+    nickname: '문성진',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-05-10T15:50:00Z',
+    avatar_url: koreanAvatars.male[9], // 프로페셔널 남성
+  },
+  // 추가 여성 사용자들
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440022',
+    nickname: '유소정',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-05-15T10:25:00Z',
+    avatar_url: koreanAvatars.female[12], // 청순한 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440023',
+    nickname: '한예슬',
+    age_range: '30s_early',
+    role: 'user',
+    created_at: '2024-05-20T12:35:00Z',
+    avatar_url: koreanAvatars.female[13], // 세련된 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440024',
+    nickname: '서민아',
+    age_range: '20s_early',
+    role: 'user',
+    created_at: '2024-05-25T14:15:00Z',
+    avatar_url: koreanAvatars.female[14], // 발랄한 여성
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440025',
+    nickname: '장수빈',
+    age_range: '30s_late',
+    role: 'user',
+    created_at: '2024-06-01T16:20:00Z',
+    avatar_url: koreanAvatars.female[0], // 우아한 여성 (재활용)
+  },
+  {
+    uid: '550e8400-e29b-41d4-a716-446655440026',
+    nickname: '차현진',
+    age_range: '20s_late',
+    role: 'user',
+    created_at: '2024-06-05T11:45:00Z',
+    avatar_url: koreanAvatars.female[1], // 긴머리 여성 (재활용)
+  },
 ]
 
 // 현재 시간 기준으로 진행 중인 방들을 생성
@@ -836,6 +926,297 @@ export const mockRooms = [
       nickname: '최애리',
       avatar_url: koreanAvatars.female[14],
       age_range: '30s_late',
+    }
+  },
+
+  // 추가 방들 - 더 다양한 지역과 활동
+  {
+    id: '550e8400-e29b-41d4-a716-446655440049',
+    title: '방이동 올림픽공원 산책 🌳',
+    category: 'exercise' as const,
+    lat: 37.5217,
+    lng: 127.1192,
+    place_text: '올림픽공원 호수',
+    start_at: getUpcomingDate(22), // 내일 오전
+    max_people: 5,
+    fee: 0,
+    boost_until: null,
+    profiles: {
+      nickname: '강태준',
+      avatar_url: koreanAvatars.male[3],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440050',
+    title: '잠실 롯데타워 전망대 ✨',
+    category: 'other' as const,
+    lat: 37.5125,
+    lng: 127.1025,
+    place_text: '롯데월드타워 서울스카이',
+    start_at: getUpcomingDate(41), // 3일 후 오후
+    max_people: 4,
+    fee: 27000,
+    boost_until: getBoostDate(6),
+    profiles: {
+      nickname: '오민석',
+      avatar_url: koreanAvatars.male[4],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440051',
+    title: '청담동 갤러리 투어 🎨',
+    category: 'other' as const,
+    lat: 37.5273,
+    lng: 127.0458,
+    place_text: '청담동 갤러리거리',
+    start_at: getUpcomingDate(67), // 4일 후 오후
+    max_people: 6,
+    fee: 15000,
+    boost_until: null,
+    profiles: {
+      nickname: '신동욱',
+      avatar_url: koreanAvatars.male[5],
+      age_range: '30s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440052',
+    title: '수원 화성 역사탐방 🏰',
+    category: 'other' as const,
+    lat: 37.2872,
+    lng: 127.0097,
+    place_text: '수원 화성행궁',
+    start_at: getUpcomingDate(93), // 6일 후 오전
+    max_people: 8,
+    fee: 5000,
+    boost_until: null,
+    profiles: {
+      nickname: '류준형',
+      avatar_url: koreanAvatars.male[7],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440053',
+    title: '분당 정자동 카페거리 ☕',
+    category: 'other' as const,
+    lat: 37.3621,
+    lng: 127.1106,
+    place_text: '정자동 카페거리',
+    start_at: getUpcomingDate(45), // 3일 후 오후
+    max_people: 4,
+    fee: 20000,
+    boost_until: getBoostDate(18),
+    profiles: {
+      nickname: '홍지훈',
+      avatar_url: koreanAvatars.male[8],
+      age_range: '40s',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440054',
+    title: '인사동 전통문화 체험 🎭',
+    category: 'other' as const,
+    lat: 37.5716,
+    lng: 126.9856,
+    place_text: '인사동 전통�찻집',
+    start_at: getUpcomingDate(75), // 5일 후 오후
+    max_people: 6,
+    fee: 25000,
+    boost_until: null,
+    profiles: {
+      nickname: '문성진',
+      avatar_url: koreanAvatars.male[9],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440055',
+    title: '여의도 치킨&맥주 🍗',
+    category: 'drink' as const,
+    lat: 37.5219,
+    lng: 126.9245,
+    place_text: '여의도 한강공원',
+    start_at: getUpcomingDate(9), // 9시간 후
+    max_people: 6,
+    fee: 18000,
+    boost_until: getBoostDate(3),
+    profiles: {
+      nickname: '유소정',
+      avatar_url: koreanAvatars.female[12],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440056',
+    title: '부산 광안리 맛집탐방 🍜',
+    category: 'other' as const,
+    lat: 35.1532,
+    lng: 129.1186,
+    place_text: '광안리해수욕장',
+    start_at: getUpcomingDate(145), // 10일 후
+    max_people: 5,
+    fee: 40000,
+    boost_until: getBoostDate(24),
+    profiles: {
+      nickname: '한예슬',
+      avatar_url: koreanAvatars.female[13],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440057',
+    title: '명동 쇼핑 & 브런치 🛍️',
+    category: 'other' as const,
+    lat: 37.5636,
+    lng: 126.9834,
+    place_text: '명동성당 근처',
+    start_at: getUpcomingDate(53), // 4일 후 오전
+    max_people: 4,
+    fee: 30000,
+    boost_until: null,
+    profiles: {
+      nickname: '서민아',
+      avatar_url: koreanAvatars.female[14],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440058',
+    title: '동대문 야시장 투어 🌙',
+    category: 'other' as const,
+    lat: 37.5665,
+    lng: 127.0092,
+    place_text: '동대문디자인플라자',
+    start_at: getUpcomingDate(13), // 13시간 후
+    max_people: 7,
+    fee: 15000,
+    boost_until: getBoostDate(7),
+    profiles: {
+      nickname: '장수빈',
+      avatar_url: koreanAvatars.female[0],
+      age_range: '30s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440059',
+    title: '압구정 로데오거리 🎪',
+    category: 'other' as const,
+    lat: 37.5271,
+    lng: 127.0284,
+    place_text: '압구정 로데오거리',
+    start_at: getUpcomingDate(31), // 2일 후 저녁
+    max_people: 5,
+    fee: 25000,
+    boost_until: null,
+    profiles: {
+      nickname: '차현진',
+      avatar_url: koreanAvatars.female[1],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440060',
+    title: '종로 포장마차 투어 🍢',
+    category: 'drink' as const,
+    lat: 37.5703,
+    lng: 126.9829,
+    place_text: '종로3가 포장마차거리',
+    start_at: getUpcomingDate(17), // 17시간 후
+    max_people: 6,
+    fee: 20000,
+    boost_until: getBoostDate(5),
+    profiles: {
+      nickname: '김철수',
+      avatar_url: koreanAvatars.male[0],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440061',
+    title: '대학로 연극 관람 🎭',
+    category: 'other' as const,
+    lat: 37.5816,
+    lng: 127.0026,
+    place_text: '대학로 마로니에공원',
+    start_at: getUpcomingDate(71), // 5일 후
+    max_people: 4,
+    fee: 35000,
+    boost_until: null,
+    profiles: {
+      nickname: '최소영',
+      avatar_url: koreanAvatars.female[0],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440062',
+    title: '서촌 한옥마을 산책 🏠',
+    category: 'other' as const,
+    lat: 37.5804,
+    lng: 126.9658,
+    place_text: '서촌 한옥마을',
+    start_at: getUpcomingDate(89), // 6일 후
+    max_people: 5,
+    fee: 10000,
+    boost_until: null,
+    profiles: {
+      nickname: '이영희',
+      avatar_url: koreanAvatars.female[1],
+      age_range: '30s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440063',
+    title: '신촌 맛집 탐방 🥘',
+    category: 'other' as const,
+    lat: 37.5559,
+    lng: 126.9367,
+    place_text: '신촌 연세대 앞',
+    start_at: getUpcomingDate(25), // 2일 후
+    max_people: 6,
+    fee: 22000,
+    boost_until: getBoostDate(8),
+    profiles: {
+      nickname: '박대호',
+      avatar_url: koreanAvatars.male[1],
+      age_range: '20s_late',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440064',
+    title: '남산타워 야경 감상 🌃',
+    category: 'other' as const,
+    lat: 37.5512,
+    lng: 126.9882,
+    place_text: 'N서울타워',
+    start_at: getUpcomingDate(59), // 4일 후 저녁
+    max_people: 4,
+    fee: 15000,
+    boost_until: getBoostDate(12),
+    profiles: {
+      nickname: '박민수',
+      avatar_url: koreanAvatars.male[2],
+      age_range: '20s_early',
+    }
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440065',
+    title: '가로수길 브런치 & 쇼핑 🥐',
+    category: 'other' as const,
+    lat: 37.5201,
+    lng: 127.0226,
+    place_text: '가로수길',
+    start_at: getUpcomingDate(87), // 6일 후 오전
+    max_people: 5,
+    fee: 28000,
+    boost_until: null,
+    profiles: {
+      nickname: '김지은',
+      avatar_url: koreanAvatars.female[3],
+      age_range: '20s_late',
     }
   }
 ]

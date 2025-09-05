@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import { MapPin, Clock, Users, DollarSign, Star, Edit, ArrowLeft, Navigation, Heart, Share2 } from 'lucide-react'
 import { RealtimeChatModal } from '@/components/ui/RealtimeChatModal'
 import { BoostModal } from '@/components/ui/BoostModal'
+import { ProfileModal } from '@/components/ui/ProfileModal'
 
 interface Room {
   id: string
@@ -46,6 +47,7 @@ export default function RoomDetailPage() {
   const [requesting, setRequesting] = useState(false)
   const [showHostMessageModal, setShowHostMessageModal] = useState(false)
   const [showBoostModal, setShowBoostModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const fetchRoom = useCallback(async () => {
     if (!params?.id) return
@@ -355,7 +357,7 @@ export default function RoomDetailPage() {
                   호스트에게 메시지
                 </button>
                 <button 
-                  onClick={() => router.push('/profile')}
+                  onClick={() => setShowProfileModal(true)}
                   className="px-6 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
                 >
                   프로필 보기
@@ -473,6 +475,15 @@ export default function RoomDetailPage() {
             // 페이지 새로고침으로 부스트 상태 업데이트
             fetchRoom()
           }}
+        />
+      )}
+      
+      {/* Profile Modal */}
+      {room && (
+        <ProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userId={room.host.id}
         />
       )}
     </div>
