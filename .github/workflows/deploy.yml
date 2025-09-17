@@ -1,0 +1,205 @@
+name: 🚀 Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+
+jobs:
+  # ===============================
+  # 품질 검증 (Quality Assurance)
+  # ===============================
+  quality-check:
+    name: 🔍 Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📁 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📦 Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: 📚 Get PNPM Store Directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+        id: pnpm-cache
+        
+      - name: 🗃️ Setup PNPM Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+            
+      - name: 📥 Install Dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: 🔍 TypeScript Check
+        run: pnpm typecheck
+        
+      - name: 🧹 ESLint Check
+        run: pnpm lint
+        
+      - name: 🏗️ Build Test
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          
+      - name: 🧪 Run Tests
+        run: pnpm test
+        env:
+          CI: true
+
+  # ===============================
+  # 보안 스캔 (Security Scan)
+  # ===============================
+  security-scan:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    needs: [quality-check]
+    
+    steps:
+      - name: 📁 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📦 Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: 📥 Install Dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: 🔒 Security Audit
+        run: pnpm audit --audit-level moderate
+        
+      - name: 🛡️ CodeQL Analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: typescript, javascript
+          
+      - name: 🏗️ Autobuild
+        uses: github/codeql-action/autobuild@v2
+        
+      - name: 📊 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # ===============================
+  # 배포 (Deploy)
+  # ===============================
+  deploy:
+    name: 🚀 Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: [quality-check, security-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+      
+    steps:
+      - name: 📁 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 🚀 Deploy to Vercel
+        id: deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+          
+  # ===============================
+  # 배포 후 검증 (Post-Deploy Tests)
+  # ===============================
+  post-deploy-tests:
+    name: 🧪 Post-Deploy Verification
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    
+    steps:
+      - name: 📁 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📦 Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: 📥 Install Dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: 🎭 Install Playwright
+        run: pnpm playwright install --with-deps
+        
+      - name: 🧪 Run E2E Tests
+        run: pnpm e2e
+        env:
+          BASE_URL: ${{ needs.deploy.outputs.url || secrets.SITE_URL }}
+          
+      - name: 📊 Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/
+          
+  # ===============================
+  # 알림 (Notifications)
+  # ===============================
+  notify:
+    name: 📢 Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [deploy, post-deploy-tests]
+    if: always()
+    
+    steps:
+      - name: 🎉 Success Notification
+        if: needs.deploy.result == 'success' && needs.post-deploy-tests.result == 'success'
+        run: |
+          echo "✅ 배포 성공! URL: ${{ needs.deploy.outputs.url }}"
+          
+      - name: ❌ Failure Notification
+        if: needs.deploy.result == 'failure' || needs.post-deploy-tests.result == 'failure'
+        run: |
+          echo "❌ 배포 실패! 로그를 확인해주세요."
+          
+      # 선택사항: Slack/Discord 알림
+      - name: 📱 Slack Notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

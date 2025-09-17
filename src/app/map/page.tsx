@@ -33,6 +33,7 @@ import {
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
 import { toast } from 'sonner'
 import { HostMessageNotifications } from '@/components/ui/HostMessageNotifications'
+import NotificationCenter from '@/components/ui/NotificationCenter'
 
 // 서울 기본 영역 상수
 const DEFAULT_BOUNDS = {
@@ -350,6 +351,9 @@ export default function MapPage() {
                   toast.success(`${message.sender?.nickname}님의 메시지를 확인했습니다`)
                 }}
               />
+              
+              {/* General Notifications */}
+              <NotificationCenter />
               
               {/* Filter Toggle */}
               <Button

@@ -1,14 +1,16 @@
 /* src/app/auth/login/page.tsx */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { brandMessages } from '@/lib/brand'
 import { useAuth } from '@/lib/useAuth'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/flags'
 import { SocialLogin } from '@/components/social-login'
+import { SkipLink } from '@/components/ui/AccessibilityProvider'
+import { useKeyboardNavigation, useKeyboardShortcuts } from '@/hooks/useKeyboardNavigation'
 import toast from 'react-hot-toast'
 
 export default function LoginPage() {
@@ -16,6 +18,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [isEmailFocused, setIsEmailFocused] = useState(false)
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false)
+  const [formStatus, setFormStatus] = useState('')
+  
+  // 키보드 네비게이션 설정
+  const keyboardNav = useKeyboardNavigation({
+    enableArrowKeys: false, // 폼에서는 Tab 키만 사용
+    enableActivation: true,
+    loop: true
+  })
+  
+  // 키보드 단축키 설정
+  useKeyboardShortcuts({
+    'ctrl+enter': () => {
+      const form = document.querySelector('form')
+      if (form) {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true })
+        form.dispatchEvent(submitEvent)
+      }
+    },
+    'escape': () => {
+      // 필드 포커스 해제
+      const activeElement = document.activeElement as HTMLElement
+      if (activeElement) {
+        activeElement.blur()
+      }
+    }
+  })
   const router = useRouter()
   const { user, loading, signIn } = useAuth()
 
@@ -26,33 +58,126 @@ export default function LoginPage() {
     }
   }, [user, loading, router])
 
+  // Real-time email validation with screen reader announcements
+  const validateEmail = useCallback((email: string) => {
+    if (!email) {
+      setEmailError('')
+      setFormStatus('')
+      return false
+    }
+    if (!email.includes('@')) {
+      const errorMsg = '이메일 주소에 @ 기호가 포함되어야 합니다'
+      setEmailError(errorMsg)
+      setFormStatus(`이메일 오류: ${errorMsg}`)
+      return false
+    }
+    if (!email.includes('.') || email.indexOf('@') > email.lastIndexOf('.')) {
+      const errorMsg = '올바른 이메일 형식이 아닙니다. 예: user@example.com'
+      setEmailError(errorMsg)
+      setFormStatus(`이메일 오류: ${errorMsg}`)
+      return false
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      const errorMsg = '올바른 이메일 주소를 입력해주세요. 예: user@example.com'
+      setEmailError(errorMsg)
+      setFormStatus(`이메일 오류: ${errorMsg}`)
+      return false
+    }
+    setEmailError('')
+    setFormStatus('이메일 주소가 올바릅니다')
+    return true
+  }, [])
+
+  // Real-time password validation with screen reader announcements
+  const validatePassword = useCallback((password: string) => {
+    if (!password) {
+      setPasswordError('')
+      return false
+    }
+    if (password.length < 6) {
+      const errorMsg = '비밀번호는 6자 이상이어야 합니다'
+      setPasswordError(errorMsg)
+      setFormStatus(`비밀번호 오류: ${errorMsg}`)
+      return false
+    }
+    setPasswordError('')
+    setFormStatus('비밀번호가 올바릅니다')
+    return true
+  }, [])
+
+  // Handle email change with validation
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    if (isEmailFocused || value) {
+      validateEmail(value)
+    }
+  }
+
+  // Handle password change with validation
+  const handlePasswordChange = (value: string) => {
+    setPassword(value)
+    if (isPasswordFocused || value) {
+      validatePassword(value)
+    }
+  }
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // 유효성 검사
+    // 전체 유효성 검사
+    const isEmailValid = validateEmail(email)
+    const isPasswordValid = validatePassword(password)
+
     if (!email || !password) {
-      toast.error('이메일과 비밀번호를 입력해주세요')
+      if (!email) {
+        setEmailError('이메일을 입력해주세요')
+        setFormStatus('이메일 필드가 비어있습니다. 이메일 주소를 입력해주세요.')
+      }
+      if (!password) {
+        setPasswordError('비밀번호를 입력해주세요')
+        setFormStatus('비밀번호 필드가 비어있습니다. 비밀번호를 입력해주세요.')
+      }
+      toast.error('모든 필드를 입력해주세요')
       return
     }
 
-    if (!email.includes('@')) {
-      toast.error('올바른 이메일 주소를 입력해주세요')
+    if (!isEmailValid || !isPasswordValid) {
+      setFormStatus('입력 정보에 오류가 있습니다. 각 필드의 오류 메시지를 확인하고 수정해주세요.')
+      toast.error('입력 정보를 다시 확인해주세요')
       return
     }
 
     setIsLoading(true)
+    setFormStatus('로그인을 처리하고 있습니다. 잠시만 기다려주세요.')
 
     try {
       const result = await signIn(email, password)
       
       if (result.success) {
-        toast.success('로그인 성공!')
+        setFormStatus('로그인에 성공했습니다! 지도 페이지로 이동합니다.')
+        toast.success('로그인 성공! 지도로 이동합니다 🚀')
         router.push('/map')
       } else {
-        toast.error(result.error || '로그인에 실패했습니다')
+        // 더 구체적인 에러 메시지
+        let errorMessage = ''
+        if (result.error?.includes('Invalid login credentials')) {
+          errorMessage = '이메일 또는 비밀번호가 잘못되었습니다. 다시 확인해주세요.'
+          toast.error('이메일 또는 비밀번호가 잘못되었습니다')
+        } else if (result.error?.includes('Email not confirmed')) {
+          errorMessage = '이메일 인증이 필요합니다. 이메일을 확인하여 계정을 활성화해주세요.'
+          toast.error('이메일 인증이 필요합니다. 메일을 확인해주세요')
+        } else {
+          errorMessage = result.error || '로그인에 실패했습니다. 다시 시도해주세요.'
+          toast.error(result.error || '로그인에 실패했습니다')
+        }
+        setFormStatus(`로그인 오류: ${errorMessage}`)
       }
     } catch (error: any) {
-      toast.error(error.message || '로그인 중 오류가 발생했습니다')
+      console.error('Login error:', error)
+      const errorMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.'
+      setFormStatus(`연결 오류: ${errorMessage}`)
+      toast.error('네트워크 연결을 확인하고 다시 시도해주세요')
     } finally {
       setIsLoading(false)
     }
@@ -71,23 +196,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <>
+      <SkipLink href="#main-content">주 콘텐츠로 바로 가기</SkipLink>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8" role="main">
+        <div 
+          ref={keyboardNav.containerRef as React.RefObject<HTMLDivElement>}
+          className="w-full max-w-md space-y-6 sm:max-w-lg" 
+          id="main-content"
+          data-keyboard-container="true"
+        >
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 shadow-lg">
-            <span className="text-2xl">📍</span>
+        <div className="text-center">
+          <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-full flex items-center justify-center mb-6 shadow-lg transition-transform hover:scale-105" role="img" aria-label="밋핀 로고">
+            <span className="text-2xl sm:text-3xl">📍</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 tracking-tight">
             {brandMessages.appName}에 로그인
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
             {brandMessages.tagline}
           </p>
         </div>
 
+        {/* Screen Reader Status Announcements */}
+        <div 
+          id="form-status" 
+          className="sr-only" 
+          aria-live="polite" 
+          aria-atomic="true"
+          role="status"
+        >
+          {formStatus}
+        </div>
+
         {/* Login Form */}
-        <div className="bg-white rounded-xl shadow-xl p-8 border border-gray-100 backdrop-blur-sm">
+        <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 border border-gray-100 backdrop-blur-sm" role="form" aria-labelledby="login-heading" aria-describedby="form-instructions">
+          <h2 id="login-heading" className="sr-only">로그인 폼</h2>
+          <p id="form-instructions" className="sr-only">
+            이메일과 비밀번호를 입력하여 로그인하세요. 필드간 이동은 Tab 키를, 
+            양식 제출은 Ctrl+Enter를 사용하세요. 각 필드는 실시간으로 유효성을 검사합니다.
+          </p>
           
           {/* Social Login */}
           <SocialLogin 
@@ -119,106 +267,224 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleEmailLogin} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                이메일
+          <form onSubmit={handleEmailLogin} className="space-y-5 sm:space-y-6" noValidate role="form" aria-label="이메일 로그인">
+            <div role="group" aria-labelledby="email-label">
+              <label id="email-label" htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                이메일 주소 <span className="text-red-500" aria-label="필수 입력">*</span>
               </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="your@email.com"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onFocus={() => setIsEmailFocused(true)}
+                  onBlur={() => setIsEmailFocused(false)}
+                  required
+                  className={`w-full px-4 py-3 sm:py-4 text-base border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    emailError 
+                      ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1' 
+                      : email && !emailError 
+                      ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
+                      : 'border-gray-300 focus:ring-primary focus:ring-offset-1'
+                  }`}
+                  placeholder="your@email.com"
+                  disabled={isLoading}
+                  autoComplete="email"
+                  inputMode="email"
+                  aria-describedby={`email-help ${emailError ? 'email-error' : ''}`.trim()}
+                  aria-invalid={!!emailError}
+                  aria-required="true"
+                />
+                <div id="email-help" className="sr-only">
+                  이메일 주소를 입력하세요. 예: user@example.com 형식으로 입력해주세요.
+                </div>
+                {email && !emailError && (
+                  <div className="absolute right-3 top-3 sm:top-4 text-green-500" role="img" aria-label="유효한 이메일">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+                {emailError && (
+                  <div className="absolute right-3 top-3 sm:top-4 text-red-500" role="img" aria-label="이메일 오류">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              {emailError && (
+                <p id="email-error" className="mt-2 text-sm text-red-600 flex items-start" role="alert" aria-live="polite">
+                  <svg className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span>{emailError}</span>
+                </p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                비밀번호
+            <div role="group" aria-labelledby="password-label">
+              <label id="password-label" htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호 <span className="text-red-500" aria-label="필수 입력">*</span>
               </label>
               <div className="relative">
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                   required
-                  className="w-full px-3 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className={`w-full px-4 py-3 sm:py-4 pr-16 sm:pr-20 text-base border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed ${
+                    passwordError 
+                      ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1' 
+                      : password && !passwordError 
+                      ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
+                      : 'border-gray-300 focus:ring-primary focus:ring-offset-1'
+                  }`}
                   placeholder="••••••••"
                   disabled={isLoading}
+                  autoComplete="current-password"
+                  aria-describedby={`password-help ${passwordError ? 'password-error' : ''}`.trim()}
+                  aria-invalid={!!passwordError}
+                  aria-required="true"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                  disabled={isLoading}
-                >
-                  {showPassword ? '🙈' : '👁️'}
-                </button>
+                <div id="password-help" className="sr-only">
+                  비밀번호를 입력하세요. 최소 6자 이상이어야 합니다. 
+                  비밀번호 표시 버튼을 사용하여 입력한 내용을 확인할 수 있습니다.
+                </div>
+                <div className="absolute right-3 sm:right-4 top-3 sm:top-4 flex items-center space-x-2">
+                  {password && !passwordError && (
+                    <div className="text-green-500" role="img" aria-label="유효한 비밀번호">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  {passwordError && (
+                    <div className="text-red-500" role="img" aria-label="비밀번호 오류">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded transition-colors touch-manipulation"
+                    disabled={isLoading}
+                    aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'}
+                    aria-pressed={showPassword}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {showPassword ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      )}
+                    </svg>
+                  </button>
+                </div>
               </div>
+              {passwordError && (
+                <p id="password-error" className="mt-2 text-sm text-red-600 flex items-start" role="alert" aria-live="polite">
+                  <svg className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span>{passwordError}</span>
+                </p>
+              )}
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 py-3 text-base font-medium"
+              className="w-full bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 py-3 sm:py-4 text-base sm:text-lg font-medium rounded-lg transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed touch-manipulation"
               disabled={isLoading}
+              aria-describedby="submit-help keyboard-shortcuts"
+              aria-label={isLoading ? '로그인 처리 중' : '이메일로 로그인하기'}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  로그인 중...
+                <div className="flex items-center justify-center" role="status" aria-label="로그인 처리 중입니다. 잠시만 기다려주세요.">
+                  <svg className="w-5 h-5 mr-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>로그인 중...</span>
                 </div>
               ) : (
-                '이메일로 로그인'
+                <span>이메일로 로그인</span>
               )}
             </Button>
           </form>
 
+          <div className="sr-only">
+            <p id="submit-help">
+              이메일과 비밀번호로 로그인합니다. 모든 필드를 올바르게 입력한 후 로그인 버튼을 클릭하거나 Ctrl+Enter를 누르세요.
+            </p>
+            <p id="keyboard-shortcuts">
+              키보드 사용법: Tab으로 필드간 이동, Ctrl+Enter로 양식 제출, Escape로 포커스 해제
+            </p>
+          </div>
+          
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               계정이 없으신가요?{' '}
-              <Link href="/auth/signup" className="text-primary hover:underline font-medium">
+              <Link 
+                href="/auth/signup" 
+                className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded font-medium transition-colors touch-manipulation"
+                aria-label="회원가입 페이지로 이동"
+              >
                 회원가입
               </Link>
             </p>
           </div>
 
           {/* Forgot Password */}
-          <div className="mt-2 text-center">
-            <button className="text-sm text-gray-500 hover:text-primary">
+          <div className="mt-3 text-center">
+            <button 
+              type="button"
+              className="text-sm sm:text-base text-gray-500 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded p-1 transition-colors touch-manipulation"
+              aria-label="비밀번호 찾기"
+            >
               비밀번호를 잊으셨나요?
             </button>
           </div>
         </div>
 
         {/* Back to Home */}
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-gray-500 hover:text-primary transition-colors">
-            ← 홈으로 돌아가기
+        <div className="text-center">
+          <Link 
+            href="/" 
+            className="inline-flex items-center text-sm sm:text-base text-gray-500 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded p-2 transition-colors touch-manipulation"
+            aria-label="홈 페이지로 돌아가기"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            홈으로 돌아가기
           </Link>
         </div>
 
         {/* Features Preview */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div className="p-3 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20">
-            <div className="text-xl mb-1">🗺️</div>
-            <div className="text-xs text-gray-600">지도 기반<br />모임</div>
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center" role="region" aria-label="주요 기능">
+          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
+            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="지도">🗺️</div>
+            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">지도 기반<br />모임</div>
           </div>
-          <div className="p-3 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20">
-            <div className="text-xl mb-1">💬</div>
-            <div className="text-xs text-gray-600">실시간<br />채팅</div>
+          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
+            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="채팅">💬</div>
+            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">실시간<br />채팅</div>
           </div>
-          <div className="p-3 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20">
-            <div className="text-xl mb-1">👥</div>
-            <div className="text-xs text-gray-600">쉬운<br />매칭</div>
+          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
+            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="매칭">👥</div>
+            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">쉬운<br />매칭</div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

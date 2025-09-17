@@ -1,9 +1,9 @@
 /* src/components/ui/NotificationCenter.tsx - 실시간 알림 센터 */
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Bell, X, Check, Users, MessageSquare, Star, Gift } from 'lucide-react'
 import { useAuth } from '@/lib/useAuth'
 import { formatDistanceToNow } from 'date-fns'
@@ -32,22 +32,72 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   const [isLoading, setIsLoading] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  // 알림 목록 가져오기
-  const fetchNotifications = async () => {
+  // 고도화된 폴링 시스템
+  const etagRef = useRef<string | null>(null)
+  const retryCountRef = useRef(0)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [isPolling, setIsPolling] = useState(false)
+
+  // 지능형 폴링 간격 계산
+  const getPollingInterval = useCallback(() => {
+    if (retryCountRef.current === 0) return 15000 // 정상: 15초
+    return Math.min(30000, 5000 * Math.pow(2, retryCountRef.current)) // 백오프: 최대 30초
+  }, [])
+
+  // 알림 목록 가져오기 (ETag 지원)
+  const fetchNotifications = useCallback(async (force = false) => {
     if (!user) return
 
+    setIsPolling(true)
     try {
-      const response = await fetch('/api/notifications')
-      const result = await response.json()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      }
+      
+      // 강제 새로고침이 아니고 ETag가 있으면 If-None-Match 헤더 추가
+      if (!force && etagRef.current) {
+        headers['If-None-Match'] = etagRef.current
+      }
 
+      const response = await fetch('/api/notifications', { headers })
+      
+      // 304 Not Modified - 변경사항 없음
+      if (response.status === 304) {
+        retryCountRef.current = 0
+        setLastUpdated(new Date())
+        return
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+
+      const result = await response.json()
+      
       if (result.ok) {
+        // ETag 저장
+        const newEtag = response.headers.get('ETag')
+        if (newEtag) {
+          etagRef.current = newEtag
+        }
+
         setNotifications(result.data || [])
         setUnreadCount(result.data?.filter((n: Notification) => !n.read).length || 0)
+        setLastUpdated(new Date())
+        retryCountRef.current = 0
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error)
+      retryCountRef.current = Math.min(retryCountRef.current + 1, 5)
+      
+      // 첫 번째 에러가 아니면 토스트 표시
+      if (retryCountRef.current > 1) {
+        // toast.error('알림을 불러오는데 실패했습니다. 재시도 중...')
+      }
+    } finally {
+      setIsPolling(false)
     }
-  }
+  }, [user])
 
   // 알림 읽음 처리
   const markAsRead = async (notificationId: string) => {
@@ -142,28 +192,61 @@ export default function NotificationCenter({ className = '' }: NotificationCente
     }
   }
 
-  // 실시간 알림 업데이트
+  // 실시간 폴링 설정 (15초 간격 + 지능형 백오프)
   useEffect(() => {
     if (user) {
-      fetchNotifications()
+      fetchNotifications(true) // 초기 로드
 
-      // 30초마다 새 알림 확인
-      intervalRef.current = setInterval(fetchNotifications, 30000)
+      const startPolling = () => {
+        intervalRef.current = setInterval(
+          () => fetchNotifications(), 
+          getPollingInterval()
+        )
+      }
+
+      startPolling()
+
+      // 윈도우 포커스 시 즉시 새로고침
+      const handleFocus = () => {
+        fetchNotifications(true)
+      }
+      
+      // Visibility API로 백그라운드 최적화
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          fetchNotifications(true)
+        }
+      }
+      
+      window.addEventListener('focus', handleFocus)
+      document.addEventListener('visibilitychange', handleVisibilityChange)
 
       return () => {
         if (intervalRef.current) {
           clearInterval(intervalRef.current)
         }
+        window.removeEventListener('focus', handleFocus)
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
       }
     }
     
     return () => {
-      // cleanup when user is null
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
     }
-  }, [user])
+  }, [user, fetchNotifications, getPollingInterval])
+
+  // 에러 발생 시 폴링 간격 조정
+  useEffect(() => {
+    if (intervalRef.current && retryCountRef.current > 0) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = setInterval(
+        () => fetchNotifications(),
+        getPollingInterval()
+      )
+    }
+  }, [retryCountRef.current, fetchNotifications, getPollingInterval])
 
   // 브라우저 알림 권한 요청
   useEffect(() => {
@@ -179,12 +262,16 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       {/* 알림 벨 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full transition-all duration-200"
         aria-label="알림"
+        data-testid="notification-bell"
       >
         <Bell className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+          <span 
+            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse"
+            data-testid="notification-badge"
+          >
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -200,7 +287,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
           />
 
           {/* 알림 리스트 */}
-          <Card className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-hidden z-50 shadow-xl">
+          <Card className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-hidden z-50 shadow-xl" data-testid="notification-panel">
             <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">알림</h3>
               <div className="flex items-center gap-2">
@@ -211,6 +298,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                     size="sm"
                     disabled={isLoading}
                     className="text-xs h-7"
+                    data-testid="mark-all-read-btn"
                   >
                     <Check className="w-3 h-3 mr-1" />
                     모두 읽음
@@ -219,6 +307,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-gray-400 hover:text-gray-600"
+                  data-testid="close-notification-panel"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -227,7 +316,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
 
             <div className="max-h-80 overflow-y-auto">
               {notifications.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-gray-500" data-testid="empty-notifications">
                   <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                   <p className="text-sm">새로운 알림이 없습니다</p>
                 </div>
@@ -240,6 +329,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                         !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                       }`}
                       onClick={() => handleNotificationClick(notification)}
+                      data-testid={`notification-${notification.id}`}
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 mt-1">
@@ -267,6 +357,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                             deleteNotification(notification.id)
                           }}
                           className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+                          data-testid={`delete-notification-${notification.id}`}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -285,6 +376,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                     window.location.href = '/notifications'
                   }}
                   className="text-sm text-primary hover:text-primary/80 font-medium"
+                  data-testid="view-all-notifications"
                 >
                   모든 알림 보기
                 </button>

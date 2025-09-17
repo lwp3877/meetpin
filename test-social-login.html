@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소셜 로그인 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .social-btn {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .kakao-btn {
+            background: #FEE500;
+            color: #3C1E1E;
+        }
+        .google-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .naver-btn {
+            background: #03C75A;
+            color: white;
+        }
+        .social-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .social-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+        }
+        .success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 소셜 로그인 기능 테스트</h1>
+        <p>밋핀 앱의 소셜 로그인 기능을 독립적으로 테스트합니다.</p>
+        
+        <div id="social-buttons">
+            <button class="social-btn kakao-btn" onclick="testKakaoLogin()">
+                <span>K</span>
+                카카오 로그인 테스트
+            </button>
+            
+            <button class="social-btn google-btn" onclick="testGoogleLogin()">
+                <span>G</span>
+                구글 로그인 테스트
+            </button>
+            
+            <button class="social-btn naver-btn" onclick="testNaverLogin()">
+                <span>N</span>
+                네이버 로그인 테스트
+            </button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <h3>📊 테스트 현황</h3>
+            <div id="test-status">
+                <div>✅ Mock 소셜 로그인 구현 완료</div>
+                <div>✅ localStorage 기반 사용자 데이터 저장</div>
+                <div>✅ Cookie 기반 서버 인증 연동</div>
+                <div>🔄 실제 OAuth 프로바이더 연동 대기</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProvider = null;
+
+        function setLoading(provider, isLoading) {
+            const buttons = document.querySelectorAll('.social-btn');
+            buttons.forEach(btn => {
+                btn.disabled = isLoading;
+                if (btn.onclick.toString().includes(provider)) {
+                    if (isLoading) {
+                        btn.innerHTML = `<div class="spinner"></div> ${provider} 로그인 중...`;
+                    }
+                }
+            });
+        }
+
+        function showResult(provider, success, message, userData = null) {
+            const resultDiv = document.getElementById('result');
+            const className = success ? 'result success' : 'result error';
+            const icon = success ? '✅' : '❌';
+            
+            let content = `
+                <div class="${className}">
+                    <h3>${icon} ${provider} 로그인 ${success ? '성공' : '실패'}</h3>
+                    <p>${message}</p>
+                    ${userData ? `
+                        <details style="margin-top: 10px;">
+                            <summary>생성된 사용자 데이터</summary>
+                            <pre style="margin-top: 10px; font-size: 12px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 4px; overflow-x: auto;">${JSON.stringify(userData, null, 2)}</pre>
+                        </details>
+                    ` : ''}
+                </div>
+            `;
+            
+            resultDiv.innerHTML = content;
+        }
+
+        function resetButtons() {
+            document.getElementById('social-buttons').innerHTML = `
+                <button class="social-btn kakao-btn" onclick="testKakaoLogin()">
+                    <span>K</span>
+                    카카오 로그인 테스트
+                </button>
+                
+                <button class="social-btn google-btn" onclick="testGoogleLogin()">
+                    <span>G</span>
+                    구글 로그인 테스트
+                </button>
+                
+                <button class="social-btn naver-btn" onclick="testNaverLogin()">
+                    <span>N</span>
+                    네이버 로그인 테스트
+                </button>
+            `;
+        }
+
+        async function testKakaoLogin() {
+            currentProvider = '카카오';
+            setLoading('카카오', true);
+            
+            try {
+                // Mock 카카오 로그인 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const mockKakaoUser = {
+                    id: 'kakao_' + Date.now(),
+                    email: 'kakao.test@example.com',
+                    nickname: '카카오테스트유저',
+                    role: 'user',
+                    age_range: '20-29',
+                    provider: 'kakao',
+                    avatar_url: null,
+                    intro: null,
+                    referral_code: null,
+                    created_at: new Date().toISOString(),
+                };
+                
+                // localStorage에 저장 (클라이언트 인증)
+                localStorage.setItem('meetpin_user', JSON.stringify(mockKakaoUser));
+                
+                // Cookie에 저장 (서버 인증)
+                document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockKakaoUser))}; path=/; max-age=86400`;
+                
+                showResult('카카오', true, '카카오 로그인이 성공적으로 시뮬레이션되었습니다!', mockKakaoUser);
+                
+            } catch (error) {
+                showResult('카카오', false, `카카오 로그인 중 오류 발생: ${error.message}`);
+            }
+            
+            resetButtons();
+        }
+
+        async function testGoogleLogin() {
+            currentProvider = '구글';
+            setLoading('구글', true);
+            
+            try {
+                // Mock 구글 로그인 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                
+                const mockGoogleUser = {
+                    id: 'google_' + Date.now(),
+                    email: 'google.test@gmail.com',
+                    nickname: '구글테스트유저',
+                    role: 'user',
+                    age_range: '30-39',
+                    provider: 'google',
+                    avatar_url: 'https://lh3.googleusercontent.com/example',
+                    intro: null,
+                    referral_code: null,
+                    created_at: new Date().toISOString(),
+                };
+                
+                // localStorage에 저장 (클라이언트 인증)
+                localStorage.setItem('meetpin_user', JSON.stringify(mockGoogleUser));
+                
+                // Cookie에 저장 (서버 인증)
+                document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockGoogleUser))}; path=/; max-age=86400`;
+                
+                showResult('구글', true, '구글 로그인이 성공적으로 시뮬레이션되었습니다!', mockGoogleUser);
+                
+            } catch (error) {
+                showResult('구글', false, `구글 로그인 중 오류 발생: ${error.message}`);
+            }
+            
+            resetButtons();
+        }
+
+        async function testNaverLogin() {
+            currentProvider = '네이버';
+            setLoading('네이버', true);
+            
+            try {
+                // Mock 네이버 로그인 시뮬레이션
+                await new Promise(resolve => setTimeout(resolve, 1800));
+                
+                const mockNaverUser = {
+                    id: 'naver_' + Date.now(),
+                    email: 'naver.test@naver.com',
+                    nickname: '네이버테스트유저',
+                    role: 'user',
+                    age_range: '40-49',
+                    provider: 'naver',
+                    avatar_url: null,
+                    intro: null,
+                    referral_code: null,
+                    created_at: new Date().toISOString(),
+                };
+                
+                // localStorage에 저장 (클라이언트 인증)
+                localStorage.setItem('meetpin_user', JSON.stringify(mockNaverUser));
+                
+                // Cookie에 저장 (서버 인증)
+                document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockNaverUser))}; path=/; max-age=86400`;
+                
+                showResult('네이버', true, '네이버 로그인이 성공적으로 시뮬레이션되었습니다!', mockNaverUser);
+                
+            } catch (error) {
+                showResult('네이버', false, `네이버 로그인 중 오류 발생: ${error.message}`);
+            }
+            
+            resetButtons();
+        }
+
+        // 페이지 로드 시 기존 인증 상태 확인
+        window.addEventListener('load', () => {
+            const existingUser = localStorage.getItem('meetpin_user');
+            if (existingUser) {
+                try {
+                    const userData = JSON.parse(existingUser);
+                    showResult('기존 세션', true, '이미 로그인된 사용자가 있습니다.', userData);
+                } catch (e) {
+                    console.error('Invalid user data in localStorage');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

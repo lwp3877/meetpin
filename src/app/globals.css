@@ -51,3 +51,389 @@ html {
     font-size: 16px;
   }
 }
+
+/* ======================================
+   WCAG 2.1 접근성 준수 스타일
+   ====================================== */
+
+/* Skip Links - 키보드 사용자를 위한 스킵 링크 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    --primary: #00ff00;
+    --boost: #ffff00;
+    --accent: #ff8800;
+  }
+  
+  .high-contrast {
+    --tw-border-opacity: 1;
+  }
+  
+  .high-contrast input,
+  .high-contrast select,
+  .high-contrast button {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+}
+
+/* 모션 감소 설정 준수 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .reduce-motion * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 포커스 가시성 향상 */
+.focus-visible *:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 키보드 네비게이션을 위한 포커스 스타일 */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 터치 타겟 최소 크기 보장 (44px × 44px) */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a[role="button"],
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* 스크린 리더 전용 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* 에러 상태 색상 대비 보장 */
+.text-red-600 {
+  color: #dc2626; /* 4.5:1 대비율 보장 */
+}
+
+.text-green-500 {
+  color: #059669; /* 4.5:1 대비율 보장 */
+}
+
+/* 링크 구분을 위한 밑줄 (색상만으로 구분하지 않음) */
+a:not(.no-underline) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover:not(.no-underline) {
+  text-decoration-thickness: 2px;
+}
+
+/* 폼 라벨 시각적 연결 */
+label {
+  cursor: pointer;
+}
+
+/* 필수 필드 표시 개선 */
+.required::after {
+  content: " *";
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* 로딩 애니메이션 접근성 개선 */
+@keyframes spin-accessible {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-accessible {
+  animation: spin-accessible 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-accessible {
+    animation: none;
+  }
+}
+
+/* 텍스트 크기 조절 지원 */
+@media screen and (min-width: 1px) {
+  html {
+    text-size-adjust: 100%;
+  }
+}
+
+/* 색상 대비 보장을 위한 추가 스타일 */
+.text-gray-600 {
+  color: #4b5563; /* 향상된 대비율 */
+}
+
+.text-gray-500 {
+  color: #6b7280; /* 향상된 대비율 */
+}
+
+.border-gray-300 {
+  border-color: #d1d5db;
+}
+
+/* 터치 피드백 개선 */
+button:active,
+input[type="submit"]:active,
+[role="button"]:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  input[type="submit"]:active,
+  [role="button"]:active {
+    transform: none;
+  }
+}
+
+/* ======================================
+   터치 인터페이스 최적화
+   ====================================== */
+
+/* 터치 하이라이트 제거 */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* 터치 타겟 최소 크기 보장 */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[role="link"],
+[tabindex="0"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* 터치 피드백 개선 */
+.touch-pressed {
+  transform: scale(0.96);
+  opacity: 0.8;
+  transition: all 0.1s ease;
+}
+
+/* 스크롤 성능 최적화 */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS bounce 방지 */
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 터치 친화적 폼 요소 */
+input,
+select,
+textarea {
+  font-size: 16px; /* iOS 줌 방지 */
+  border-radius: 8px;
+  touch-action: manipulation;
+}
+
+/* 터치 선택 개선 */
+.touch-select-wrapper {
+  position: relative;
+  display: block;
+}
+
+/* 제스처 영역 */
+.swipe-area {
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* 드래그 방지가 필요한 요소 */
+.no-drag {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: auto;
+}
+
+/* 터치 스크롤 영역 */
+.touch-scroll {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* 터치 디바이스에서만 적용되는 스타일 */
+@media (pointer: coarse) {
+  /* 더 큰 터치 타겟 */
+  .touch-target-lg {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px;
+  }
+}
+
+/* 고해상도 터치 디바이스 */
+@media (pointer: coarse) and (-webkit-min-device-pixel-ratio: 2) {
+  /* 레티나 디스플레이용 최적화 */
+  .icon,
+  .emoji {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* 터치 안전 영역 (노치 디바이스) */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* 모바일 가로/세로 모드 대응 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  /* 가로 모드에서 높이 최적화 */
+  .landscape-compact {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  
+  .landscape-compact .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* PWA 풀스크린 모드 지원 */
+@media (display-mode: standalone) {
+  .pwa-fullscreen {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* ======================================
+   제스처 및 상호작용 개선
+   ====================================== */
+
+/* Long press 피드백 */
+@keyframes longpress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.longpress-feedback {
+  animation: longpress 0.3s ease-in-out;
+}
+
+/* 스와이프 액션 */
+.swipe-actions {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipe-content {
+  transition: transform 0.3s ease;
+  background: var(--background);
+  position: relative;
+  z-index: 2;
+}
+
+.swipe-actions-left,
+.swipe-actions-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.swipe-actions-left {
+  left: 0;
+  background: var(--primary);
+}
+
+.swipe-actions-right {
+  right: 0;
+  background: var(--accent);
+}
+
+/* 터치 선택 텍스트 개선 */
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--primary);
+  color: white;
+}

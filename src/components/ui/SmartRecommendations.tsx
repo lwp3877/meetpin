@@ -1,11 +1,12 @@
 /* src/components/ui/SmartRecommendations.tsx - AI 기반 맞춤 추천 시스템 */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, MapPin, Users, Clock, Star, TrendingUp, Heart } from 'lucide-react'
+import { Sparkles, MapPin, Users, Clock, TrendingUp, Heart } from 'lucide-react'
 import { useAuth } from '@/lib/useAuth'
 import { getCategoryDisplay } from '@/lib/brand'
 
@@ -47,7 +48,7 @@ export default function SmartRecommendations({
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'drink' | 'exercise' | 'other'>('all')
 
   // 추천 데이터 가져오기
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = useCallback(async () => {
     if (!user) return
 
     setIsLoading(true)
@@ -71,11 +72,11 @@ export default function SmartRecommendations({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user, selectedCategory, userLocation])
 
   useEffect(() => {
     fetchRecommendations()
-  }, [user, selectedCategory, userLocation])
+  }, [fetchRecommendations])
 
   // 매치 점수에 따른 색상
   const getMatchScoreColor = (score: number) => {
@@ -230,9 +231,11 @@ export default function SmartRecommendations({
 
                     <div className="flex items-center ml-3">
                       {room.host.avatar_url ? (
-                        <img
+                        <Image
                           src={room.host.avatar_url}
                           alt={room.host.nickname}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full"
                         />
                       ) : (

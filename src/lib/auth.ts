@@ -99,6 +99,15 @@ export async function requireAuth(): Promise<User> {
  */
 export async function requireAdmin(): Promise<User> {
   const user = await getAuthenticatedUser()
+  
+  // Mock 모드인 경우 사용자 메타데이터에서 역할 확인
+  if (isDevelopmentMode && user.app_metadata?.provider === 'mock') {
+    if (user.user_metadata?.role !== 'admin') {
+      throw new ApiError('관리자 권한이 필요합니다', 403, 'ADMIN_REQUIRED')
+    }
+    return user
+  }
+  
   const supabase = await createServerSupabaseClient()
   
   const { data: profile, error } = await supabase

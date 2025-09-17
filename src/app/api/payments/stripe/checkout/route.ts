@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createBoostCheckoutSession } from '@/lib/payments/stripe'
 import { boostSchema } from '@/lib/zodSchemas'
-import { config } from '@/lib/flags'
+import { config, isDevelopmentMode } from '@/lib/flags'
 import {
   createMethodRouter,
   getAuthenticatedUser,
@@ -16,6 +16,22 @@ async function createCheckoutSession(request: NextRequest) {
   
   // 요청 본문 검증
   const { room_id, days } = await parseAndValidateBody(request, boostSchema)
+  
+  // 개발 모드에서는 Mock 결제 처리
+  if (isDevelopmentMode) {
+    // Mock 결제 세션 정보 반환
+    const mockSessionId = `cs_test_mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const mockCheckoutUrl = `${config.baseUrl}/room/${room_id}?payment=success&mock=true`
+    
+    console.log(`[Mock Payment] Room ${room_id} boost for ${days} days by user ${user.id}`)
+    
+    return createSuccessResponse({
+      checkout_url: mockCheckoutUrl,
+      session_id: mockSessionId,
+      mock: true,
+      message: '개발 모드: Mock 결제 세션이 생성되었습니다'
+    })
+  }
   
   try {
     const session = await createBoostCheckoutSession({

@@ -256,6 +256,38 @@ export interface Database {
           created_at?: string
         }
       }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          title: string
+          message: string
+          metadata: Record<string, any> | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          title: string
+          message: string
+          metadata?: Record<string, any> | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          title?: string
+          message?: string
+          metadata?: Record<string, any> | null
+          is_read?: boolean
+          created_at?: string
+        }
+      }
     }
     Views: {
       admin_stats: {

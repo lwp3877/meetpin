@@ -76,7 +76,12 @@
       "WebFetch(domain:meetpin-git-main-meetpins-projects.vercel.app)",
       "Bash(pnpm playwright:*)",
       "Bash(node:*)",
-      "Bash(pnpm exec:*)"
+      "Bash(pnpm exec:*)",
+      "WebFetch(domain:dapi.kakao.com)",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__create_directory",
+      "Bash(start C:Users이원표Desktopmeetpintest-social-login.html)",
+      "Bash(start \"\" \"C:\\Users\\이원표\\Desktop\\meetpin\\test-social-login.html\")"
     ],
     "deny": [],
     "ask": []

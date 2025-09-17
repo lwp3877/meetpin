@@ -2,18 +2,30 @@ import { NextRequest } from 'next/server'
 import { verifyWebhookSignature, handleWebhookEvent, calculateBoostExpiry } from '@/lib/payments/stripe'
 import { createSuccessResponse, createErrorResponse } from '@/lib/api'
 import { createClient } from '@supabase/supabase-js'
+import { isDevelopmentMode } from '@/lib/flags'
 
 // POST /api/payments/stripe/webhook - Stripe 웹훅 처리
 export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature')
   
-  if (!signature) {
+  // 개발 모드에서는 웹훅 서명 검증 생략
+  if (!isDevelopmentMode && !signature) {
     return createErrorResponse('Missing Stripe signature', 400)
   }
   
   try {
     const payload = await request.text()
-    const event = verifyWebhookSignature(payload, signature)
+    
+    let event: any
+    
+    if (isDevelopmentMode) {
+      // 개발 모드에서는 직접 JSON 파싱
+      console.log(`[Mock Webhook] Processing development mode webhook`)
+      event = JSON.parse(payload)
+    } else {
+      // 프로덕션 모드에서는 서명 검증
+      event = verifyWebhookSignature(payload, signature!)
+    }
     
     console.log(`Received Stripe webhook: ${event.type}`)
     
@@ -22,32 +34,39 @@ export async function POST(request: NextRequest) {
     
     // checkout.session.completed 이벤트의 경우 DB 업데이트
     if (result.success && result.type === 'checkout.session.completed' && result.roomId && result.days) {
-      try {
-        // Supabase Admin 클라이언트 생성 (RLS 우회)
-        const supabaseAdmin = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          {
-            auth: {
-              autoRefreshToken: false,
-              persistSession: false
-            }
-          }
-        )
-        
+      if (isDevelopmentMode) {
+        // 개발 모드에서는 DB 업데이트 시뮬레이션만 수행
         const boostExpiry = calculateBoostExpiry(result.days)
-        const { error: updateError } = await supabaseAdmin
-          .from('rooms')
-          .update({ boost_until: boostExpiry.toISOString() })
-          .eq('id', result.roomId)
-        
-        if (updateError) {
-          console.error('Failed to update boost_until:', updateError)
-        } else {
-          console.log(`Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`)
+        console.log(`[Mock DB Update] Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`)
+        console.log(`[Mock DB Update] Development mode - No actual database update performed`)
+      } else {
+        try {
+          // Supabase Admin 클라이언트 생성 (RLS 우회)
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false
+              }
+            }
+          )
+          
+          const boostExpiry = calculateBoostExpiry(result.days)
+          const { error: updateError } = await supabaseAdmin
+            .from('rooms')
+            .update({ boost_until: boostExpiry.toISOString() })
+            .eq('id', result.roomId)
+          
+          if (updateError) {
+            console.error('Failed to update boost_until:', updateError)
+          } else {
+            console.log(`Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`)
+          }
+        } catch (error) {
+          console.error('DB update error after payment:', error)
         }
-      } catch (error) {
-        console.error('DB update error after payment:', error)
       }
     }
     
