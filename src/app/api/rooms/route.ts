@@ -8,6 +8,14 @@ import { mockRooms } from '@/lib/mockData'
 import { isDevelopmentMode } from '@/lib/flags'
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
+  // Supabase 환경변수 검증 (프로덕션에서 실제 DB 사용 시)
+  if (!isDevelopmentMode) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('Missing Supabase environment variables')
+      return apiUtils.error('서버 설정 오류입니다', 500)
+    }
+  }
+
   const searchParams = parseQueryParams(request)
   const { page, limit, offset } = parsePaginationParams(searchParams)
   
@@ -76,7 +84,7 @@ async function getRooms(request: NextRequest) {
     .from('rooms')
     .select(`
       *,
-      profiles:host_uid (
+      profiles!host_uid (
         nickname,
         avatar_url,
         age_range
@@ -204,7 +212,7 @@ async function createRoom(request: NextRequest) {
     ])
     .select(`
       *,
-      profiles:host_uid (
+      profiles!host_uid (
         nickname,
         avatar_url,
         age_range

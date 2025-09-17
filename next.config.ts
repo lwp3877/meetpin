@@ -54,8 +54,10 @@ const nextConfig: NextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['lucide-react', '@tanstack/react-query'],
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
+  
+  // 서버 외부 패키지
+  serverExternalPackages: ['@supabase/supabase-js'],
 
   // 보안 헤더
   async headers() {
