@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/zodSchemas'
 import { parseBBoxParam } from '@/lib/bbox'
 import { mockRooms } from '@/lib/mockData'
-import { isDevelopmentMode } from '@/lib/flags'
+import { isDevelopmentMode, isProduction } from '@/lib/flags'
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
   // Supabase 환경변수 검증 (프로덕션에서 실제 DB 사용 시)
@@ -27,8 +27,12 @@ async function getRooms(request: NextRequest) {
     return apiUtils.validation('bbox 파라미터가 필요합니다 (형식: south,west,north,east)')
   }
   
-  // 개발 모드에서는 Mock 데이터 사용
-  if (isDevelopmentMode) {
+  // Mock 데이터 사용 조건: isDevelopmentMode이거나 프로덕션에서 DB 연결 실패 시
+  // TEMPORARY PRODUCTION FIX: 환경변수 누락 시 Mock 데이터 사용
+  const shouldUseMockData = isDevelopmentMode || 
+    (isProduction && (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY))
+  
+  if (shouldUseMockData) {
     // 카테고리 필터
     const category = searchParams.get('category')
     const validCategories = ['drink', 'exercise', 'other']
