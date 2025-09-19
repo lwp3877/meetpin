@@ -4,10 +4,10 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/useAuth'
 import { ImageUploader } from './ImageUploader'
-import { getRandomKoreanAvatar } from '@/lib/koreanAvatars'
+import { getRandomKoreanAvatar } from '@/lib/config/koreanAvatars'
 import { User, Shuffle } from 'lucide-react'
 import toast from 'react-hot-toast'
-import type { ImageUploadResult } from '@/lib/imageUpload'
+import type { ImageUploadResult } from '@/lib/services/imageUpload'
 
 interface ProfileImageUploaderProps {
   currentAvatarUrl?: string

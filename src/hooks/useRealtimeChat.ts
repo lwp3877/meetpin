@@ -34,6 +34,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useAuth } from '@/lib/useAuth'
+import { logger } from '@/lib/utils/logger'
 
 interface ChatMessage {
   id: string
@@ -303,7 +304,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
         filter: roomId ? `room_id=eq.${roomId}` : `sender_uid=eq.${user.id}`
       },
       (payload) => {
-        console.log('New message received:', payload)
+        logger.debug('New message received:', payload)
         loadMessages() // 새 메시지가 오면 다시 로드
       }
     )
@@ -318,7 +319,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
         filter: roomId ? `room_id=eq.${roomId}` : `receiver_uid=eq.${user.id}`
       },
       (payload) => {
-        console.log('Message updated:', payload)
+        logger.debug('Message updated:', payload)
         loadMessages()
       }
     )
@@ -355,11 +356,11 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     })
 
     channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
-      console.log('User joined:', key, newPresences)
+      logger.debug('User joined:', key, newPresences)
     })
 
     channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-      console.log('User left:', key, leftPresences)
+      logger.debug('User left:', key, leftPresences)
     })
 
     // 현재 사용자를 온라인으로 표시
@@ -374,7 +375,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     channel.subscribe((status) => {
       // 개발 모드에서는 로그 출력 안함
       if (process.env.NODE_ENV !== 'development') {
-        console.log('Channel status:', status)
+        logger.info('Chat channel status:', status)
       }
       setConnectionStatus(status === 'SUBSCRIBED' ? 'connected' : 
                         status === 'CHANNEL_ERROR' ? 'disconnected' : 'connecting')

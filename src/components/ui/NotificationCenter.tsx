@@ -35,8 +35,8 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   // 고도화된 폴링 시스템
   const etagRef = useRef<string | null>(null)
   const retryCountRef = useRef(0)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const [isPolling, setIsPolling] = useState(false)
+  const [_lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [_isPolling, setIsPolling] = useState(false)
 
   // 지능형 폴링 간격 계산
   const getPollingInterval = useCallback(() => {
@@ -246,7 +246,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         getPollingInterval()
       )
     }
-  }, [retryCountRef.current, fetchNotifications, getPollingInterval])
+  }, [fetchNotifications, getPollingInterval])
 
   // 브라우저 알림 권한 요청
   useEffect(() => {

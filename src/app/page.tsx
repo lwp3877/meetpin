@@ -6,13 +6,13 @@ import { useAuth } from '@/lib/useAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { OnboardingModal } from '@/components/onboarding-modal'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { OnboardingModal } from '@/components/auth/onboarding-modal'
+import { ThemeToggle } from '@/components/common/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ChevronLeft, ChevronRight, MapPin, Users, Calendar, Star } from 'lucide-react'
-import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
+import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
 
 // Enhanced mock data for recommendation slider
 const FEATURED_ROOMS = [

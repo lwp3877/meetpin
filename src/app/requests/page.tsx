@@ -9,7 +9,7 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/config/brand'
 import {
   Clock,
   MapPin,

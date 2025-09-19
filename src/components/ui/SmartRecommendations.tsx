@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, MapPin, Users, Clock, TrendingUp, Heart } from 'lucide-react'
 import { useAuth } from '@/lib/useAuth'
-import { getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/config/brand'
 
 interface RecommendedRoom {
   id: string

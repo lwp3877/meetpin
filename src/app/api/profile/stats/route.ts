@@ -2,7 +2,71 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/config/mockData'
+
+interface UserStats {
+  hostedRooms: number
+  joinedRooms: number
+  completedMatches: number
+  totalMessages: number
+}
+
+interface Achievement {
+  id: string
+  title: string
+  description: string
+  icon: string
+  unlocked: boolean
+  unlockedAt?: string
+}
+
+// 성취 시스템 생성 함수
+function generateAchievements(stats: UserStats): Achievement[] {
+  const achievements: Achievement[] = [
+    {
+      id: 'first_room',
+      title: '첫 모임 개최자',
+      description: '첫 번째 모임을 성공적으로 개최했습니다',
+      icon: '🎉',
+      unlocked: stats.hostedRooms >= 1,
+      unlockedAt: stats.hostedRooms >= 1 ? new Date().toISOString() : undefined
+    },
+    {
+      id: 'room_host_master',
+      title: '모임 마스터',
+      description: '5개 이상의 모임을 개최했습니다',
+      icon: '👑',
+      unlocked: stats.hostedRooms >= 5,
+      unlockedAt: stats.hostedRooms >= 5 ? new Date().toISOString() : undefined
+    },
+    {
+      id: 'social_butterfly',
+      title: '소셜 나비',
+      description: '10개 이상의 모임에 참여했습니다',
+      icon: '🦋',
+      unlocked: stats.joinedRooms >= 10,
+      unlockedAt: stats.joinedRooms >= 10 ? new Date().toISOString() : undefined
+    },
+    {
+      id: 'conversation_starter',
+      title: '대화의 달인',
+      description: '50개 이상의 메시지를 주고받았습니다',
+      icon: '💬',
+      unlocked: stats.totalMessages >= 50,
+      unlockedAt: stats.totalMessages >= 50 ? new Date().toISOString() : undefined
+    },
+    {
+      id: 'match_maker',
+      title: '매치 메이커',
+      description: '10번 이상의 매칭을 성공시켰습니다',
+      icon: '💝',
+      unlocked: stats.completedMatches >= 10,
+      unlockedAt: stats.completedMatches >= 10 ? new Date().toISOString() : undefined
+    }
+  ]
+  
+  return achievements.filter(achievement => achievement.unlocked)
+}
 
 // 프로필 통계 조회
 export async function GET(req: NextRequest) {
@@ -108,7 +172,12 @@ export async function GET(req: NextRequest) {
       completedMatches: matchCount || 0,
       totalMessages: messageCount || 0,
       memberSince: user.created_at,
-      achievements: [], // TODO: 성취 시스템 구현
+      achievements: generateAchievements({
+        hostedRooms: hostedCount || 0,
+        joinedRooms: joinedCount || 0,
+        completedMatches: matchCount || 0,
+        totalMessages: messageCount || 0
+      }),
       recentActivity: [
         ...(recentRooms || []).map((room: any) => ({
           type: 'hosted',

@@ -2,7 +2,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/config/mockData'
 
 // 호스트 메시지 읽음 처리
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

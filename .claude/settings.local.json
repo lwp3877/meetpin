@@ -81,7 +81,10 @@
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__create_directory",
       "Bash(start C:Users이원표Desktopmeetpintest-social-login.html)",
-      "Bash(start \"\" \"C:\\Users\\이원표\\Desktop\\meetpin\\test-social-login.html\")"
+      "Bash(start \"\" \"C:\\Users\\이원표\\Desktop\\meetpin\\test-social-login.html\")",
+      "mcp__filesystem__move_file",
+      "Bash(git rm:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

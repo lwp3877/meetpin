@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { brandMessages } from "@/lib/brand";
-import Providers from "@/components/Providers";
+import { brandMessages } from "@/lib/config/brand";
+import Providers from "@/components/common/Providers";
 
 export const metadata: Metadata = {
   title: `${brandMessages.appName} - ${brandMessages.tagline}`,

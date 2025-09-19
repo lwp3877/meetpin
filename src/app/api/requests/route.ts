@@ -15,8 +15,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { requestSchema } from '@/lib/zodSchemas'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { requestSchema } from '@/lib/utils/zodSchemas'
+import { isDevelopmentMode } from '@/lib/config/mockData'
 import {
   createMethodRouter,
   getAuthenticatedUser,

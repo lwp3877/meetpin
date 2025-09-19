@@ -4,9 +4,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { ImageUploader } from './ImageUploader'
-import { getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/config/brand'
 import { Palette, Sparkles, Camera } from 'lucide-react'
-import type { ImageUploadResult } from '@/lib/imageUpload'
+import type { ImageUploadResult } from '@/lib/services/imageUpload'
 
 interface RoomImageUploaderProps {
   currentImageUrl?: string

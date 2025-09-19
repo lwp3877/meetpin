@@ -1,23 +1,94 @@
 {
-  "framework": "nextjs",
+  "version": 2,
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
-  "outputDirectory": ".next",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": "nextjs",
+  "regions": ["icn1", "hnd1", "sin1"],
   "functions": {
-    "app/api/**/*.ts": {
+    "src/app/api/**/*.ts": {
+      "runtime": "nodejs20.x",
       "maxDuration": 30
     }
   },
   "headers": [
     {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://meetpin.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(self)"
+        },
+        {
           "key": "X-Force-Deployment",
-          "value": "v1.1.0-enterprise-ui"
+          "value": "v1.2.0-custom-domain"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/map",
+      "permanent": true
+    },
+    {
+      "source": "/index",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-expired-boosts",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-old-notifications",
+      "schedule": "0 2 * * *"
     }
   ]
 }

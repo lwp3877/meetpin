@@ -1,8 +1,8 @@
 /* src/lib/api.ts */
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
-import { getAuthenticatedUser, requireAdmin } from '@/lib/auth'
-import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
+import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
+import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/utils/rateLimit'
 
 /**
  * 간단한 인메모리 레이트 리미팅 스토어
@@ -36,7 +36,7 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
 }
 
 // Re-export auth functions for compatibility
-export { getAuthenticatedUser, requireAdmin } from '@/lib/auth'
+export { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
 
 /**
  * 통일된 API 응답 타입

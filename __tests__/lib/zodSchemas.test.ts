@@ -5,7 +5,7 @@ import {
   createMessageSchema, 
   createReportSchema,
   profileSchema 
-} from '@/lib/zodSchemas'
+} from '@/lib/utils/zodSchemas'
 
 describe('Zod Schemas', () => {
   describe('createRoomSchema', () => {

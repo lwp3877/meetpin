@@ -1,5 +1,5 @@
 /* 파일경로: __tests__/lib/bbox.test.ts */
-import { parseBBoxParam, calculateDistance, isValidBBox, KOREA_BBOX, SEOUL_BBOX } from '@/lib/bbox'
+import { parseBBoxParam, calculateDistance, isValidBBox, KOREA_BBOX, SEOUL_BBOX } from '@/lib/utils/bbox'
 
 describe('BBox utilities', () => {
   describe('parseBBoxParam', () => {

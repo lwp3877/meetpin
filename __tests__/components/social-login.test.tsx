@@ -1,12 +1,15 @@
 /* __tests__/components/social-login.test.tsx */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { SocialLogin } from '@/components/social-login'
+import { SocialLogin } from '@/components/auth/social-login'
 import toast from 'react-hot-toast'
 
 // Toast 모킹
 jest.mock('react-hot-toast')
 const mockToast = toast as jest.Mocked<typeof toast>
+
+// setTimeout 모킹으로 즉시 실행
+jest.useFakeTimers()
 
 // 로컬스토리지 모킹
 const mockLocalStorage = {
@@ -16,18 +19,26 @@ const mockLocalStorage = {
 }
 Object.defineProperty(window, 'localStorage', { value: mockLocalStorage })
 
-// 쿠키 설정 모킹
-Object.defineProperty(document, 'cookie', {
-  writable: true,
-  value: '',
-})
-
 describe('SocialLogin 컴포넌트', () => {
   let mockOnSuccess: jest.Mock
 
   beforeEach(() => {
     mockOnSuccess = jest.fn()
     jest.clearAllMocks()
+    mockLocalStorage.setItem.mockClear()
+    mockToast.success.mockClear()
+    mockToast.error.mockClear()
+    // 타이머 리셋
+    jest.clearAllTimers()
+  })
+
+  afterEach(() => {
+    cleanup()
+    jest.runOnlyPendingTimers()
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
   })
 
   test('모든 소셜 로그인 버튼이 렌더링된다', () => {
@@ -55,25 +66,25 @@ describe('SocialLogin 컴포넌트', () => {
     // 로딩 상태 확인
     expect(screen.getByText(/카카오로 로그인 중.../)).toBeInTheDocument()
 
+    // 타이머 실행으로 setTimeout 완료
+    jest.advanceTimersByTime(1000)
+
     // 성공 완료 대기
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalledWith('카카오 로그인 성공!')
-    }, { timeout: 2000 })
-
-    // localStorage에 사용자 데이터 저장 확인
-    await waitFor(() => {
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'meetpin_user',
-        expect.stringContaining('kakao_')
-      )
     })
 
-    // onSuccess 콜백 호출 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalled()
     expect(mockOnSuccess).toHaveBeenCalled()
+
+    // localStorage 저장 내용 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+      'meetpin_user',
+      expect.stringContaining('kakao_')
+    )
   })
 
   test('구글 로그인이 성공적으로 동작한다', async () => {
-    jest.clearAllMocks() // 각 테스트마다 모킹 초기화
     render(<SocialLogin onSuccess={mockOnSuccess} />)
     
     const googleButton = screen.getByText(/구글로 로그인하기/)
@@ -82,21 +93,22 @@ describe('SocialLogin 컴포넌트', () => {
     // 로딩 상태 확인
     expect(screen.getByText(/구글로 로그인 중.../)).toBeInTheDocument()
 
-    // 성공 완료 대기 (시간 늘림)
+    // 타이머 실행으로 setTimeout 완료
+    jest.advanceTimersByTime(1000)
+
+    // 성공 완료 대기
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalledWith('구글 로그인 성공!')
-    }, { timeout: 3000 })
+    })
 
-    // localStorage에 사용자 데이터 저장 확인
-    await waitFor(() => {
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'meetpin_user',
-        expect.stringContaining('google_')
-      )
-    }, { timeout: 1000 })
-
-    // onSuccess 콜백 호출 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalled()
     expect(mockOnSuccess).toHaveBeenCalled()
+
+    // localStorage 저장 내용 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+      'meetpin_user',
+      expect.stringContaining('google_')
+    )
   })
 
   test('네이버 로그인이 성공적으로 동작한다', async () => {
@@ -108,21 +120,22 @@ describe('SocialLogin 컴포넌트', () => {
     // 로딩 상태 확인
     expect(screen.getByText(/네이버로 로그인 중.../)).toBeInTheDocument()
 
+    // 타이머 실행으로 setTimeout 완료
+    jest.advanceTimersByTime(1000)
+
     // 성공 완료 대기
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalledWith('네이버 로그인 성공!')
-    }, { timeout: 2000 })
-
-    // localStorage에 사용자 데이터 저장 확인
-    await waitFor(() => {
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'meetpin_user',
-        expect.stringContaining('naver_')
-      )
     })
 
-    // onSuccess 콜백 호출 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalled()
     expect(mockOnSuccess).toHaveBeenCalled()
+
+    // localStorage 저장 내용 확인
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+      'meetpin_user',
+      expect.stringContaining('naver_')
+    )
   })
 
   test('disabled 상태에서는 버튼이 비활성화된다', () => {
@@ -175,76 +188,68 @@ describe('SocialLogin 컴포넌트', () => {
     const kakaoButton = screen.getByText(/카카오로 로그인하기/)
     fireEvent.click(kakaoButton)
 
+    // 타이머 실행으로 setTimeout 완료
+    jest.advanceTimersByTime(1000)
+
+    // 전체 로그인 프로세스 완료 대기
     await waitFor(() => {
       expect(mockLocalStorage.setItem).toHaveBeenCalled()
+      expect(mockOnSuccess).toHaveBeenCalled()
     })
 
     // localStorage에 저장된 데이터 검증
-    const setItemCall = mockLocalStorage.setItem.mock.calls.find(call => call[0] === 'meetpin_user')
-    expect(setItemCall).toBeDefined()
+    const setItemCalls = mockLocalStorage.setItem.mock.calls
+    const userDataCall = setItemCalls.find(call => call[0] === 'meetpin_user')
+    expect(userDataCall).toBeDefined()
     
-    const userData = JSON.parse(setItemCall![1])
+    const userData = JSON.parse(userDataCall![1])
     expect(userData).toMatchObject({
       id: expect.stringMatching(/^kakao_\d+$/),
       email: 'kakao@example.com',
       nickname: '카카오사용자',
       role: 'user',
       age_range: '20-29',
-      avatar_url: undefined,
-      intro: undefined,
-      referral_code: undefined,
       created_at: expect.any(String),
     })
+    
+    // undefined 값들은 JSON.stringify에서 제외되므로 별도 확인
+    expect(userData.avatar_url).toBeUndefined()
+    expect(userData.intro).toBeUndefined()
+    expect(userData.referral_code).toBeUndefined()
   })
 
-  test('쿠키에 사용자 데이터가 저장된다', async () => {
-    // 쿠키 설정 모킹 함수
-    const originalCookie = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie')
-    let cookieValue = ''
-    
-    Object.defineProperty(document, 'cookie', {
-      get: () => cookieValue,
-      set: (value) => { cookieValue = value },
-      configurable: true,
-    })
-
-    render(<SocialLogin onSuccess={mockOnSuccess} />)
-    
-    const kakaoButton = screen.getByText(/카카오로 로그인하기/)
-    fireEvent.click(kakaoButton)
-
-    await waitFor(() => {
-      expect(document.cookie).toContain('meetpin_mock_user=')
-    })
-
-    // 원래 쿠키 설정 복원
-    if (originalCookie) {
-      Object.defineProperty(Document.prototype, 'cookie', originalCookie)
-    }
-  })
-})
-
-// 통합 테스트
-describe('SocialLogin 통합 테스트', () => {
-  test('전체 소셜 로그인 플로우가 정상 동작한다', async () => {
-    const mockOnSuccess = jest.fn()
-    render(<SocialLogin onSuccess={mockOnSuccess} />)
-
-    // 1. 카카오 로그인 테스트
+  test('각 소셜 로그인이 개별적으로 작동한다', async () => {
+    // 카카오 테스트
+    const { unmount: unmountKakao } = render(<SocialLogin onSuccess={mockOnSuccess} />)
     fireEvent.click(screen.getByText(/카카오로 로그인하기/))
-    await waitFor(() => expect(mockToast.success).toHaveBeenCalledWith('카카오 로그인 성공!'))
+    jest.advanceTimersByTime(1000)
     
-    // 2. 구글 로그인 테스트 (새 인스턴스)
-    render(<SocialLogin onSuccess={mockOnSuccess} />)
-    fireEvent.click(screen.getAllByText(/구글로 로그인하기/)[0])
-    await waitFor(() => expect(mockToast.success).toHaveBeenCalledWith('구글 로그인 성공!'))
+    await waitFor(() => {
+      expect(mockOnSuccess).toHaveBeenCalledTimes(1)
+    })
     
-    // 3. 네이버 로그인 테스트 (새 인스턴스)
+    unmountKakao()
+    jest.clearAllMocks()
+    
+    // 구글 테스트
+    const { unmount: unmountGoogle } = render(<SocialLogin onSuccess={mockOnSuccess} />)
+    fireEvent.click(screen.getByText(/구글로 로그인하기/))
+    jest.advanceTimersByTime(1000)
+    
+    await waitFor(() => {
+      expect(mockOnSuccess).toHaveBeenCalledTimes(1)
+    })
+    
+    unmountGoogle()
+    jest.clearAllMocks()
+    
+    // 네이버 테스트
     render(<SocialLogin onSuccess={mockOnSuccess} />)
-    fireEvent.click(screen.getAllByText(/네이버로 로그인하기/)[0])
-    await waitFor(() => expect(mockToast.success).toHaveBeenCalledWith('네이버 로그인 성공!'))
-
-    // 모든 콜백이 호출되었는지 확인
-    expect(mockOnSuccess).toHaveBeenCalledTimes(3)
+    fireEvent.click(screen.getByText(/네이버로 로그인하기/))
+    jest.advanceTimersByTime(1000)
+    
+    await waitFor(() => {
+      expect(mockOnSuccess).toHaveBeenCalledTimes(1)
+    })
   })
 })

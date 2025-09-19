@@ -29,6 +29,16 @@
 .mcp.json
 playwright-report/
 test-results/
+.swc/
+.turbo/
+
+# 임시 및 테스트 파일
+*_TRIGGER.txt
+*_UPDATE_*.txt
+*_SYNC_*.txt
+test-*.js
+test-*.html
+final-*.js
 
 # IDE 설정
 .idea/

@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { mockUsers } from '@/lib/mockData'
+import { mockUsers } from '@/lib/config/mockData'
 
 interface UserProfile {
   id: string
@@ -33,9 +33,7 @@ export default function UserProfilePage() {
   }
 
   useEffect(() => {
-    console.log('Profile useEffect executing, userId:', userId)
     const foundUser = mockUsers.find(u => u.uid === userId)
-    console.log('Found user:', foundUser)
       
     if (foundUser) {
       setUserProfile({

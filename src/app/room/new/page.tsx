@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import RoomForm from '@/components/RoomForm'
+import RoomForm from '@/components/room/RoomForm'
 import PageTransition, { CardAnimation } from '@/components/ui/PageTransition'
 import Toast from '@/components/ui/Toast'
 import { ButtonPresets } from '@/components/ui/EnhancedButton'

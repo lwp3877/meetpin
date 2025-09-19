@@ -1,5 +1,5 @@
 /* 파일경로: src/app/legal/privacy/page.tsx */
-import { brandMessages } from '@/lib/brand'
+import { brandMessages } from '@/lib/config/brand'
 
 export default function PrivacyPage() {
   return (

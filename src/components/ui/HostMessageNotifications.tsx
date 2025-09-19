@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/useAuth'
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications'
 import { Bell, MessageCircle, Clock, User, X } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 interface HostMessage {
   id: string
@@ -30,6 +31,7 @@ interface HostMessageNotificationsProps {
 export function HostMessageNotifications({ onMessageClick }: HostMessageNotificationsProps) {
   const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   // 실시간 알림 훅 사용
   const {
@@ -161,7 +163,7 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
                 <button
                   onClick={() => {
                     setIsOpen(false)
-                    // TODO: Navigate to messages page
+                    router.push('/messages')
                     toast.success('전체 메시지 페이지로 이동합니다')
                   }}
                   className="text-sm text-primary hover:text-primary/80 font-medium"

@@ -22,7 +22,7 @@ import {
   NotificationSettings as NS,
   MeetPinNotifications,
   initializeNotifications
-} from '@/lib/notifications'
+} from '@/lib/services/notifications'
 import toast from 'react-hot-toast'
 
 interface NotificationSettingsProps {

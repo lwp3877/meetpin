@@ -9,9 +9,9 @@ import {
   formatPrice, 
   processBoostPayment,
   mockPaymentProcess 
-} from '@/lib/stripe'
+} from '@/lib/services/stripe'
 import { useAuth } from '@/lib/useAuth'
-import { isDevelopmentMode } from '@/lib/mockData'
+import { isDevelopmentMode } from '@/lib/config/mockData'
 import toast from 'react-hot-toast'
 
 interface BoostModalProps {

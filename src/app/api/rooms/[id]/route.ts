@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { roomUpdateSchema } from '@/lib/zodSchemas'
-import { isDevelopmentMode, mockRooms } from '@/lib/mockData'
+import { roomUpdateSchema } from '@/lib/utils/zodSchemas'
+import { isDevelopmentMode, mockRooms } from '@/lib/config/mockData'
 import {
   createMethodRouter,
   getAuthenticatedUser,

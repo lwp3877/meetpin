@@ -6,7 +6,8 @@ import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useAuth } from '@/lib/useAuth'
 import toast from 'react-hot-toast'
-import { MeetPinNotifications, NotificationSettings } from '@/lib/notifications'
+import { MeetPinNotifications, NotificationSettings } from '@/lib/services/notifications'
+import { logger } from '@/lib/utils/logger'
 
 interface HostMessage {
   id: string
@@ -191,7 +192,7 @@ export function useRealtimeNotifications({
         filter: `receiver_uid=eq.${user.id}`
       },
       async (payload) => {
-        console.log('New notification received:', payload)
+        logger.debug('New notification received:', payload)
         
         try {
           // 새 메시지 정보를 가져와서 상태 업데이트
@@ -249,7 +250,7 @@ export function useRealtimeNotifications({
         filter: `receiver_uid=eq.${user.id}`
       },
       (payload) => {
-        console.log('Message updated:', payload)
+        logger.debug('Message updated:', payload)
         
         if (payload.new.is_read !== payload.old.is_read) {
           setMessages(prev => prev.map(msg => 
@@ -277,7 +278,7 @@ export function useRealtimeNotifications({
         filter: `receiver_uid=eq.${user.id}`
       },
       (payload) => {
-        console.log('Message deleted:', payload)
+        logger.debug('Message deleted:', payload)
         
         setMessages(prev => prev.filter(msg => msg.id !== payload.old.id))
         
@@ -291,7 +292,7 @@ export function useRealtimeNotifications({
     channel.subscribe((status) => {
       // 개발 모드에서만 상태 로그 출력 (CLOSED는 정상)
       if (process.env.NODE_ENV === 'development' && status !== 'CLOSED') {
-        console.log('Notifications channel status:', status)
+        logger.info('Notifications channel status:', status)
       }
       
       if (status === 'SUBSCRIBED') {

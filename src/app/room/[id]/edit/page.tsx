@@ -5,8 +5,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
-import RoomForm from '@/components/RoomForm'
-import { brandMessages } from '@/lib/brand'
+import RoomForm from '@/components/room/RoomForm'
+import { brandMessages } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
 
 interface Room {

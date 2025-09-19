@@ -5,7 +5,7 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
-import * as authService from '@/lib/authService'
+import * as authService from '@/lib/services/authService'
 
 // 개발 모드에서 로그 출력
 if (authService.isDevelopmentMode()) {

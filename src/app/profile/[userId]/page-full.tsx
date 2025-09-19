@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
 import PageTransition from '@/components/ui/PageTransition'
 import { useAuth } from '@/lib/useAuth'
-import { mockUsers } from '@/lib/mockData'
+import { mockUsers } from '@/lib/config/mockData'
 
 interface UserProfile {
   id: string
@@ -52,9 +52,7 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     // Mock 환경에서 사용자 정보 찾기 (인증 상태와 관계없이)
-    console.log('Profile useEffect executing, userId:', userId)
     const foundUser = mockUsers.find(u => u.uid === userId)
-    console.log('Found user:', foundUser)
       
     if (foundUser) {
         setUserProfile({

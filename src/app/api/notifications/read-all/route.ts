@@ -3,9 +3,9 @@
 import { NextRequest } from 'next/server'
 import { ApiResponse, ApiError, getAuthenticatedUser } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { isDevelopmentMode } from '@/lib/flags'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const user = await getAuthenticatedUser()
     

@@ -1,7 +1,7 @@
 /* src/components/ui/UserFeedback.tsx - 사용자 피드백 및 리뷰 시스템 */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Star, Heart, Flag, MessageSquare } from 'lucide-react'

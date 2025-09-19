@@ -1,6 +1,6 @@
 /* src/lib/payments/stripe.ts */
 import Stripe from 'stripe'
-import { flags, config } from '@/lib/flags'
+import { flags, config } from '@/lib/config/flags'
 
 // Stripe 초기화 (서버 전용)
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

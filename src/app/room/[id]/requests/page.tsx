@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
-import { getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
 
 interface Request {

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createBoostCheckoutSession } from '@/lib/payments/stripe'
-import { boostSchema } from '@/lib/zodSchemas'
-import { config, isDevelopmentMode } from '@/lib/flags'
+import { boostSchema } from '@/lib/utils/zodSchemas'
+import { config, isDevelopmentMode } from '@/lib/config/flags'
 import {
   createMethodRouter,
   getAuthenticatedUser,

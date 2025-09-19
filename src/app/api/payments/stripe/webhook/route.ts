@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { verifyWebhookSignature, handleWebhookEvent, calculateBoostExpiry } from '@/lib/payments/stripe'
 import { createSuccessResponse, createErrorResponse } from '@/lib/api'
 import { createClient } from '@supabase/supabase-js'
-import { isDevelopmentMode } from '@/lib/flags'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
 // POST /api/payments/stripe/webhook - Stripe 웹훅 처리
 export async function POST(request: NextRequest) {

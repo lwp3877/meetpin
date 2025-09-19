@@ -2,10 +2,10 @@
 import { NextRequest } from 'next/server'
 import { createMethodRouter, parseQueryParams, parsePaginationParams, withRateLimit, withUserRateLimit, parseAndValidateBody, apiUtils, getAuthenticatedUser } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { createRoomSchema } from '@/lib/zodSchemas'
-import { parseBBoxParam } from '@/lib/bbox'
-import { mockRooms } from '@/lib/mockData'
-import { isDevelopmentMode, isProduction } from '@/lib/flags'
+import { createRoomSchema } from '@/lib/utils/zodSchemas'
+import { parseBBoxParam } from '@/lib/utils/bbox'
+import { mockRooms } from '@/lib/config/mockData'
+import { isDevelopmentMode } from '@/lib/config/flags'
 // GET /api/rooms - 방 목록 조회 (BBox 기반)
 async function getRooms(request: NextRequest) {
   // Supabase 환경변수 검증 (프로덕션에서 실제 DB 사용 시)
@@ -27,12 +27,8 @@ async function getRooms(request: NextRequest) {
     return apiUtils.validation('bbox 파라미터가 필요합니다 (형식: south,west,north,east)')
   }
   
-  // Mock 데이터 사용 조건: isDevelopmentMode이거나 프로덕션에서 DB 연결 실패 시
-  // TEMPORARY PRODUCTION FIX: 환경변수 누락 시 Mock 데이터 사용
-  const shouldUseMockData = isDevelopmentMode || 
-    (isProduction && (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY))
-  
-  if (shouldUseMockData) {
+  // Mock 데이터 사용 조건: 명시적으로 개발 모드인 경우만
+  if (isDevelopmentMode) {
     // 카테고리 필터
     const category = searchParams.get('category')
     const validCategories = ['drink', 'exercise', 'other']

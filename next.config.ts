@@ -195,8 +195,8 @@ const nextConfig: NextConfig = {
     BUILD_VERSION: process.env.npm_package_version || '1.0.0',
   },
 
-  // 출력 설정
-  output: 'standalone',
+  // 출력 설정 (Vercel에서는 자동으로 standalone 사용)
+  output: process.env.VERCEL ? 'standalone' : undefined,
   
   // TypeScript 최적화
   typescript: {

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { brandMessages } from '@/lib/brand'
+import { brandMessages } from '@/lib/config/brand'
 import { MapPin, Users, Star, Clock, Palette, BookOpen, Coffee, Gamepad2 } from 'lucide-react'
 
 const HOBBY_SPOTS = [

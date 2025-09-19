@@ -5,9 +5,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import DynamicMap from '@/components/DynamicMap'
-import { debounce } from '@/lib/debounce'
-import { ThemeToggle } from '@/components/theme-toggle'
+import DynamicMap from '@/components/map/DynamicMap'
+import { debounce } from '@/lib/utils'
+import { ThemeToggle } from '@/components/common/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -30,7 +30,7 @@ import {
   Navigation,
   LogOut
 } from 'lucide-react'
-import { isFeatureEnabled, trackFeatureUsage } from '@/lib/features'
+import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
 import { toast } from 'sonner'
 import { HostMessageNotifications } from '@/components/ui/HostMessageNotifications'
 import NotificationCenter from '@/components/ui/NotificationCenter'
@@ -178,8 +178,8 @@ export default function MapPage() {
       await loadRooms(bounds)
       toast.success('내 주변 모임을 찾았습니다')
       trackFeatureUsage()
-    } catch (error) {
-      console.error('Location error:', error)
+    } catch (_error) {
+      console.error('Location error:', _error)
       toast.error('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요')
     }
   }
@@ -195,7 +195,7 @@ export default function MapPage() {
       await signOut()
       toast.success('성공적으로 로그아웃되었습니다')
       router.push('/auth/login')
-    } catch (error) {
+    } catch (_error) {
       toast.error('로그아웃 중 오류가 발생했습니다')
     }
   }

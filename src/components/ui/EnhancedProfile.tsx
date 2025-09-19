@@ -16,7 +16,7 @@ import {
   Award,
   Star
 } from 'lucide-react'
-import { getCategoryDisplay } from '@/lib/brand'
+import { getCategoryDisplay } from '@/lib/config/brand'
 
 interface ProfileStats {
   hostedRooms: number

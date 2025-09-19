@@ -1,5 +1,8 @@
 # .github/workflows/ci.yml
-name: CI
+# MeetPin 지속적 통합 파이프라인
+# 코드 품질, 타입 안전성, 테스트를 자동으로 검증합니다
+
+name: 🚀 MeetPin CI
 
 on:
   push:
@@ -7,21 +10,106 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  # 테스트 환경에서 Mock 데이터 사용
+  NEXT_PUBLIC_USE_MOCK_DATA: true
+  # 캐시 효율성을 위한 Node.js 설정
+  NODE_OPTIONS: --max_old_space_size=4096
+
 jobs:
-  build:
+  # 📋 코드 품질 검사
+  quality-check:
+    name: 📋 코드 품질 검사
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - name: 📦 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 📝 pnpm 설정
+        uses: pnpm/action-setup@v4
         with:
           version: 8
-      - uses: actions/setup-node@v4
+
+      - name: 🟢 Node.js 설정
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm build
-      - run: pnpm test
-      # E2E 테스트 일시적으로 비활성화 (프로덕션 배포 후 재활성화 예정)
-      # - run: pnpm e2e --reporter=list
+          cache: 'pnpm'
+
+      - name: 📚 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 TypeScript 타입 검사
+        run: pnpm typecheck
+
+      - name: 🧹 ESLint 검사
+        run: pnpm lint
+
+      - name: 🏗️ 빌드 테스트
+        run: pnpm build
+
+  # 🧪 단위 테스트
+  unit-tests:
+    name: 🧪 단위 테스트
+    runs-on: ubuntu-latest
+    needs: quality-check
+    steps:
+      - name: 📦 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 📝 pnpm 설정
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: 🟢 Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: 📚 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Jest 단위 테스트 실행
+        run: pnpm test
+
+  # 🎭 E2E 테스트
+  e2e-tests:
+    name: 🎭 E2E 테스트
+    runs-on: ubuntu-latest
+    needs: quality-check
+    steps:
+      - name: 📦 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 📝 pnpm 설정
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: 🟢 Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: 📚 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Playwright 브라우저 설치
+        run: pnpm playwright install --with-deps
+
+      - name: 🏗️ 애플리케이션 빌드
+        run: pnpm build
+
+      - name: 🧪 E2E 테스트 실행
+        run: pnpm e2e --reporter=list
+
+      - name: 📊 테스트 결과 업로드
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

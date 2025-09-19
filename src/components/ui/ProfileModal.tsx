@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { mockUsers } from '@/lib/mockData'
+import { mockUsers } from '@/lib/config/mockData'
 
 interface ProfileModalProps {
   isOpen: boolean

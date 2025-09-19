@@ -4,7 +4,7 @@
 import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Upload, X, Loader2, Camera, Image as ImageIcon } from 'lucide-react'
-import { uploadImage, deleteImage, createImagePreview, handleImageDrop, type ImageUploadOptions, type ImageUploadResult } from '@/lib/imageUpload'
+import { uploadImage, deleteImage, createImagePreview, handleImageDrop, type ImageUploadOptions, type ImageUploadResult } from '@/lib/services/imageUpload'
 import { useAuth } from '@/lib/useAuth'
 import toast from 'react-hot-toast'
 

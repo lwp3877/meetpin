@@ -1,7 +1,7 @@
 /* src/components/ui/Toast.tsx */
 import React from 'react'
 import toast, { Toaster, ToastBar } from 'react-hot-toast'
-import { brandColors } from '@/lib/brand'
+import { brandColors } from '@/lib/config/brand'
 
 // Enhanced toast functions with better styling
 export const Toast = {

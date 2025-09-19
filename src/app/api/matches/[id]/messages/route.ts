@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { createMessageSchema } from '@/lib/zodSchemas'
+import { createMessageSchema } from '@/lib/utils/zodSchemas'
 import {
   createMethodRouter,
   getAuthenticatedUser,

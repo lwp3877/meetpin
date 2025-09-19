@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import ChatPanel from '@/components/ChatPanel'
+import ChatPanel from '@/components/chat/ChatPanel'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 
 export default function ChatPage({ 
