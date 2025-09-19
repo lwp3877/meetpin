@@ -84,7 +84,9 @@
       "Bash(start \"\" \"C:\\Users\\이원표\\Desktop\\meetpin\\test-social-login.html\")",
       "mcp__filesystem__move_file",
       "Bash(git rm:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(vercel:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
