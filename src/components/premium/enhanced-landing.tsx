@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation'
 import PremiumButton from '@/components/ui/premium-button'
 import { RoomCard } from '@/components/ui/premium-card'
 import { Badge } from '@/components/ui/badge'
+import LiveActivityStats from '@/components/home/live-activity-stats'
+import SignupIncentive from '@/components/onboarding/signup-incentive'
+import WelcomeTour from '@/components/onboarding/welcome-tour'
+import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
 import { 
   MapPin, 
   Users, 
@@ -146,7 +150,8 @@ export default function EnhancedLanding() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
+    <MobileOptimizedLayout>
+      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-primary-50">
       {/* Hero Section */}
       <section className="relative pt-20 pb-32 overflow-hidden">
         {/* Background Effects */}
@@ -395,6 +400,26 @@ export default function EnhancedLanding() {
         </div>
       </section>
 
+      {/* Live Activity Stats Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-primary-50">
+        <div className="container mx-auto px-6">
+          <LiveActivityStats />
+        </div>
+      </section>
+
+      {/* Signup Incentive Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-neutral-800 mb-4">
+              <span className="text-gradient">지금 가입하면 특별 혜택</span>
+            </h2>
+            <p className="text-lg text-neutral-600">한정 기간 동안만 제공되는 프리미엄 혜택을 놓치지 마세요!</p>
+          </div>
+          <SignupIncentive />
+        </div>
+      </section>
+
       {/* Final CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary-600 to-boost-600 text-white">
         <div className="container mx-auto px-6 text-center">
@@ -412,6 +437,7 @@ export default function EnhancedLanding() {
           </PremiumButton>
         </div>
       </section>
-    </div>
+      </div>
+    </MobileOptimizedLayout>
   )
 }

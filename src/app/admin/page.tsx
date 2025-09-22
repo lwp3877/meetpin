@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { BotSchedulerControl } from '@/components/admin/bot-scheduler-control'
 import { toast } from 'sonner'
 
 interface AdminStats {
@@ -380,6 +381,9 @@ export default function AdminPage() {
             <TabsTrigger value="reports" className="data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-700">
               ⚠️ 신고 관리
             </TabsTrigger>
+            <TabsTrigger value="bot-scheduler" className="data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-700">
+              🤖 봇 스케줄러
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -630,6 +634,10 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="bot-scheduler">
+            <BotSchedulerControl />
           </TabsContent>
         </Tabs>
       </main>
