@@ -24,9 +24,65 @@ export async function PATCH(req: NextRequest) {
       throw new ApiError('올바른 이미지 URL이 아닙니다', 400, 'INVALID_AVATAR_URL')
     }
 
-    // URL 형식 검증 (null이 아닌 경우)
-    if (avatar_url && !avatar_url.startsWith('http')) {
-      throw new ApiError('올바른 이미지 URL 형식이 아닙니다', 400, 'INVALID_URL_FORMAT')
+    // URL 보안 검증 (SSRF 방지)
+    if (avatar_url) {
+      // URL 길이 제한
+      if (avatar_url.length > 500) {
+        throw new ApiError('이미지 URL이 너무 깁니다 (최대 500자)', 400, 'URL_TOO_LONG')
+      }
+
+      // HTTPS만 허용
+      if (!avatar_url.startsWith('https://')) {
+        throw new ApiError('HTTPS URL만 허용됩니다', 400, 'INVALID_PROTOCOL')
+      }
+
+      // 허용된 도메인 whitelist
+      const allowedDomains = [
+        'images.unsplash.com',
+        'api.dicebear.com',
+        'avatars.githubusercontent.com',
+        'lh3.googleusercontent.com',
+        'k.kakaocdn.net',
+        'storage.googleapis.com',
+        // Supabase Storage 도메인 (프로젝트별로 다름)
+        process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '') + '/storage/v1/object/public',
+      ].filter(Boolean)
+
+      try {
+        const url = new URL(avatar_url)
+        
+        // 내부 네트워크 IP 차단 (SSRF 방지)
+        const hostname = url.hostname
+        if (hostname === 'localhost' || 
+            hostname === '127.0.0.1' || 
+            hostname.startsWith('192.168.') ||
+            hostname.startsWith('10.') ||
+            hostname.startsWith('172.')) {
+          throw new ApiError('내부 네트워크 URL은 허용되지 않습니다', 400, 'INTERNAL_URL_BLOCKED')
+        }
+
+        // 허용된 도메인 확인
+        const isAllowedDomain = allowedDomains.some(domain => 
+          hostname === domain || hostname.endsWith('.' + domain)
+        )
+        
+        if (!isAllowedDomain) {
+          throw new ApiError(`허용되지 않은 도메인입니다. 허용된 도메인: ${allowedDomains.join(', ')}`, 400, 'DOMAIN_NOT_ALLOWED')
+        }
+
+        // 이미지 파일 확장자 검증
+        const pathname = url.pathname.toLowerCase()
+        const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+        const hasValidExtension = allowedExtensions.some(ext => pathname.endsWith(ext))
+        
+        if (!hasValidExtension && !pathname.includes('/avatar')) { // API 기반 아바타 서비스 예외
+          throw new ApiError(`지원되지 않는 이미지 형식입니다. 허용된 형식: ${allowedExtensions.join(', ')}`, 400, 'INVALID_IMAGE_FORMAT')
+        }
+
+      } catch (urlError) {
+        if (urlError instanceof ApiError) throw urlError
+        throw new ApiError('올바른 URL 형식이 아닙니다', 400, 'INVALID_URL_FORMAT')
+      }
     }
 
     if (isDevelopmentMode) {

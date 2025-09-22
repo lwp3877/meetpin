@@ -135,7 +135,7 @@ async function seedData() {
         // 새 봇 사용자 생성
         const { data: newUser, error: userError } = await supabaseAdmin.auth.admin.createUser({
           email: botData.email,
-          password: 'meetpin-bot-2024!',
+          password: process.env.BOT_DEFAULT_PASSWORD || 'meetpin-bot-2024!',
           email_confirm: true,
           user_metadata: {
             nickname: botData.nickname,

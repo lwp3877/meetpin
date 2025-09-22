@@ -275,10 +275,10 @@ export class BotRoomScheduler {
 
       for (let i = 0; i < adjustedRoomCount; i++) {
         // 카테고리 랜덤 선택
-        const category = slot.categories[Math.floor(Math.random() * slot.categories.length)]
+        const _category = slot.categories[Math.floor(Math.random() * slot.categories.length)]
         
         // 위치 가중치에 따른 랜덤 선택
-        const location = this.selectWeightedLocation(slot.locationWeight)
+        const _location = this.selectWeightedLocation(slot.locationWeight)
         
         // 약간의 시간 간격을 두고 생성 (너무 동시에 생성되지 않도록)
         setTimeout(() => {
@@ -342,7 +342,7 @@ export class BotRoomScheduler {
 
     if (this.timers.length > 0) {
       const now = Date.now()
-      const nextDelay = Math.min(...this.timers.map(timer => {
+      const nextDelay = Math.min(...this.timers.map(_timer => {
         // TypeScript에서 timeout의 시간 정보에 직접 접근할 수 없으므로
         // 대략적인 다음 스케줄 시간을 계산
         return 60000 // 1분 후 (예시)
@@ -364,7 +364,7 @@ export class BotRoomScheduler {
     console.log(`🧪 테스트 봇 방 ${count}개 생성 시작`)
     
     for (let i = 0; i < count; i++) {
-      const testCategory = category || ['drink', 'exercise', 'other'][Math.floor(Math.random() * 3)]
+      const _testCategory = category || ['drink', 'exercise', 'other'][Math.floor(Math.random() * 3)]
       setTimeout(() => {
         smartRoomGenerator.generateSingleBotRoom()
       }, i * 1500) // 1.5초 간격

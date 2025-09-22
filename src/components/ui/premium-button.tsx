@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { premiumTheme } from '@/lib/design/premium-theme'
+// Premium theme utilities for future enhancements
 
 interface PremiumButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient' | 'glass'

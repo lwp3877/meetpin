@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BotManager } from '@/lib/bot/bot-scheduler'
-import { rateLimit } from '@/lib/api'
+import { rateLimit, requireAdmin } from '@/lib/api'
 
 /**
  * 봇 방 수동 생성 API
@@ -9,20 +9,11 @@ import { rateLimit } from '@/lib/api'
 export async function POST(request: NextRequest) {
   try {
     // 관리자 전용 기능으로 제한
-    const { searchParams } = new URL(request.url)
-    const adminKey = searchParams.get('admin_key')
-    
-    if (adminKey !== process.env.BOT_ADMIN_KEY && process.env.NODE_ENV === 'production') {
-      return NextResponse.json(
-        { ok: false, message: '관리자 권한이 필요합니다' },
-        { status: 403 }
-      )
-    }
+    const admin = await requireAdmin()
 
-    // Rate limiting
-    const clientIP = request.headers.get('x-forwarded-for') || 'unknown'
+    // Rate limiting (관리자 기준)
     const rateLimitResult = rateLimit(
-      `bot-generate:${clientIP}`,
+      `bot-generate:${admin.id}`,
       5, // 5회
       60 * 1000 // 1분
     )
@@ -83,6 +74,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
+    // 관리자만 봇 상태 조회 가능
+    await requireAdmin()
+    
     const stats = BotManager.getStats()
     
     return NextResponse.json({

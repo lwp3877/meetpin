@@ -74,24 +74,44 @@ async function updateRequest(
     if (new Date() > cutoffTime) {
       throw new ApiError('요청 수락 마감 시간이 지났습니다')
     }
+  }
+  
+  // 수락하는 경우 원자적 트랜잭션으로 처리 (race condition 방지)
+  if (status === 'accepted') {
+    // PostgreSQL 함수를 사용한 원자적 처리
+    const { data: result, error: transactionError } = await (supabase as any)
+      .rpc('accept_request_atomically', {
+        request_id: id,
+        max_capacity: requestWithRoom.room.max_people
+      })
     
-    // 현재 수락된 참가자 수 확인
-    const { count: currentCount } = await supabase
-      .from('requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('room_id', requestWithRoom.room_id)
-      .eq('status', 'accepted')
+    if (transactionError) {
+      console.error('Transaction error:', transactionError)
+      if (transactionError.message?.includes('room_full')) {
+        throw new ApiError('방이 가득 찼습니다')
+      }
+      throw new ApiError('요청 처리에 실패했습니다')
+    }
     
-    if ((currentCount || 0) >= requestWithRoom.room.max_people - 1) {
+    if (!result) {
       throw new ApiError('방이 가득 찼습니다')
+    }
+  } else {
+    // 거절하는 경우 단순 업데이트
+    const { error: updateError } = await (supabase as any)
+      .from('requests')
+      .update({ status })
+      .eq('id', id)
+    
+    if (updateError) {
+      console.error('Request update error:', updateError)
+      throw new ApiError('요청 처리에 실패했습니다')
     }
   }
   
-  // 트랜잭션으로 요청 상태 업데이트 및 매칭 생성
-  const { data: updatedRequest, error: updateError } = await (supabase as any)
+  // 업데이트된 요청 정보 조회
+  const { data: updatedRequest, error: fetchError } = await supabase
     .from('requests')
-    .update({ status })
-    .eq('id', id)
     .select(`
       *,
       room:rooms!requests_room_id_fkey(
@@ -113,33 +133,12 @@ async function updateRequest(
         avatar_url
       )
     `)
+    .eq('id', id)
     .single()
   
-  if (updateError) {
-    console.error('Request update error:', updateError)
-    throw new ApiError('요청 처리에 실패했습니다')
-  }
-  
-  // 수락된 경우 매칭 생성
-  if (status === 'accepted') {
-    const { error: matchError } = await (supabase as any)
-      .from('matches')
-      .insert({
-        room_id: requestWithRoom.room_id,
-        host_uid: requestWithRoom.room.host_uid,
-        guest_uid: requestWithRoom.requester_uid,
-      })
-    
-    if (matchError && matchError.code !== '23505') { // 중복 제외
-      console.error('Match creation error:', matchError)
-      // 매칭 생성 실패시 요청 상태를 다시 pending으로 되돌림
-      await (supabase as any)
-        .from('requests')
-        .update({ status: 'pending' })
-        .eq('id', id)
-      
-      throw new ApiError('매칭 생성에 실패했습니다')
-    }
+  if (fetchError) {
+    console.error('Updated request fetch error:', fetchError)
+    throw new ApiError('처리된 요청 정보를 가져올 수 없습니다')
   }
   
   const message = status === 'accepted' 

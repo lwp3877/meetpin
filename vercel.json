@@ -17,7 +17,7 @@
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://meetpin.com"
+          "value": "https://meetpin-weld.vercel.app"
         },
         {
           "key": "Access-Control-Allow-Methods",

@@ -7,6 +7,7 @@ ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.host_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.blocked_users ENABLE ROW LEVEL SECURITY;
 
@@ -25,6 +26,8 @@ DROP POLICY IF EXISTS "matches_involved_read" ON public.matches;
 DROP POLICY IF EXISTS "matches_system_write" ON public.matches;
 
 DROP POLICY IF EXISTS "messages_involved_all" ON public.messages;
+
+DROP POLICY IF EXISTS "host_messages_conversation_all" ON public.host_messages;
 
 DROP POLICY IF EXISTS "reports_user_insert" ON public.reports;
 DROP POLICY IF EXISTS "reports_admin_read" ON public.reports;
@@ -177,6 +180,23 @@ WITH CHECK (
     WHERE id = match_id 
     AND (host_uid = auth.uid() OR guest_uid = auth.uid())
   )
+);
+
+-- =============================================================================
+-- HOST_MESSAGES 정책
+-- =============================================================================
+
+-- 호스트와 참가자만 대화 메시지 읽기/쓰기 가능
+CREATE POLICY "host_messages_conversation_all" ON public.host_messages
+FOR ALL
+TO authenticated
+USING (
+  sender_uid = auth.uid()
+  OR receiver_uid = auth.uid()
+)
+WITH CHECK (
+  sender_uid = auth.uid()
+  AND sender_uid != receiver_uid
 );
 
 -- =============================================================================

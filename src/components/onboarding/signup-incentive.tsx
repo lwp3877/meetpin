@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+// Button component not used in current implementation
 import { Badge } from '@/components/ui/badge'
 import PremiumButton from '@/components/ui/premium-button'
 import { Gift, Star, Users, Clock, Sparkles, Crown, Heart, Zap } from 'lucide-react'

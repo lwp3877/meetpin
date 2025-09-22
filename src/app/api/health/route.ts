@@ -1,7 +1,7 @@
 /* src/app/api/health/route.ts - 프로덕션 헬스체크 API */
 
 import { NextRequest } from 'next/server'
-import { ApiResponse, apiUtils } from '@/lib/api'
+import { ApiResponse, apiUtils, requireAdmin } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
@@ -189,11 +189,8 @@ async function checkServices() {
 // POST 요청으로 상세 진단 정보 제공 (관리자 전용)
 export async function POST(request: NextRequest): Promise<Response> {
   try {
-    // 간단한 인증 체크 (실제로는 더 강력한 인증 필요)
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return apiUtils.unauthorized('인증이 필요합니다')
-    }
+    // 관리자 인증 필요
+    const user = await requireAdmin()
     
     // 상세 진단 정보 수집
     const diagnostics = await collectDetailedDiagnostics()

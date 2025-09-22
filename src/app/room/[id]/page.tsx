@@ -50,21 +50,51 @@ export default function RoomDetailPage() {
   const [showProfileModal, setShowProfileModal] = useState(false)
 
   const fetchRoom = useCallback(async () => {
-    if (!params?.id) return
+    if (!params?.id || params.id === 'undefined' || params.id === 'null') {
+      console.warn('Invalid room ID:', params?.id)
+      toast.error('올바르지 않은 방 ID입니다')
+      router.push('/map')
+      return
+    }
+
+    // UUID 형식 검증
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(params.id)) {
+      toast.error('잘못된 방 ID 형식입니다')
+      router.push('/map')
+      return
+    }
 
     try {
-      const response = await fetch(`/api/rooms/${params.id}`)
+      setIsLoading(true)
+      const response = await fetch(`/api/rooms/${params.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const result = await response.json()
 
-      if (result.ok) {
+      if (result.ok && result.data?.room) {
         setRoom(result.data.room)
       } else {
-        toast.error(result.message || '방 정보를 불러오지 못했습니다')
+        toast.error(result.message || '방 정보를 찾을 수 없습니다')
         router.push('/map')
       }
     } catch (error: any) {
       console.error('Error fetching room:', error)
-      toast.error('방 정보를 불러오는 중 오류가 발생했습니다')
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('네트워크 연결을 확인해주세요')
+      } else if (error.message.includes('404')) {
+        toast.error('존재하지 않는 방입니다')
+      } else {
+        toast.error('방 정보를 불러오는 중 오류가 발생했습니다')
+      }
       router.push('/map')
     } finally {
       setIsLoading(false)

@@ -318,25 +318,69 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     return _browserClient
   }
   
-  const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
-  
-  _browserClient = createClient<Database>(url, key, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'meetpin-supabase-auth-token',
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'meetpin-web',
+  try {
+    const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
+    
+    _browserClient = createClient<Database>(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        storageKey: 'meetpin-supabase-auth-token',
       },
-    },
-  })
-  
-  return _browserClient
+      realtime: {
+        params: {
+          eventsPerSecond: 10, // 초당 이벤트 제한
+        },
+        heartbeatIntervalMs: 30000, // 30초 하트비트
+        reconnectAfterMs: () => Math.floor(Math.random() * 3000) + 1000, // 1-4초 랜덤 재연결
+        timeout: 20000, // 20초 타임아웃
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'meetpin-web',
+        },
+      },
+    })
+    
+    // 연결 상태 모니터링 (개발 모드에서만)
+    if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
+      _browserClient.channel('_ping').subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('Supabase realtime connection error, attempting reconnect...')
+        }
+      })
+    }
+    
+    return _browserClient
+  } catch (error) {
+    console.error('Failed to create Supabase client:', error)
+    // 개발 환경에서는 Mock 클라이언트 반환
+    if (process.env.NODE_ENV === 'development') {
+      // Mock client for development fallback
+      return {
+        from: () => ({
+          select: () => ({ data: [], error: null }),
+          insert: () => ({ data: [], error: null }),
+          update: () => ({ data: [], error: null }),
+          delete: () => ({ data: [], error: null }),
+        }),
+        auth: {
+          getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+          signOut: () => Promise.resolve({ error: null }),
+        },
+        channel: () => ({
+          on: () => ({}),
+          subscribe: () => 'SUBSCRIBED',
+          unsubscribe: () => ({}),
+          track: () => ({}),
+        }),
+      } as any
+    }
+    throw error
+  }
 }
 
 // 서버용 클라이언트 (쿠키 기반 인증)

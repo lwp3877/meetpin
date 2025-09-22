@@ -304,7 +304,10 @@ export function useRealtimeNotifications({
     channelRef.current = channel
 
     return () => {
-      channel.unsubscribe()
+      if (channelRef.current) {
+        channelRef.current.unsubscribe()
+        channelRef.current = null
+      }
     }
   }, [user, enabled, showToast, loadMessages, supabase])
 

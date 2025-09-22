@@ -3,7 +3,7 @@
  * 자연스럽고 매력적인 방을 자동으로 생성하여 플랫폼을 활성화
  */
 
-import { supabaseAdmin } from '@/lib/supabaseClient'
+// Supabase admin client for future database integration from '@/lib/supabaseClient'
 
 // 서울 핫플레이스 좌표 데이터
 const seoulHotspots = [
@@ -131,7 +131,7 @@ const timePreferences = {
 }
 
 // 날씨별 활동 추천
-const weatherActivities = {
+const _weatherActivities = {
   sunny: ['조깅', '자전거', '피크닉', '야외 카페'],
   rainy: ['실내 카페', '전시회', '영화관람', '보드게임'],
   cloudy: ['산책', '쇼핑', '맛집탐방', '문화체험'],
@@ -142,7 +142,7 @@ const weatherActivities = {
  */
 function generateRoomTitle(template: string, location: string, time: Date): string {
   const hour = time.getHours()
-  const timeOfDay = hour < 12 ? '오전' : hour < 18 ? '오후' : '저녁'
+  const _timeOfDay = hour < 12 ? '오전' : hour < 18 ? '오후' : '저녁'
   
   const title = template.replace('{location}', location)
   
@@ -154,8 +154,8 @@ function generateRoomTitle(template: string, location: string, time: Date): stri
     night: ['신나는', '열정적인', '즐거운'],
   }
   
-  const period = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : hour < 22 ? 'evening' : 'night'
-  const modifiers = timeModifiers[period]
+  const _period = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : hour < 22 ? 'evening' : 'night'
+  const modifiers = timeModifiers[_period]
   const modifier = modifiers[Math.floor(Math.random() * modifiers.length)]
   
   return `${modifier} ${title}`
@@ -272,7 +272,7 @@ export async function generateTimeBasedBotRooms(count: number = 3) {
   // 현재 시간대에 적합한 카테고리 필터링
   let preferredCategories: string[] = ['drink', 'exercise', 'other']
   
-  for (const [period, config] of Object.entries(timePreferences)) {
+  for (const [_period, config] of Object.entries(timePreferences)) {
     if (config.hours.includes(currentHour)) {
       preferredCategories = config.categories
       break
@@ -367,9 +367,11 @@ export const naturalPatterns = {
   },
 }
 
-export default {
+const smartRoomGenerator = {
   generateSingleBotRoom,
   generateTimeBasedBotRooms,
   generatePopularTimeRooms,
   naturalPatterns,
 }
+
+export default smartRoomGenerator

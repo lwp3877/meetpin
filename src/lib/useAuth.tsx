@@ -6,6 +6,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import * as authService from '@/lib/services/authService'
+import { redirectToLogin, redirectToHome } from '@/lib/utils/navigation'
 
 // 개발 모드에서 로그 출력
 if (authService.isDevelopmentMode()) {
@@ -183,7 +184,7 @@ export function withAuth<P extends object>(Component: React.ComponentType<P>) {
     }
 
     if (!user) {
-      window.location.href = '/auth/login'
+      redirectToLogin()
       return null
     }
 
@@ -208,7 +209,7 @@ export function withAdmin<P extends object>(Component: React.ComponentType<P>) {
     }
 
     if (!user) {
-      window.location.href = '/auth/login'
+      redirectToLogin()
       return null
     }
 
@@ -219,7 +220,7 @@ export function withAdmin<P extends object>(Component: React.ComponentType<P>) {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">접근 권한 없음</h1>
             <p className="text-gray-600 mb-4">관리자 권한이 필요합니다.</p>
             <button 
-              onClick={() => window.location.href = '/'}
+              onClick={redirectToHome}
               className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-deep transition-colors"
             >
               홈으로 돌아가기
@@ -239,7 +240,7 @@ export function useRequireAuth() {
   
   useEffect(() => {
     if (!loading && !user) {
-      window.location.href = '/auth/login'
+      redirectToLogin()
     }
   }, [user, loading])
 
@@ -251,9 +252,9 @@ export function useRequireAdmin() {
   
   useEffect(() => {
     if (!loading && !user) {
-      window.location.href = '/auth/login'
+      redirectToLogin()
     } else if (!loading && user && user.role !== 'admin') {
-      window.location.href = '/'
+      redirectToHome()
     }
   }, [user, loading])
 

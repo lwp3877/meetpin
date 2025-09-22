@@ -107,6 +107,22 @@ CREATE TABLE IF NOT EXISTS public.reports (
   CONSTRAINT no_self_report CHECK (reporter_uid != target_uid)
 );
 
+-- 호스트 메시지 테이블 (호스트와 참가자 간 직접 메시지)
+CREATE TABLE IF NOT EXISTS public.host_messages (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  room_id UUID REFERENCES public.rooms(id) ON DELETE CASCADE NOT NULL,
+  sender_uid UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  receiver_uid UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  text TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT false NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  
+  -- 제약 조건
+  CONSTRAINT text_length CHECK (char_length(text) >= 1 AND char_length(text) <= 1000),
+  CONSTRAINT no_self_message CHECK (sender_uid != receiver_uid)
+);
+
 -- 차단된 사용자 테이블
 CREATE TABLE IF NOT EXISTS public.blocked_users (
   blocker_uid UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -157,6 +173,13 @@ CREATE INDEX IF NOT EXISTS idx_messages_match_id ON public.messages(match_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_sender_uid ON public.messages(sender_uid);
 CREATE INDEX IF NOT EXISTS idx_messages_match_created ON public.messages(match_id, created_at DESC);
+
+-- 호스트 메시지 관련 인덱스
+CREATE INDEX IF NOT EXISTS idx_host_messages_room_id ON public.host_messages(room_id);
+CREATE INDEX IF NOT EXISTS idx_host_messages_sender_uid ON public.host_messages(sender_uid);
+CREATE INDEX IF NOT EXISTS idx_host_messages_receiver_uid ON public.host_messages(receiver_uid);
+CREATE INDEX IF NOT EXISTS idx_host_messages_created_at ON public.host_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_host_messages_conversation ON public.host_messages(room_id, sender_uid, receiver_uid, created_at DESC);
 
 -- 신고 관련 인덱스
 CREATE INDEX IF NOT EXISTS idx_reports_reporter_uid ON public.reports(reporter_uid);

@@ -363,15 +363,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       logger.debug('User left:', key, leftPresences)
     })
 
-    // 현재 사용자를 온라인으로 표시
-    channel.track({
-      uid: user.id,
-      nickname: user.nickname,
-      avatar_url: user.avatar_url,
-      last_seen: new Date().toISOString()
-    })
-
-    // 채널 구독
+    // 채널 구독 먼저 수행
     channel.subscribe((status) => {
       // 개발 모드에서는 로그 출력 안함
       if (process.env.NODE_ENV !== 'development') {
@@ -381,6 +373,13 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
                         status === 'CHANNEL_ERROR' ? 'disconnected' : 'connecting')
       
       if (status === 'SUBSCRIBED') {
+        // 구독 완료 후 presence 추적 시작
+        channel.track({
+          uid: user.id,
+          nickname: user.nickname,
+          avatar_url: user.avatar_url,
+          last_seen: new Date().toISOString()
+        })
         loadMessages()
       }
     })
@@ -388,7 +387,10 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     channelRef.current = channel
 
     return () => {
-      channel.unsubscribe()
+      if (channelRef.current) {
+        channelRef.current.unsubscribe()
+        channelRef.current = null
+      }
     }
   }, [user, roomId, enabled, loadMessages, supabase])
 

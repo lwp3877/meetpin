@@ -1,15 +1,16 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
-import Link from 'next/link'
+// Link imported but handled via PremiumButton
 import { useRouter } from 'next/navigation'
 import PremiumButton from '@/components/ui/premium-button'
 import { RoomCard } from '@/components/ui/premium-card'
 import { Badge } from '@/components/ui/badge'
 import LiveActivityStats from '@/components/home/live-activity-stats'
 import SignupIncentive from '@/components/onboarding/signup-incentive'
-import WelcomeTour from '@/components/onboarding/welcome-tour'
+// WelcomeTour available for future implementation
 import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
 import { 
   MapPin, 
@@ -249,11 +250,12 @@ export default function EnhancedLanding() {
                   <div key={room.id} className="w-full flex-shrink-0 px-4">
                     <RoomCard className="relative overflow-hidden">
                       {/* Room Image */}
-                      <div className="aspect-video rounded-xl overflow-hidden mb-6">
-                        <img 
+                      <div className="relative aspect-video rounded-xl overflow-hidden mb-6">
+                        <Image 
                           src={room.image} 
                           alt={room.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                         

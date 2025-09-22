@@ -16,11 +16,9 @@ import {
   Star, 
   Clock, 
   ChevronDown,
-  Filter,
   Search,
   Menu,
   X,
-  Phone,
   Smartphone
 } from 'lucide-react'
 
@@ -79,7 +77,7 @@ const MOBILE_FEATURED_ROOMS = [
 ]
 
 export function MobileOptimizedLayout({ children, showMobileOptimizations = true }: MobileLayoutProps) {
-  const [isMobile, setIsMobile] = useState(false)
+  const [_isMobile, setIsMobile] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [activeTab, setActiveTab] = useState('all')
 
