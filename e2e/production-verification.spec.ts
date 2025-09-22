@@ -89,8 +89,8 @@ test.describe('Production Site Verification', () => {
     // 브라우저 콘솔에서 환경변수 확인
     const useMockData = await page.evaluate(() => {
       return (window as any).__NEXT_PUBLIC_USE_MOCK_DATA || 
-             process.env.NEXT_PUBLIC_USE_MOCK_DATA ||
-             localStorage.getItem('NEXT_PUBLIC_USE_MOCK_DATA');
+             (process.env as any).NEXT_PUBLIC_USE_MOCK_DATA ||
+             (window as any).localStorage?.getItem?.('NEXT_PUBLIC_USE_MOCK_DATA');
     });
     
     console.log('Client-side NEXT_PUBLIC_USE_MOCK_DATA:', useMockData);
