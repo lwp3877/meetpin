@@ -94,7 +94,7 @@ export default function TermsPage() {
                 <ul className="pl-6 space-y-1">
                   <li>• 타인의 명의를 이용하여 신청한 경우</li>
                   <li>• 허위 정보를 기재하거나 회사가 제시하는 내용을 기재하지 않은 경우</li>
-                  <li>• 만 18세 미만인 경우</li>
+                  <li>• 만 19세 미만인 경우 (성인 인증이 완료되지 않은 경우)</li>
                   <li>• 이전에 회원자격을 상실한 적이 있는 경우</li>
                 </ul>
               </div>
@@ -140,9 +140,9 @@ export default function TermsPage() {
                 <p>① 서비스 이용료는 무료입니다. 다만, 부가 서비스인 모임 부스트는 유료입니다.</p>
                 <p>② 모임 부스트 이용료는 다음과 같습니다:</p>
                 <ul className="pl-6 space-y-1">
-                  <li>• 1일 부스트: 3,000원</li>
-                  <li>• 3일 부스트: 8,000원</li>
-                  <li>• 7일 부스트: 15,000원</li>
+                  <li>• 1일 부스트: 1,000원</li>
+                  <li>• 3일 부스트: 2,500원</li>
+                  <li>• 7일 부스트: 5,000원</li>
                 </ul>
                 <p>③ 결제는 Stripe 결제 시스템을 통해 처리되며, 결제 완료 즉시 부스트가 활성화됩니다.</p>
               </div>
@@ -158,7 +158,7 @@ export default function TermsPage() {
                   <li>• 결제 오류로 인한 중복 결제의 경우</li>
                   <li>• 기타 회사의 귀책사유로 서비스를 제공받지 못한 경우</li>
                 </ul>
-                <p>③ 환불 신청은 고객센터를 통해 접수하며, 확인 후 3-5 영업일 내에 처리됩니다.</p>
+                <p>③ 환불 신청은 고객센터(support@meetpin.kr)를 통해 접수하며, 확인 후 3-5 영업일 내에 처리됩니다.</p>
               </div>
             </section>
 
@@ -176,7 +176,7 @@ export default function TermsPage() {
                 <p>① 회사는 회원이 본 약관의 의무를 위반한 경우 경고, 일시정지, 영구이용정지 등의 조치를 취할 수 있습니다.</p>
                 <p>② 회사는 다음 각 호에 해당하는 경우 서비스 이용을 제한할 수 있습니다:</p>
                 <ul className="pl-6 space-y-1">
-                  <li>• 미성년자가 서비스를 이용하는 경우</li>
+                  <li>• 만 19세 미만이 서비스를 이용하는 경우</li>
                   <li>• 타인의 명예를 손상하거나 불이익을 주는 행위를 한 경우</li>
                   <li>• 서비스의 안정적 운영을 방해한 경우</li>
                   <li>• 반복적으로 신고를 받은 경우</li>
@@ -208,6 +208,18 @@ export default function TermsPage() {
               <div className="space-y-3 text-text-muted leading-relaxed">
                 <p>① 회사는 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 보상처리하기 위하여 피해보상처리기구를 설치·운영합니다.</p>
                 <p>② 회사와 이용자 간에 발생한 전자상거래 분쟁에 관한 소송은 서울중앙지방법원을 관할 법원으로 합니다.</p>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="text-lg font-semibold text-text mb-4">제15조 (회사 정보 및 연락처)</h3>
+              <div className="space-y-3 text-text-muted leading-relaxed">
+                <p>① 회사명: 밋핀(MeetPin)</p>
+                <p>② 대표자: [대표자명]</p>
+                <p>③ 사업자등록번호: [사업자등록번호]</p>
+                <p>④ 주소: [회사주소]</p>
+                <p>⑤ 고객센터: support@meetpin.kr</p>
+                <p>⑥ 개인정보보호책임자: privacy@meetpin.kr</p>
               </div>
             </section>
 

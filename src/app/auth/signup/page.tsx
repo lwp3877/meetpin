@@ -732,24 +732,24 @@ export default function SignUpPage() {
           </Link>
         </div>
 
-        {/* Special Offer */}
-        <div className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-xl p-4 sm:p-6 text-white shadow-xl border border-yellow-300" role="region" aria-labelledby="special-offer">
+        {/* Welcome Message - 허위 혜택 정보 제거 */}
+        <div className="bg-gradient-to-r from-emerald-400 via-teal-500 to-blue-500 rounded-xl p-4 sm:p-6 text-white shadow-xl border border-emerald-300" role="region" aria-labelledby="welcome-message">
           <div className="text-center">
-            <div className="text-3xl sm:text-4xl mb-3" role="img" aria-label="선물">🎁</div>
-            <h3 id="special-offer" className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-              신규 가입 특별 혜택!
+            <div className="text-3xl sm:text-4xl mb-3" role="img" aria-label="환영">👋</div>
+            <h3 id="welcome-message" className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+              밋핀에 오신 것을 환영합니다!
             </h3>
             <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
-              <div className="text-xl sm:text-2xl font-bold mb-2">프리미엄 부스트 3일 무료</div>
+              <div className="text-lg sm:text-xl font-bold mb-2">지도 기반 모임 서비스</div>
               <div className="text-xs sm:text-sm opacity-90 leading-relaxed">
-                ✨ 내 모임이 상단에 노출되어 더 많은 사람들이 볼 수 있어요
+                ✨ 내 주변 사람들과 안전하고 즐거운 만남을 시작해보세요
               </div>
               <div className="text-xs sm:text-sm opacity-90 mt-2">
-                💰 일반 가격: 2,500원 → <span className="font-bold line-through">무료</span>
+                📍 위치 기반 매칭 • 💬 실시간 채팅 • 🛡️ 안전한 환경
               </div>
             </div>
             <div className="text-xs sm:text-sm leading-relaxed">
-              지금 가입하면 자동으로 적용됩니다!
+              회원가입 후 바로 이용 가능합니다!
             </div>
           </div>
         </div>

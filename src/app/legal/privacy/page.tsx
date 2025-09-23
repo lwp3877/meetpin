@@ -271,7 +271,7 @@ export default function PrivacyPage() {
                     <h4 className="font-semibold text-green-900 mb-2">권리 행사 방법</h4>
                     <ul className="space-y-1 text-sm">
                       <li>• 서비스 내 설정 메뉴</li>
-                      <li>• 이메일: privacy@meetpin.com</li>
+                      <li>• 이메일: privacy@meetpin.kr</li>
                       <li>• 서면, 전화, 전자우편</li>
                       <li>• 대리인을 통한 신청 가능</li>
                     </ul>
@@ -328,7 +328,7 @@ export default function PrivacyPage() {
                       <ul className="space-y-2 text-sm">
                         <li><strong>성명:</strong> 이원표</li>
                         <li><strong>직책:</strong> 개발팀장</li>
-                        <li><strong>연락처:</strong> privacy@meetpin.com</li>
+                        <li><strong>연락처:</strong> privacy@meetpin.kr</li>
                         <li><strong>전화:</strong> 02-1234-5678</li>
                       </ul>
                     </div>
@@ -337,7 +337,7 @@ export default function PrivacyPage() {
                       <ul className="space-y-2 text-sm">
                         <li><strong>부서명:</strong> 개발팀</li>
                         <li><strong>담당자:</strong> 개인정보보호팀</li>
-                        <li><strong>연락처:</strong> privacy@meetpin.com</li>
+                        <li><strong>연락처:</strong> privacy@meetpin.kr</li>
                         <li><strong>전화:</strong> 02-1234-5678</li>
                       </ul>
                     </div>

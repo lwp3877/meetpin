@@ -215,7 +215,7 @@ function generateRealisticFee(category: string, location: string): number {
 /**
  * 봇 방 단일 생성
  */
-export async function generateSingleBotRoom() {
+export async function generateSingleBotRoom(): Promise<any> {
   try {
     // 랜덤 핫스팟 선택
     const hotspot = seoulHotspots[Math.floor(Math.random() * seoulHotspots.length)]
@@ -264,7 +264,7 @@ export async function generateSingleBotRoom() {
 /**
  * 시간대에 따른 스마트 방 생성
  */
-export async function generateTimeBasedBotRooms(count: number = 3) {
+export async function generateTimeBasedBotRooms(count: number = 3): Promise<any[]> {
   const rooms = []
   const now = new Date()
   const currentHour = now.getHours()
@@ -309,7 +309,7 @@ export async function generateTimeBasedBotRooms(count: number = 3) {
 /**
  * 지역별 인기 시간대 분석 후 봇 방 생성
  */
-export async function generatePopularTimeRooms(district: string, count: number = 2) {
+export async function generatePopularTimeRooms(district: string, count: number = 2): Promise<any[]> {
   const districtHotspots = seoulHotspots.filter(h => h.district === district)
   if (districtHotspots.length === 0) return []
   

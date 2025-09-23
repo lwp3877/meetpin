@@ -41,10 +41,15 @@ export async function POST(request: NextRequest) {
         console.log(`[Mock DB Update] Development mode - No actual database update performed`)
       } else {
         try {
+          // 환경 변수 검증
+          if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            throw new Error('Missing Supabase environment variables')
+          }
+          
           // Supabase Admin 클라이언트 생성 (RLS 우회)
           const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY,
             {
               auth: {
                 autoRefreshToken: false,
@@ -60,12 +65,16 @@ export async function POST(request: NextRequest) {
             .eq('id', result.roomId)
           
           if (updateError) {
-            console.error('Failed to update boost_until:', updateError)
+            console.error('CRITICAL: Failed to update boost after payment:', updateError)
+            // 결제는 완료되었지만 DB 업데이트 실패 - 관리자 알림 필요
+            return createErrorResponse('Payment completed but boost activation failed', 500)
           } else {
             console.log(`Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`)
           }
         } catch (error) {
-          console.error('DB update error after payment:', error)
+          console.error('CRITICAL: DB update error after payment:', error)
+          // 결제 완료 후 DB 업데이트 실패는 치명적 오류
+          return createErrorResponse('Payment completed but boost activation failed', 500)
         }
       }
     }

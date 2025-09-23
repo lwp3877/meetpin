@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,7 +28,9 @@ interface LiveMetrics {
   botRatio: number
 }
 
-export function RealTimeMonitoring() {
+interface RealTimeMonitoringProps {}
+
+export function RealTimeMonitoring(_props: RealTimeMonitoringProps = {}) {
   const [health, setHealth] = useState<SystemHealth | null>(null)
   const [metrics, setMetrics] = useState<LiveMetrics | null>(null)
   const [autoRefresh, setAutoRefresh] = useState(true)
@@ -48,14 +50,16 @@ export function RealTimeMonitoring() {
 
       return () => clearInterval(interval)
     }
-  }, [autoRefresh])
+    
+    return () => {} // Add explicit return for non-autoRefresh case
+  }, [autoRefresh, fetchSystemHealth, fetchLiveMetrics])
 
-  const fetchSystemHealth = async () => {
+  const fetchSystemHealth = useCallback(async () => {
     const startTime = Date.now()
     
     try {
       // DB 연결 테스트
-      const { data, error } = await supabase
+      const { data: _data, error } = await supabase
         .from('profiles')
         .select('count')
         .limit(1)
@@ -69,7 +73,7 @@ export function RealTimeMonitoring() {
         errorRate: 0, // TODO: 에러율 계산
         lastUpdate: new Date()
       })
-    } catch (error) {
+    } catch (_error) {
       setHealth({
         dbStatus: 'error',
         activeUsers: 0,
@@ -78,14 +82,14 @@ export function RealTimeMonitoring() {
         lastUpdate: new Date()
       })
     }
-  }
+  }, [supabase])
 
-  const fetchLiveMetrics = async () => {
+  const fetchLiveMetrics = useCallback(async () => {
     try {
       // 현재 온라인 사용자 (지난 5분간 활동)
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
       
-      const [onlineRes, roomsRes, reportsRes, signupsRes] = await Promise.all([
+      const [_onlineRes, roomsRes, reportsRes, signupsRes] = await Promise.all([
         // 온라인 사용자 (TODO: 실제 세션 트래킹 구현)
         supabase
           .from('profiles')
@@ -133,10 +137,10 @@ export function RealTimeMonitoring() {
       })
 
       setLastRefresh(new Date())
-    } catch (error) {
-      console.error('실시간 지표 로딩 오류:', error)
+    } catch (_error) {
+      console.error('실시간 지표 로딩 오류:', _error)
     }
-  }
+  }, [supabase])
 
   const getStatusColor = (status: string) => {
     switch (status) {

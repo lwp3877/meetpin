@@ -5,8 +5,8 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Star, ThumbsUp, MessageCircle, Flag, User } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Star, Flag, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -52,9 +52,9 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
   useEffect(() => {
     fetchReviews()
     checkCanReview()
-  }, [targetUserId, user])
+  }, [targetUserId, user, fetchReviews, checkCanReview])
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('reviews')
@@ -70,12 +70,12 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
       if (!error && data) {
         setReviews(data)
       }
-    } catch (error) {
-      console.error('리뷰 로딩 오류:', error)
+    } catch (_error) {
+      console.error('리뷰 로딩 오류:', _error)
     }
-  }
+  }, [targetUserId, supabase])
 
-  const checkCanReview = async () => {
+  const checkCanReview = useCallback(async () => {
     if (!user || user.id === targetUserId) {
       setCanReview(false)
       return
@@ -98,10 +98,10 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
         .single()
 
       setCanReview(!!matches && matches.length > 0 && !existingReview)
-    } catch (error) {
+    } catch (_error) {
       setCanReview(false)
     }
-  }
+  }, [user, targetUserId, supabase])
 
   const handleSubmitReview = async () => {
     if (!user || rating === 0) {
@@ -112,7 +112,7 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
     setIsSubmitting(true)
 
     try {
-      const { error } = await supabase
+      const { error } = await ((supabase as any)
         .from('reviews')
         .insert({
           reviewer_uid: user.id,
@@ -120,7 +120,7 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
           room_id: roomId,
           rating,
           comment: comment.trim()
-        })
+        }))
 
       if (error) {
         throw error
@@ -134,8 +134,8 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
       fetchReviews()
       onReviewSubmitted?.()
 
-    } catch (error: any) {
-      toast.error(error.message || '후기 등록에 실패했습니다')
+    } catch (_error: any) {
+      toast.error(_error.message || '후기 등록에 실패했습니다')
     } finally {
       setIsSubmitting(false)
     }
@@ -178,7 +178,7 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
                 <div className="text-3xl font-bold text-primary">
                   {getAverageRating()}
                 </div>
-                <StarRating rating={parseFloat(getAverageRating())} />
+                <StarRating rating={parseFloat(getAverageRating().toString())} />
                 <div className="text-sm text-gray-500 mt-1">
                   {reviews.length}개 후기
                 </div>

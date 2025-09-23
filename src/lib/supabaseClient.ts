@@ -25,6 +25,7 @@ export interface Database {
         Row: {
           uid: string
           nickname: string | null
+          email: string | null
           age_range: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
           avatar_url: string | null
           intro: string | null
@@ -35,6 +36,7 @@ export interface Database {
         Insert: {
           uid: string
           nickname?: string | null
+          email?: string | null
           age_range?: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
           avatar_url?: string | null
           intro?: string | null
@@ -45,6 +47,7 @@ export interface Database {
         Update: {
           uid?: string
           nickname?: string | null
+          email?: string | null
           age_range?: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
           avatar_url?: string | null
           intro?: string | null
@@ -288,6 +291,234 @@ export interface Database {
           created_at?: string
         }
       }
+      emergency_reports: {
+        Row: {
+          id: string
+          reporter_id: string | null
+          report_type: string
+          description: string
+          latitude: number | null
+          longitude: number | null
+          location_address: string | null
+          room_id: string | null
+          reported_user_id: string | null
+          priority: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reporter_id?: string | null
+          report_type: string
+          description: string
+          latitude?: number | null
+          longitude?: number | null
+          location_address?: string | null
+          room_id?: string | null
+          reported_user_id?: string | null
+          priority?: string
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reporter_id?: string | null
+          report_type?: string
+          description?: string
+          latitude?: number | null
+          longitude?: number | null
+          location_address?: string | null
+          room_id?: string | null
+          reported_user_id?: string | null
+          priority?: string
+          status?: string
+          created_at?: string
+        }
+      }
+      privacy_rights_requests: {
+        Row: {
+          id: string
+          user_id: string
+          request_type: string
+          reason: string
+          specific_data: string | null
+          contact_email: string
+          urgency: string
+          legal_basis: string | null
+          preferred_response_method: string
+          additional_info: string | null
+          status: string
+          request_metadata: Record<string, any> | null
+          admin_response: string | null
+          processed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          request_type: string
+          reason: string
+          specific_data?: string | null
+          contact_email: string
+          urgency?: string
+          legal_basis?: string | null
+          preferred_response_method?: string
+          additional_info?: string | null
+          status?: string
+          request_metadata?: Record<string, any> | null
+          admin_response?: string | null
+          processed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          request_type?: string
+          reason?: string
+          specific_data?: string | null
+          contact_email?: string
+          urgency?: string
+          legal_basis?: string | null
+          preferred_response_method?: string
+          additional_info?: string | null
+          status?: string
+          request_metadata?: Record<string, any> | null
+          admin_response?: string | null
+          processed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      admin_notifications: {
+        Row: {
+          id: string
+          type: string
+          title: string
+          message: string
+          priority: string
+          reference_id: string | null
+          metadata: Record<string, any> | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          type: string
+          title: string
+          message: string
+          priority?: string
+          reference_id?: string | null
+          metadata?: Record<string, any> | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          type?: string
+          title?: string
+          message?: string
+          priority?: string
+          reference_id?: string | null
+          metadata?: Record<string, any> | null
+          is_read?: boolean
+          created_at?: string
+        }
+      }
+      age_verification_logs: {
+        Row: {
+          id: string
+          user_id: string
+          verification_method: string
+          age_range: string
+          is_adult: boolean
+          verification_ip: string | null
+          user_agent: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          verification_method: string
+          age_range: string
+          is_adult: boolean
+          verification_ip?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          verification_method?: string
+          age_range?: string
+          is_adult?: boolean
+          verification_ip?: string | null
+          user_agent?: string | null
+          created_at?: string
+        }
+      }
+      user_verification_status: {
+        Row: {
+          id: string
+          user_id: string
+          verification_type: string
+          verification_data: Record<string, any>
+          status: string
+          verified_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          verification_type: string
+          verification_data: Record<string, any>
+          status?: string
+          verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          verification_type?: string
+          verification_data?: Record<string, any>
+          status?: string
+          verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      reviews: {
+        Row: {
+          id: string
+          reviewer_uid: string
+          reviewed_uid: string
+          room_id: string | null
+          rating: number
+          comment: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reviewer_uid: string
+          reviewed_uid: string
+          room_id?: string | null
+          rating: number
+          comment: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reviewer_uid?: string
+          reviewed_uid?: string
+          room_id?: string | null
+          rating?: number
+          comment?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       admin_stats: {
@@ -295,6 +526,26 @@ export interface Database {
           metric: string
           value: number
           description: string
+        }
+      }
+      emergency_reports_dashboard: {
+        Row: {
+          id: string
+          reporter_id: string | null
+          report_type: string
+          description: string
+          priority: string
+          status: string
+          created_at: string
+          [key: string]: any
+        }
+      }
+      emergency_reports_stats: {
+        Row: {
+          total_reports: number
+          pending_reports: number
+          resolved_reports: number
+          [key: string]: any
         }
       }
     }

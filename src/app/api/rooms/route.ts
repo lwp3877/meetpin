@@ -192,36 +192,24 @@ async function createRoom(request: NextRequest) {
     return apiUtils.validation('방 시작 시간은 최소 30분 후여야 합니다')
   }
   
-  // 방 생성
-  const { data: room, error } = await (supabase as any)
-    .from('rooms')
-    .insert([
-      {
-        host_uid: user.id,
-        title: roomData.title,
-        description: roomData.description,
-        category: roomData.category,
-        lat: roomData.lat,
-        lng: roomData.lng,
-        place_text: roomData.place_text,
-        start_at: roomData.start_at,
-        max_people: roomData.max_people,
-        fee: roomData.fee,
-        visibility: roomData.visibility,
-      }
-    ])
-    .select(`
-      *,
-      profiles!host_uid (
-        nickname,
-        avatar_url,
-        age_range
-      )
-    `)
-    .single()
+  // 트랜잭션을 통한 방 생성 + 호스트 자동 참가
+  const { data: room, error } = await ((supabase as any)
+    .rpc('create_room_with_host_participation', {
+      host_user_id: user.id,
+      room_data: roomData
+    })) as { data: any | null, error: any }
   
   if (error) {
-    console.error('Room creation error:', error)
+    console.error('Room creation transaction error:', error)
+    
+    // 특정 에러 메시지에 따른 사용자 친화적 응답
+    if (error.message?.includes('시작 시간은 최소 30분 후여야 합니다')) {
+      return apiUtils.validation('방 시작 시간은 최소 30분 후여야 합니다')
+    }
+    if (error.message?.includes('존재하지 않는 사용자입니다')) {
+      return apiUtils.error('사용자 인증에 실패했습니다', 401)
+    }
+    
     return apiUtils.error('방 생성에 실패했습니다', 500)
   }
   

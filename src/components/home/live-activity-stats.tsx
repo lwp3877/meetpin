@@ -20,7 +20,9 @@ interface ActivityStat {
   bgColor: string
 }
 
-export function LiveActivityStats() {
+interface LiveActivityStatsProps {}
+
+export function LiveActivityStats(_props: LiveActivityStatsProps = {}) {
   const [stats, setStats] = useState<ActivityStat[]>([
     {
       id: 'online',

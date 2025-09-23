@@ -29,7 +29,9 @@ interface SchedulerStatus {
   nextSchedule?: Date
 }
 
-export function BotSchedulerControl() {
+interface BotSchedulerControlProps {}
+
+export function BotSchedulerControl(_props: BotSchedulerControlProps = {}) {
   const [status, setStatus] = useState<SchedulerStatus>({
     isRunning: false,
     activeTimers: 0

@@ -66,6 +66,11 @@ async function getRoom(
     .eq('room_id', id)
     .eq('status', 'accepted')
   
+  // room이 존재하는지 타입 가드로 확인
+  if (!room || typeof room !== 'object') {
+    throw new ApiError('방을 찾을 수 없습니다', 404)
+  }
+
   return createSuccessResponse({
     room: {
       ...(room as any),
@@ -109,7 +114,7 @@ async function updateRoom(
   }
   
   // 방 정보 업데이트
-  const { data: updatedRoom, error } = await (supabase as any)
+  const { data: updatedRoom, error } = await ((supabase as any)
     .from('rooms')
     .update(updateData)
     .eq('id', id)
@@ -122,7 +127,7 @@ async function updateRoom(
         avatar_url
       )
     `)
-    .single()
+    .single()) as { data: any | null, error: any }
   
   if (error) {
     console.error('Room update error:', error)

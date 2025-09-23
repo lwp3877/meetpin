@@ -82,7 +82,7 @@ export function safeExtractParams<T extends Record<string, string>>(
 ): Promise<T> | T {
   if ('then' in context.params) {
     // Promise<T> 케이스
-    return context.params.then((params) => {
+    return (context.params as Promise<T>).then((params: T) => {
       for (const field of requiredFields) {
         validateRequired(params[field], String(field))
         
@@ -340,7 +340,7 @@ export async function safeApiCall<T>(
       )
     }
     
-    return data.data
+    return data.data as T
   } catch (error) {
     if (error instanceof TypeError && error.message.includes('fetch')) {
       throw new NetworkError()

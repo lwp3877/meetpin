@@ -35,11 +35,11 @@ export async function GET(request: NextRequest) {
     }
 
     // 만료된 부스트 NULL로 설정
-    const { error: updateError } = await supabase
+    const { error: updateError } = await ((supabase as any)
       .from('rooms')
       .update({ boost_until: null, updated_at: now })
       .not('boost_until', 'is', null)
-      .lt('boost_until', now)
+      .lt('boost_until', now)) as { error: any }
 
     if (updateError) {
       console.error('Failed to cleanup expired boosts:', updateError)
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       message: 'Expired boosts cleaned up successfully',
       cleaned: expiredBoosts.length,
-      rooms: expiredBoosts.map(room => ({
+      rooms: expiredBoosts.map((room: any) => ({
         id: room.id,
         title: room.title,
         expired_at: room.boost_until
