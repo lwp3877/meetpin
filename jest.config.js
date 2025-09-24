@@ -16,6 +16,7 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/e2e/',
+    '<rootDir>/tests/rls/', // Exclude RLS security tests that require Supabase
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   testMatch: [

@@ -21,7 +21,7 @@ import {
   createMethodRouter,
   getAuthenticatedUser,
   parseAndValidateBody,
-  createSuccessResponse,
+  apiUtils,
   parsePaginationParams,
   getClientIP,
   rateLimit,
@@ -89,7 +89,7 @@ async function getRequests(request: NextRequest) {
     throw new ApiError('요청 목록을 가져오는데 실패했습니다')
   }
   
-  return createSuccessResponse({
+  return apiUtils.success({
     requests: requests || [],
     pagination: {
       page: Math.floor(offset / limit) + 1,
@@ -123,11 +123,7 @@ async function createRequest(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }
     
-    return NextResponse.json({
-      ok: true,
-      data: mockRequest,
-      message: '참가 요청이 전송되었습니다'
-    })
+    return apiUtils.success(mockRequest, '참가 요청이 전송되었습니다')
   }
   
   const supabase = await createServerSupabaseClient()
@@ -214,7 +210,7 @@ async function createRequest(request: NextRequest) {
     throw new ApiError('참가 요청에 실패했습니다')
   }
   
-  return createSuccessResponse(newRequest, '참가 요청이 성공적으로 전송되었습니다', 201)
+  return apiUtils.created(newRequest, '참가 요청이 성공적으로 전송되었습니다')
 }
 
 export const { GET, POST } = createMethodRouter({

@@ -55,7 +55,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Stripe 결제 시스템**: 부스트 기능을 위한 완전한 결제 처리
 - **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
 - **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
-- **단위 테스트**: 49/49 테스트 모두 통과
+- **단위 테스트**: 60/60 테스트 통과 (RLS 보안 테스트 포함)
 - **개발 서버**: localhost:3000에서 안정적 실행 (포트 설정 가능)
 
 ### 🔧 Development Mode Features
@@ -81,11 +81,26 @@ pnpm format       # Format code with Prettier
 pnpm format:check # Check code formatting
 
 # Testing Suite
-pnpm test         # Run Jest unit tests (49/49 passing)
+pnpm test         # Run Jest unit tests (60/60 passing)
 pnpm test:watch   # Run tests in watch mode
 pnpm e2e          # Run Playwright E2E tests
 pnpm e2e:ui       # Run E2E tests with UI
 pnpm playwright:install # Install Playwright browsers
+
+# Quality Assurance Extended
+pnpm qa:local     # Local Playwright tests
+pnpm qa:production # Production smoke tests
+pnpm qa:detailed  # Detailed production tests
+pnpm qa:performance # Performance tests
+pnpm qa:mobile    # Mobile device testing
+pnpm qa:validate  # Full validation pipeline
+pnpm qa:full      # Complete QA suite
+
+# Performance & Analysis
+pnpm analyze:bundle # Bundle analysis with ANALYZE=1
+pnpm perf:baseline  # Create performance baseline
+pnpm perf:compare   # Compare against baseline
+pnpm perf:guard     # Performance regression guard
 
 # Database Operations (Manual)
 pnpm db:migrate   # Reminder to run scripts/migrate.sql in Supabase
@@ -201,6 +216,11 @@ SITE_URL=
 NEXT_PUBLIC_ENABLE_STRIPE_CHECKOUT=true
 NEXT_PUBLIC_ENABLE_REALTIME_NOTIFICATIONS=true
 NEXT_PUBLIC_ENABLE_FILE_UPLOAD=true
+
+# Testing Environment (RLS Security Tests)
+# Required only for advanced security testing
+# NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_for_testing
+# SUPABASE_SERVICE_ROLE_KEY=your_service_role_for_testing
 ```
 
 ## Korean Language Considerations
@@ -219,11 +239,18 @@ Centralized in `src/lib/brand.ts`:
 
 ## Testing Strategy
 
-- **Jest** for unit tests of utilities and business logic
-- **Playwright** for E2E tests with UI support
-- Critical user flows: signup → room creation → matching → chat
-- API integration tests for authentication and authorization
-- RLS policy testing in database environment
+- **Jest** for unit tests of utilities and business logic (60/60 tests expected to pass)
+- **Advanced RLS Security Testing**: Comprehensive security test suite in `tests/rls/rls-security.spec.ts`
+  - Row Level Security policy validation
+  - User isolation and permission testing
+  - Cross-user data access prevention
+  - Admin privilege escalation protection
+  - Performance testing with large datasets
+- **Playwright** for E2E tests with UI support and accessibility testing
+- **Multi-environment Testing**: Local, production, mobile, and performance test suites
+- **Critical User Flows**: signup → room creation → matching → chat
+- **Lighthouse Integration**: Performance, accessibility, and SEO auditing
+- **Mobile Testing**: Chrome and Safari mobile browser testing
 
 ## Important Development Notes
 
@@ -268,12 +295,16 @@ Centralized in `src/lib/brand.ts`:
 - **Korean Avatars**: Curated avatar collection for local users
 
 ### Testing Strategy
-- **Jest Unit Tests**: 49/49 tests passing, covering utilities and business logic
-- **Test Location**: `__tests__/` directory with comprehensive coverage
+- **Jest Unit Tests**: 60/60 tests passing, covering utilities, business logic, and security
+- **Test Locations**: `__tests__/` for unit tests, `tests/rls/` for security tests, `e2e/` for end-to-end
+- **RLS Security Tests**: Comprehensive Row Level Security validation requiring Supabase environment variables
 - **Single Test Run**: `pnpm test -- __tests__/lib/zodSchemas.test.ts`
+- **Environment-Specific Tests**: Separate test suites for development (Mock) and production environments
 - **Critical User Flows**: signup → room creation → matching → chat
-- **E2E Testing**: Playwright for end-to-end browser testing
+- **E2E Testing**: Playwright for cross-browser end-to-end testing with mobile device emulation
+- **Performance Testing**: Bundle analysis, baseline comparison, and regression guards
 - **Development Testing**: Mock data enables full feature testing without external services
+- **Security Testing**: RLS policy validation, privilege escalation prevention, user isolation testing
 
 ### Advanced Component Architecture
 - **Modal System**: Centralized modal management (BoostModal, RealtimeChatModal)
@@ -297,7 +328,7 @@ Centralized in `src/lib/brand.ts`:
 ### Current Deployment Status
 - **Platform**: Vercel (meetpin-weld.vercel.app)
 - **Git Integration**: Automatic deployment from GitHub main branch
-- **Build Status**: Latest version 1.0.2-force-update with comprehensive cache invalidation
+- **Build Status**: Latest version 1.3.3-route-conflict-fix with comprehensive cache invalidation
 - **Environment**: Production environment variables configured in Vercel dashboard
 
 ### Deployment Architecture
@@ -336,3 +367,13 @@ Common production deployment issues and solutions:
    - Solution: Run `pnpm repo:doctor` locally before pushing
 4. **Git Synchronization**: Local changes not reflecting in deployment
    - Solution: Ensure all changes are committed and pushed to GitHub main branch
+5. **RLS Test Failures**: Security tests failing due to missing Supabase environment variables
+   - Solution: Either provide Supabase credentials for testing or skip RLS tests in development
+   - Note: RLS tests in `tests/rls/` require live Supabase connection and will fail in CI/CD without proper setup
+
+### Test Environment Configuration
+- **Unit Tests**: All tests in `__tests__/` run without external dependencies
+- **RLS Security Tests**: Tests in `tests/rls/` require Supabase environment variables
+- **Jest Configuration**: `jest.config.js` excludes `tests/rls/` by default to prevent CI failures
+- **Test Isolation**: RLS tests create and cleanup their own test data to avoid conflicts
+- **Running RLS Tests**: To run security tests separately: `pnpm test tests/rls/rls-security.spec.ts` (requires Supabase environment variables)

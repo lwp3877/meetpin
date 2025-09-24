@@ -237,5 +237,5 @@ async function createRoom(request: NextRequest) {
 // 라우터 설정
 export const { GET, POST } = createMethodRouter({
   GET: withRateLimit('api')(getRooms),
-  POST: withUserRateLimit('createRoom')(createRoom),
+  POST: withUserRateLimit('content')(createRoom),
 })
