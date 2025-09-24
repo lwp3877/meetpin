@@ -1,0 +1,21 @@
+FORCE_DEPLOYMENT_404_ROUTES_FIX
+Timestamp: 2025-09-24T16:40:00Z
+Target routes to fix:
+- /legal/location-terms (404 → 200)
+- /legal/cookie-policy (404 → 200)  
+- /api/healthz (404 → 200)
+- /api/dsar/delete-request (404 → 200)
+
+Files verified in git:
+✅ docs/legal/ko/location-terms.md
+✅ docs/legal/ko/cookie-policy.md
+✅ src/app/api/healthz/route.ts
+✅ src/app/api/dsar/delete-request/route.ts
+✅ src/app/legal/[slug]/page.tsx (with dynamicParams=true)
+
+Build manifest confirmed locally:
+✅ All 4 routes present in Next.js build
+✅ No static export configuration issues
+
+Issue: Vercel deployment cache not updating
+Solution: Force push to trigger complete rebuild
