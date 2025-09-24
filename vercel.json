@@ -54,7 +54,11 @@
         },
         {
           "key": "X-Force-Deployment",
-          "value": "v1.2.0-custom-domain"
+          "value": "v2.0.0-cache-bust-900d990"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     }
