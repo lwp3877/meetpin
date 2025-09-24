@@ -50,13 +50,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  return Object.keys(LEGAL_DOCUMENTS).map((slug) => ({
-    slug
-  }))
+  // Force static generation of all legal document pages
+  return [
+    { slug: 'privacy' },
+    { slug: 'terms' },
+    { slug: 'location-terms' },
+    { slug: 'cookie-policy' }
+  ]
 }
 
 // Allow dynamic params beyond static ones
 export const dynamicParams = true
+
+// Force static generation at build time
+export const dynamic = 'force-static'
 
 async function getLegalDocument(slug: string): Promise<string | null> {
   try {
