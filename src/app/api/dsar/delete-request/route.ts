@@ -1,4 +1,14 @@
-export async function GET(){return Response.json({pending:false});}
-export async function POST(){return Response.json({requested:true},{status:201});}
-export async function DELETE(){return Response.json({cancelled:true});}
-export const dynamic='force-dynamic';
+/* src/app/api/dsar/delete-request/route.ts */
+import { NextRequest } from 'next/server'
+
+export async function GET(): Promise<Response> {
+  return Response.json({ pending: false })
+}
+
+export async function POST(req: NextRequest): Promise<Response> {
+  return Response.json({ requested: true }, { status: 201 })
+}
+
+export async function DELETE(): Promise<Response> {
+  return Response.json({ cancelled: true })
+}
