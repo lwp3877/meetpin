@@ -55,6 +55,9 @@ export async function generateStaticParams() {
   }))
 }
 
+// Allow dynamic params beyond static ones
+export const dynamicParams = true
+
 async function getLegalDocument(slug: string): Promise<string | null> {
   try {
     const filePath = join(process.cwd(), 'docs', 'legal', 'ko', `${slug}.md`)
