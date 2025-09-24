@@ -103,7 +103,10 @@
       "Bash(NEXT_DISABLE_SOURCEMAPS=true pnpm next build --no-lint)",
       "Bash(NEXT_DISABLE_SOURCEMAPS=true pnpm build)",
       "Bash(if exist \"nul\" del \"nul\")",
-      "Bash(git clean:*)"
+      "Bash(git clean:*)",
+      "Bash(if [ -z \"$VERCEL_TOKEN\" ])",
+      "Bash(then echo \"NEED_TOKEN\")",
+      "Bash(exit 2)"
     ],
     "deny": [],
     "ask": []
