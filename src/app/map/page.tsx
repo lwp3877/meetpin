@@ -12,28 +12,43 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
+import dynamic from 'next/dynamic'
+
+// 필터 컴포넌트를 필요할 때만 로딩
+const MapFilters = dynamic(() => import('@/components/map/lazy/MapFilters'), {
+  ssr: false,
+  loading: () => (
+    <Card className="mt-6 animate-pulse">
+      <CardContent className="p-8">
+        <div className="h-32 bg-gray-200 rounded"></div>
+      </CardContent>
+    </Card>
+  )
+})
 import { 
   Search, 
   SlidersHorizontal, 
   Plus, 
   MapPin, 
-  Users, 
   Mail, 
   User, 
   TrendingUp,
-  Calendar,
-  DollarSign,
-  Filter,
   X,
   Navigation,
   LogOut
-} from 'lucide-react'
+} from '@/components/icons/MapIcons'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
 import { toast } from 'sonner'
-import { HostMessageNotifications } from '@/components/ui/HostMessageNotifications'
-import NotificationCenter from '@/components/ui/NotificationCenter'
+// 알림 컴포넌트들을 동적 로딩 - 초기 번들 사이즈 감소
+const HostMessageNotifications = dynamic(() => import('@/components/ui/HostMessageNotifications').then(mod => ({ default: mod.HostMessageNotifications })), {
+  ssr: false,
+  loading: () => <div className="w-6 h-6 bg-gray-200 rounded animate-pulse" />
+})
+
+const NotificationCenter = dynamic(() => import('@/components/ui/NotificationCenter'), {
+  ssr: false,
+  loading: () => <div className="w-6 h-6 bg-gray-200 rounded animate-pulse" />
+})
 
 // 서울 기본 영역 상수
 const DEFAULT_BOUNDS = {
@@ -84,8 +99,11 @@ export default function MapPage() {
   
 
 
-  // 방 목록 로드
-  const loadRooms = useCallback(async (bbox?: BBox) => {
+  // 방 목록 로드 (재시도 메커니즘 포함)
+  const loadRooms = useCallback(async (bbox?: BBox, retryCount = 0) => {
+    const MAX_RETRIES = 3
+    const RETRY_DELAY = 1000 // 1초
+
     try {
       setIsLoading(true)
       setError(null)
@@ -98,7 +116,27 @@ export default function MapPage() {
         url += `&category=${selectedCategory}`
       }
 
-      const response = await fetch(url)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10초 타임아웃
+
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        if (response.status >= 500 && retryCount < MAX_RETRIES) {
+          // 서버 오류 시 재시도
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)))
+          return loadRooms(bbox, retryCount + 1)
+        }
+        throw new Error(`서버 오류 (${response.status}): 모임을 불러올 수 없습니다`)
+      }
+
       const result = await response.json()
 
       if (!result.ok) {
@@ -107,12 +145,23 @@ export default function MapPage() {
 
       setRooms(result.data.rooms || [])
       if (result.data.rooms?.length === 0) {
-        toast.info('이 지역에는 아직 모임이 없습니다')
+        toast.info('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
       }
     } catch (err: any) {
       console.error('Rooms load error:', err)
-      setError(err.message)
-      toast.error('모임을 불러오는 중 오류가 발생했습니다')
+      
+      if (err.name === 'AbortError') {
+        setError('요청 시간이 초과되었습니다')
+        toast.error('네트워크가 느려 요청이 취소되었습니다. 다시 시도해주세요')
+      } else if (err.message?.includes('fetch')) {
+        setError('인터넷 연결을 확인해주세요')
+        toast.error('인터넷 연결이 불안정합니다. 연결을 확인하고 다시 시도해주세요')
+      } else {
+        setError(err.message || '알 수 없는 오류가 발생했습니다')
+        toast.error(retryCount >= MAX_RETRIES ? 
+          '모임을 불러오는데 계속 실패했습니다. 잠시 후 다시 시도해주세요' : 
+          '모임을 불러오는 중 오류가 발생했습니다')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -150,17 +199,19 @@ export default function MapPage() {
 
   // 내 주변 버튼 핸들러
   const handleNearMe = async () => {
-    try {
-      if (!navigator.geolocation) {
-        toast.error('위치 서비스가 지원되지 않습니다')
-        return
-      }
+    if (!navigator.geolocation) {
+      toast.error('이 브라우저는 위치 서비스를 지원하지 않습니다')
+      return
+    }
 
+    toast.loading('현재 위치를 확인하는 중...', { id: 'location-loading' })
+
+    try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 600000
+          timeout: 15000,
+          maximumAge: 300000 // 5분
         })
       })
 
@@ -176,11 +227,23 @@ export default function MapPage() {
       }
 
       await loadRooms(bounds)
-      toast.success('내 주변 모임을 찾았습니다')
+      toast.success('내 주변 모임을 찾았습니다', { id: 'location-loading' })
       trackFeatureUsage()
-    } catch (_error) {
-      console.error('Location error:', _error)
-      toast.error('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요')
+    } catch (error: any) {
+      console.error('Location error:', error)
+      toast.dismiss('location-loading')
+      
+      if (error.code === 1) {
+        toast.error('위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요', {
+          duration: 5000
+        })
+      } else if (error.code === 2) {
+        toast.error('위치를 찾을 수 없습니다. 인터넷 연결과 GPS를 확인해주세요')
+      } else if (error.code === 3) {
+        toast.error('위치 요청 시간이 초과되었습니다. 다시 시도해주세요')
+      } else {
+        toast.error('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요')
+      }
     }
   }
 
@@ -419,115 +482,16 @@ export default function MapPage() {
 
           {/* Enhanced Filters Panel */}
           {showFilters && (
-            <Card className="mt-6 bg-gradient-to-br from-white/98 to-emerald-50/50 dark:from-gray-900/98 dark:to-emerald-950/50 backdrop-blur-xl border-2 border-emerald-200/30 dark:border-emerald-800/30 shadow-2xl shadow-emerald-500/10 rounded-2xl animate-in slide-in-from-top-2 duration-300">
-              <CardContent className="p-8">
-                <div className="grid md:grid-cols-4 gap-8">
-                  {/* Category Filter */}
-                  <div className="space-y-4">
-                    <label className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center">
-                      <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mr-3">
-                        <Filter className="w-3 h-3 text-white" />
-                      </div>
-                      카테고리
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { key: 'all', label: '전체', emoji: '🌐', color: 'from-gray-400 to-gray-500' },
-                        { key: 'drink', label: '술', emoji: '🍻', color: 'from-amber-400 to-orange-500' },
-                        { key: 'exercise', label: '운동', emoji: '💪', color: 'from-red-400 to-pink-500' },
-                        { key: 'other', label: '기타', emoji: '✨', color: 'from-purple-400 to-indigo-500' },
-                      ].map(category => (
-                        <Button
-                          key={category.key}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCategoryChange(category.key)}
-                          className={`group p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                            selectedCategory === category.key 
-                              ? `bg-gradient-to-r ${category.color} text-white shadow-lg shadow-emerald-500/25` 
-                              : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-md'
-                          }`}
-                        >
-                          <div className="text-center space-y-1">
-                            <div className={`text-lg ${selectedCategory === category.key ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
-                              {category.emoji}
-                            </div>
-                            <div className={`text-xs font-semibold ${
-                              selectedCategory === category.key ? 'text-white' : 'text-gray-700 dark:text-gray-300'
-                            }`}>
-                              {category.label}
-                            </div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Time Filter */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      시간
-                    </label>
-                    <Select value={timeFilter} onValueChange={setTimeFilter}>
-                      <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">전체</SelectItem>
-                        <SelectItem value="today">오늘</SelectItem>
-                        <SelectItem value="tomorrow">내일</SelectItem>
-                        <SelectItem value="week">이번 주</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Price Range */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      참가비 (최대 {priceRange[0] === 100000 ? '10만원+' : `${priceRange[0].toLocaleString()}원`})
-                    </label>
-                    <div className="space-y-3">
-                      <Slider
-                        value={priceRange}
-                        onValueChange={setPriceRange}
-                        max={100000}
-                        min={0}
-                        step={10000}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>무료</span>
-                        <span>10만원+</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Max People */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-                      <Users className="w-4 h-4 mr-2" />
-                      최대 인원 ({maxPeople[0]}명 이하)
-                    </label>
-                    <div className="space-y-3">
-                      <Slider
-                        value={maxPeople}
-                        onValueChange={setMaxPeople}
-                        max={20}
-                        min={2}
-                        step={1}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>2명</span>
-                        <span>20명+</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <MapFilters
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              maxPeople={maxPeople}
+              setMaxPeople={setMaxPeople}
+              timeFilter={timeFilter}
+              setTimeFilter={setTimeFilter}
+            />
           )}
         </div>
       </header>

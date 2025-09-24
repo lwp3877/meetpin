@@ -49,11 +49,6 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
 
   const supabase = createBrowserSupabaseClient()
 
-  useEffect(() => {
-    fetchReviews()
-    checkCanReview()
-  }, [targetUserId, user, fetchReviews, checkCanReview])
-
   const fetchReviews = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -102,6 +97,11 @@ export function ReviewSystem({ targetUserId, roomId, onReviewSubmitted }: Review
       setCanReview(false)
     }
   }, [user, targetUserId, supabase])
+
+  useEffect(() => {
+    fetchReviews()
+    checkCanReview()
+  }, [targetUserId, user, fetchReviews, checkCanReview])
 
   const handleSubmitReview = async () => {
     if (!user || rating === 0) {

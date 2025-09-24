@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-09-23T16:03:37.228Z",
+  "commit": "local",
+  "branch": "local",
+  "bundle": {
+    "totalJS": 2689,
+    "initialJS": 307,
+    "totalCSS": 170,
+    "timestamp": "2025-09-23T16:04:17.258Z"
+  },
+  "webVitals": {
+    "LCP": 1800,
+    "TBT": 150,
+    "CLS": 0.08,
+    "pages": [
+      {
+        "name": "Home",
+        "url": "/",
+        "critical": true,
+        "LCP": 2246.555014389787,
+        "TBT": 221.7256119771411,
+        "CLS": 0.08685505138504432
+      },
+      {
+        "name": "Map Search",
+        "url": "/map",
+        "critical": true,
+        "LCP": 2144.3051083102246,
+        "TBT": 232.22452746294226,
+        "CLS": 0.09827866596734502
+      },
+      {
+        "name": "Room Detail",
+        "url": "/room/[id]",
+        "critical": true,
+        "LCP": 1869.5425581926972,
+        "TBT": 174.55908552509547,
+        "CLS": 0.11099606922099291
+      },
+      {
+        "name": "Chat",
+        "url": "/chat/[matchId]",
+        "critical": true,
+        "LCP": 2294.4089664238018,
+        "TBT": 200.0562993504227,
+        "CLS": 0.08739185963358223
+      }
+    ],
+    "timestamp": "2025-09-23T16:04:17.259Z"
+  },
+  "lighthouse": {
+    "performance": 85,
+    "accessibility": 98,
+    "bestPractices": 96,
+    "seo": 97,
+    "timestamp": "2025-09-23T16:04:17.259Z"
+  }
+}

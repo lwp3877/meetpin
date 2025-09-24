@@ -88,7 +88,19 @@
       "Bash(vercel:*)",
       "Bash(npm install:*)",
       "mcp__filesystem__read_multiple_files",
-      "Bash(if exist \"C:\\Users\\이원표\\Desktop\\meetpin\\src\\app\\hobby\\FORCE_DEPLOY.txt\" del \"C:\\Users\\이원표\\Desktop\\meetpin\\src\\app\\hobby\\FORCE_DEPLOY.txt\")"
+      "Bash(if exist \"C:\\Users\\이원표\\Desktop\\meetpin\\src\\app\\hobby\\FORCE_DEPLOY.txt\" del \"C:\\Users\\이원표\\Desktop\\meetpin\\src\\app\\hobby\\FORCE_DEPLOY.txt\")",
+      "Bash(pnpm qa:validate:*)",
+      "Bash(playwright test:*)",
+      "Bash(pnpm perf:baseline:*)",
+      "Bash(pnpm analyze:bundle:*)",
+      "Bash(pnpm perf:compare:*)",
+      "Bash(if exist \"C:\\Users\\이원표\\Desktop\\meetpin\\.next\" rmdir /s /q \"C:\\Users\\이원표\\Desktop\\meetpin\\.next\")",
+      "Bash(if exist \".next\" rmdir /s /q \".next\")",
+      "Bash(if exist \"node_modules\\.cache\" rmdir /s /q \"node_modules\\.cache\")",
+      "Bash(pnpm:*)",
+      "Bash(gh:*)",
+      "Bash(git --version)",
+      "Bash(NEXT_DISABLE_SOURCEMAPS=true pnpm next build --no-lint)"
     ],
     "deny": [],
     "ask": []

@@ -10,6 +10,7 @@ import {
   parsePaginationParams,
   ApiError
 } from '@/lib/api'
+import { withCache, CacheKeys, CacheTTL, invalidateMessageCache } from '@/lib/cache/redis'
 
 // 금칙어 목록 (1차 필터링)
 const FORBIDDEN_WORDS = [
@@ -66,40 +67,46 @@ async function getMessages(
     throw new ApiError('차단된 사용자와의 대화입니다', 403)
   }
   
-  // 메시지 목록 조회 (최신 순, 페이지네이션)
-  const { data: messages, error, count } = await supabase
-    .from('messages')
-    .select(`
-      *,
-      sender:profiles!messages_sender_uid_fkey(
-        id,
-        nickname,
-        avatar_url
-      )
-    `, { count: 'exact' })
-    .eq('match_id', matchId)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1)
+  // 메시지 목록 조회 (Redis 캐시 적용)
+  const cacheKey = CacheKeys.messages(matchId, limit)
   
-  if (error) {
-    console.error('Messages fetch error:', error)
-    throw new ApiError('메시지를 가져오는데 실패했습니다')
-  }
-  
-  return createSuccessResponse({
-    messages: (messages || []).reverse(), // 시간순으로 정렬
-    pagination: {
-      page: Math.floor(offset / limit) + 1,
-      limit,
-      total: count || 0
-    },
-    match: {
-      id: matchId,
-      host_uid: matchData.host_uid,
-      guest_uid: matchData.guest_uid,
-      room_id: matchData.room_id
+  const result = await withCache(cacheKey, CacheTTL.messages, async () => {
+    const { data: messages, error, count } = await supabase
+      .from('messages')
+      .select(`
+        *,
+        sender:profiles!messages_sender_uid_fkey(
+          id,
+          nickname,
+          avatar_url
+        )
+      `, { count: 'exact' })
+      .eq('match_id', matchId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+    
+    if (error) {
+      console.error('Messages fetch error:', error)
+      throw new ApiError('메시지를 가져오는데 실패했습니다')
+    }
+    
+    return {
+      messages: (messages || []).reverse(), // 시간순으로 정렬
+      pagination: {
+        page: Math.floor(offset / limit) + 1,
+        limit,
+        total: count || 0
+      },
+      match: {
+        id: matchId,
+        host_uid: matchData.host_uid,
+        guest_uid: matchData.guest_uid,
+        room_id: matchData.room_id
+      }
     }
   })
+  
+  return createSuccessResponse(result)
 }
 
 // POST /api/matches/[id]/messages - 새 메시지 생성
@@ -169,6 +176,9 @@ async function createMessage(
     console.error('Message creation error:', error)
     throw new ApiError('메시지 전송에 실패했습니다')
   }
+  
+  // 메시지 생성 성공 시 해당 매칭의 메시지 캐시 무효화
+  await invalidateMessageCache(matchId)
   
   return createSuccessResponse(newMessage, '메시지가 성공적으로 전송되었습니다', 201)
 }

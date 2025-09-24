@@ -1,0 +1,114 @@
+{
+  "summary": "FAIL",
+  "regressions": [],
+  "improvements": [],
+  "budgetViolations": [
+    "초기 JS 크기 예산 초과: 307KB > 230KB"
+  ],
+  "details": {
+    "bundle": {
+      "baseline": {
+        "totalJS": 2689,
+        "initialJS": 307,
+        "totalCSS": 170,
+        "timestamp": "2025-09-23T16:04:17.258Z"
+      },
+      "current": {
+        "totalJS": 2696,
+        "initialJS": 307,
+        "totalCSS": 169,
+        "timestamp": "2025-09-23T16:04:51.353Z"
+      },
+      "diff": {
+        "totalJS": 7,
+        "initialJS": 0,
+        "totalCSS": -1
+      },
+      "percentChange": {
+        "totalJS": "0.3",
+        "initialJS": "0.0",
+        "totalCSS": "-0.6"
+      }
+    },
+    "webVitals": {
+      "baseline": {
+        "LCP": 1800,
+        "TBT": 150,
+        "CLS": 0.08,
+        "pages": [
+          {
+            "name": "Home",
+            "url": "/",
+            "critical": true,
+            "LCP": 2246.555014389787,
+            "TBT": 221.7256119771411,
+            "CLS": 0.08685505138504432
+          },
+          {
+            "name": "Map Search",
+            "url": "/map",
+            "critical": true,
+            "LCP": 2144.3051083102246,
+            "TBT": 232.22452746294226,
+            "CLS": 0.09827866596734502
+          },
+          {
+            "name": "Room Detail",
+            "url": "/room/[id]",
+            "critical": true,
+            "LCP": 1869.5425581926972,
+            "TBT": 174.55908552509547,
+            "CLS": 0.11099606922099291
+          },
+          {
+            "name": "Chat",
+            "url": "/chat/[matchId]",
+            "critical": true,
+            "LCP": 2294.4089664238018,
+            "TBT": 200.0562993504227,
+            "CLS": 0.08739185963358223
+          }
+        ],
+        "timestamp": "2025-09-23T16:04:17.259Z"
+      },
+      "current": {
+        "LCP": 1651,
+        "TBT": 160,
+        "CLS": 0.073,
+        "timestamp": "2025-09-23T16:04:51.353Z"
+      },
+      "diff": {
+        "LCP": -149,
+        "TBT": 10,
+        "CLS": -0.007
+      },
+      "percentChange": {
+        "LCP": "-8.3",
+        "TBT": "6.7",
+        "CLS": "-8.8"
+      }
+    },
+    "lighthouse": {
+      "baseline": {
+        "performance": 85,
+        "accessibility": 98,
+        "bestPractices": 96,
+        "seo": 97,
+        "timestamp": "2025-09-23T16:04:17.259Z"
+      },
+      "current": {
+        "performance": 85,
+        "accessibility": 96,
+        "bestPractices": 95,
+        "seo": 97,
+        "timestamp": "2025-09-23T16:04:51.353Z"
+      },
+      "diff": {
+        "performance": 0,
+        "accessibility": -2,
+        "bestPractices": -1,
+        "seo": 0
+      }
+    }
+  }
+}

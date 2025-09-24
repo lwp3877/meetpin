@@ -20,7 +20,9 @@ interface ActivityStat {
   bgColor: string
 }
 
-interface LiveActivityStatsProps {}
+interface LiveActivityStatsProps {
+  className?: string
+}
 
 export function LiveActivityStats(_props: LiveActivityStatsProps = {}) {
   const [stats, setStats] = useState<ActivityStat[]>([

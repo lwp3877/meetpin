@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Bell, X, Check, Users, MessageSquare, Star, Gift } from 'lucide-react'
 import { useAuth } from '@/lib/useAuth'
-import { formatDistanceToNow } from 'date-fns'
-import { ko } from 'date-fns/locale'
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
+import { ko } from 'date-fns/locale/ko'
 
 interface Notification {
   id: string

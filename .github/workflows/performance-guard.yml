@@ -1,0 +1,342 @@
+# 성능 회귀 방지 워크플로우
+# PR 시 Lighthouse CI 실행 및 성능 예산 검증
+# 예산 초과 시 PR 실패 처리
+
+name: 🚀 Performance Regression Guard
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'next.config.js'
+      - 'tailwind.config.ts'
+  workflow_dispatch: # 수동 실행 가능
+  
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
+  
+jobs:
+  performance-audit:
+    name: 성능 감사 및 예산 검증
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # 이전 커밋과 비교를 위해
+          
+      - name: pnpm 설정
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+        
+      - name: 프로덕션 빌드
+        run: |
+          echo "🏗️ 프로덕션 빌드 중..."
+          pnpm build
+          
+      - name: 빌드 사이즈 분석
+        run: |
+          echo "📊 빌드 사이즈 분석 중..."
+          
+          # 번들 사이즈 측정
+          BUNDLE_SIZE=$(du -sh .next/static | cut -f1)
+          echo "번들 사이즈: $BUNDLE_SIZE"
+          echo "bundle_size=$BUNDLE_SIZE" >> $GITHUB_OUTPUT
+          
+          # JavaScript 번들 상세 분석
+          echo "=== JavaScript 번들 분석 ==="
+          find .next/static/chunks -name "*.js" -exec ls -lh {} \; | sort -k5 -hr | head -10
+          
+          # 큰 파일 경고 (1MB 초과)
+          LARGE_FILES=$(find .next/static -size +1M -type f)
+          if [ -n "$LARGE_FILES" ]; then
+            echo "⚠️ 1MB 초과 파일 발견:"
+            echo "$LARGE_FILES"
+          fi
+          
+      - name: Lighthouse CI 설치
+        run: |
+          echo "🏠 Lighthouse CI 설치 중..."
+          npm install -g @lhci/cli@0.12.x
+          
+      - name: 개발 서버 시작 (백그라운드)
+        run: |
+          echo "🚀 개발 서버 시작 중..."
+          pnpm start &
+          
+          # 서버 준비 대기 (최대 60초)
+          for i in {1..60}; do
+            if curl -s http://localhost:3000/api/healthz > /dev/null; then
+              echo "✅ 서버 준비 완료 (${i}초)"
+              break
+            fi
+            echo "⏳ 서버 시작 대기 중... ($i/60)"
+            sleep 1
+          done
+          
+      - name: Lighthouse 성능 감사
+        run: |
+          echo "🔍 Lighthouse 성능 감사 실행 중..."
+          
+          # Lighthouse CI 설정 파일 생성
+          cat > lighthouserc.js << 'EOF'
+          module.exports = {
+            ci: {
+              collect: {
+                url: [
+                  'http://localhost:3000',
+                  'http://localhost:3000/map',
+                  'http://localhost:3000/room/new'
+                ],
+                numberOfRuns: 3,
+                settings: {
+                  chromeFlags: '--no-sandbox --headless --disable-gpu',
+                  preset: 'desktop',
+                  throttling: {
+                    rttMs: 40,
+                    throughputKbps: 10240,
+                    cpuSlowdownMultiplier: 1
+                  }
+                }
+              },
+              assert: {
+                assertions: {
+                  'categories:performance': ['error', {minScore: 0.75}],
+                  'categories:accessibility': ['error', {minScore: 0.9}],
+                  'categories:best-practices': ['error', {minScore: 0.8}],
+                  'categories:seo': ['error', {minScore: 0.8}],
+                  
+                  // Core Web Vitals 예산
+                  'largest-contentful-paint': ['error', {maxNumericValue: 4000}],
+                  'cumulative-layout-shift': ['error', {maxNumericValue: 0.25}],
+                  'total-blocking-time': ['error', {maxNumericValue: 600}],
+                  'first-contentful-paint': ['error', {maxNumericValue: 3000}],
+                  
+                  // 리소스 예산
+                  'total-byte-weight': ['error', {maxNumericValue: 3000000}], // 3MB
+                  'unused-javascript': ['warn', {maxNumericValue: 500000}], // 500KB
+                  'unused-css-rules': ['warn', {maxNumericValue: 100000}], // 100KB
+                  
+                  // 성능 메트릭
+                  'speed-index': ['error', {maxNumericValue: 5000}],
+                  'interactive': ['error', {maxNumericValue: 6000}]
+                }
+              },
+              upload: {
+                target: 'temporary-public-storage'
+              }
+            }
+          }
+          EOF
+          
+          # Lighthouse CI 실행
+          lhci autorun
+          
+      - name: 성능 예산 검증
+        id: perf-budget
+        run: |
+          echo "💰 성능 예산 검증 중..."
+          
+          # Lighthouse 결과 파싱
+          RESULTS_DIR=".lighthouseci"
+          if [ -d "$RESULTS_DIR" ]; then
+            echo "=== Lighthouse 결과 요약 ==="
+            
+            # 성능 점수 추출
+            for file in $RESULTS_DIR/*.json; do
+              if [ -f "$file" ]; then
+                PERF_SCORE=$(jq -r '.categories.performance.score // 0' "$file")
+                LCP=$(jq -r '.audits."largest-contentful-paint".numericValue // 0' "$file")
+                CLS=$(jq -r '.audits."cumulative-layout-shift".numericValue // 0' "$file")
+                TBT=$(jq -r '.audits."total-blocking-time".numericValue // 0' "$file")
+                
+                echo "성능 점수: $(echo "$PERF_SCORE * 100" | bc -l | cut -d. -f1)/100"
+                echo "LCP: ${LCP}ms"
+                echo "CLS: $CLS"
+                echo "TBT: ${TBT}ms"
+                
+                # 예산 초과 체크
+                if (( $(echo "$PERF_SCORE < 0.75" | bc -l) )); then
+                  echo "budget_violation=performance_score" >> $GITHUB_OUTPUT
+                fi
+                
+                if (( $(echo "$LCP > 4000" | bc -l) )); then
+                  echo "budget_violation=lcp" >> $GITHUB_OUTPUT
+                fi
+                
+                if (( $(echo "$CLS > 0.25" | bc -l) )); then
+                  echo "budget_violation=cls" >> $GITHUB_OUTPUT
+                fi
+              fi
+            done
+          fi
+          
+      - name: 이전 버전과 성능 비교
+        run: |
+          echo "📊 성능 변화 분석 중..."
+          
+          # 기준 브랜치 체크아웃
+          git fetch origin main
+          
+          # 현재 브랜치의 번들 사이즈
+          CURRENT_SIZE=$(du -s .next/static | cut -f1)
+          
+          # main 브랜치로 임시 전환
+          git stash push -m "temp-stash-for-comparison"
+          git checkout origin/main
+          
+          # 기준 버전 빌드 (실패해도 계속)
+          if pnpm build; then
+            BASELINE_SIZE=$(du -s .next/static | cut -f1)
+            SIZE_DIFF=$((CURRENT_SIZE - BASELINE_SIZE))
+            SIZE_CHANGE_PERCENT=$(echo "scale=2; $SIZE_DIFF * 100 / $BASELINE_SIZE" | bc -l)
+            
+            echo "기준 번들 사이즈: ${BASELINE_SIZE}KB"
+            echo "현재 번들 사이즈: ${CURRENT_SIZE}KB"
+            echo "변화량: ${SIZE_DIFF}KB (${SIZE_CHANGE_PERCENT}%)"
+            
+            # 번들 사이즈 10% 초과 증가 시 경고
+            if (( $(echo "$SIZE_CHANGE_PERCENT > 10" | bc -l) )); then
+              echo "⚠️ 번들 사이즈 10% 초과 증가"
+              echo "bundle_size_violation=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ 기준 버전 빌드 실패 - 비교 생략"
+          fi
+          
+          # 원래 브랜치로 복원
+          git checkout -
+          git stash pop || true
+          
+      - name: 성능 리포트 생성
+        if: always()
+        run: |
+          echo "📋 성능 리포트 생성 중..."
+          
+          cat > perf-report.md << 'EOF'
+          ## 🚀 성능 감사 결과
+          
+          ### 📊 Lighthouse 점수
+          EOF
+          
+          # Lighthouse 결과가 있으면 추가
+          if [ -d ".lighthouseci" ]; then
+            echo "| 메트릭 | 점수/값 | 상태 |" >> perf-report.md
+            echo "|--------|---------|------|" >> perf-report.md
+            
+            for file in .lighthouseci/*.json; do
+              if [ -f "$file" ]; then
+                PERF=$(jq -r '.categories.performance.score // 0' "$file")
+                PERF_SCORE=$(echo "$PERF * 100" | bc -l | cut -d. -f1)
+                
+                LCP=$(jq -r '.audits."largest-contentful-paint".numericValue // 0' "$file")
+                CLS=$(jq -r '.audits."cumulative-layout-shift".numericValue // 0' "$file")
+                TBT=$(jq -r '.audits."total-blocking-time".numericValue // 0' "$file")
+                
+                PERF_STATUS=$([ "$PERF_SCORE" -ge 75 ] && echo "✅" || echo "❌")
+                LCP_STATUS=$([ "$(echo "$LCP <= 4000" | bc -l)" = "1" ] && echo "✅" || echo "❌")
+                CLS_STATUS=$([ "$(echo "$CLS <= 0.25" | bc -l)" = "1" ] && echo "✅" || echo "❌")
+                
+                echo "| Performance | ${PERF_SCORE}/100 | $PERF_STATUS |" >> perf-report.md
+                echo "| LCP | ${LCP}ms | $LCP_STATUS |" >> perf-report.md
+                echo "| CLS | $CLS | $CLS_STATUS |" >> perf-report.md
+                echo "| TBT | ${TBT}ms | - |" >> perf-report.md
+                break
+              fi
+            done
+          fi
+          
+          echo "" >> perf-report.md
+          echo "### 📦 번들 분석" >> perf-report.md
+          echo "- 현재 번들 사이즈: $(du -sh .next/static | cut -f1)" >> perf-report.md
+          
+          # 예산 위반 요약
+          if [ -n "${{ steps.perf-budget.outputs.budget_violation }}" ]; then
+            echo "" >> perf-report.md
+            echo "### ⚠️ 성능 예산 위반" >> perf-report.md
+            echo "- 위반 항목: ${{ steps.perf-budget.outputs.budget_violation }}" >> perf-report.md
+            echo "- **이 PR은 성능 기준을 충족하지 않습니다.**" >> perf-report.md
+          fi
+          
+      - name: PR에 성능 리포트 댓글 추가
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              const report = fs.readFileSync('perf-report.md', 'utf8');
+              
+              // 기존 봇 댓글 찾기
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              
+              const botComment = comments.find(comment => 
+                comment.user.type === 'Bot' && 
+                comment.body.includes('🚀 성능 감사 결과')
+              );
+              
+              if (botComment) {
+                // 기존 댓글 업데이트
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: report
+                });
+              } else {
+                // 새 댓글 생성
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: report
+                });
+              }
+            } catch (error) {
+              console.log('성능 리포트 댓글 추가 실패:', error);
+            }
+            
+      - name: 성능 예산 위반 시 실패 처리
+        if: steps.perf-budget.outputs.budget_violation
+        run: |
+          echo "❌ 성능 예산 위반으로 인한 CI 실패"
+          echo "위반 항목: ${{ steps.perf-budget.outputs.budget_violation }}"
+          echo ""
+          echo "성능 개선 후 다시 시도해주세요:"
+          echo "1. 불필요한 JavaScript 제거"
+          echo "2. 이미지 최적화"
+          echo "3. 코드 스플리팅 적용"
+          echo "4. 번들 분석: pnpm analyze:bundle"
+          exit 1
+          
+      - name: 아티팩트 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: |
+            .lighthouseci/
+            perf-report.md
+          retention-days: 30

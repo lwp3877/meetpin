@@ -325,7 +325,6 @@ export function setUserId(userId: string) {
 declare global {
   interface Window {
     va?: (event: string, data?: any) => void
-    gtag?: (...args: any[]) => void
   }
 }
 

@@ -135,9 +135,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body className="min-h-screen bg-background font-sans antialiased touch-manipulation">
         <Providers>
-          <div id="root" className="relative flex min-h-screen flex-col">
+          <div id="root" className="relative flex min-h-screen flex-col mobile-full-height">
             <main className="flex-1">
               {children}
             </main>
@@ -145,6 +145,46 @@ export default function RootLayout({
           <div id="modal-root" />
           <div id="toast-root" />
         </Providers>
+        
+        {/* 터치 최적화 초기화 스크립트 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 터치 최적화 즉시 실행
+              (function() {
+                // 뷰포트 메타 태그 설정
+                var viewport = document.querySelector('meta[name=viewport]');
+                if (!viewport) {
+                  viewport = document.createElement('meta');
+                  viewport.name = 'viewport';
+                  document.head.appendChild(viewport);
+                }
+                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+
+                // iOS Safari 100vh 문제 해결
+                function setVhUnit() {
+                  var vh = window.innerHeight * 0.01;
+                  document.documentElement.style.setProperty('--vh', vh + 'px');
+                }
+                setVhUnit();
+                window.addEventListener('resize', setVhUnit);
+                window.addEventListener('orientationchange', setVhUnit);
+
+                // 터치 지연 제거
+                document.documentElement.style.touchAction = 'manipulation';
+                
+                // 텍스트 선택 방지 (필요한 곳에서만)
+                document.body.style.webkitUserSelect = 'none';
+                document.body.style.userSelect = 'none';
+                
+                // 입력 필드에서는 텍스트 선택 허용
+                var style = document.createElement('style');
+                style.textContent = 'input, textarea, [contenteditable] { -webkit-user-select: text !important; user-select: text !important; }';
+                document.head.appendChild(style);
+              })();
+            `
+          }}
+        />
       </body>
     </html>
   );

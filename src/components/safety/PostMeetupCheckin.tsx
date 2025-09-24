@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Shield, Star, AlertTriangle, CheckCircle, Users } from 'lucide-react'
+import { Shield, Star, AlertTriangle, CheckCircle, Users, Clock } from 'lucide-react'
 import { useAuth } from '@/lib/useAuth'
 import { isDevelopmentMode } from '@/lib/config/mockData'
 import toast from 'react-hot-toast'

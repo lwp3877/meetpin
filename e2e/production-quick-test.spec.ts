@@ -1,7 +1,23 @@
-/* e2e/production-quick-test.spec.ts */
+/* 파일경로: e2e/production-quick-test.spec.ts */
+// 🚀 프로덕션 스모크 테스트 - 핵심 기능 빠른 검증
+
 import { test, expect } from '@playwright/test'
 
-test.describe('배포된 사이트 핵심 기능 테스트', () => {
+const PRODUCTION_URL = process.env.TEST_URL || 'https://meetpin-weld.vercel.app'
+
+test.describe('🌐 Production Smoke Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    // 프로덕션 환경에서 긴 타임아웃 설정
+    test.setTimeout(60000)
+    
+    // 네트워크 상태 체크
+    page.on('response', response => {
+      if (response.status() >= 400) {
+        console.warn(`⚠️ HTTP ${response.status()}: ${response.url()}`)
+      }
+    })
+  })
+
   test('신규 사용자 핵심 여정 테스트', async ({ page }) => {
     console.log('🚀 배포된 사이트 테스트 시작...')
     

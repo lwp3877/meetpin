@@ -218,7 +218,7 @@ export function withUserRateLimit(type: RateLimitType) {
   }
 }
 
-// 에러 처리 미들웨어
+// 에러 처리 미들웨어 (강화된 버전)
 export function withErrorHandling(handler: ApiHandler) {
   return async (request: NextRequest, context: any): Promise<NextResponse> => {
     try {
@@ -230,7 +230,20 @@ export function withErrorHandling(handler: ApiHandler) {
         return createErrorResponse(error.message, error.status, error.code)
       }
       
-      // Supabase 에러 처리
+      // 네트워크 및 연결 에러 처리
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return createErrorResponse('네트워크 연결에 실패했습니다', 503, 'NETWORK_ERROR')
+      }
+      
+      if (error.name === 'AbortError') {
+        return createErrorResponse('요청 시간이 초과되었습니다', 408, 'TIMEOUT_ERROR')
+      }
+      
+      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+        return createErrorResponse('서비스에 연결할 수 없습니다', 503, 'CONNECTION_ERROR')
+      }
+      
+      // Supabase 에러 처리 (확장됨)
       if (error.code) {
         switch (error.code) {
           case 'PGRST116':
@@ -241,9 +254,29 @@ export function withErrorHandling(handler: ApiHandler) {
             return createErrorResponse('참조 무결성 위반입니다', 400, 'FOREIGN_KEY_VIOLATION')
           case '42501':
             return createErrorResponse('권한이 없습니다', 403, 'INSUFFICIENT_PRIVILEGE')
+          case '08006':
+            return createErrorResponse('데이터베이스 연결에 실패했습니다', 503, 'DATABASE_CONNECTION_ERROR')
+          case '53300':
+            return createErrorResponse('서버가 과부하 상태입니다', 503, 'SERVER_OVERLOAD')
+          case '57014':
+            return createErrorResponse('쿼리 실행 시간이 초과되었습니다', 408, 'QUERY_TIMEOUT')
+          case 'JWT_EXPIRED':
+            return createErrorResponse('인증 토큰이 만료되었습니다', 401, 'TOKEN_EXPIRED')
+          case 'JWT_INVALID':
+            return createErrorResponse('잘못된 인증 토큰입니다', 401, 'TOKEN_INVALID')
           default:
             console.error('Supabase Error:', error)
         }
+      }
+      
+      // JSON 파싱 에러 처리
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        return createErrorResponse('잘못된 요청 형식입니다', 400, 'INVALID_JSON')
+      }
+      
+      // 메모리 부족 에러
+      if (error.code === 'ERR_MEMORY_ALLOCATION_FAILED' || error.message?.includes('memory')) {
+        return createErrorResponse('서버 리소스가 부족합니다', 503, 'MEMORY_ERROR')
       }
       
       return createErrorResponse('서버 내부 오류가 발생했습니다', 500, 'INTERNAL_ERROR')

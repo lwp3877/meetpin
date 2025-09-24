@@ -28,7 +28,9 @@ interface LiveMetrics {
   botRatio: number
 }
 
-interface RealTimeMonitoringProps {}
+interface RealTimeMonitoringProps {
+  className?: string
+}
 
 export function RealTimeMonitoring(_props: RealTimeMonitoringProps = {}) {
   const [health, setHealth] = useState<SystemHealth | null>(null)
@@ -37,22 +39,6 @@ export function RealTimeMonitoring(_props: RealTimeMonitoringProps = {}) {
   const [lastRefresh, setLastRefresh] = useState(new Date())
 
   const supabase = createBrowserSupabaseClient()
-
-  useEffect(() => {
-    fetchSystemHealth()
-    fetchLiveMetrics()
-
-    if (autoRefresh) {
-      const interval = setInterval(() => {
-        fetchSystemHealth()
-        fetchLiveMetrics()
-      }, 30000) // 30초마다 갱신
-
-      return () => clearInterval(interval)
-    }
-    
-    return () => {} // Add explicit return for non-autoRefresh case
-  }, [autoRefresh, fetchSystemHealth, fetchLiveMetrics])
 
   const fetchSystemHealth = useCallback(async () => {
     const startTime = Date.now()
@@ -141,6 +127,22 @@ export function RealTimeMonitoring(_props: RealTimeMonitoringProps = {}) {
       console.error('실시간 지표 로딩 오류:', _error)
     }
   }, [supabase])
+
+  useEffect(() => {
+    fetchSystemHealth()
+    fetchLiveMetrics()
+
+    if (autoRefresh) {
+      const interval = setInterval(() => {
+        fetchSystemHealth()
+        fetchLiveMetrics()
+      }, 30000) // 30초마다 갱신
+
+      return () => clearInterval(interval)
+    }
+    
+    return () => {} // Add explicit return for non-autoRefresh case
+  }, [autoRefresh, fetchSystemHealth, fetchLiveMetrics])
 
   const getStatusColor = (status: string) => {
     switch (status) {

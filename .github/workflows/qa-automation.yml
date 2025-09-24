@@ -1,0 +1,351 @@
+# 파일경로: .github/workflows/qa-automation.yml
+# 🎯 MeetPin QA Automation & Deployment Verification
+# 시니어 QA 엔지니어 · 테스팅 오토메이터 · 배포 검증 전문가
+
+name: "🚀 QA Automation & Deployment Verification"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # 매일 오전 9시 (KST)에 프로덕션 헬스체크 실행
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      test_environment:
+        description: 'Test Environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - development
+      test_type:
+        description: 'Test Type'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+        - full
+        - smoke
+        - performance
+        - security
+        - accessibility
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  # 🔍 1단계: 사전 검증 - 코드 품질 및 빌드 검증
+  pre-validation:
+    name: "🔍 Pre-validation & Build Check"
+    runs-on: ubuntu-latest
+    outputs:
+      should-run-tests: ${{ steps.changes.outputs.should-run }}
+      build-success: ${{ steps.build.outputs.success }}
+    
+    steps:
+      - name: "📥 Checkout Code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "🛠️ Setup Node.js & PNPM"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: "📦 Install PNPM"
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }}
+
+      - name: "📦 Install Dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "📝 TypeScript Type Check"
+        run: pnpm typecheck
+
+      - name: "🧹 ESLint Code Quality Check"
+        run: pnpm lint
+
+      - name: "🔧 Build Application"
+        id: build
+        run: |
+          pnpm build
+          echo "success=true" >> $GITHUB_OUTPUT
+
+      - name: "🧪 Unit Tests"
+        run: pnpm test
+
+      - name: "📊 Check for Changes"
+        id: changes
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should-run=true" >> $GITHUB_OUTPUT
+          else
+            # Check if relevant files changed
+            if git diff --name-only ${{ github.event.before }}..${{ github.sha }} | grep -E "\.(ts|tsx|js|jsx|json|md)$|e2e/|\.github/"; then
+              echo "should-run=true" >> $GITHUB_OUTPUT
+            else
+              echo "should-run=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  # 🎭 2단계: E2E 테스팅 - 크로스 브라우저 사용자 여정 검증
+  e2e-testing:
+    name: "🎭 E2E Testing - ${{ matrix.project }}"
+    runs-on: ubuntu-latest
+    needs: pre-validation
+    if: needs.pre-validation.outputs.should-run-tests == 'true' && needs.pre-validation.outputs.build-success == 'true'
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        project: 
+          - chromium
+          - firefox
+          - webkit
+          - mobile-chrome
+          - mobile-safari
+    
+    steps:
+      - name: "📥 Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "🛠️ Setup Node.js & PNPM"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: "📦 Install PNPM"
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }}
+
+      - name: "📦 Install Dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "🎭 Install Playwright Browsers"
+        run: pnpm playwright install --with-deps
+
+      - name: "🚀 Start Development Server"
+        run: |
+          pnpm build
+          pnpm start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: "🧪 Run E2E Tests - ${{ matrix.project }}"
+        run: |
+          pnpm e2e --project=${{ matrix.project }} --reporter=html,json,junit
+        env:
+          CI: true
+          PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.project }}
+
+      - name: "📸 Upload Test Results"
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: |
+            playwright-report-${{ matrix.project }}/
+            test-results/
+          retention-days: 30
+
+      - name: "📊 Upload Test Results to GitHub"
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: E2E Test Results - ${{ matrix.project }}
+          path: test-results/junit.xml
+          reporter: java-junit
+          fail-on-error: false
+
+  # 🔒 3단계: 보안 & 성능 검증
+  security-performance:
+    name: "🔒 Security & Performance Analysis"
+    runs-on: ubuntu-latest
+    needs: pre-validation
+    if: needs.pre-validation.outputs.should-run-tests == 'true'
+    
+    steps:
+      - name: "📥 Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "🛠️ Setup Node.js & PNPM"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: "📦 Install PNPM"
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }}
+
+      - name: "📦 Install Dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "🎭 Install Playwright"
+        run: pnpm playwright install --with-deps chromium
+
+      - name: "🚀 Start Application"
+        run: |
+          pnpm build
+          pnpm start &
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: "🔒 Security & Performance Tests"
+        run: pnpm e2e e2e/performance-security.spec.ts --project=chromium
+        env:
+          CI: true
+
+      - name: "📈 Lighthouse Performance Audit"
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          configPath: './lighthouse.config.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  # 🌐 4단계: 프로덕션 배포 검증
+  production-verification:
+    name: "🌐 Production Deployment Verification"
+    runs-on: ubuntu-latest
+    needs: [pre-validation, e2e-testing]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: "📥 Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "🛠️ Setup Node.js & PNPM"
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: "📦 Install PNPM"
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }}
+
+      - name: "📦 Install Dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "🎭 Install Playwright"
+        run: pnpm playwright install --with-deps chromium
+
+      - name: "⏳ Wait for Vercel Deployment"
+        uses: UnlyEd/github-action-await-vercel@v1
+        if: github.event_name == 'push'
+        with:
+          deployment-url: https://meetpin-weld.vercel.app
+          timeout: 300
+
+      - name: "🧪 Production Smoke Tests"
+        run: pnpm e2e e2e/production-quick-test.spec.ts --project=chromium
+        env:
+          CI: true
+          TEST_URL: https://meetpin-weld.vercel.app
+
+      - name: "🔍 Detailed Production Tests"
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_type == 'full')
+        run: pnpm e2e e2e/detailed-production-test.spec.ts --project=chromium
+        env:
+          CI: true
+          TEST_URL: https://meetpin-weld.vercel.app
+
+      - name: "📊 Production Health Check"
+        run: |
+          curl -f https://meetpin-weld.vercel.app/api/health || exit 1
+          echo "✅ Production health check passed"
+
+  # 📝 5단계: QA 결과 리포팅 및 PR 코멘트
+  qa-reporting:
+    name: "📝 QA Results & PR Comments"
+    runs-on: ubuntu-latest
+    needs: [pre-validation, e2e-testing, security-performance, production-verification]
+    if: always() && github.event_name == 'pull_request'
+    
+    steps:
+      - name: "📥 Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "📥 Download Test Artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          path: test-results/
+
+      - name: "📊 Generate QA Summary Report"
+        id: qa-summary
+        run: |
+          echo "## 🎯 QA Automation Results Summary" > qa-report.md
+          echo "" >> qa-report.md
+          echo "### 📋 Test Execution Overview" >> qa-report.md
+          echo "- **Pre-validation**: ${{ needs.pre-validation.result }}" >> qa-report.md
+          echo "- **E2E Testing**: ${{ needs.e2e-testing.result }}" >> qa-report.md
+          echo "- **Security & Performance**: ${{ needs.security-performance.result }}" >> qa-report.md
+          echo "- **Production Verification**: ${{ needs.production-verification.result }}" >> qa-report.md
+          echo "" >> qa-report.md
+          
+          # Test results analysis
+          if [[ "${{ needs.e2e-testing.result }}" == "success" ]]; then
+            echo "✅ **E2E Tests**: All user journeys verified across browsers" >> qa-report.md
+          else
+            echo "❌ **E2E Tests**: Some tests failed - check artifacts" >> qa-report.md
+          fi
+          
+          if [[ "${{ needs.security-performance.result }}" == "success" ]]; then
+            echo "✅ **Security & Performance**: All checks passed" >> qa-report.md
+          else
+            echo "❌ **Security & Performance**: Issues detected" >> qa-report.md
+          fi
+          
+          echo "" >> qa-report.md
+          echo "### 🔗 Detailed Reports" >> qa-report.md
+          echo "- [Playwright Test Reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> qa-report.md
+          echo "- [Performance Metrics](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> qa-report.md
+          echo "" >> qa-report.md
+          echo "### 📱 Tested Browsers & Devices" >> qa-report.md
+          echo "- ✅ Desktop: Chrome, Firefox, Safari" >> qa-report.md
+          echo "- ✅ Mobile: Chrome (Pixel 5), Safari (iPhone 12)" >> qa-report.md
+          echo "" >> qa-report.md
+          echo "---" >> qa-report.md
+          echo "*🤖 Generated by QA Automation System*" >> qa-report.md
+          
+          # Set output for PR comment
+          echo "qa-summary=$(cat qa-report.md)" >> $GITHUB_OUTPUT
+
+      - name: "💬 Comment QA Results on PR"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const qaReport = fs.readFileSync('qa-report.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: qaReport
+            });
+
+  # 🚨 6단계: 실패 알림 (Slack/Email)
+  failure-notification:
+    name: "🚨 Failure Notification"
+    runs-on: ubuntu-latest
+    needs: [pre-validation, e2e-testing, security-performance, production-verification]
+    if: failure() && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: "📧 Send Failure Notification"
+        run: |
+          echo "🚨 Critical: QA automation detected failures in main branch"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo ""
+          echo "Failed Jobs:"
+          echo "- Pre-validation: ${{ needs.pre-validation.result }}"
+          echo "- E2E Testing: ${{ needs.e2e-testing.result }}"
+          echo "- Security & Performance: ${{ needs.security-performance.result }}"
+          echo "- Production Verification: ${{ needs.production-verification.result }}"
+          echo ""
+          echo "🔗 Action URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

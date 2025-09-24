@@ -1,0 +1,195 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "🔄 MeetPin 자동 의존성 업데이트 - 보안 우선 설정",
+  "extends": [
+    "config:recommended",
+    "security:openssf-scorecard",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":separatePatchReleases"
+  ],
+  "timezone": "Asia/Seoul",
+  "schedule": ["before 6am on monday"],
+  "labels": ["dependencies", "security"],
+  "assignees": ["@admins"],
+  "reviewers": ["@admins"],
+  
+  "packageRules": [
+    {
+      "description": "🚨 보안 업데이트는 즉시 적용",
+      "matchDepTypes": ["dependencies", "devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "labels": ["security-patch"],
+      "automerge": false,
+      "schedule": ["at any time"]
+    },
+    
+    {
+      "description": "🔒 보안 취약점 수정은 최우선",
+      "vulnerabilityAlert": true,
+      "labels": ["security-vulnerability", "priority-critical"],
+      "reviewers": ["@security-team"],
+      "assignees": ["@security-team"],
+      "schedule": ["at any time"],
+      "prPriority": 10
+    },
+    
+    {
+      "description": "⚡ Next.js 관련 업데이트",
+      "matchPackageNames": ["next", "@next/*"],
+      "labels": ["nextjs"],
+      "groupName": "Next.js",
+      "reviewers": ["@frontend-team"],
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "🗄️ Supabase 관련 업데이트", 
+      "matchPackageNames": ["@supabase/*"],
+      "labels": ["supabase"],
+      "groupName": "Supabase",
+      "reviewers": ["@backend-team"],
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "🧪 테스팅 도구 업데이트",
+      "matchPackageNames": ["@playwright/*", "playwright", "jest", "@testing-library/*"],
+      "labels": ["testing"],
+      "groupName": "Testing Tools",
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "🔧 개발 도구 업데이트",
+      "matchDepTypes": ["devDependencies"],
+      "matchPackageNames": ["eslint", "prettier", "typescript", "@types/*"],
+      "labels": ["dev-tools"],
+      "groupName": "Development Tools",
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "🎨 UI 라이브러리 업데이트",
+      "matchPackageNames": ["@radix-ui/*", "lucide-react", "tailwindcss"],
+      "labels": ["ui"],
+      "groupName": "UI Libraries",
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "🔐 보안 도구 업데이트",
+      "matchPackageNames": ["@upstash/*", "isomorphic-dompurify"],
+      "labels": ["security-tools"],
+      "groupName": "Security Tools",
+      "reviewers": ["@security-team"],
+      "schedule": ["before 6am on monday"]
+    },
+    
+    {
+      "description": "📊 메이저 버전은 별도 PR",
+      "matchUpdateTypes": ["major"],
+      "labels": ["major-update"],
+      "reviewers": ["@tech-leads"],
+      "assignees": ["@tech-leads"],
+      "schedule": ["before 6am on monday"],
+      "prCreation": "not-pending"
+    },
+    
+    {
+      "description": "🛑 위험한 패키지는 업데이트 제외",
+      "matchPackageNames": ["lodash", "request", "moment"],
+      "enabled": false
+    }
+  ],
+  
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security-vulnerability"],
+    "assignees": ["@security-team"],
+    "reviewers": ["@security-team"],
+    "schedule": ["at any time"],
+    "prCreation": "immediate"
+  },
+  
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "🔄 Dependency Dashboard - MeetPin",
+  "dependencyDashboardHeader": "이 대시보드는 저장소의 의존성 업데이트 상태를 추적합니다. 보안 업데이트는 최우선으로 처리됩니다.",
+  "dependencyDashboardFooter": "💡 질문이나 문제가 있으면 @security-team에 문의하세요.",
+  
+  "prHeader": "이 PR은 Renovate에 의해 자동으로 생성되었습니다. 🤖",
+  "prFooter": "📋 변경사항을 검토하고 테스트를 확인한 후 병합해주세요.",
+  
+  "commitMessage": {
+    "prefix": "deps:",
+    "lowerCase": "never"
+  },
+  
+  "branchPrefix": "renovate/",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"],
+    "commitMessage": "chore: 🔒 update lockfile",
+    "prTitle": "🔒 Update lockfile",
+    "labels": ["lockfile-maintenance"]
+  },
+  
+  "separateMinorPatch": true,
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  
+  "platformAutomerge": false,
+  "rebaseWhen": "behind-base-branch",
+  
+  "regexManagers": [
+    {
+      "description": "Docker 이미지 태그 업데이트",
+      "fileMatch": ["^Dockerfile$", "docker-compose.yml"],
+      "matchStrings": ["FROM (?<depName>.*?):(?<currentValue>.*?)\\s"],
+      "datasourceTemplate": "docker"
+    },
+    
+    {
+      "description": "GitHub Actions 버전 업데이트",
+      "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+      "matchStrings": ["uses: (?<depName>.*?)@(?<currentValue>.*?)\\s"],
+      "datasourceTemplate": "github-tags"
+    }
+  ],
+  
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "package.json engines 필드 업데이트",
+      "fileMatch": ["^package\\.json$"],
+      "matchStrings": ["\"node\":\\s*\"(?<currentValue>.*?)\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    }
+  ],
+  
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/coverage/**"
+  ],
+  
+  "ignoreDeps": [
+    "typescript"
+  ],
+  
+  "postUpdateOptions": [
+    "pnpmDedupe"
+  ],
+  
+  "semanticCommits": "enabled",
+  "semanticCommitType": "deps",
+  "semanticCommitScope": null
+}

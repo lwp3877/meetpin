@@ -12,6 +12,7 @@ import LiveActivityStats from '@/components/home/live-activity-stats'
 import SignupIncentive from '@/components/onboarding/signup-incentive'
 // WelcomeTour available for future implementation
 import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
+import LegalFooter from '@/components/layout/LegalFooter'
 import { 
   MapPin, 
   Users, 
@@ -439,6 +440,9 @@ export default function EnhancedLanding() {
           </PremiumButton>
         </div>
       </section>
+
+      {/* Legal Footer */}
+      <LegalFooter variant="default" />
       </div>
     </MobileOptimizedLayout>
   )

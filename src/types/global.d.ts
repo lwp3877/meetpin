@@ -227,7 +227,11 @@ export type RequestStatus = 'pending' | 'accepted' | 'rejected'
 declare global {
   interface Window {
     kakao?: any
-    gtag?: any
+    gtag?: (
+      command: 'config' | 'event' | 'consent',
+      targetId: string | any,
+      config?: any
+    ) => void
   }
   
   namespace NodeJS {

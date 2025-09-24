@@ -4,6 +4,11 @@ import { NextRequest } from 'next/server'
 import { ApiResponse, ApiError, getAuthenticatedUser } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
+import { withCache, CacheKeys, CacheTTL, invalidateUserCache } from '@/lib/cache/redis'
+
+// API 캐싱 설정 - 알림은 실시간성이 중요하므로 15초간만 캐싱
+export const revalidate = 15 // 15초마다 재검증
+export const dynamic = 'force-dynamic' // 사용자별 알림 데이터
 
 export async function GET(_request: NextRequest) {
   try {
@@ -65,31 +70,35 @@ export async function GET(_request: NextRequest) {
       } as ApiResponse<any[]>)
     }
 
-    // 실제 데이터베이스에서 알림 조회
-    const supabase = await createServerSupabaseClient()
+    // 실제 데이터베이스에서 알림 조회 (Redis 캐시 적용)
+    const cacheKey = CacheKeys.notifications(user.id)
     
-    const { data: notifications, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50)
+    const formattedNotifications = await withCache(cacheKey, CacheTTL.notifications, async () => {
+      const supabase = await createServerSupabaseClient()
+      
+      const { data: notifications, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
 
-    if (error) {
-      throw new ApiError('알림을 가져오는데 실패했습니다', 500)
-    }
+      if (error) {
+        throw new ApiError('알림을 가져오는데 실패했습니다', 500)
+      }
 
-    // 데이터 형식 변환
-    const formattedNotifications = notifications?.map((notification: any) => ({
-      id: notification.id,
-      type: notification.type,
-      title: notification.title,
-      message: notification.message,
-      createdAt: notification.created_at,
-      read: notification.is_read,
-      actionUrl: notification.metadata?.actionUrl,
-      data: notification.metadata
-    })) || []
+      // 데이터 형식 변환
+      return notifications?.map((notification: any) => ({
+        id: notification.id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        createdAt: notification.created_at,
+        read: notification.is_read,
+        actionUrl: notification.metadata?.actionUrl,
+        data: notification.metadata
+      })) || []
+    })
 
     return Response.json({
       ok: true,
@@ -141,6 +150,9 @@ export async function POST(request: NextRequest) {
     if (error) {
       throw new ApiError('알림 생성에 실패했습니다', 500)
     }
+
+    // 알림 생성 성공 시 해당 사용자의 알림 캐시 무효화
+    await invalidateUserCache(user.id)
 
     return Response.json({
       ok: true,

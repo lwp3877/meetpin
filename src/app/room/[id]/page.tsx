@@ -9,9 +9,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getCategoryDisplay } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
 import { MapPin, Clock, Users, DollarSign, Star, Edit, ArrowLeft, Navigation, Heart, Share2 } from 'lucide-react'
-import { RealtimeChatModal } from '@/components/ui/RealtimeChatModal'
-import { BoostModal } from '@/components/ui/BoostModal'
-import { ProfileModal } from '@/components/ui/ProfileModal'
+import dynamic from 'next/dynamic'
+
+// 모달 컴포넌트들을 필요할 때만 로딩
+const RealtimeChatModal = dynamic(() => import('@/components/ui/RealtimeChatModal').then(mod => ({ default: mod.RealtimeChatModal })), {
+  ssr: false,
+  loading: () => null
+})
+
+const BoostModal = dynamic(() => import('@/components/ui/BoostModal').then(mod => ({ default: mod.BoostModal })), {
+  ssr: false,
+  loading: () => null
+})
+
+const ProfileModal = dynamic(() => import('@/components/ui/ProfileModal').then(mod => ({ default: mod.ProfileModal })), {
+  ssr: false,
+  loading: () => null
+})
 
 interface Room {
   id: string
@@ -65,15 +79,32 @@ export default function RoomDetailPage() {
       return
     }
 
+    const loadingToastId = toast.loading('모임 정보를 불러오는 중...', { duration: 10000 })
+    
     try {
       setIsLoading(true)
+      
+      // AbortController로 타임아웃 처리
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+      
       const response = await fetch(`/api/rooms/${params.id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: controller.signal,
       })
       
+      clearTimeout(timeoutId)
+      
       if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('ROOM_NOT_FOUND')
+        } else if (response.status === 403) {
+          throw new Error('ROOM_ACCESS_DENIED')
+        } else if (response.status >= 500) {
+          throw new Error('SERVER_ERROR')
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       
@@ -81,21 +112,33 @@ export default function RoomDetailPage() {
 
       if (result.ok && result.data?.room) {
         setRoom(result.data.room)
+        toast.dismiss(loadingToastId)
+        toast.success('모임 정보를 불러왔습니다')
       } else {
-        toast.error(result.message || '방 정보를 찾을 수 없습니다')
-        router.push('/map')
+        throw new Error(result.message || 'INVALID_RESPONSE')
       }
     } catch (error: any) {
       console.error('Error fetching room:', error)
+      toast.dismiss(loadingToastId)
       
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        toast.error('네트워크 연결을 확인해주세요')
-      } else if (error.message.includes('404')) {
-        toast.error('존재하지 않는 방입니다')
+      if (error.name === 'AbortError') {
+        toast.error('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('네트워크 연결을 확인해주세요. Wi-Fi 또는 모바일 데이터를 확인하세요')
+      } else if (error.message === 'ROOM_NOT_FOUND') {
+        toast.error('존재하지 않는 모임입니다')
+      } else if (error.message === 'ROOM_ACCESS_DENIED') {
+        toast.error('접근 권한이 없는 모임입니다')
+      } else if (error.message === 'SERVER_ERROR') {
+        toast.error('서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요')
       } else {
-        toast.error('방 정보를 불러오는 중 오류가 발생했습니다')
+        toast.error('모임 정보를 불러오는 중 오류가 발생했습니다')
       }
-      router.push('/map')
+      
+      // 3초 후 자동으로 지도로 이동
+      setTimeout(() => {
+        router.push('/map')
+      }, 3000)
     } finally {
       setIsLoading(false)
     }
@@ -113,24 +156,74 @@ export default function RoomDetailPage() {
   }, [user, loading, fetchRoom, router])
 
   const handleJoinRequest = async () => {
-    if (!room || !user) return
+    if (!room || !user) {
+      toast.error('로그인이 필요합니다')
+      return
+    }
+    
+    if (requesting) return // 중복 요청 방지
+    
     setRequesting(true)
+    const loadingToastId = toast.loading('참가 신청하는 중...', { duration: 10000 })
 
     try {
+      // AbortController로 타임아웃 처리
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      
       const response = await fetch('/api/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ room_id: room.id }),
+        signal: controller.signal,
       })
+      
+      clearTimeout(timeoutId)
+      toast.dismiss(loadingToastId)
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error('ALREADY_REQUESTED')
+        } else if (response.status === 403) {
+          throw new Error('ACCESS_DENIED')
+        } else if (response.status === 400) {
+          throw new Error('INVALID_REQUEST')
+        } else if (response.status >= 500) {
+          throw new Error('SERVER_ERROR')
+        }
+        throw new Error(`HTTP ${response.status}`)
+      }
 
       const result = await response.json()
       if (result.ok) {
-        toast.success('참가 신청이 완료되었습니다!')
+        toast.success('🎉 참가 신청이 완료되었습니다!', { 
+          duration: 4000,
+          icon: '✅'
+        })
+        // 선택적으로 방 정보 새로고침
+        setTimeout(() => fetchRoom(), 1000)
       } else {
-        toast.error(result.message || '참가 신청에 실패했습니다')
+        throw new Error(result.message || 'UNKNOWN_ERROR')
       }
-    } catch {
-      toast.error('참가 신청 중 오류가 발생했습니다')
+    } catch (error: any) {
+      console.error('Join request error:', error)
+      toast.dismiss(loadingToastId)
+      
+      if (error.name === 'AbortError') {
+        toast.error('요청 시간이 초과되었습니다. 다시 시도해주세요')
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        toast.error('네트워크 연결을 확인해주세요')
+      } else if (error.message === 'ALREADY_REQUESTED') {
+        toast.error('이미 참가 신청한 모임입니다')
+      } else if (error.message === 'ACCESS_DENIED') {
+        toast.error('이 모임에 참가할 권한이 없습니다')
+      } else if (error.message === 'INVALID_REQUEST') {
+        toast.error('잘못된 참가 신청입니다')
+      } else if (error.message === 'SERVER_ERROR') {
+        toast.error('서버 오류로 참가 신청에 실패했습니다. 잠시 후 다시 시도해주세요')
+      } else {
+        toast.error('참가 신청 중 오류가 발생했습니다')
+      }
     } finally {
       setRequesting(false)
     }

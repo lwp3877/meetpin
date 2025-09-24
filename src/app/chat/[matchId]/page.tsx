@@ -29,23 +29,72 @@ export default function ChatPage({
         setIsLoading(true)
         setError(null)
 
+        // matchId 유효성 검증
+        if (!matchId || matchId === 'undefined' || matchId === 'null') {
+          throw new Error('올바르지 않은 채팅 ID입니다')
+        }
+
+        // UUID 형식 검증
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        if (!uuidRegex.test(matchId)) {
+          throw new Error('잘못된 채팅 ID 형식입니다')
+        }
+
+        // 타임아웃 처리를 위한 AbortController
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000)
+
         const { data: { user }, error: userError } = await supabase.auth.getUser()
         
-        if (userError || !user) {
+        clearTimeout(timeoutId)
+        
+        if (userError) {
+          if (userError.message.includes('session_expired')) {
+            throw new Error('로그인 세션이 만료되었습니다. 다시 로그인해주세요')
+          } else if (userError.message.includes('invalid_token')) {
+            throw new Error('인증 토큰이 유효하지 않습니다. 다시 로그인해주세요')
+          }
+          throw new Error('인증 정보를 확인할 수 없습니다')
+        }
+        
+        if (!user) {
           throw new Error('로그인이 필요합니다')
+        }
+
+        // 매치 접근 권한 확인
+        const matchResponse = await fetch(`/api/matches/${matchId}/verify`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        })
+
+        if (!matchResponse.ok) {
+          if (matchResponse.status === 404) {
+            throw new Error('존재하지 않는 채팅입니다')
+          } else if (matchResponse.status === 403) {
+            throw new Error('이 채팅에 접근할 권한이 없습니다')
+          }
+          throw new Error('채팅 접근 권한을 확인할 수 없습니다')
         }
 
         setCurrentUserId(user.id)
       } catch (err: any) {
         console.error('User fetch error:', err)
-        setError(err.message)
+        
+        if (err.name === 'AbortError') {
+          setError('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')
+        } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+          setError('네트워크 연결을 확인해주세요')
+        } else {
+          setError(err.message || '채팅을 불러오는 중 오류가 발생했습니다')
+        }
       } finally {
         setIsLoading(false)
       }
     }
 
     getCurrentUser()
-  }, [supabase])
+  }, [supabase, matchId])
 
   const handleClose = () => {
     router.back()

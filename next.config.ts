@@ -53,7 +53,18 @@ const nextConfig: NextConfig = {
 
   // 실험적 기능
   experimental: {
-    optimizePackageImports: ['lucide-react', '@tanstack/react-query'],
+    optimizePackageImports: [
+      'lucide-react', 
+      '@tanstack/react-query',
+      'date-fns',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      'react-hook-form',
+      'zod'
+    ],
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
   
   // 서버 외부 패키지
@@ -95,7 +106,26 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(self), payment=(self)',
           },
-          // Content Security Policy
+          // Content Security Policy (Report-Only for testing)
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com",
+              "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
+              "img-src 'self' data: blob: https: http:",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "frame-src 'self' https://js.stripe.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
+              "report-uri /api/security/csp-report",
+            ].join('; '),
+          },
+          // Content Security Policy (Enforced - 점진적으로 활성화)
           {
             key: 'Content-Security-Policy',
             value: [

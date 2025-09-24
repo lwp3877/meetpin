@@ -1,0 +1,270 @@
+/* src/app/api/upload/presigned/route.ts */
+// 🔐 Presigned URL 기반 보안 파일 업로드
+
+import 'server-only'
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient } from '@/lib/supabaseClient'
+import { getAuthenticatedUser, ApiError } from '@/lib/api'
+import { rateLimit } from '@/lib/rateLimit'
+import { PresignedRequestSchema, type PresignedRequest } from '@/lib/upload/shared'
+import { 
+  validateFileUploadServer, 
+  sanitizeFileNameServer, 
+  createUploadSession, 
+  getUploadSession, 
+  deleteUploadSession,
+  type UploadSession 
+} from '@/lib/upload/server'
+
+// Next.js Route 설정
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting: 1분에 10번까지
+    const ip = request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip') || 
+               'unknown'
+    const rateLimitResult = await rateLimit(
+      `presigned:${ip}`,
+      10,
+      60 * 1000
+    )
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many upload requests' },
+        { 
+          status: 429,
+          headers: { 'Retry-After': '60' }
+        }
+      )
+    }
+
+    // 인증 확인
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      throw new ApiError('Authentication required', 401)
+    }
+
+    // 요청 본문 검증
+    const body: PresignedRequest = await request.json()
+    const validation = PresignedRequestSchema.safeParse(body)
+    
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      )
+    }
+
+    const { fileName, fileSize, fileType, uploadType, roomId, reportId } = validation.data
+
+    // 파일 업로드 보안 검증
+    const mockFile = {
+      name: fileName,
+      size: fileSize,
+      type: fileType
+    }
+
+    const fileValidation = await validateFileUploadServer(mockFile, uploadType)
+    if (!fileValidation.isValid) {
+      return NextResponse.json(
+        { error: fileValidation.error },
+        { status: 400 }
+      )
+    }
+
+    // 추가 권한 검증
+    const supabase = await createServerSupabaseClient()
+    
+    if (uploadType === 'roomImage' && roomId) {
+      // 방 호스트만 방 이미지 업로드 가능
+      const { data: room } = await supabase
+        .from('rooms')
+        .select('host_uid')
+        .eq('id', roomId)
+        .single()
+
+      if (!room || (room as any).host_uid !== user.id) {
+        return NextResponse.json(
+          { error: 'Permission denied: Only room host can upload room images' },
+          { status: 403 }
+        )
+      }
+    }
+
+    if (uploadType === 'reportFile' && reportId) {
+      // 신고 작성자만 신고 파일 업로드 가능
+      const { data: report } = await supabase
+        .from('reports')
+        .select('reporter_id')
+        .eq('id', reportId)
+        .single()
+
+      if (!report || (report as any).reporter_id !== user.id) {
+        return NextResponse.json(
+          { error: 'Permission denied: Only report author can upload files' },
+          { status: 403 }
+        )
+      }
+    }
+
+    // 고유한 파일 경로 생성
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 8)
+    const sanitizedFileName = sanitizeFileNameServer(fileName)
+    
+    let bucketName: string
+    let filePath: string
+
+    switch (uploadType) {
+      case 'avatar':
+        bucketName = 'avatars'
+        filePath = `${user.id}/${timestamp}_${random}_${fileValidation.sanitizedName}`
+        break
+      
+      case 'roomImage':
+        bucketName = 'room-images'
+        filePath = `${roomId}/${timestamp}_${random}_${fileValidation.sanitizedName}`
+        break
+      
+      case 'reportFile':
+        bucketName = 'report-files'
+        filePath = `${reportId}/${timestamp}_${random}_${fileValidation.sanitizedName}`
+        break
+    }
+
+    // Presigned URL 생성 (5분 유효)
+    const { data: presignedData, error: presignedError } = await supabase
+      .storage
+      .from(bucketName)
+      .createSignedUploadUrl(filePath, {
+        upsert: false
+      })
+
+    if (presignedError) {
+      console.error('Presigned URL creation failed:', presignedError)
+      throw new ApiError('Failed to create upload URL', 500)
+    }
+
+    // 업로드 세션 기록 (추적용)
+    const uploadSession: UploadSession = {
+      user_id: user.id,
+      file_path: filePath,
+      bucket_name: bucketName,
+      upload_type: uploadType,
+      file_size: fileSize,
+      file_type: fileType,
+      expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5분 후
+      created_at: new Date().toISOString()
+    }
+
+    // 세션을 임시 저장 (Redis 등에 저장 권장)
+    createUploadSession(presignedData.path, uploadSession)
+
+    return NextResponse.json({
+      uploadUrl: presignedData.signedUrl,
+      filePath: presignedData.path,
+      bucketName,
+      expiresIn: 300, // 5분
+      maxFileSize: fileSize,
+      allowedTypes: uploadType === 'reportFile' 
+        ? ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+        : ['image/jpeg', 'image/png', 'image/webp']
+    })
+
+  } catch (error) {
+    console.error('Presigned URL creation error:', error)
+    
+    if (error instanceof ApiError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status }
+      )
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// 업로드 완료 확인
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      throw new ApiError('Authentication required', 401)
+    }
+
+    const { filePath } = await request.json()
+    
+    if (!filePath) {
+      return NextResponse.json(
+        { error: 'File path required' },
+        { status: 400 }
+      )
+    }
+
+    // 업로드 세션 확인
+    const session = getUploadSession(filePath)
+    if (!session || session.user_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Invalid upload session' },
+        { status: 400 }
+      )
+    }
+
+    // 파일 업로드 완료 확인
+    const supabase = await createServerSupabaseClient()
+    const { data: fileData, error: fileError } = await supabase
+      .storage
+      .from(session.bucket_name)
+      .list(filePath.split('/').slice(0, -1).join('/'), {
+        search: filePath.split('/').pop()
+      })
+
+    if (fileError || !fileData || fileData.length === 0) {
+      return NextResponse.json(
+        { error: 'File upload not confirmed' },
+        { status: 400 }
+      )
+    }
+
+    // 업로드 세션 정리
+    deleteUploadSession(filePath)
+
+    // 파일 공개 URL 생성
+    const { data: urlData } = supabase
+      .storage
+      .from(session.bucket_name)
+      .getPublicUrl(filePath)
+
+    return NextResponse.json({
+      success: true,
+      fileUrl: urlData.publicUrl,
+      filePath,
+      bucketName: session.bucket_name
+    })
+
+  } catch (error) {
+    console.error('Upload confirmation error:', error)
+    
+    if (error instanceof ApiError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status }
+      )
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+

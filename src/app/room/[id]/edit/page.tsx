@@ -5,9 +5,23 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
-import RoomForm from '@/components/room/RoomForm'
 import { brandMessages } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
+import dynamic from 'next/dynamic'
+
+// RoomForm을 필요할 때만 로딩
+const RoomForm = dynamic(() => import('@/components/room/RoomForm'), {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse space-y-6">
+      <div className="h-6 bg-gray-200 rounded w-32"></div>
+      <div className="h-10 bg-gray-200 rounded"></div>
+      <div className="h-6 bg-gray-200 rounded w-24"></div>
+      <div className="h-10 bg-gray-200 rounded"></div>
+      <div className="h-32 bg-gray-200 rounded"></div>
+    </div>
+  )
+})
 
 interface Room {
   id: string

@@ -29,7 +29,9 @@ interface SchedulerStatus {
   nextSchedule?: Date
 }
 
-interface BotSchedulerControlProps {}
+interface BotSchedulerControlProps {
+  className?: string
+}
 
 export function BotSchedulerControl(_props: BotSchedulerControlProps = {}) {
   const [status, setStatus] = useState<SchedulerStatus>({
