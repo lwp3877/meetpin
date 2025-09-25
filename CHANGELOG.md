@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.6] - 2025-01-28
+
+### Fixed
+- 🔥 **ops routes: force-dynamic + simplified implementation**: 상태 엔드포인트 간소화 및 동적 처리 강제
+- ⚡ **라우팅 최적화**: App Router 단일화로 라우팅 충돌 제거
+- 🛡️ **ESLint 경고 해결**: 미사용 변수 underscore prefix 적용
+
+### Technical Details
+- `/status`: 간소화된 정적 상태 페이지로 변경 (force-dynamic + revalidate=0)
+- `/api/healthz`, `/api/ready`: AbortController 패턴 + 1500ms 타임아웃 적용
+- Pages Router 이중 구조 제거로 빌드 충돌 해결
+
 ## [1.4.5] - 2025-01-28
 
 ### Fixed
