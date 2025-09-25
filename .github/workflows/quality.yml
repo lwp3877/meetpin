@@ -36,6 +36,9 @@ jobs:
       - name: 🧹 ESLint Check
         run: pnpm lint
 
+      - name: 🔒 Security audit
+        run: pnpm audit:security
+
       - name: 🏗️ Build Check
         run: pnpm build
 
@@ -83,3 +86,4 @@ jobs:
           echo "✅ Build: Success"
           echo "✅ Architecture: Valid"
           echo "✅ Smoke Test: Passed"
+          echo "✅ Security Audit: No moderate+ vulnerabilities"

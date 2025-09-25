@@ -52,7 +52,8 @@
     "sentry:upload": "node scripts/sentry-upload.js",
     "smoke": "playwright test e2e/smoke.spec.ts",
     "analyze": "cross-env ANALYZE=true pnpm build",
-    "bundle:guard": "node scripts/bundle-guard.js"
+    "bundle:guard": "node scripts/bundle-guard.js",
+    "audit:security": "pnpm audit --audit-level moderate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
