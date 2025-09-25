@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5] - 2025-01-28
+
+### Fixed
+- 🔥 **Production 404 긴급 수정**: 상태 엔드포인트 3종 force-dynamic 설정 완료
+- ⚡ **캐시 무효화**: 빌드시 정적 사전렌더링 비활성화, 실시간 API 응답 보장
+- 🛡️ **타입 안전성 보완**: Promise.race 반환형 타입 캐스팅, 미사용 변수 ESLint 경고 해결
+
+### Technical Details
+- `/status` 페이지: 'use client' 전용 클라이언트 컴포넌트로 변경
+- `/api/healthz`, `/api/ready`: `export const dynamic = 'force-dynamic'` + `revalidate = 0` + `runtime = 'nodejs'` 설정
+- Vercel 배포 캐시 계층 우회를 위한 완전 동적 라우팅 적용
+
 ## [1.4.2] - 2025-01-28
 
 ### Added
