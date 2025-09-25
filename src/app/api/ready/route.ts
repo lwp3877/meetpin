@@ -15,7 +15,7 @@ export async function GET() {
   // Check if essential tables exist (migration check)
   try {
     const migStart = Date.now()
-    const supabase = createServerSupabaseClient()
+    const supabase = await createServerSupabaseClient()
 
     // Try to access core tables to verify migrations
     const { data: profilesData, error: profilesError } = await Promise.race([

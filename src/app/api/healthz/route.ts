@@ -16,7 +16,7 @@ export async function GET() {
   // Database check
   try {
     const dbStart = Date.now()
-    const supabase = createServerSupabaseClient()
+    const supabase = await createServerSupabaseClient()
 
     const { data, error } = await Promise.race([
       supabase.from('profiles').select('id').limit(1),
