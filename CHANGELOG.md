@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.7] - 2025-01-28
+
+### Fixed
+- 🔥 **disable static export; enable server runtime for ops endpoints**: Vercel standalone output 비활성화로 API 라우트 복원
+- ⚡ **서버 실행 모드 강제**: next.config.ts에서 output 설정 주석 처리하여 API 함수 생성 활성화
+- 🛡️ **빌드 모드 검증**: ƒ (Dynamic) 마크 확인으로 서버 사이드 렌더링 보장
+
+### Technical Details
+- `next.config.ts`: `output: 'standalone'` 조건부 설정 비활성화 (API 404 원인 제거)
+- 빌드 결과: `/status`, `/api/healthz`, `/api/ready` 모두 ƒ (Dynamic) 마크 확인
+- Vercel 함수 런타임: nodejs20.x + 30초 최대 지속시간 설정 유지
+
 ## [1.4.6] - 2025-01-28
 
 ### Fixed

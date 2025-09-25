@@ -226,8 +226,8 @@ const nextConfig: NextConfig = {
     BUILD_VERSION: process.env.npm_package_version || '1.0.0',
   },
 
-  // 출력 설정 (Vercel에서는 자동으로 standalone 사용)
-  output: process.env.VERCEL ? 'standalone' : undefined,
+  // 출력 설정 - 서버 실행 모드 강제 (API 라우트 지원)
+  // output: process.env.VERCEL ? 'standalone' : undefined,  // 주석 처리 - API 404 방지
 
   // TypeScript 최적화
   typescript: {
