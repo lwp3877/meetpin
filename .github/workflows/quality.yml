@@ -50,6 +50,14 @@ jobs:
       - name: 🏛️ Architecture Check
         run: pnpm arch:check
 
+      - name: 🎭 Install Playwright (for smoke tests)
+        run: pnpm playwright install --with-deps chromium
+
+      - name: 🔥 Post-build smoke test
+        run: pnpm smoke
+        env:
+          TEST_URL: 'http://localhost:3000'
+
       - name: ✅ Quality Summary
         run: |
           echo "🎉 All quality checks passed!"
@@ -57,3 +65,4 @@ jobs:
           echo "✅ ESLint: 0 warnings"
           echo "✅ Build: Success"
           echo "✅ Architecture: Valid"
+          echo "✅ Smoke Test: Passed"

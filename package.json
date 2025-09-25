@@ -49,7 +49,8 @@
     "perf:compare": "node scripts/perf-compare.mjs",
     "perf:guard": "pnpm perf:baseline && pnpm perf:compare",
     "perf:slow4g": "playwright test tests/perf/slow4g.spec.ts",
-    "sentry:upload": "node scripts/sentry-upload.js"
+    "sentry:upload": "node scripts/sentry-upload.js",
+    "smoke": "playwright test e2e/smoke.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
