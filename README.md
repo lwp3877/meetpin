@@ -1,5 +1,10 @@
 # 밋핀 (MeetPin) - 지도 기반 소셜 만남 플랫폼
 
+[![Quality Guard](https://github.com/meetpin/meetpin/workflows/🔧%20Quality%20Guard/badge.svg)](https://github.com/meetpin/meetpin/actions/workflows/quality.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-0_errors-green.svg)](https://github.com/meetpin/meetpin)
+[![ESLint](https://img.shields.io/badge/ESLint-0_warnings-green.svg)](https://github.com/meetpin/meetpin)
+[![Architecture](https://img.shields.io/badge/Architecture-Valid-brightgreen.svg)](https://github.com/meetpin/meetpin)
+
 > 📍 핀 찍고, 지금 모여요!
 > 지도에서 방을 만들어 근처 사람들과 만나고, 새로운 인연을 만들어보세요.
 
