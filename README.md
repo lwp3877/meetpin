@@ -4,6 +4,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-0_errors-green.svg)](https://github.com/meetpin/meetpin)
 [![ESLint](https://img.shields.io/badge/ESLint-0_warnings-green.svg)](https://github.com/meetpin/meetpin)
 [![Architecture](https://img.shields.io/badge/Architecture-Valid-brightgreen.svg)](https://github.com/meetpin/meetpin)
+[![Deployment](https://img.shields.io/badge/Deployment-Error_Budget_Protected-blue.svg)](https://github.com/meetpin/meetpin/actions/workflows/quality.yml)
+[![Uptime](https://img.shields.io/badge/Uptime-Monitored-green.svg)](https://github.com/meetpin/meetpin/actions/workflows/uptime.yml)
 
 > 📍 핀 찍고, 지금 모여요!
 > 지도에서 방을 만들어 근처 사람들과 만나고, 새로운 인연을 만들어보세요.
@@ -164,6 +166,21 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 ```
 
 ## 📦 배포
+
+### 🛡️ 배포 제한 조건
+
+배포는 다음 조건들을 모두 충족해야만 가능합니다:
+
+- ✅ **코드 품질**: TypeScript 0 에러, ESLint 0 경고
+- ✅ **보안 검사**: moderate+ 취약점 없음
+- ✅ **번들 크기**: main chunk < 300KB
+- ✅ **아키텍처**: 경계 규칙 준수
+- ✅ **스모크 테스트**: 핵심 기능 동작 확인
+- 📊 **에러 버짓**: 최근 60분 에러율 < 5% (설정 가능)
+
+에러 버짓 초과 시 수동 승인이 필요합니다.
+
+### 🚀 배포 단계
 
 1. Supabase 프로젝트 생성 및 데이터베이스 설정
 2. 카카오 개발자 계정에서 JavaScript 키 발급

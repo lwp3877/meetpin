@@ -11,7 +11,8 @@
 - **CDN/Hosting**: Vercel Edge Network
 - **Cache**: Redis (ioredis) - 3개 핵심 엔드포인트
 - **External APIs**: Kakao Maps, Stripe Payments
-- **Monitoring**: 자체 구현 건상 체크 시스템
+- **Monitoring**: 자체 구현 건상 체크 시스템 + Sentry (opt-in)
+- **Security**: CSP, HSTS, X-Frame-Options, audit pipeline
 
 ---
 
@@ -215,16 +216,141 @@ pnpm analyze:bundle
 
 ---
 
+## 🚑 장애 30분 내 복구 절차 (Emergency Rollback)
+
+### ⚡ 즉시 롤백 프로세스
+
+#### 1단계: 장애 확인 및 의사결정 (2분)
+
+```bash
+# 빠른 서비스 상태 체크
+curl -I https://meetpin-weld.vercel.app/api/health
+curl -I https://meetpin-weld.vercel.app/
+
+# 장애 심각도 판단:
+# - 5xx 에러 또는 응답 없음: 즉시 롤백
+# - 기능 일부 장애: 5분 내 핫픽스 시도, 실패 시 롤백
+# - 성능 저하: 모니터링 후 판단
+```
+
+#### 2단계: Vercel 즉시 롤백 (5분)
+
+```bash
+# 방법 1: Vercel Dashboard 롤백 (가장 빠름)
+# 1. vercel.com → meetpin project → Deployments
+# 2. 마지막 정상 배포 선택 → "Promote to Production"
+# 3. 확인 후 배포 (1-3분)
+
+# 방법 2: CLI 롤백 (백업 방법)
+vercel --prod --confirm
+# 또는 특정 배포로
+vercel promote <deployment-url> --scope=meetpin
+```
+
+#### 3단계: 데이터베이스 롤백 가드 (5분)
+
+```bash
+# ⚠️ DB 마이그레이션이 포함된 경우에만 필요
+# Supabase 콘솔에서 스키마 변경 확인
+
+# 마이그레이션 롤백이 필요한 경우:
+# 1. Supabase Dashboard → SQL Editor
+# 2. 해당 마이그레이션의 rollback SQL 실행
+# 3. RLS 정책 재적용 확인
+
+# 롤백 SQL 예시 (사전에 각 마이그레이션별로 준비)
+# DROP TABLE IF EXISTS new_table;
+# ALTER TABLE existing_table DROP COLUMN new_column;
+```
+
+#### 4단계: 캐시 무효화 (2분)
+
+```bash
+# CDN 캐시 무효화 (Vercel 자동, 확인용)
+# Redis 캐시 클리어 (필요한 경우)
+curl -X POST https://meetpin-weld.vercel.app/api/cache/clear \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+
+# 브라우저 캐시 강제 무효화를 위한 빌드 태그 확인
+# buildBuster.ts 업데이트 후 재배포된 상태인지 확인
+```
+
+#### 5단계: 서비스 검증 및 모니터링 (5분)
+
+```bash
+# 핵심 기능 스모크 테스트
+pnpm smoke
+# 또는 수동 체크:
+# 1. 홈페이지 로딩
+# 2. 로그인 기능
+# 3. 방 생성/조회
+# 4. 지도 렌더링
+
+# 헬스체크 재확인
+curl https://meetpin-weld.vercel.app/api/health
+curl https://meetpin-weld.vercel.app/api/livez
+
+# 성능 메트릭 체크 (Core Web Vitals)
+# Vercel Analytics에서 즉시 확인
+```
+
+#### 6단계: 후속 조치 (10분)
+
+```bash
+# 장애 보고서 작성
+echo "$(date): Rollback completed" >> incidents/$(date +%Y%m%d_%H%M).md
+
+# 모니터링 강화 (Sentry alerts, 로그 확인)
+# 근본 원인 분석 계획 수립
+# 포스트모템 스케줄 (24-48시간 내)
+```
+
+### 🛡️ 롤백 방지 가드
+
+#### 안전한 배포 파이프라인
+
+```bash
+# CI/CD에서 자동 검증 (이미 적용됨):
+# 1. TypeScript 컴파일 (0 에러)
+# 2. ESLint (0 경고)
+# 3. Security audit (moderate+ 차단)
+# 4. Bundle size guard (300KB limit)
+# 5. Architecture boundaries
+# 6. 스모크 테스트 4단계
+# 7. Sentry 소스맵 업로드
+```
+
+#### 배포 전 체크리스트
+
+```bash
+# 로컬에서 전체 검증
+pnpm repo:doctor        # 품질 종합 체크
+pnpm smoke             # 핵심 기능 동작 확인
+pnpm bundle:guard      # 번들 사이즈 확인
+pnpm audit:security    # 보안 취약점 확인
+
+# 배포 후 필수 확인 (5분)
+curl -f https://meetpin-weld.vercel.app/api/health
+curl -f https://meetpin-weld.vercel.app/
+# 실제 브라우저에서 핵심 기능 1회 테스트
+```
+
+---
+
 ## 🎛️ 운영 도구 및 명령어
 
 ### 개발 환경 관리
 
 ```bash
 # 전체 품질 검사 (SRE 필수)
-pnpm repo:doctor  # typecheck + lint + build
+pnpm repo:doctor  # typecheck + lint + arch + build
 
-# 성능 기준선 설정
-pnpm perf:baseline
+# 보안 검사
+pnpm audit:security  # moderate+ 취약점 감지
+
+# 성능 검사
+pnpm bundle:guard    # 번들 사이즈 가드
+pnpm perf:baseline   # 성능 기준선 설정
 
 # 성능 비교 분석
 pnpm perf:compare

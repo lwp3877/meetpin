@@ -29,6 +29,36 @@ export async function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || 'unknown'
   const pathname = request.nextUrl.pathname
 
+  // 🔒 SAFE_MODE: Block write operations (emergency read-only mode)
+  if (process.env.SAFE_MODE === 'true') {
+    const isWriteOperation = request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS'
+    const isWriteAPI = pathname.startsWith('/api/') &&
+      !pathname.includes('/health') &&
+      !pathname.includes('/status') &&
+      !pathname.includes('/ready') &&
+      !pathname.includes('/livez') &&
+      !pathname.includes('/readyz') &&
+      !pathname.includes('/monitoring')
+
+    if (isWriteOperation && isWriteAPI) {
+      console.warn(`[SAFE_MODE] Blocked write operation: ${request.method} ${pathname} from ${clientIP}`)
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Service Temporarily Read-Only',
+          message: 'Read-only window',
+          code: 'SAFE_MODE_ENABLED'
+        }),
+        {
+          status: 503,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': '900' // 15 minutes
+          }
+        }
+      )
+    }
+  }
+
   // 기본적인 Rate limiting (전역)
   if (!simpleRateLimit(clientIP, 100, 60000)) {
     // 1분에 100요청
@@ -112,9 +142,33 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 보안 헤더 추가 (Next.js config와 중복되지 않도록)
+  // 강화된 보안 헤더 추가
   supabaseResponse.headers.set('X-Request-ID', crypto.randomUUID())
   supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')
+  supabaseResponse.headers.set('X-Frame-Options', 'DENY')
+  supabaseResponse.headers.set('X-XSS-Protection', '1; mode=block')
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  supabaseResponse.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+
+  // HSTS (HTTPS에서만)
+  if (request.nextUrl.protocol === 'https:') {
+    supabaseResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  }
+
+  // CSP 헤더 - Kakao Maps, Stripe, Supabase 허용
+  const cspPolicy = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https://*.kakaocdn.net https://*.supabase.co https://*.stripe.com",
+    "connect-src 'self' https://*.supabase.co https://api.stripe.com https://dapi.kakao.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "frame-src https://js.stripe.com",
+    "object-src 'none'",
+    "base-uri 'self'"
+  ].join('; ')
+
+  supabaseResponse.headers.set('Content-Security-Policy', cspPolicy)
 
   return supabaseResponse
 }

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   // 프로덕션 최적화
@@ -239,4 +240,20 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+// Sentry configuration (only if DSN exists)
+const sentryWebpackPluginOptions = {
+  org: process.env.SENTRY_ORG || 'meetpin',
+  project: process.env.SENTRY_PROJECT || 'meetpin',
+  silent: true,
+  widenClientFileUpload: true,
+  reactComponentAnnotation: { enabled: true },
+  tunnelRoute: '/monitoring',
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+}
+
+// Export with conditional Sentry wrapper
+export default process.env.SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+  : nextConfig

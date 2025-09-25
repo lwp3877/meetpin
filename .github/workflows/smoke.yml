@@ -1,0 +1,66 @@
+name: 🔥 Production Smoke Tests
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    # Run every hour
+    - cron: '0 */1 * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Test URL'
+        required: false
+        default: 'https://meetpin-weld.vercel.app'
+
+jobs:
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📚 Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: 📚 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Install Playwright
+        run: pnpm playwright install --with-deps chromium
+
+      - name: 🔥 Run smoke tests
+        run: pnpm smoke
+        env:
+          TEST_URL: ${{ github.event.inputs.url || 'https://meetpin-weld.vercel.app' }}
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+      - name: 📈 Post smoke test summary
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Smoke tests passed - production is healthy"
+          else
+            echo "❌ Smoke tests failed - production may have issues"
+            exit 1
+          fi

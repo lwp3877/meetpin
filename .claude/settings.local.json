@@ -109,7 +109,8 @@
       "Bash(exit 2)",
       "Bash(git pull:*)",
       "Bash(git merge:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(git tag:*)"
     ],
     "deny": [],
     "ask": []
