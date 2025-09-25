@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.10] - 2025-01-28
+
+### Fixed
+- 🚫 **cache hard-disable for ops routes**: 상태 엔드포인트 캐시 완전 차단
+- 🔄 **이중 캐시 방어**: next.config.ts headers() + middleware.ts 양쪽 적용
+- ⚡ **캐시 버스터**: /status 페이지에 timestamp 쿼리 자동 새로고침
+- 🛡️ **강화된 no-cache 헤더**: no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, stale-while-revalidate=0
+
+### Technical Details
+- `/status`: force-dynamic + 30초 자동 새로고침 + 타임스탬프 캐시버스터
+- `middleware.ts`: 캐시 차단 헤더 강제 적용
+- `next.config.ts`: 패턴별 캐시 헤더 설정 (/status, /api/:path(status|healthz|ready))
+- 빌드에서 ƒ Middleware + ƒ (Dynamic) 마크 확인
+
 ## [1.4.7] - 2025-01-28
 
 ### Fixed
