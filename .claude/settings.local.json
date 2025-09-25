@@ -108,7 +108,8 @@
       "Bash(then echo \"NEED_TOKEN\")",
       "Bash(exit 2)",
       "Bash(git pull:*)",
-      "Bash(git mv:*)"
+      "Bash(git merge:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

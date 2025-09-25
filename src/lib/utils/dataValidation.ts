@@ -510,10 +510,10 @@ export class DataValidationMonitor {
     }
 
     // 결과 저장
-    if (!this.validationResults.has(_endpoint)) {
+    if (!this.validationResults.has(endpoint)) {
       this.validationResults.set(endpoint, [])
     }
-    this.validationResults.get(_endpoint)!.push(result)
+    this.validationResults.get(endpoint)!.push(result)
 
     // 에러가 있으면 콘솔에 즉시 출력
     if (!result.isValid) {
