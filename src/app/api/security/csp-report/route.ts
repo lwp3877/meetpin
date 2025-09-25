@@ -7,11 +7,11 @@ import { rateLimit } from '@/lib/rateLimit'
 interface CSPReport {
   'csp-report': {
     'document-uri': string
-    'referrer': string
+    referrer: string
     'violated-directive': string
     'effective-directive': string
     'original-policy': string
-    'disposition': string
+    disposition: string
     'blocked-uri': string
     'line-number': number
     'column-number': number
@@ -24,9 +24,8 @@ interface CSPReport {
 export async function POST(request: NextRequest) {
   try {
     // CSP 리포트는 빈번할 수 있으므로 관대한 레이트 리밋
-    const ip = request.headers.get('x-forwarded-for') || 
-               request.headers.get('x-real-ip') || 
-               'unknown'
+    const ip =
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const rateLimitResult = await rateLimit(
       `csp-report:${ip}`,
       100, // 100 리포트/분
@@ -34,11 +33,11 @@ export async function POST(request: NextRequest) {
     )
 
     if (!rateLimitResult.success) {
-      return new NextResponse('Too Many CSP Reports', { 
+      return new NextResponse('Too Many CSP Reports', {
         status: 429,
         headers: {
-          'Retry-After': '60'
-        }
+          'Retry-After': '60',
+        },
       })
     }
 
@@ -60,26 +59,21 @@ export async function POST(request: NextRequest) {
       sourceFile: report['source-file'],
       lineNumber: report['line-number'],
       scriptSample: report['script-sample']?.substring(0, 100), // 처음 100자만
-      disposition: report.disposition
+      disposition: report.disposition,
     }
 
     // 프로덕션에서는 로깅 서비스로 전송
     if (process.env.NODE_ENV === 'production') {
       // 중요한 CSP 위반만 로깅 (스팸 방지)
-      const importantViolations = [
-        'script-src',
-        'object-src', 
-        'base-uri',
-        'form-action'
-      ]
+      const importantViolations = ['script-src', 'object-src', 'base-uri', 'form-action']
 
-      const isImportant = importantViolations.some(directive => 
+      const isImportant = importantViolations.some(directive =>
         report['violated-directive'].includes(directive)
       )
 
       if (isImportant) {
         console.error('🚨 Critical CSP Violation:', violation)
-        
+
         // Sentry나 다른 모니터링 서비스로 전송
         // await sendToMonitoring(violation)
       }
@@ -91,24 +85,23 @@ export async function POST(request: NextRequest) {
     // 위반 패턴 분석을 위한 간단한 통계
     const violationType = report['violated-directive']
     const blockedDomain = extractDomain(report['blocked-uri'])
-    
+
     // 메모리 기반 카운터 (프로덕션에서는 Redis 사용 권장)
     if (!global.cspStats) {
       global.cspStats = new Map()
     }
-    
+
     const statsKey = `${violationType}:${blockedDomain}`
     const currentCount = global.cspStats.get(statsKey) || 0
     global.cspStats.set(statsKey, currentCount + 1)
 
-    return new NextResponse('CSP Report Received', { 
+    return new NextResponse('CSP Report Received', {
       status: 204,
       headers: {
         'Content-Type': 'text/plain',
-        'Cache-Control': 'no-cache'
-      }
+        'Cache-Control': 'no-cache',
+      },
     })
-
   } catch (error) {
     console.error('CSP Report Processing Error:', error)
     return new NextResponse('Internal Server Error', { status: 500 })
@@ -130,7 +123,7 @@ export async function GET(request: NextRequest) {
 
     const stats = global.cspStats || new Map()
     const sortedStats = Array.from(stats.entries())
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 50) // 상위 50개만
 
     return NextResponse.json({
@@ -139,10 +132,9 @@ export async function GET(request: NextRequest) {
         const [directive, domain] = key.split(':')
         return { directive, domain, count }
       }),
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     })
-
-  } catch (error) {
+  } catch (_error) {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }
@@ -153,7 +145,7 @@ function extractDomain(url: string): string {
     if (url === 'eval' || url === 'inline') return url
     if (url.startsWith('data:')) return 'data'
     if (url.startsWith('blob:')) return 'blob'
-    
+
     const urlObj = new URL(url)
     return urlObj.hostname
   } catch {

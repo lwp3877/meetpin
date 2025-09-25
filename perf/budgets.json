@@ -12,7 +12,7 @@
       },
       "TBT": {
         "threshold": 200,
-        "unit": "ms", 
+        "unit": "ms",
         "description": "Total Blocking Time - interactivity"
       },
       "CLS": {
@@ -29,7 +29,7 @@
       },
       "totalJS": {
         "threshold": 500,
-        "unit": "KB", 
+        "unit": "KB",
         "description": "Total JavaScript size (gzipped)"
       },
       "css": {
@@ -58,13 +58,13 @@
       },
       "accessibility": {
         "threshold": 95,
-        "unit": "score", 
+        "unit": "score",
         "description": "Lighthouse Accessibility score"
       },
       "bestPractices": {
         "threshold": 95,
         "unit": "score",
-        "description": "Lighthouse Best Practices score"  
+        "description": "Lighthouse Best Practices score"
       },
       "seo": {
         "threshold": 95,
@@ -80,7 +80,7 @@
       "critical": true
     },
     {
-      "name": "Map Search", 
+      "name": "Map Search",
       "url": "/map",
       "critical": true
     },
@@ -91,7 +91,7 @@
     },
     {
       "name": "Chat",
-      "url": "/chat/[matchId]", 
+      "url": "/chat/[matchId]",
       "critical": true
     }
   ],

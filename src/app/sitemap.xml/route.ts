@@ -2,7 +2,7 @@
 export async function GET() {
   const baseUrl = process.env.SITE_URL || 'https://meetpin-weld.vercel.app'
   const currentDate = new Date().toISOString()
-  
+
   const staticPages = [
     {
       url: baseUrl,
@@ -52,7 +52,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${staticPages
   .map(
-    (page) => `
+    page => `
   <url>
     <loc>${page.url}</loc>
     <lastmod>${page.lastModified}</lastmod>

@@ -14,16 +14,23 @@ export class BrowserDetector {
   /**
    * 현재 브라우저 종류 감지
    */
-  static getBrowserType(): 'chrome' | 'firefox' | 'safari' | 'edge' | 'opera' | 'samsung' | 'unknown' {
+  static getBrowserType():
+    | 'chrome'
+    | 'firefox'
+    | 'safari'
+    | 'edge'
+    | 'opera'
+    | 'samsung'
+    | 'unknown' {
     const ua = this.userAgent.toLowerCase()
-    
+
     if (ua.includes('edg/')) return 'edge'
     if (ua.includes('opr/') || ua.includes('opera/')) return 'opera'
     if (ua.includes('chrome/') && ua.includes('samsungbrowser/')) return 'samsung'
     if (ua.includes('chrome/')) return 'chrome'
     if (ua.includes('firefox/')) return 'firefox'
     if (ua.includes('safari/') && !ua.includes('chrome/')) return 'safari'
-    
+
     return 'unknown'
   }
 
@@ -59,8 +66,10 @@ export class BrowserDetector {
    * PWA 환경 확인
    */
   static isPWA(): boolean {
-    return window.matchMedia('(display-mode: standalone)').matches || 
-           (window.navigator as any).standalone === true
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    )
   }
 
   /**
@@ -103,12 +112,13 @@ export class FeatureSupport {
    * WebP 이미지 포맷 지원 확인
    */
   static async supportsWebP(): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const webP = new Image()
       webP.onload = webP.onerror = () => {
         resolve(webP.height === 2)
       }
-      webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+      webP.src =
+        'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
     })
   }
 
@@ -194,20 +204,27 @@ export class PerformanceOptimizer {
       return () => {}
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const element = entry.target
-          callback ? callback(element) : this.loadLazyImage(element)
-          observer.unobserve(element)
-        }
-      })
-    }, {
-      rootMargin: '50px 0px',
-      threshold: 0.1
-    })
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const element = entry.target
+            if (callback) {
+              callback(element)
+            } else {
+              PerformanceOptimizer.loadLazyImage(element)
+            }
+            observer.unobserve(element)
+          }
+        })
+      },
+      {
+        rootMargin: '50px 0px',
+        threshold: 0.1,
+      }
+    )
 
-    document.querySelectorAll(selector).forEach((element) => {
+    document.querySelectorAll(selector).forEach(element => {
       observer.observe(element)
     })
 
@@ -233,7 +250,7 @@ export class PerformanceOptimizer {
    * 이미지 프리로딩
    */
   static preloadImages(urls: string[]): Promise<void[]> {
-    const promises = urls.map((url) => {
+    const promises = urls.map(url => {
       return new Promise<void>((resolve, reject) => {
         const img = new Image()
         img.onload = () => resolve()
@@ -258,10 +275,10 @@ export class PerformanceOptimizer {
     const dnsPrefetch = [
       'https://xnrqfkecpabucnoxxtwa.supabase.co',
       'https://fonts.googleapis.com',
-      'https://fonts.gstatic.com'
+      'https://fonts.gstatic.com',
     ]
 
-    dnsPrefetch.forEach((domain) => {
+    dnsPrefetch.forEach(domain => {
       const link = document.createElement('link')
       link.rel = 'dns-prefetch'
       link.href = domain
@@ -269,7 +286,7 @@ export class PerformanceOptimizer {
     })
 
     // 리소스 프리로드
-    this.preloadImages(criticalUrls).catch((error) => {
+    this.preloadImages(criticalUrls).catch(error => {
       console.warn('Resource preload failed:', error)
     })
   }
@@ -288,7 +305,7 @@ export class PerformanceOptimizer {
       const memoryInfo = {
         used: Math.round(memory.usedJSHeapSize / 1048576), // MB
         total: Math.round(memory.totalJSHeapSize / 1048576), // MB
-        limit: Math.round(memory.jsHeapSizeLimit / 1048576) // MB
+        limit: Math.round(memory.jsHeapSizeLimit / 1048576), // MB
       }
 
       // 메모리 사용량이 80% 이상이면 경고
@@ -329,7 +346,7 @@ export class PerformanceOptimizer {
    * 이미지 최적화
    */
   static optimizeImages() {
-    document.querySelectorAll('img').forEach((img) => {
+    document.querySelectorAll('img').forEach(img => {
       // 로딩 속성 설정
       if (!img.loading) {
         img.loading = 'lazy'
@@ -360,7 +377,7 @@ export class NetworkOptimizer {
     const updateConnectionStatus = () => {
       const isOnline = navigator.onLine
       document.body.classList.toggle('offline', !isOnline)
-      
+
       if (!isOnline) {
         console.warn('네트워크 연결이 끊어졌습니다')
       } else {
@@ -387,7 +404,7 @@ export class NetworkOptimizer {
     if ('connection' in navigator) {
       const connection = (navigator as any).connection
       const effectiveType = connection.effectiveType
-      
+
       switch (effectiveType) {
         case 'slow-2g':
         case '2g':
@@ -400,7 +417,7 @@ export class NetworkOptimizer {
           return 'unknown'
       }
     }
-    
+
     return 'unknown'
   }
 
@@ -409,7 +426,7 @@ export class NetworkOptimizer {
    */
   static adaptToConnectionQuality() {
     const quality = this.getConnectionQuality()
-    
+
     switch (quality) {
       case 'slow':
         // 저품질 설정
@@ -441,11 +458,13 @@ export class CompatibilityPatches {
     // Intersection Observer 폴리필
     if (!('IntersectionObserver' in window)) {
       polyfills.push(
-        import('intersection-observer').then(() => {
-          console.log('IntersectionObserver polyfill loaded')
-        }).catch(() => {
-          console.warn('Failed to load IntersectionObserver polyfill')
-        })
+        import('intersection-observer')
+          .then(() => {
+            console.log('IntersectionObserver polyfill loaded')
+          })
+          .catch(() => {
+            console.warn('Failed to load IntersectionObserver polyfill')
+          })
       )
     }
 
@@ -490,10 +509,12 @@ export class CompatibilityPatches {
     let supportsPassive = false
     try {
       const opts = Object.defineProperty({}, 'passive', {
-        get: () => { supportsPassive = true }
+        get: () => {
+          supportsPassive = true
+        },
       })
       window.addEventListener('test', null as any, opts)
-    } catch (e) {}
+    } catch (_e) {}
 
     // 패치가 필요한 경우 글로벌 설정
     if (!supportsPassive) {
@@ -516,9 +537,9 @@ export async function initializeBrowserCompatibility() {
     isAndroid: BrowserDetector.isAndroid(),
     hasTouchSupport: BrowserDetector.hasTouchSupport(),
     isPWA: BrowserDetector.isPWA(),
-    isOnline: BrowserDetector.isOnline()
+    isOnline: BrowserDetector.isOnline(),
   }
-  
+
   console.log('📱 브라우저 정보:', browserInfo)
 
   // 호환성 패치 적용
@@ -562,11 +583,12 @@ export async function initializeBrowserCompatibility() {
   }
 }
 
-export default {
+const defaultExport = {
   BrowserDetector,
   FeatureSupport,
   PerformanceOptimizer,
   NetworkOptimizer,
   CompatibilityPatches,
-  initializeBrowserCompatibility
+  initializeBrowserCompatibility,
 }
+export default defaultExport

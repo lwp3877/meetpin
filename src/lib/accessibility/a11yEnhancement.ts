@@ -16,14 +16,16 @@ export class KeyboardNavigation {
     'select:not([disabled])',
     'textarea:not([disabled])',
     '[tabindex]:not([tabindex="-1"])',
-    '[contenteditable="true"]'
+    '[contenteditable="true"]',
   ].join(', ')
 
   /**
    * 포커스 트랩 설정 (모달 등에서 사용)
    */
   static setupFocusTrap(container: HTMLElement): () => void {
-    const focusableEls = container.querySelectorAll(this.focusableElements) as NodeListOf<HTMLElement>
+    const focusableEls = container.querySelectorAll(
+      this.focusableElements
+    ) as NodeListOf<HTMLElement>
     const firstFocusableEl = focusableEls[0]
     const lastFocusableEl = focusableEls[focusableEls.length - 1]
 
@@ -71,29 +73,32 @@ export class KeyboardNavigation {
   static setupShortcuts(): () => void {
     const shortcuts = {
       // 전역 단축키
-      'Alt+h': () => window.location.href = '/',                    // 홈
-      'Alt+m': () => window.location.href = '/map',                 // 지도
-      'Alt+p': () => window.location.href = '/profile',             // 프로필
-      'Alt+s': () => {                                               // 검색 포커스
-        const searchInput = document.querySelector('input[type="search"], input[placeholder*="검색"]') as HTMLInputElement
+      'Alt+h': () => (window.location.href = '/'), // 홈
+      'Alt+m': () => (window.location.href = '/map'), // 지도
+      'Alt+p': () => (window.location.href = '/profile'), // 프로필
+      'Alt+s': () => {
+        // 검색 포커스
+        const searchInput = document.querySelector(
+          'input[type="search"], input[placeholder*="검색"]'
+        ) as HTMLInputElement
         searchInput?.focus()
       },
-      'Ctrl+/': () => this.showShortcutHelp(),                      // 단축키 도움말
-      '/': (e: KeyboardEvent) => {                                  // 빠른 검색
+      'Ctrl+/': () => this.showShortcutHelp(), // 단축키 도움말
+      '/': (e: KeyboardEvent) => {
+        // 빠른 검색
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
         e.preventDefault()
-        const searchInput = document.querySelector('input[type="search"], input[placeholder*="검색"]') as HTMLInputElement
+        const searchInput = document.querySelector(
+          'input[type="search"], input[placeholder*="검색"]'
+        ) as HTMLInputElement
         searchInput?.focus()
-      }
+      },
     }
 
     const handleKeyboard = (e: KeyboardEvent) => {
-      const key = [
-        e.ctrlKey && 'Ctrl',
-        e.altKey && 'Alt',
-        e.shiftKey && 'Shift',
-        e.key
-      ].filter(Boolean).join('+')
+      const key = [e.ctrlKey && 'Ctrl', e.altKey && 'Alt', e.shiftKey && 'Shift', e.key]
+        .filter(Boolean)
+        .join('+')
 
       const action = shortcuts[key as keyof typeof shortcuts]
       if (action) {
@@ -157,7 +162,7 @@ export class KeyboardNavigation {
 
     const dialog = helpModal.querySelector('[role="dialog"]') as HTMLElement
     const closeBtn = helpModal.querySelector('[data-close]') as HTMLElement
-    
+
     // 포커스 트랩 설정
     const cleanupFocusTrap = this.setupFocusTrap(dialog)
 
@@ -167,7 +172,7 @@ export class KeyboardNavigation {
     }
 
     closeBtn.addEventListener('click', close)
-    helpModal.addEventListener('click', (e) => {
+    helpModal.addEventListener('click', e => {
       if (e.target === helpModal.firstElementChild) close()
     })
   }
@@ -239,7 +244,7 @@ export class VisualAccessibility {
    */
   static setupHighContrastMode(): () => void {
     const isHighContrast = window.matchMedia('(prefers-contrast: high)').matches
-    
+
     if (isHighContrast) {
       document.documentElement.classList.add('high-contrast')
     }
@@ -261,7 +266,7 @@ export class VisualAccessibility {
    */
   static setupReducedMotion(): () => void {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    
+
     if (prefersReducedMotion) {
       document.documentElement.classList.add('reduce-motion')
     }
@@ -343,9 +348,12 @@ export class VisualAccessibility {
   /**
    * 색상 대비 체크
    */
-  static checkColorContrast(foreground: string, background: string): { ratio: number; wcagLevel: 'AAA' | 'AA' | 'fail' } {
+  static checkColorContrast(
+    foreground: string,
+    background: string
+  ): { ratio: number; wcagLevel: 'AAA' | 'AA' | 'fail' } {
     // 간단한 대비 계산 (실제로는 더 복잡한 계산이 필요)
-    const getLuminance = (color: string): number => {
+    const getLuminance = (_color: string): number => {
       // 이 부분은 실제 구현에서는 더 정확한 luminance 계산이 필요
       return 0.5 // 임시값
     }
@@ -353,7 +361,8 @@ export class VisualAccessibility {
     const fgLuminance = getLuminance(foreground)
     const bgLuminance = getLuminance(background)
 
-    const ratio = (Math.max(fgLuminance, bgLuminance) + 0.05) / (Math.min(fgLuminance, bgLuminance) + 0.05)
+    const ratio =
+      (Math.max(fgLuminance, bgLuminance) + 0.05) / (Math.min(fgLuminance, bgLuminance) + 0.05)
 
     if (ratio >= 7) return { ratio, wcagLevel: 'AAA' }
     if (ratio >= 4.5) return { ratio, wcagLevel: 'AA' }
@@ -392,10 +401,10 @@ export class ScreenReaderSupport {
   static announceToScreenReader(message: string, priority: 'polite' | 'assertive' = 'polite') {
     const regionId = priority === 'assertive' ? 'alert-live-region' : 'status-live-region'
     const region = document.getElementById(regionId)
-    
+
     if (region) {
       region.textContent = message
-      
+
       // 메시지를 지우기 위해 타이머 설정
       setTimeout(() => {
         region.textContent = ''
@@ -408,14 +417,14 @@ export class ScreenReaderSupport {
    */
   static enhanceARIA() {
     // 버튼에 적절한 역할 추가
-    document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])').forEach((btn) => {
+    document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])').forEach(btn => {
       if (!btn.textContent?.trim()) {
         console.warn('Button without accessible name detected:', btn)
       }
     })
 
     // 입력 필드에 라벨 연결 확인
-    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach((input) => {
+    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach(input => {
       const id = input.getAttribute('id')
       if (id) {
         const label = document.querySelector(`label[for="${id}"]`)
@@ -426,13 +435,17 @@ export class ScreenReaderSupport {
     })
 
     // 이미지에 alt 텍스트 확인
-    document.querySelectorAll('img:not([alt])').forEach((img) => {
+    document.querySelectorAll('img:not([alt])').forEach(img => {
       console.warn('Image without alt text detected:', img)
     })
 
     // 링크에 목적 설명 확인
-    document.querySelectorAll('a:not([aria-label]):not([aria-labelledby])').forEach((link) => {
-      if (!link.textContent?.trim() || link.textContent.trim() === '더보기' || link.textContent.trim() === '자세히') {
+    document.querySelectorAll('a:not([aria-label]):not([aria-labelledby])').forEach(link => {
+      if (
+        !link.textContent?.trim() ||
+        link.textContent.trim() === '더보기' ||
+        link.textContent.trim() === '자세히'
+      ) {
         console.warn('Link with unclear purpose detected:', link)
       }
     })
@@ -446,9 +459,9 @@ export class ScreenReaderSupport {
     let currentLevel = 0
     let hasH1 = false
 
-    headings.forEach((heading) => {
+    headings.forEach(heading => {
       const level = parseInt(heading.tagName.charAt(1))
-      
+
       if (level === 1) {
         if (hasH1) {
           console.warn('Multiple H1 elements detected. Consider using only one H1 per page.')
@@ -457,7 +470,10 @@ export class ScreenReaderSupport {
       }
 
       if (level > currentLevel + 1) {
-        console.warn(`Heading level skip detected: jumping from H${currentLevel} to H${level}`, heading)
+        console.warn(
+          `Heading level skip detected: jumping from H${currentLevel} to H${level}`,
+          heading
+        )
       }
 
       currentLevel = level
@@ -479,12 +495,12 @@ export class UsabilityEnhancement {
   static validateTouchTargets() {
     const minSize = 44 // 44px 최소 권장 크기
 
-    document.querySelectorAll('button, a, input, select, textarea').forEach((element) => {
+    document.querySelectorAll('button, a, input, select, textarea').forEach(element => {
       const rect = element.getBoundingClientRect()
-      
+
       if (rect.width < minSize || rect.height < minSize) {
         console.warn(`Touch target too small (${rect.width}x${rect.height}):`, element)
-        
+
         // 자동으로 최소 크기 보장 클래스 추가
         element.classList.add('touch-target-enhanced')
       }
@@ -508,7 +524,7 @@ export class UsabilityEnhancement {
    * 입력 도움말 및 유효성 검사 메시지
    */
   static enhanceFormAccessibility() {
-    document.querySelectorAll('input, textarea, select').forEach((input) => {
+    document.querySelectorAll('input, textarea, select').forEach(input => {
       // 필수 필드 표시
       if (input.hasAttribute('required')) {
         const label = document.querySelector(`label[for="${input.id}"]`)
@@ -518,10 +534,10 @@ export class UsabilityEnhancement {
       }
 
       // 유효성 검사 메시지 개선
-      input.addEventListener('invalid', (e) => {
+      input.addEventListener('invalid', e => {
         const target = e.target as HTMLInputElement
         const message = target.validationMessage
-        
+
         ScreenReaderSupport.announceToScreenReader(
           `${target.labels?.[0]?.textContent || '입력 필드'}에 오류가 있습니다: ${message}`,
           'assertive'
@@ -535,7 +551,7 @@ export class UsabilityEnhancement {
    */
   static enhanceLoadingStates() {
     // 모든 로딩 스피너에 적절한 레이블 추가
-    document.querySelectorAll('.animate-spin, [data-loading]').forEach((spinner) => {
+    document.querySelectorAll('.animate-spin, [data-loading]').forEach(spinner => {
       if (!spinner.getAttribute('aria-label') && !spinner.getAttribute('aria-labelledby')) {
         spinner.setAttribute('aria-label', '로딩 중')
         spinner.setAttribute('role', 'status')
@@ -543,15 +559,15 @@ export class UsabilityEnhancement {
     })
 
     // 버튼 로딩 상태 개선
-    const observeButtonLoading = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    const observeButtonLoading = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.target instanceof HTMLButtonElement) {
           const button = mutation.target
           const isLoading = button.disabled && button.querySelector('.animate-spin')
-          
+
           if (isLoading) {
             button.setAttribute('aria-describedby', 'loading-description')
-            
+
             if (!document.getElementById('loading-description')) {
               const desc = document.createElement('span')
               desc.id = 'loading-description'
@@ -566,11 +582,11 @@ export class UsabilityEnhancement {
       })
     })
 
-    document.querySelectorAll('button').forEach((button) => {
-      observeButtonLoading.observe(button, { 
-        attributes: true, 
-        childList: true, 
-        subtree: true 
+    document.querySelectorAll('button').forEach(button => {
+      observeButtonLoading.observe(button, {
+        attributes: true,
+        childList: true,
+        subtree: true,
       })
     })
   }
@@ -588,15 +604,17 @@ export class AccessibilityTesting {
     const warnings: string[] = []
 
     // 이미지 alt 텍스트 검사
-    document.querySelectorAll('img:not([alt])').forEach((img) => {
+    document.querySelectorAll('img:not([alt])').forEach(img => {
       errors.push(`이미지에 alt 텍스트가 없습니다: ${(img as HTMLImageElement).src}`)
     })
 
     // 폼 라벨 검사
-    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach((input) => {
+    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach(input => {
       const id = input.getAttribute('id')
       if (!id || !document.querySelector(`label[for="${id}"]`)) {
-        errors.push(`입력 필드에 라벨이 없습니다: ${(input as HTMLInputElement).name || (input as HTMLInputElement).type}`)
+        errors.push(
+          `입력 필드에 라벨이 없습니다: ${(input as HTMLInputElement).name || (input as HTMLInputElement).type}`
+        )
       }
     })
 
@@ -612,16 +630,18 @@ export class AccessibilityTesting {
     const style = getComputedStyle(document.body)
     const bgColor = style.backgroundColor
     const textColor = style.color
-    
+
     if (bgColor === textColor) {
       errors.push('텍스트와 배경색이 동일합니다')
     }
 
     // 터치 대상 크기 검사
-    document.querySelectorAll('button, a').forEach((element) => {
+    document.querySelectorAll('button, a').forEach(element => {
       const rect = element.getBoundingClientRect()
       if (rect.width < 44 || rect.height < 44) {
-        warnings.push(`터치 대상이 너무 작습니다 (${rect.width}x${rect.height}): ${element.textContent?.slice(0, 30)}`)
+        warnings.push(
+          `터치 대상이 너무 작습니다 (${rect.width}x${rect.height}): ${element.textContent?.slice(0, 30)}`
+        )
       }
     })
 
@@ -635,9 +655,9 @@ export class AccessibilityTesting {
     const checks = this.runAutomaticChecks()
     const totalElements = document.querySelectorAll('*').length
     const issues = checks.errors.length + checks.warnings.length * 0.5
-    
-    const score = Math.max(0, Math.min(100, 100 - (issues / totalElements * 100)))
-    
+
+    const score = Math.max(0, Math.min(100, 100 - (issues / totalElements) * 100))
+
     return {
       score: Math.round(score),
       details: {
@@ -645,8 +665,8 @@ export class AccessibilityTesting {
         errors: checks.errors.length,
         warnings: checks.warnings.length,
         errorsList: checks.errors,
-        warningsList: checks.warnings
-      }
+        warningsList: checks.warnings,
+      },
     }
   }
 
@@ -655,7 +675,7 @@ export class AccessibilityTesting {
    */
   static generateReport(): string {
     const score = this.calculateA11yScore()
-    
+
     return `
 접근성 점수: ${score.score}/100
 
@@ -664,15 +684,23 @@ export class AccessibilityTesting {
 - 오류: ${score.details.errors}개
 - 경고: ${score.details.warnings}개
 
-${score.details.errors > 0 ? `
+${
+  score.details.errors > 0
+    ? `
 ❌ 오류 목록:
 ${score.details.errorsList.map((error: string) => `- ${error}`).join('\n')}
-` : ''}
+`
+    : ''
+}
 
-${score.details.warnings > 0 ? `
+${
+  score.details.warnings > 0
+    ? `
 ⚠️ 경고 목록:
 ${score.details.warningsList.map((warning: string) => `- ${warning}`).join('\n')}
-` : ''}
+`
+    : ''
+}
 
 💡 개선 권장사항:
 - 모든 이미지에 적절한 alt 텍스트 제공
@@ -693,7 +721,7 @@ export function initializeAccessibility(): () => void {
   // 기본 접근성 설정
   KeyboardNavigation.addSkipLinks()
   const cleanupShortcuts = KeyboardNavigation.setupShortcuts()
-  
+
   // 시각적 접근성
   const cleanupHighContrast = VisualAccessibility.setupHighContrastMode()
   const cleanupReducedMotion = VisualAccessibility.setupReducedMotion()
@@ -740,11 +768,13 @@ export function initializeAccessibility(): () => void {
   }
 }
 
-export default {
+const a11yEnhancements = {
   KeyboardNavigation,
   VisualAccessibility,
   ScreenReaderSupport,
   UsabilityEnhancement,
   AccessibilityTesting,
-  initializeAccessibility
+  initializeAccessibility,
 }
+
+export default a11yEnhancements

@@ -1,21 +1,21 @@
 /**
  * 실시간 채팅 훅 (useRealtimeChat)
- * 
+ *
  * Supabase Realtime을 사용하여 WebSocket 기반의 실시간 채팅을 구현합니다.
  * 호스트와 참가자 간의 1:1 메시지 교환을 위한 훅입니다.
- * 
+ *
  * @features
  * - 실시간 메시지 송수신
  * - 타이핑 상태 표시 (typing indicators)
  * - 온라인 사용자 상태 추적
  * - 메시지 읽음 상태 관리
  * - 연결 상태 모니터링
- * 
+ *
  * @params
  * - roomId: 채팅이 연결된 방의 ID
  * - otherUserId: 대화 상대방의 사용자 ID
  * - enabled: 훅 활성화 여부 (기본: true)
- * 
+ *
  * @returns
  * - messages: 채팅 메시지 목록
  * - loading: 로딩 상태
@@ -77,13 +77,15 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
   const { user } = useAuth()
   const supabase = createBrowserSupabaseClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
-  
+
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([])
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
+  const [connectionStatus, setConnectionStatus] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('connecting')
 
   // 메시지 로드
   const loadMessages = useCallback(async () => {
@@ -104,11 +106,12 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
           created_at: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
           sender_profile: {
             nickname: '모임 호스트',
-            avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-          }
+            avatar_url:
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+          },
         },
         {
-          id: '2', 
+          id: '2',
           room_id: roomId || 'mock-room',
           sender_uid: user.id,
           receiver_uid: 'mock-host-123',
@@ -117,9 +120,10 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
           created_at: new Date(Date.now() - 1800000).toISOString(), // 30분 전
           receiver_profile: {
             nickname: '모임 호스트',
-            avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-          }
-        }
+            avatar_url:
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+          },
+        },
       ]
       setMessages(mockMessages)
       return
@@ -132,11 +136,13 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       // 조건에 따라 메시지 필터링
       let query = supabase
         .from('host_messages')
-        .select(`
+        .select(
+          `
           *,
           sender_profile:profiles!sender_uid(nickname, avatar_url),
           receiver_profile:profiles!receiver_uid(nickname, avatar_url)
-        `)
+        `
+        )
         .order('created_at', { ascending: true })
 
       // 특정 방의 메시지만 가져오기
@@ -146,7 +152,9 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
 
       // 특정 사용자와의 대화만 가져오기
       if (otherUserId) {
-        query = query.or(`and(sender_uid.eq.${user.id},receiver_uid.eq.${otherUserId}),and(sender_uid.eq.${otherUserId},receiver_uid.eq.${user.id})`)
+        query = query.or(
+          `and(sender_uid.eq.${user.id},receiver_uid.eq.${otherUserId}),and(sender_uid.eq.${otherUserId},receiver_uid.eq.${user.id})`
+        )
       } else {
         // 사용자가 송신자이거나 수신자인 메시지만
         query = query.or(`sender_uid.eq.${user.id},receiver_uid.eq.${user.id}`)
@@ -169,89 +177,94 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
   }, [user, roomId, otherUserId, enabled, supabase])
 
   // 메시지 전송
-  const sendMessage = useCallback(async (text: string, receiverUid: string) => {
-    if (!user || !text.trim()) return false
+  const sendMessage = useCallback(
+    async (text: string, receiverUid: string) => {
+      if (!user || !text.trim()) return false
 
-    // 개발 모드에서는 Mock 메시지 추가
-    if (process.env.NODE_ENV === 'development') {
-      // Mock 메시지를 현재 메시지 목록에 추가
-      const newMessage: ChatMessage = {
-        id: Date.now().toString(),
-        room_id: roomId || 'mock-room',
-        sender_uid: user.id,
-        receiver_uid: receiverUid,
-        text: text.trim(),
-        is_read: false,
-        created_at: new Date().toISOString(),
-        sender_profile: {
-          nickname: user.email?.split('@')[0] || '나',
-          avatar_url: user.avatar_url
-        }
-      }
-      
-      setMessages(prev => [...prev, newMessage])
-      
-      // 2초 후 자동 응답 Mock
-      setTimeout(() => {
-        const autoReply: ChatMessage = {
-          id: (Date.now() + 1).toString(),
+      // 개발 모드에서는 Mock 메시지 추가
+      if (process.env.NODE_ENV === 'development') {
+        // Mock 메시지를 현재 메시지 목록에 추가
+        const newMessage: ChatMessage = {
+          id: Date.now().toString(),
           room_id: roomId || 'mock-room',
-          sender_uid: receiverUid,
-          receiver_uid: user.id,
-          text: '메시지 잘 받았습니다! 곧 답변드릴게요.',
+          sender_uid: user.id,
+          receiver_uid: receiverUid,
+          text: text.trim(),
           is_read: false,
           created_at: new Date().toISOString(),
           sender_profile: {
-            nickname: '모임 호스트',
-            avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-          }
+            nickname: user.email?.split('@')[0] || '나',
+            avatar_url: user.avatar_url,
+          },
         }
-        setMessages(prev => [...prev, autoReply])
-      }, 2000)
-      
-      return true
-    }
 
-    try {
-      const { error } = await (supabase as any)
-        .from('host_messages')
-        .insert({
+        setMessages(prev => [...prev, newMessage])
+
+        // 2초 후 자동 응답 Mock
+        setTimeout(() => {
+          const autoReply: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            room_id: roomId || 'mock-room',
+            sender_uid: receiverUid,
+            receiver_uid: user.id,
+            text: '메시지 잘 받았습니다! 곧 답변드릴게요.',
+            is_read: false,
+            created_at: new Date().toISOString(),
+            sender_profile: {
+              nickname: '모임 호스트',
+              avatar_url:
+                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+            },
+          }
+          setMessages(prev => [...prev, autoReply])
+        }, 2000)
+
+        return true
+      }
+
+      try {
+        const { error } = await (supabase as any).from('host_messages').insert({
           room_id: roomId || '',
           sender_uid: user.id,
           receiver_uid: receiverUid,
           text: text.trim(),
-          is_read: false
+          is_read: false,
         })
 
-      if (error) throw error
+        if (error) throw error
 
-      return true
-    } catch (err: any) {
-      // 프로덕션 모드에서만 오류 로그 출력
-      if (process.env.NODE_ENV === 'production') {
-        console.error('Failed to send message:', err)
-        setError(err.message || '메시지 전송에 실패했습니다')
+        return true
+      } catch (err: any) {
+        // 프로덕션 모드에서만 오류 로그 출력
+        if (process.env.NODE_ENV === 'production') {
+          console.error('Failed to send message:', err)
+          setError(err.message || '메시지 전송에 실패했습니다')
+        }
+        return false
       }
-      return false
-    }
-  }, [user, roomId, supabase])
+    },
+    [user, roomId, supabase]
+  )
 
   // 메시지 읽음 처리
-  const markAsRead = useCallback(async (messageId: string) => {
-    if (!user) return
+  const markAsRead = useCallback(
+    async (messageId: string) => {
+      if (!user) return
 
-    try {
-      const { error } = await (supabase as any)
-        .from('host_messages')
-        .update({ is_read: true, updated_at: new Date().toISOString() })
-        .eq('id', messageId)
-        .eq('receiver_uid', user.id)
+      try {
+        const { error } = await (supabase as any)
+          .from('host_messages')
+          .update({ is_read: true, updated_at: new Date().toISOString() })
+          .eq('id', messageId)
+          .eq('receiver_uid', user.id)
 
-      if (error) throw error
-    } catch (err: any) {
-      console.error('Failed to mark message as read:', err)
-    }
-  }, [user, supabase])
+        if (error) throw error
+      } catch (err: any) {
+        console.error('Failed to mark message as read:', err)
+      }
+    },
+    [user, supabase]
+  )
 
   // 타이핑 상태 전송
   const sendTyping = useCallback(() => {
@@ -263,8 +276,8 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       payload: {
         uid: user.id,
         nickname: user.nickname,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     })
   }, [user])
 
@@ -276,15 +289,15 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       type: 'broadcast',
       event: 'stop_typing',
       payload: {
-        uid: user.id
-      }
+        uid: user.id,
+      },
     })
   }, [user])
 
   // Realtime 채널 설정
   useEffect(() => {
     if (!user || !enabled) return
-    
+
     // 개발 모드에서는 실시간 채널 설정 건너뛰기
     if (process.env.NODE_ENV === 'development') {
       setConnectionStatus('connected')
@@ -301,9 +314,9 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
         event: 'INSERT',
         schema: 'public',
         table: 'host_messages',
-        filter: roomId ? `room_id=eq.${roomId}` : `sender_uid=eq.${user.id}`
+        filter: roomId ? `room_id=eq.${roomId}` : `sender_uid=eq.${user.id}`,
       },
-      (payload) => {
+      payload => {
         logger.debug('New message received:', payload)
         loadMessages() // 새 메시지가 오면 다시 로드
       }
@@ -316,9 +329,9 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
         event: 'UPDATE',
         schema: 'public',
         table: 'host_messages',
-        filter: roomId ? `room_id=eq.${roomId}` : `receiver_uid=eq.${user.id}`
+        filter: roomId ? `room_id=eq.${roomId}` : `receiver_uid=eq.${user.id}`,
       },
-      (payload) => {
+      payload => {
         logger.debug('Message updated:', payload)
         loadMessages()
       }
@@ -329,11 +342,14 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       if (payload.uid !== user.id) {
         setTypingUsers(prev => {
           const filtered = prev.filter(u => u.uid !== payload.uid)
-          return [...filtered, { 
-            uid: payload.uid, 
-            nickname: payload.nickname,
-            timestamp: payload.timestamp 
-          }]
+          return [
+            ...filtered,
+            {
+              uid: payload.uid,
+              nickname: payload.nickname,
+              timestamp: payload.timestamp,
+            },
+          ]
         })
       }
     })
@@ -346,12 +362,14 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     // Presence 설정 (온라인 사용자)
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState()
-      const online = Object.values(state).flat().map((presence: any) => ({
-        uid: presence.uid,
-        nickname: presence.nickname,
-        last_seen: presence.last_seen,
-        presence_ref: presence.presence_ref
-      })) as OnlineUser[]
+      const online = Object.values(state)
+        .flat()
+        .map((presence: any) => ({
+          uid: presence.uid,
+          nickname: presence.nickname,
+          last_seen: presence.last_seen,
+          presence_ref: presence.presence_ref,
+        })) as OnlineUser[]
       setOnlineUsers(online)
     })
 
@@ -364,21 +382,26 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     })
 
     // 채널 구독 먼저 수행
-    channel.subscribe((status) => {
+    channel.subscribe(status => {
       // 개발 모드에서는 로그 출력 안함
       if (process.env.NODE_ENV !== 'development') {
         logger.info('Chat channel status:', status)
       }
-      setConnectionStatus(status === 'SUBSCRIBED' ? 'connected' : 
-                        status === 'CHANNEL_ERROR' ? 'disconnected' : 'connecting')
-      
+      setConnectionStatus(
+        status === 'SUBSCRIBED'
+          ? 'connected'
+          : status === 'CHANNEL_ERROR'
+            ? 'disconnected'
+            : 'connecting'
+      )
+
       if (status === 'SUBSCRIBED') {
         // 구독 완료 후 presence 추적 시작
         channel.track({
           uid: user.id,
           nickname: user.nickname,
           avatar_url: user.avatar_url,
-          last_seen: new Date().toISOString()
+          last_seen: new Date().toISOString(),
         })
         loadMessages()
       }
@@ -420,6 +443,6 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     markAsRead,
     sendTyping,
     stopTyping,
-    refetch: loadMessages
+    refetch: loadMessages,
   }
 }

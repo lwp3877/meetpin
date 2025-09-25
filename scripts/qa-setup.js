@@ -13,24 +13,26 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
 // QA 관련 스크립트 추가
 const qaScripts = {
-  "qa:local": "playwright test --config=playwright.config.ts",
-  "qa:production": "TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/production-quick-test.spec.ts",
-  "qa:detailed": "TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/detailed-production-test.spec.ts",
-  "qa:performance": "playwright test e2e/performance-security.spec.ts --project=chromium",
-  "qa:mobile": "playwright test --project=mobile-chrome --project=mobile-safari",
-  "qa:report": "playwright show-report",
-  "qa:setup": "node scripts/qa-setup.js && playwright install",
-  "qa:validate": "pnpm typecheck && pnpm lint && pnpm build && pnpm test",
-  "qa:full": "pnpm qa:validate && pnpm qa:local && pnpm qa:production"
+  'qa:local': 'playwright test --config=playwright.config.ts',
+  'qa:production':
+    'TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/production-quick-test.spec.ts',
+  'qa:detailed':
+    'TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/detailed-production-test.spec.ts',
+  'qa:performance': 'playwright test e2e/performance-security.spec.ts --project=chromium',
+  'qa:mobile': 'playwright test --project=mobile-chrome --project=mobile-safari',
+  'qa:report': 'playwright show-report',
+  'qa:setup': 'node scripts/qa-setup.js && playwright install',
+  'qa:validate': 'pnpm typecheck && pnpm lint && pnpm build && pnpm test',
+  'qa:full': 'pnpm qa:validate && pnpm qa:local && pnpm qa:production',
 }
 
 Object.assign(packageJson.scripts, qaScripts)
 
 // devDependencies에 QA 도구 추가 확인
 const qaDevDeps = {
-  "@axe-core/playwright": "^4.8.5",
-  "lighthouse": "^11.4.0",
-  "wait-on": "^7.2.0"
+  '@axe-core/playwright': '^4.8.5',
+  lighthouse: '^11.4.0',
+  'wait-on': '^7.2.0',
 }
 
 if (!packageJson.devDependencies) {
@@ -59,7 +61,7 @@ const gitignoreAdditions = [
   'lighthouse-results/',
   '.nyc_output/',
   'coverage/',
-  '*.log'
+  '*.log',
 ]
 
 let gitignoreContent = ''

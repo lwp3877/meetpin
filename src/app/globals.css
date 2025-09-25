@@ -1,10 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 
 :root {
   --background: #ffffff;
   --foreground: #111827;
-  
+
   /* Brand colors */
   --primary: #10b981;
   --primary-deep: #059669;
@@ -12,7 +12,7 @@
   --accent: #f97316;
   --text-muted: #6b7280;
   --bg-soft: #f3f4f6;
-  
+
   /* Category colors */
   --category-drink: #e11d48;
   --category-exercise: #3b82f6;
@@ -31,7 +31,8 @@
   --color-category-drink: var(--category-drink);
   --color-category-exercise: var(--category-exercise);
   --color-category-other: var(--category-other);
-  --font-sans: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:
+    'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
@@ -83,11 +84,11 @@ html {
     --boost: #ffff00;
     --accent: #ff8800;
   }
-  
+
   .high-contrast {
     --tw-border-opacity: 1;
   }
-  
+
   .high-contrast input,
   .high-contrast select,
   .high-contrast button {
@@ -106,7 +107,7 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   .reduce-motion * {
     animation: none !important;
     transition: none !important;
@@ -128,11 +129,11 @@ html {
 
 /* 터치 타겟 최소 크기 보장 (44px × 44px) */
 button,
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-a[role="button"],
-[role="button"] {
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+a[role='button'],
+[role='button'] {
   min-height: 44px;
   min-width: 44px;
   touch-action: manipulation;
@@ -190,7 +191,7 @@ label {
 
 /* 필수 필드 표시 개선 */
 .required::after {
-  content: " *";
+  content: ' *';
   color: #dc2626;
   font-weight: bold;
 }
@@ -234,16 +235,16 @@ label {
 
 /* 터치 피드백 개선 */
 button:active,
-input[type="submit"]:active,
-[role="button"]:active {
+input[type='submit']:active,
+[role='button']:active {
   transform: scale(0.98);
   transition: transform 0.1s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
   button:active,
-  input[type="submit"]:active,
-  [role="button"]:active {
+  input[type='submit']:active,
+  [role='button']:active {
     transform: none;
   }
 }
@@ -264,9 +265,9 @@ a,
 input,
 select,
 textarea,
-[role="button"],
-[role="link"],
-[tabindex="0"] {
+[role='button'],
+[role='link'],
+[tabindex='0'] {
   min-height: 44px;
   min-width: 44px;
   touch-action: manipulation;
@@ -366,7 +367,7 @@ textarea {
     padding-top: 8px;
     padding-bottom: 8px;
   }
-  
+
   .landscape-compact .space-y-6 > * + * {
     margin-top: 1rem;
   }
@@ -385,9 +386,15 @@ textarea {
 
 /* Long press 피드백 */
 @keyframes longpress {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .longpress-feedback {

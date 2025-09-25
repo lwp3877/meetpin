@@ -45,59 +45,62 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   }, [])
 
   // 알림 목록 가져오기 (ETag 지원)
-  const fetchNotifications = useCallback(async (force = false) => {
-    if (!user) return
+  const fetchNotifications = useCallback(
+    async (force = false) => {
+      if (!user) return
 
-    setIsPolling(true)
-    try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-      }
-      
-      // 강제 새로고침이 아니고 ETag가 있으면 If-None-Match 헤더 추가
-      if (!force && etagRef.current) {
-        headers['If-None-Match'] = etagRef.current
-      }
-
-      const response = await fetch('/api/notifications', { headers })
-      
-      // 304 Not Modified - 변경사항 없음
-      if (response.status === 304) {
-        retryCountRef.current = 0
-        setLastUpdated(new Date())
-        return
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const result = await response.json()
-      
-      if (result.ok) {
-        // ETag 저장
-        const newEtag = response.headers.get('ETag')
-        if (newEtag) {
-          etagRef.current = newEtag
+      setIsPolling(true)
+      try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
         }
 
-        setNotifications(result.data || [])
-        setUnreadCount(result.data?.filter((n: Notification) => !n.read).length || 0)
-        setLastUpdated(new Date())
-        retryCountRef.current = 0
+        // 강제 새로고침이 아니고 ETag가 있으면 If-None-Match 헤더 추가
+        if (!force && etagRef.current) {
+          headers['If-None-Match'] = etagRef.current
+        }
+
+        const response = await fetch('/api/notifications', { headers })
+
+        // 304 Not Modified - 변경사항 없음
+        if (response.status === 304) {
+          retryCountRef.current = 0
+          setLastUpdated(new Date())
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+
+        const result = await response.json()
+
+        if (result.ok) {
+          // ETag 저장
+          const newEtag = response.headers.get('ETag')
+          if (newEtag) {
+            etagRef.current = newEtag
+          }
+
+          setNotifications(result.data || [])
+          setUnreadCount(result.data?.filter((n: Notification) => !n.read).length || 0)
+          setLastUpdated(new Date())
+          retryCountRef.current = 0
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error)
+        retryCountRef.current = Math.min(retryCountRef.current + 1, 5)
+
+        // 첫 번째 에러가 아니면 토스트 표시
+        if (retryCountRef.current > 1) {
+          // toast.error('알림을 불러오는데 실패했습니다. 재시도 중...')
+        }
+      } finally {
+        setIsPolling(false)
       }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error)
-      retryCountRef.current = Math.min(retryCountRef.current + 1, 5)
-      
-      // 첫 번째 에러가 아니면 토스트 표시
-      if (retryCountRef.current > 1) {
-        // toast.error('알림을 불러오는데 실패했습니다. 재시도 중...')
-      }
-    } finally {
-      setIsPolling(false)
-    }
-  }, [user])
+    },
+    [user]
+  )
 
   // 알림 읽음 처리
   const markAsRead = async (notificationId: string) => {
@@ -108,9 +111,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
 
       if (response.ok) {
         setNotifications(prev =>
-          prev.map(n =>
-            n.id === notificationId ? { ...n, read: true } : n
-          )
+          prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
         )
         setUnreadCount(prev => Math.max(0, prev - 1))
       }
@@ -130,9 +131,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       })
 
       if (response.ok) {
-        setNotifications(prev =>
-          prev.map(n => ({ ...n, read: true }))
-        )
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })))
         setUnreadCount(0)
       }
     } catch (error) {
@@ -176,19 +175,19 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'room_request':
-        return <Users className="w-5 h-5 text-blue-600" />
+        return <Users className="h-5 w-5 text-blue-600" />
       case 'message':
-        return <MessageSquare className="w-5 h-5 text-green-600" />
+        return <MessageSquare className="h-5 w-5 text-green-600" />
       case 'room_full':
-        return <Users className="w-5 h-5 text-orange-600" />
+        return <Users className="h-5 w-5 text-orange-600" />
       case 'review':
-        return <Star className="w-5 h-5 text-yellow-600" />
+        return <Star className="h-5 w-5 text-yellow-600" />
       case 'boost_reminder':
-        return <Gift className="w-5 h-5 text-purple-600" />
+        return <Gift className="h-5 w-5 text-purple-600" />
       case 'match_success':
-        return <Star className="w-5 h-5 text-pink-600" />
+        return <Star className="h-5 w-5 text-pink-600" />
       default:
-        return <Bell className="w-5 h-5 text-gray-600" />
+        return <Bell className="h-5 w-5 text-gray-600" />
     }
   }
 
@@ -198,10 +197,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       fetchNotifications(true) // 초기 로드
 
       const startPolling = () => {
-        intervalRef.current = setInterval(
-          () => fetchNotifications(), 
-          getPollingInterval()
-        )
+        intervalRef.current = setInterval(() => fetchNotifications(), getPollingInterval())
       }
 
       startPolling()
@@ -210,14 +206,14 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       const handleFocus = () => {
         fetchNotifications(true)
       }
-      
+
       // Visibility API로 백그라운드 최적화
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
           fetchNotifications(true)
         }
       }
-      
+
       window.addEventListener('focus', handleFocus)
       document.addEventListener('visibilitychange', handleVisibilityChange)
 
@@ -229,7 +225,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         document.removeEventListener('visibilitychange', handleVisibilityChange)
       }
     }
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
@@ -241,10 +237,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
   useEffect(() => {
     if (intervalRef.current && retryCountRef.current > 0) {
       clearInterval(intervalRef.current)
-      intervalRef.current = setInterval(
-        () => fetchNotifications(),
-        getPollingInterval()
-      )
+      intervalRef.current = setInterval(() => fetchNotifications(), getPollingInterval())
     }
   }, [fetchNotifications, getPollingInterval])
 
@@ -262,14 +255,14 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       {/* 알림 벨 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full transition-all duration-200"
+        className="focus:ring-primary relative rounded-full p-2 text-gray-600 transition-all duration-200 hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none"
         aria-label="알림"
         data-testid="notification-bell"
       >
-        <Bell className="w-6 h-6" />
+        <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
-          <span 
-            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse"
+          <span
+            className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] animate-pulse items-center justify-center rounded-full bg-red-500 px-1 text-xs text-white"
             data-testid="notification-badge"
           >
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -281,14 +274,14 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       {isOpen && (
         <>
           {/* 배경 오버레이 */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* 알림 리스트 */}
-          <Card className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-hidden z-50 shadow-xl" data-testid="notification-panel">
-            <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
+          <Card
+            className="absolute top-full right-0 z-50 mt-2 max-h-96 w-80 overflow-hidden shadow-xl"
+            data-testid="notification-panel"
+          >
+            <div className="flex items-center justify-between border-b bg-white px-4 py-3">
               <h3 className="font-semibold text-gray-900">알림</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
@@ -297,10 +290,10 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                     variant="ghost"
                     size="sm"
                     disabled={isLoading}
-                    className="text-xs h-7"
+                    className="h-7 text-xs"
                     data-testid="mark-all-read-btn"
                   >
-                    <Check className="w-3 h-3 mr-1" />
+                    <Check className="mr-1 h-3 w-3" />
                     모두 읽음
                   </Button>
                 )}
@@ -309,7 +302,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                   className="text-gray-400 hover:text-gray-600"
                   data-testid="close-notification-panel"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -317,34 +310,36 @@ export default function NotificationCenter({ className = '' }: NotificationCente
             <div className="max-h-80 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="p-8 text-center text-gray-500" data-testid="empty-notifications">
-                  <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                  <Bell className="mx-auto mb-2 h-8 w-8 text-gray-300" />
                   <p className="text-sm">새로운 알림이 없습니다</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
-                  {notifications.map((notification) => (
+                  {notifications.map(notification => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                        !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                      className={`cursor-pointer p-4 transition-colors hover:bg-gray-50 ${
+                        !notification.read ? 'border-l-4 border-l-blue-500 bg-blue-50' : ''
                       }`}
                       onClick={() => handleNotificationClick(notification)}
                       data-testid={`notification-${notification.id}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-1">
+                        <div className="mt-1 flex-shrink-0">
                           {getNotificationIcon(notification.type)}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium text-gray-900 ${
-                            !notification.read ? 'font-semibold' : ''
-                          }`}>
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={`text-sm font-medium text-gray-900 ${
+                              !notification.read ? 'font-semibold' : ''
+                            }`}
+                          >
                             {notification.title}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                          <p className="mt-1 line-clamp-2 text-sm text-gray-600">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="mt-2 text-xs text-gray-500">
                             {formatDistanceToNow(new Date(notification.createdAt), {
                               addSuffix: true,
                               locale: ko,
@@ -352,14 +347,14 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                           </p>
                         </div>
                         <button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation()
                             deleteNotification(notification.id)
                           }}
-                          className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+                          className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600"
                           data-testid={`delete-notification-${notification.id}`}
                         >
-                          <X className="w-4 h-4" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
@@ -375,7 +370,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                     setIsOpen(false)
                     window.location.href = '/notifications'
                   }}
-                  className="text-sm text-primary hover:text-primary/80 font-medium"
+                  className="text-primary hover:text-primary/80 text-sm font-medium"
                   data-testid="view-all-notifications"
                 >
                   모든 알림 보기

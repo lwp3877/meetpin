@@ -23,7 +23,7 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
     enableActivation = true,
     trapFocus = false,
     initialFocusIndex = 0,
-    loop = true
+    loop = true,
   } = options
 
   const containerRef = useRef<HTMLElement>(null)
@@ -33,41 +33,46 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
   // 네비게이션 가능한 요소들 가져오기
   const getFocusableElements = useCallback(() => {
     if (!containerRef.current) return []
-    
+
     const elements = Array.from(containerRef.current.querySelectorAll(selector)) as HTMLElement[]
     return elements.filter(el => {
-      return !(el as any).disabled && 
-             el.tabIndex !== -1 &&
-             el.offsetParent !== null && // 화면에 보이는 요소만
-             !el.getAttribute('aria-hidden')
+      return (
+        !(el as any).disabled &&
+        el.tabIndex !== -1 &&
+        el.offsetParent !== null && // 화면에 보이는 요소만
+        !el.getAttribute('aria-hidden')
+      )
     })
   }, [selector])
 
   // 특정 인덱스로 포커스 이동
-  const focusElement = useCallback((index: number) => {
-    const elements = getFocusableElements()
-    if (elements.length === 0) return
+  const focusElement = useCallback(
+    (index: number) => {
+      const elements = getFocusableElements()
+      if (elements.length === 0) return
 
-    let targetIndex = index
-    if (loop) {
-      targetIndex = ((index % elements.length) + elements.length) % elements.length
-    } else {
-      targetIndex = Math.max(0, Math.min(index, elements.length - 1))
-    }
+      let targetIndex = index
+      if (loop) {
+        targetIndex = ((index % elements.length) + elements.length) % elements.length
+      } else {
+        targetIndex = Math.max(0, Math.min(index, elements.length - 1))
+      }
 
-    const targetElement = elements[targetIndex]
-    if (targetElement) {
-      targetElement.focus()
-      setCurrentIndex(targetIndex)
-      
-      // 스크롤하여 요소를 화면에 표시
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'nearest'
-      })
-    }
-  }, [getFocusableElements, loop])
+      const targetElement = elements[targetIndex]
+      if (targetElement) {
+        targetElement.focus()
+        setCurrentIndex(targetIndex)
+
+        // 스크롤하여 요소를 화면에 표시
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest',
+        })
+      }
+    },
+    [getFocusableElements, loop]
+  )
 
   // 다음 요소로 포커스 이동
   const focusNext = useCallback(() => {
@@ -91,89 +96,107 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
   }, [getFocusableElements, focusElement])
 
   // 키보드 이벤트 핸들러
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!isActive) return
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isActive) return
 
-    const { key, ctrlKey, metaKey, altKey } = e
-    
-    // 수정자 키가 눌린 경우 무시 (브라우저 단축키 우선)
-    if (ctrlKey || metaKey || altKey) return
+      const { key, ctrlKey, metaKey, altKey } = e
 
-    switch (key) {
-      case 'ArrowDown':
-      case 'ArrowRight':
-        if (enableArrowKeys) {
-          e.preventDefault()
-          focusNext()
-        }
-        break
-        
-      case 'ArrowUp':
-      case 'ArrowLeft':
-        if (enableArrowKeys) {
-          e.preventDefault()
-          focusPrevious()
-        }
-        break
-        
-      case 'Home':
-        if (enableArrowKeys) {
-          e.preventDefault()
-          focusFirst()
-        }
-        break
-        
-      case 'End':
-        if (enableArrowKeys) {
-          e.preventDefault()
-          focusLast()
-        }
-        break
-        
-      case 'Tab':
-        if (trapFocus) {
-          e.preventDefault()
-          if (e.shiftKey) {
-            focusPrevious()
-          } else {
+      // 수정자 키가 눌린 경우 무시 (브라우저 단축키 우선)
+      if (ctrlKey || metaKey || altKey) return
+
+      switch (key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          if (enableArrowKeys) {
+            e.preventDefault()
             focusNext()
           }
-        }
-        break
-        
-      case 'Enter':
-      case ' ': // 스페이스바
-        if (enableActivation) {
-          const activeElement = document.activeElement as HTMLElement
-          if (activeElement && getFocusableElements().includes(activeElement)) {
-            // 엔터는 항상 처리, 스페이스는 버튼/링크만
-            if (key === 'Enter' || 
-                activeElement.tagName === 'BUTTON' ||
-                activeElement.getAttribute('role') === 'button') {
-              e.preventDefault()
-              activeElement.click()
+          break
+
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          if (enableArrowKeys) {
+            e.preventDefault()
+            focusPrevious()
+          }
+          break
+
+        case 'Home':
+          if (enableArrowKeys) {
+            e.preventDefault()
+            focusFirst()
+          }
+          break
+
+        case 'End':
+          if (enableArrowKeys) {
+            e.preventDefault()
+            focusLast()
+          }
+          break
+
+        case 'Tab':
+          if (trapFocus) {
+            e.preventDefault()
+            if (e.shiftKey) {
+              focusPrevious()
+            } else {
+              focusNext()
             }
           }
-        }
-        break
-        
-      case 'Escape':
-        if (trapFocus) {
-          // 포커스 트랩에서 벗어나기
-          setIsActive(false)
-        }
-        break
-    }
-  }, [isActive, enableArrowKeys, enableActivation, trapFocus, focusNext, focusPrevious, focusFirst, focusLast, getFocusableElements])
+          break
+
+        case 'Enter':
+        case ' ': // 스페이스바
+          if (enableActivation) {
+            const activeElement = document.activeElement as HTMLElement
+            if (activeElement && getFocusableElements().includes(activeElement)) {
+              // 엔터는 항상 처리, 스페이스는 버튼/링크만
+              if (
+                key === 'Enter' ||
+                activeElement.tagName === 'BUTTON' ||
+                activeElement.getAttribute('role') === 'button'
+              ) {
+                e.preventDefault()
+                activeElement.click()
+              }
+            }
+          }
+          break
+
+        case 'Escape':
+          if (trapFocus) {
+            // 포커스 트랩에서 벗어나기
+            setIsActive(false)
+          }
+          break
+      }
+    },
+    [
+      isActive,
+      enableArrowKeys,
+      enableActivation,
+      trapFocus,
+      focusNext,
+      focusPrevious,
+      focusFirst,
+      focusLast,
+      getFocusableElements,
+    ]
+  )
 
   // 포커스 이벤트 핸들러
-  const handleFocus = useCallback((e: FocusEvent) => {
-    const elements = getFocusableElements()
-    const focusedIndex = elements.indexOf(e.target as HTMLElement)
-    if (focusedIndex !== -1) {
-      setCurrentIndex(focusedIndex)
-    }
-  }, [getFocusableElements])
+  const handleFocus = useCallback(
+    (e: FocusEvent) => {
+      const elements = getFocusableElements()
+      const focusedIndex = elements.indexOf(e.target as HTMLElement)
+      if (focusedIndex !== -1) {
+        setCurrentIndex(focusedIndex)
+      }
+    },
+    [getFocusableElements]
+  )
 
   // 키보드 네비게이션 활성화/비활성화
   const activate = useCallback(() => {
@@ -217,7 +240,7 @@ export function useKeyboardNavigation(options: KeyboardNavigationOptions = {}) {
     focusFirst,
     focusLast,
     focusElement,
-    getFocusableElements
+    getFocusableElements,
   }
 }
 
@@ -227,7 +250,7 @@ export function useFocusTrap(isOpen: boolean) {
     trapFocus: true,
     enableArrowKeys: true,
     enableActivation: true,
-    loop: true
+    loop: true,
   })
 
   useEffect(() => {
@@ -265,7 +288,7 @@ export function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const { key, ctrlKey, metaKey, shiftKey, altKey } = e
-      
+
       // 수정자 키 조합 생성
       let combination = ''
       if (ctrlKey || metaKey) combination += 'ctrl+'
@@ -288,29 +311,30 @@ export function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
 // 포커스 관리 유틸리티
 export const focusUtils = {
   // 포커스 가능한 요소들의 셀렉터
-  FOCUSABLE_SELECTOR: 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), [contenteditable]',
-  
+  FOCUSABLE_SELECTOR:
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), [contenteditable]',
+
   // 요소에 포커스를 맞추고 스크롤
   focusWithScroll: (element: HTMLElement) => {
     element.focus()
     element.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
-      inline: 'nearest'
+      inline: 'nearest',
     })
   },
-  
+
   // 포커스 표시 강화
   enhanceFocusVisibility: (element: HTMLElement) => {
     element.setAttribute('data-focus-enhanced', 'true')
     element.style.outline = '2px solid var(--primary)'
     element.style.outlineOffset = '2px'
   },
-  
+
   // 포커스 표시 제거
   removeFocusVisibility: (element: HTMLElement) => {
     element.removeAttribute('data-focus-enhanced')
     element.style.outline = ''
     element.style.outlineOffset = ''
-  }
+  },
 }

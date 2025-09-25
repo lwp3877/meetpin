@@ -34,7 +34,8 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
   }
 
   // API 키 확인 (프로덕션에서 하드코딩된 키 사용)
-  const key = apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
+  const key =
+    apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
   if (!key) {
     return Promise.reject(new Error('Kakao Maps API 키가 설정되지 않았습니다'))
   }
@@ -53,7 +54,7 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services,clusterer&autoload=false`
-    
+
     script.onload = () => {
       if (window.kakao && window.kakao.maps) {
         window.kakao.maps.load(() => {
@@ -63,11 +64,11 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
         reject(new Error('Kakao Maps API 로드 실패'))
       }
     }
-    
+
     script.onerror = () => {
       reject(new Error('Kakao Maps API 스크립트 로드 실패'))
     }
-    
+
     document.head.appendChild(script)
   })
 
@@ -136,13 +137,13 @@ export function getCurrentPosition(): Promise<{ lat: number; lng: number }> {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      position => {
         resolve({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         })
       },
-      (error) => {
+      error => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
             reject(new Error('위치 권한이 거부되었습니다'))
@@ -171,7 +172,7 @@ export function getCurrentPosition(): Promise<{ lat: number; lng: number }> {
  */
 export const SEOUL_CENTER = {
   lat: 37.5665,
-  lng: 126.9780,
+  lng: 126.978,
 }
 
 /**

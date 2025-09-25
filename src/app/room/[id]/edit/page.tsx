@@ -14,13 +14,13 @@ const RoomForm = dynamic(() => import('@/components/room/RoomForm'), {
   ssr: false,
   loading: () => (
     <div className="animate-pulse space-y-6">
-      <div className="h-6 bg-gray-200 rounded w-32"></div>
-      <div className="h-10 bg-gray-200 rounded"></div>
-      <div className="h-6 bg-gray-200 rounded w-24"></div>
-      <div className="h-10 bg-gray-200 rounded"></div>
-      <div className="h-32 bg-gray-200 rounded"></div>
+      <div className="h-6 w-32 rounded bg-gray-200"></div>
+      <div className="h-10 rounded bg-gray-200"></div>
+      <div className="h-6 w-24 rounded bg-gray-200"></div>
+      <div className="h-10 rounded bg-gray-200"></div>
+      <div className="h-32 rounded bg-gray-200"></div>
     </div>
-  )
+  ),
 })
 
 interface Room {
@@ -78,7 +78,7 @@ export default function EditRoomPage() {
       }
 
       const roomData = result.data.room
-      
+
       // 호스트 권한 확인
       if (!roomData.is_host) {
         throw new Error('방을 수정할 권한이 없습니다')
@@ -113,7 +113,6 @@ export default function EditRoomPage() {
 
       toast.success('방 정보가 성공적으로 수정되었습니다!')
       router.push(`/room/${roomId}`)
-      
     } catch (err: any) {
       console.error('Room update error:', err)
       setError(err.message)
@@ -149,7 +148,6 @@ export default function EditRoomPage() {
 
       toast.success('모임이 성공적으로 삭제되었습니다')
       router.push('/map')
-      
     } catch (err: any) {
       console.error('Room delete error:', err)
       setError(err.message)
@@ -172,9 +170,9 @@ export default function EditRoomPage() {
   // 인증 체크
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           <p className="text-gray-600">
             {authLoading ? '인증 확인 중...' : '방 정보를 불러오는 중...'}
           </p>
@@ -186,14 +184,12 @@ export default function EditRoomPage() {
   // 인증 실패
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">🔐</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">로그인 필요</h2>
-          <p className="text-gray-600 mb-6">방을 수정하려면 로그인이 필요합니다.</p>
-          <Button onClick={() => router.push('/auth/login')}>
-            로그인하기
-          </Button>
+          <div className="mb-4 text-4xl">🔐</div>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">로그인 필요</h2>
+          <p className="mb-6 text-gray-600">방을 수정하려면 로그인이 필요합니다.</p>
+          <Button onClick={() => router.push('/auth/login')}>로그인하기</Button>
         </div>
       </div>
     )
@@ -202,18 +198,16 @@ export default function EditRoomPage() {
   // 오류 또는 방 없음
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">❌</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">방을 불러올 수 없습니다</h2>
-          <p className="text-gray-600 mb-6">{error || '존재하지 않는 방이거나 권한이 없습니다.'}</p>
+          <div className="mb-4 text-4xl">❌</div>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">방을 불러올 수 없습니다</h2>
+          <p className="mb-6 text-gray-600">{error || '존재하지 않는 방이거나 권한이 없습니다.'}</p>
           <div className="space-x-4">
             <Button onClick={() => router.push('/map')} variant="outline">
               지도로 돌아가기
             </Button>
-            <Button onClick={loadRoom}>
-              다시 시도
-            </Button>
+            <Button onClick={loadRoom}>다시 시도</Button>
           </div>
         </div>
       </div>
@@ -227,31 +221,24 @@ export default function EditRoomPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-10 border-b border-white/20 bg-white/80 backdrop-blur-sm">
+        <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              className="mr-2"
-            >
+            <Button variant="ghost" size="sm" onClick={handleCancel} className="mr-2">
               ← 뒤로
             </Button>
             <h1 className="text-xl font-bold text-gray-900">모임 수정</h1>
           </div>
-          <div className="text-sm text-gray-600">
-            {brandMessages.appName}
-          </div>
+          <div className="text-sm text-gray-600">{brandMessages.appName}</div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="container mx-auto max-w-2xl px-4 py-8">
         {/* Warning Messages */}
         {hasStarted && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
             <div className="flex items-center">
-              <span className="text-xl mr-3">⚠️</span>
+              <span className="mr-3 text-xl">⚠️</span>
               <div>
                 <h3 className="font-medium text-yellow-900">이미 시작된 모임입니다</h3>
                 <p className="text-sm text-yellow-800">
@@ -263,13 +250,14 @@ export default function EditRoomPage() {
         )}
 
         {hasParticipants && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
             <div className="flex items-center">
-              <span className="text-xl mr-3">👥</span>
+              <span className="mr-3 text-xl">👥</span>
               <div>
                 <h3 className="font-medium text-blue-900">참가자가 있는 모임입니다</h3>
                 <p className="text-sm text-blue-800">
-                  현재 {room.participants_count}명이 참가 중입니다. 주요 정보 변경 시 참가자들에게 알림이 전송됩니다.
+                  현재 {room.participants_count}명이 참가 중입니다. 주요 정보 변경 시 참가자들에게
+                  알림이 전송됩니다.
                 </p>
               </div>
             </div>
@@ -277,8 +265,8 @@ export default function EditRoomPage() {
         )}
 
         {/* Edit Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
             &quot;{room.title}&quot; 수정하기
           </h2>
 
@@ -303,12 +291,12 @@ export default function EditRoomPage() {
           />
 
           {/* Delete Section */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-              <h3 className="text-lg font-medium text-red-900 mb-2">⚠️ 위험 구역</h3>
-              <p className="text-sm text-red-800 mb-4">
-                모임을 삭제하면 모든 데이터가 영구적으로 삭제되며, 참가자들에게 취소 알림이 전송됩니다.
-                이 작업은 되돌릴 수 없습니다.
+          <div className="mt-12 border-t border-gray-200 pt-8">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+              <h3 className="mb-2 text-lg font-medium text-red-900">⚠️ 위험 구역</h3>
+              <p className="mb-4 text-sm text-red-800">
+                모임을 삭제하면 모든 데이터가 영구적으로 삭제되며, 참가자들에게 취소 알림이
+                전송됩니다. 이 작업은 되돌릴 수 없습니다.
               </p>
               <Button
                 onClick={handleDeleteRoom}
@@ -323,26 +311,40 @@ export default function EditRoomPage() {
         </div>
 
         {/* Tips */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
-            📝 수정 시 주의사항
-          </h3>
+        <div className="rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+          <h3 className="mb-3 text-lg font-semibold text-blue-900">📝 수정 시 주의사항</h3>
           <ul className="space-y-2 text-sm text-blue-800">
             <li className="flex items-start">
-              <span className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">1</span>
-              <span><strong>시간 변경</strong>은 참가자들에게 즉시 알림이 전송됩니다</span>
+              <span className="mt-0.5 mr-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
+                1
+              </span>
+              <span>
+                <strong>시간 변경</strong>은 참가자들에게 즉시 알림이 전송됩니다
+              </span>
             </li>
             <li className="flex items-start">
-              <span className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">2</span>
-              <span><strong>장소 변경</strong> 시 참가자들이 혼란스러워할 수 있으니 신중히 결정하세요</span>
+              <span className="mt-0.5 mr-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
+                2
+              </span>
+              <span>
+                <strong>장소 변경</strong> 시 참가자들이 혼란스러워할 수 있으니 신중히 결정하세요
+              </span>
             </li>
             <li className="flex items-start">
-              <span className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">3</span>
-              <span><strong>최대 인원 축소</strong> 시 현재 참가자보다 작게 설정할 수 없습니다</span>
+              <span className="mt-0.5 mr-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
+                3
+              </span>
+              <span>
+                <strong>최대 인원 축소</strong> 시 현재 참가자보다 작게 설정할 수 없습니다
+              </span>
             </li>
             <li className="flex items-start">
-              <span className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 mt-0.5">4</span>
-              <span><strong>참가비 변경</strong>은 이미 결제한 참가자에게 별도 안내가 필요합니다</span>
+              <span className="mt-0.5 mr-3 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white">
+                4
+              </span>
+              <span>
+                <strong>참가비 변경</strong>은 이미 결제한 참가자에게 별도 안내가 필요합니다
+              </span>
             </li>
           </ul>
         </div>

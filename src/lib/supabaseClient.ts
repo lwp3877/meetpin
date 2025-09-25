@@ -26,7 +26,14 @@ export interface Database {
           uid: string
           nickname: string | null
           email: string | null
-          age_range: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
+          age_range:
+            | 'early_twenties'
+            | 'late_twenties'
+            | 'early_thirties'
+            | 'late_thirties'
+            | 'forties'
+            | 'fifties_plus'
+            | null
           avatar_url: string | null
           intro: string | null
           role: 'user' | 'admin'
@@ -37,7 +44,14 @@ export interface Database {
           uid: string
           nickname?: string | null
           email?: string | null
-          age_range?: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
+          age_range?:
+            | 'early_twenties'
+            | 'late_twenties'
+            | 'early_thirties'
+            | 'late_thirties'
+            | 'forties'
+            | 'fifties_plus'
+            | null
           avatar_url?: string | null
           intro?: string | null
           role?: 'user' | 'admin'
@@ -48,7 +62,14 @@ export interface Database {
           uid?: string
           nickname?: string | null
           email?: string | null
-          age_range?: 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus' | null
+          age_range?:
+            | 'early_twenties'
+            | 'late_twenties'
+            | 'early_thirties'
+            | 'late_thirties'
+            | 'forties'
+            | 'fifties_plus'
+            | null
           avatar_url?: string | null
           intro?: string | null
           role?: 'user' | 'admin'
@@ -263,7 +284,18 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          type: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          type:
+            | 'room_request'
+            | 'message'
+            | 'room_full'
+            | 'review'
+            | 'boost_reminder'
+            | 'match_success'
+            | 'new_message'
+            | 'request_accepted'
+            | 'request_rejected'
+            | 'room_updated'
+            | 'system_announcement'
           title: string
           message: string
           metadata: Record<string, any> | null
@@ -273,7 +305,18 @@ export interface Database {
         Insert: {
           id?: string
           user_id: string
-          type: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          type:
+            | 'room_request'
+            | 'message'
+            | 'room_full'
+            | 'review'
+            | 'boost_reminder'
+            | 'match_success'
+            | 'new_message'
+            | 'request_accepted'
+            | 'request_rejected'
+            | 'room_updated'
+            | 'system_announcement'
           title: string
           message: string
           metadata?: Record<string, any> | null
@@ -283,7 +326,18 @@ export interface Database {
         Update: {
           id?: string
           user_id?: string
-          type?: 'room_request' | 'message' | 'room_full' | 'review' | 'boost_reminder' | 'match_success' | 'new_message' | 'request_accepted' | 'request_rejected' | 'room_updated' | 'system_announcement'
+          type?:
+            | 'room_request'
+            | 'message'
+            | 'room_full'
+            | 'review'
+            | 'boost_reminder'
+            | 'match_success'
+            | 'new_message'
+            | 'request_accepted'
+            | 'request_rejected'
+            | 'room_updated'
+            | 'system_announcement'
           title?: string
           message?: string
           metadata?: Record<string, any> | null
@@ -568,10 +622,10 @@ export function createBrowserSupabaseClient(): SupabaseClient {
   if (_browserClient) {
     return _browserClient
   }
-  
+
   try {
     const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
-    
+
     _browserClient = createClient<Database>(url, key, {
       auth: {
         persistSession: true,
@@ -595,16 +649,16 @@ export function createBrowserSupabaseClient(): SupabaseClient {
         },
       },
     })
-    
+
     // 연결 상태 모니터링 (개발 모드에서만)
     if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
-      _browserClient.channel('_ping').subscribe((status) => {
+      _browserClient.channel('_ping').subscribe(status => {
         if (status === 'CHANNEL_ERROR') {
           console.warn('Supabase realtime connection error, attempting reconnect...')
         }
       })
     }
-    
+
     return _browserClient
   } catch (error) {
     console.error('Failed to create Supabase client:', error)
@@ -637,11 +691,11 @@ export function createBrowserSupabaseClient(): SupabaseClient {
 // 서버용 클라이언트 (쿠키 기반 인증)
 export async function createServerSupabaseClient() {
   const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
-  
+
   // Next.js 서버 환경에서 쿠키 접근
   const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
-  
+
   return createServerClient<Database>(url, key, {
     cookies: {
       getAll() {
@@ -649,9 +703,7 @@ export async function createServerSupabaseClient() {
       },
       setAll(cookiesToSet) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         } catch {
           // 쿠키 설정 실패는 무시 (읽기 전용 모드)
         }
@@ -663,11 +715,11 @@ export async function createServerSupabaseClient() {
 // 서버 환경변수 검증 (관리자용)
 function validateServerEnvVars() {
   const { supabaseUrl: url } = validateEnvVars()
-  
+
   if (!supabaseServiceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations')
   }
-  
+
   return { supabaseUrl: url, supabaseServiceRoleKey }
 }
 
@@ -710,7 +762,7 @@ export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
 
 export type Room = Database['public']['Tables']['rooms']['Row']
-export type RoomInsert = Database['public']['Tables']['rooms']['Insert']  
+export type RoomInsert = Database['public']['Tables']['rooms']['Insert']
 export type RoomUpdate = Database['public']['Tables']['rooms']['Update']
 
 export type Request = Database['public']['Tables']['requests']['Row']

@@ -33,11 +33,11 @@ function sanitizeUrl(url: string): string {
     const urlObj = new URL(url)
     // 쿼리 파라미터에서 PII 가능성이 있는 것들 제거
     const sensitiveParams = ['email', 'phone', 'token', 'session', 'user', 'id']
-    
+
     sensitiveParams.forEach(param => {
       urlObj.searchParams.delete(param)
     })
-    
+
     return urlObj.pathname + (urlObj.search || '')
   } catch {
     return '/unknown'
@@ -55,49 +55,53 @@ function sanitizeUserAgent(userAgent: string): string {
 // 메트릭 검증
 function validateMetrics(metrics: any[]): WebVitalMetric[] {
   const validMetrics: WebVitalMetric[] = []
-  
+
   for (const metric of metrics) {
     if (!metric.name || !metric.value || typeof metric.value !== 'number') {
       continue
     }
-    
+
     // 메트릭 이름 화이트리스트
     if (!['CLS', 'FCP', 'FID', 'LCP', 'TTFB', 'INP'].includes(metric.name)) {
       continue
     }
-    
+
     // 비정상적인 값 필터링
-    if (metric.value < 0 || metric.value > 60000) { // 60초 초과는 무시
+    if (metric.value < 0 || metric.value > 60000) {
+      // 60초 초과는 무시
       continue
     }
-    
+
     validMetrics.push({
       name: metric.name,
       value: Math.round(metric.value * 100) / 100, // 소수점 2자리
       rating: metric.rating || 'needs-improvement',
       delta: metric.delta ? Math.round(metric.delta * 100) / 100 : undefined,
-      navigationType: metric.navigationType
+      navigationType: metric.navigationType,
     })
   }
-  
+
   return validMetrics
 }
 
 // 일일 요약 통계 저장 (메모리 기반, 실제로는 Redis/DB 사용)
-const dailyStats = new Map<string, {
-  date: string
-  count: number
-  avgLCP: number
-  avgCLS: number
-  avgTTFB: number
-  deviceTypes: Record<string, number>
-  ratings: Record<string, number>
-}>()
+const dailyStats = new Map<
+  string,
+  {
+    date: string
+    count: number
+    avgLCP: number
+    avgCLS: number
+    avgTTFB: number
+    deviceTypes: Record<string, number>
+    ratings: Record<string, number>
+  }
+>()
 
 function updateDailyStats(payload: VitalsPayload) {
   const today = new Date().toISOString().split('T')[0]
   const key = `stats_${today}`
-  
+
   const existing = dailyStats.get(key) || {
     date: today,
     count: 0,
@@ -105,16 +109,16 @@ function updateDailyStats(payload: VitalsPayload) {
     avgCLS: 0,
     avgTTFB: 0,
     deviceTypes: {},
-    ratings: {}
+    ratings: {},
   }
-  
+
   existing.count++
   existing.deviceTypes[payload.device_type] = (existing.deviceTypes[payload.device_type] || 0) + 1
-  
+
   // 메트릭별 평균 계산
   payload.metrics.forEach(metric => {
     existing.ratings[metric.rating] = (existing.ratings[metric.rating] || 0) + 1
-    
+
     switch (metric.name) {
       case 'LCP':
         existing.avgLCP = (existing.avgLCP * (existing.count - 1) + metric.value) / existing.count
@@ -127,9 +131,9 @@ function updateDailyStats(payload: VitalsPayload) {
         break
     }
   })
-  
+
   dailyStats.set(key, existing)
-  
+
   // 100개 샘플마다 요약 로그 출력
   if (existing.count % 100 === 0) {
     logger.info('Web Vitals daily summary', {
@@ -139,7 +143,7 @@ function updateDailyStats(payload: VitalsPayload) {
       avg_cls: Math.round(existing.avgCLS * 1000) / 1000,
       avg_ttfb: Math.round(existing.avgTTFB),
       device_distribution: existing.deviceTypes,
-      rating_distribution: existing.ratings
+      rating_distribution: existing.ratings,
     })
   }
 }
@@ -153,26 +157,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const payload: VitalsPayload = await request.json()
-    
+
     // 입력 검증
     if (!payload.metrics || !Array.isArray(payload.metrics) || payload.metrics.length === 0) {
       return NextResponse.json({ error: 'Invalid metrics' }, { status: 400 })
     }
-    
+
     // 메트릭 검증 및 정제
     const validMetrics = validateMetrics(payload.metrics)
     if (validMetrics.length === 0) {
       return NextResponse.json({ error: 'No valid metrics' }, { status: 400 })
     }
-    
+
     // PII 제거
     const sanitizedPayload = {
       ...payload,
       url: sanitizeUrl(payload.url),
       user_agent: sanitizeUserAgent(payload.user_agent || ''),
-      metrics: validMetrics
+      metrics: validMetrics,
     }
-    
+
     // 구조화 로그 출력
     logger.info('Web Vitals collected', {
       device_type: sanitizedPayload.device_type,
@@ -180,9 +184,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       metrics_count: validMetrics.length,
       url: sanitizedPayload.url,
       sampling_rate: samplingRate,
-      session_id: payload.session_id ? 'present' : 'missing'
+      session_id: payload.session_id ? 'present' : 'missing',
     })
-    
+
     // 개별 메트릭 로그 (poor 성능인 경우)
     validMetrics.forEach(metric => {
       if (metric.rating === 'poor') {
@@ -191,25 +195,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           value: metric.value,
           rating: metric.rating,
           url: sanitizedPayload.url,
-          device_type: sanitizedPayload.device_type
+          device_type: sanitizedPayload.device_type,
         })
       }
     })
-    
+
     // 일일 통계 업데이트
     updateDailyStats(sanitizedPayload)
-    
-    return NextResponse.json({ 
-      status: 'recorded',
-      metrics_processed: validMetrics.length 
-    }, { status: 200 })
-    
+
+    return NextResponse.json(
+      {
+        status: 'recorded',
+        metrics_processed: validMetrics.length,
+      },
+      { status: 200 }
+    )
   } catch (error: any) {
     logger.error('Web Vitals collection failed', {
       error: error.message,
-      stack: error.stack?.substring(0, 500)
+      stack: error.stack?.substring(0, 500),
     })
-    
+
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
@@ -219,19 +225,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0]
-    
+
     const stats = dailyStats.get(`stats_${date}`)
-    
+
     if (!stats) {
-      return NextResponse.json({ 
-        date, 
+      return NextResponse.json({
+        date,
         message: 'No data for this date',
-        available_dates: Array.from(dailyStats.keys()).map(k => k.replace('stats_', ''))
+        available_dates: Array.from(dailyStats.keys()).map(k => k.replace('stats_', '')),
       })
     }
-    
+
     return NextResponse.json(stats)
-    
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

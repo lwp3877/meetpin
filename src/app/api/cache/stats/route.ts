@@ -17,7 +17,6 @@ export async function GET(_request: NextRequest) {
       environment: process.env.NODE_ENV,
       redisUrl: process.env.REDIS_URL ? '설정됨' : '미설정',
     })
-
   } catch (error: any) {
     console.error('Cache stats error:', error)
     return apiUtils.error(error.message || '캐시 통계를 가져올 수 없습니다', error.status || 500)

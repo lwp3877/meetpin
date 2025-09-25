@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Core Architecture
 
 ### Technology Stack
+
 - **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui, React 19
 - **Backend**: Supabase (PostgreSQL, Auth, Realtime, Storage)
 - **External APIs**: Kakao Maps SDK, Stripe payments
@@ -49,6 +50,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Current Project Status (최신 상태)
 
 ### ✅ Completed Advanced Features
+
 - **실시간 WebSocket 채팅 시스템**: Supabase Realtime을 활용한 실시간 메시징
 - **프로필/방 이미지 업로드 기능**: Supabase Storage 기반 이미지 처리 및 최적화
 - **Push 알림 시스템**: Browser Notification API 완전 구현
@@ -59,6 +61,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **개발 서버**: localhost:3000에서 안정적 실행 (포트 설정 가능)
 
 ### 🔧 Development Mode Features
+
 - **Mock Authentication**: `admin@meetpin.com` / `123456`로 테스트 로그인
 - **Sample Data**: 서울 지역 기준 샘플 모임 데이터
 - **API Mocking**: 실제 Supabase 없이도 모든 API 동작
@@ -75,7 +78,7 @@ pnpm preview      # Build and preview production version
 
 # Code Quality & Type Safety
 pnpm typecheck    # TypeScript type checking (0 errors expected)
-pnpm lint         # ESLint checking (0 warnings expected) 
+pnpm lint         # ESLint checking (0 warnings expected)
 pnpm lint:fix     # Auto-fix linting issues
 pnpm format       # Format code with Prettier
 pnpm format:check # Check code formatting
@@ -119,11 +122,13 @@ npx kill-port 3000 # Kill process on port 3000 if needed (or 3001 for alt port)
 ## Database Schema & Migration
 
 Execute database scripts in Supabase SQL Editor in this order:
+
 1. `scripts/migrate.sql` - Creates tables, indexes, triggers
 2. `scripts/rls.sql` - Applies Row Level Security policies
 3. `scripts/seed.sql` - Adds sample data (development only)
 
 ### Core Tables
+
 - `profiles` - User profiles linked to auth.users
 - `rooms` - Meeting rooms with location and metadata (includes `boost_until` for payment system)
 - `requests` - Join requests with status workflow
@@ -136,6 +141,7 @@ Execute database scripts in Supabase SQL Editor in this order:
 ## API Design Patterns
 
 ### Consistent Response Format
+
 ```typescript
 interface ApiResponse<T> {
   ok: boolean
@@ -146,19 +152,24 @@ interface ApiResponse<T> {
 ```
 
 ### Authentication Flow
+
 - `getAuthenticatedUser()` - Validates JWT and returns user
 - `requireAuth()` - Throws 401 if not authenticated
 - `requireAdmin()` - Validates admin role
 
 ### Geographic Filtering
+
 Uses BBox (bounding box) filtering instead of PostGIS for simplicity:
+
 - `src/lib/bbox.ts` contains geographic utilities
 - API endpoints accept `?bbox=south,west,north,east` parameters
 - Client-side map bounds determine search area
 - Haversine formula for distance calculations
 
 ### Rate Limiting
+
 Memory-based rate limiting in `src/lib/rateLimit.ts`:
+
 - API calls: 100/minute per IP
 - Room creation: 5/minute per user
 - Auth attempts: 5/15 minutes per IP
@@ -168,6 +179,7 @@ Memory-based rate limiting in `src/lib/rateLimit.ts`:
 ## Key Business Logic
 
 ### Room Lifecycle
+
 1. Created by host user
 2. Other users send join requests
 3. Host accepts/rejects requests
@@ -175,6 +187,7 @@ Memory-based rate limiting in `src/lib/rateLimit.ts`:
 5. Matches enable 1:1 messaging
 
 ### Payment Integration
+
 - Stripe Checkout for boost purchases (1일/₩1,000, 3일/₩2,500, 7일/₩5,000)
 - Webhook handling updates `boost_until` timestamp
 - Development mode mock payment processing
@@ -182,6 +195,7 @@ Memory-based rate limiting in `src/lib/rateLimit.ts`:
 - Complete UI with BoostModal component for purchase flow
 
 ### Security Considerations
+
 - RLS policies prevent data leakage between blocked users
 - Input validation using Zod schemas in `src/lib/zodSchemas.ts`
 - Forbidden words filtering for user-generated content
@@ -233,6 +247,7 @@ NEXT_PUBLIC_ENABLE_FILE_UPLOAD=true
 ## Brand System
 
 Centralized in `src/lib/brand.ts`:
+
 - Color palette: Primary (#10B981), Boost (#F59E0B), Accent (#F97316)
 - Category badges: 술🍻, 운동💪, 기타✨
 - Brand messages: "밋핀", "핀 찍고, 지금 모여요"
@@ -255,6 +270,7 @@ Centralized in `src/lib/brand.ts`:
 ## Important Development Notes
 
 ### Code Style & Patterns
+
 - Use `ApiResponse<T>` interface for all API responses: `{ ok: boolean, data?: T, code?: string, message?: string }`
 - Always validate input with Zod schemas from `src/lib/zodSchemas.ts`
 - Use `rateLimit(key, limit, windowMs)` for protecting endpoints
@@ -263,24 +279,28 @@ Centralized in `src/lib/brand.ts`:
 - **CRITICAL**: All authentication functions check `isDevelopmentMode` for Mock support
 
 ### Page Structure
+
 - All application pages are in `src/app/` using Next.js 15 App Router
 - Key pages: `/map` (main app), `/room/new`, `/room/[id]`, `/chat/[matchId]`, `/profile`, `/admin`
 - Legal pages: `/legal/terms`, `/legal/privacy`, `/legal/location`
 - Landing page CTAs redirect to `/map`
 
-### Geographic Data Handling  
+### Geographic Data Handling
+
 - Use BBox parameters instead of PostGIS: `?bbox=south,west,north,east` (comma-separated)
 - Utility functions in `src/lib/bbox.ts` for coordinate validation and distance calculations
 - Korea and Seoul preset bounding boxes available
 - Haversine formula for distance calculations
 
 ### Authentication Patterns
+
 - Server-side: Use `getAuthenticatedUser()` or `requireAdmin()` from `@/lib/api`
 - Client-side: Use Supabase client with proper cookie handling
 - RLS policies handle data access control automatically
 - User blocking relationships affect data visibility bidirectionally
 
 ### Real-time Features Architecture
+
 - **Supabase Realtime**: WebSocket connections for live updates
 - **Chat System**: `useRealtimeChat` hook for 1:1 messaging with typing indicators
 - **Notifications**: `useRealtimeNotifications` for host message alerts
@@ -288,6 +308,7 @@ Centralized in `src/lib/brand.ts`:
 - **Browser Push**: Native notification API for background alerts
 
 ### Image Upload System
+
 - **Supabase Storage**: Secure file storage with RLS policies
 - **Image Optimization**: WebP conversion and compression
 - **Universal Component**: `ImageUploader` for profiles and rooms
@@ -295,6 +316,7 @@ Centralized in `src/lib/brand.ts`:
 - **Korean Avatars**: Curated avatar collection for local users
 
 ### Testing Strategy
+
 - **Jest Unit Tests**: 60/60 tests passing, covering utilities, business logic, and security
 - **Test Locations**: `__tests__/` for unit tests, `tests/rls/` for security tests, `e2e/` for end-to-end
 - **RLS Security Tests**: Comprehensive Row Level Security validation requiring Supabase environment variables
@@ -307,6 +329,7 @@ Centralized in `src/lib/brand.ts`:
 - **Security Testing**: RLS policy validation, privilege escalation prevention, user isolation testing
 
 ### Advanced Component Architecture
+
 - **Modal System**: Centralized modal management (BoostModal, RealtimeChatModal)
 - **Hook Pattern**: Custom hooks for complex state (`useRealtimeChat`, `useRealtimeNotifications`)
 - **Form Integration**: React Hook Form + Zod validation throughout
@@ -314,6 +337,7 @@ Centralized in `src/lib/brand.ts`:
 - **Payment Flow**: Complete Stripe integration with development/production modes
 
 ### Project Quality Standards
+
 - **TypeScript**: Strict mode with enhanced type safety
 - **Code Quality**: Comprehensive ESLint + Prettier configuration
 - **Testing Suite**: Jest unit tests + Playwright E2E testing
@@ -326,39 +350,48 @@ Centralized in `src/lib/brand.ts`:
 ## Production Deployment
 
 ### Current Deployment Status
+
 - **Platform**: Vercel (meetpin-weld.vercel.app)
 - **Git Integration**: Automatic deployment from GitHub main branch
 - **Build Status**: Latest version 1.3.3-route-conflict-fix with comprehensive cache invalidation
 - **Environment**: Production environment variables configured in Vercel dashboard
 
 ### Deployment Architecture
+
 - **Frontend**: Next.js deployed to Vercel with automatic optimization
 - **Database**: Supabase PostgreSQL with RLS policies active
 - **CDN**: Vercel Edge Network for static assets
 - **Domain**: Custom domain available through Vercel configuration
 
 ### Build Cache Management
+
 Critical for production deployments due to aggressive CDN caching:
+
 - **Build Buster System**: `src/lib/buildBuster.ts` contains version identifiers for cache invalidation
 - **Version Bumping**: Update `package.json` version to trigger new builds
 - **Force Update Pattern**: Create dummy files (like `FORCE_UPDATE.txt`) to ensure all files are refreshed
 - **Cache Headers**: Vercel automatically handles cache invalidation for new deployments
 
 ### Production Environment Variables
+
 All environment variables must be configured in Vercel dashboard:
+
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Kakao Maps: `NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY`
 - Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
 - App: `SITE_URL` (set to production domain)
 
 ### Development vs Production Modes
+
 - **Development Mode**: Uses Mock authentication and sample data
 - **Production Mode**: Full Supabase integration with real authentication
 - **Feature Flags**: `src/lib/flags.ts` controls environment-specific features
 - **Build Detection**: `isDevelopmentMode` flag determines runtime behavior
 
 ### Troubleshooting Production Issues
+
 Common production deployment issues and solutions:
+
 1. **Cache Issues**: Old JavaScript bundles served despite code changes
    - Solution: Update `buildBuster.ts` and bump `package.json` version
 2. **Authentication Errors**: Supabase connection issues in production
@@ -372,6 +405,7 @@ Common production deployment issues and solutions:
    - Note: RLS tests in `tests/rls/` require live Supabase connection and will fail in CI/CD without proper setup
 
 ### Test Environment Configuration
+
 - **Unit Tests**: All tests in `__tests__/` run without external dependencies
 - **RLS Security Tests**: Tests in `tests/rls/` require Supabase environment variables
 - **Jest Configuration**: `jest.config.js` excludes `tests/rls/` by default to prevent CI failures

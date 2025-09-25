@@ -3,7 +3,11 @@
  * 자연스러운 패턴으로 봇 방을 자동 생성하고 관리
  */
 
-import { generateTimeBasedBotRooms, generatePopularTimeRooms, naturalPatterns } from './smart-room-generator'
+import {
+  generateTimeBasedBotRooms,
+  generatePopularTimeRooms,
+  naturalPatterns,
+} from './smart-room-generator'
 import { supabaseAdmin, type ProfileInsert, type RoomInsert } from '@/lib/supabaseClient'
 
 // 봇 생성 상태 추적
@@ -27,17 +31,19 @@ const generationState: BotGenerationState = {
 async function ensureBotProfile(botProfile: any) {
   try {
     // 봇 계정 생성 (이미 존재하면 무시)
-    const { data: authData, error: authError } = await (supabaseAdmin as any).auth.admin.createUser({
-      email: `bot_${botProfile.nickname.toLowerCase()}@meetpin.bot`,
-      password: Math.random().toString(36),
-      email_confirm: true,
-      user_metadata: {
-        is_bot: true,
-        nickname: botProfile.nickname,
-        age_range: botProfile.ageRange,
-        category_preference: botProfile.category,
+    const { data: authData, error: authError } = await (supabaseAdmin as any).auth.admin.createUser(
+      {
+        email: `bot_${botProfile.nickname.toLowerCase()}@meetpin.bot`,
+        password: Math.random().toString(36),
+        email_confirm: true,
+        user_metadata: {
+          is_bot: true,
+          nickname: botProfile.nickname,
+          age_range: botProfile.ageRange,
+          category_preference: botProfile.category,
+        },
       }
-    })
+    )
 
     if (authError && !authError.message.includes('already')) {
       console.error('봇 계정 생성 실패:', authError)
@@ -56,7 +62,7 @@ async function ensureBotProfile(botProfile: any) {
       intro: getBotIntro(botProfile),
       role: 'user', // 봇도 일반 사용자로 표시
     }
-    
+
     const { error: profileError } = await (supabaseAdmin as any)
       .from('profiles')
       .upsert(profileData)
@@ -105,12 +111,12 @@ function getBotAvatarUrl(botProfile: any): string {
     'photo-1557555187-23d685287bc3', // 여성
     'photo-1534528741775-53994a69daeb', // 여성
   ]
-  
+
   const hash = botProfile.nickname.split('').reduce((a: number, b: string) => {
-    a = ((a << 5) - a) + b.charCodeAt(0)
+    a = (a << 5) - a + b.charCodeAt(0)
     return a & a
   }, 0)
-  
+
   const avatarId = avatarIds[Math.abs(hash) % avatarIds.length]
   return `https://images.unsplash.com/${avatarId}?w=150&h=150&fit=crop&crop=face`
 }
@@ -136,7 +142,7 @@ function getBotIntro(botProfile: any): string {
       '새로운 사람들과의 만남에서 에너지를 얻어요 ✨',
     ],
   }
-  
+
   const categoryIntros = intros[botProfile.category as keyof typeof intros] || intros.other
   return categoryIntros[Math.floor(Math.random() * categoryIntros.length)]
 }
@@ -166,7 +172,7 @@ async function createBotRoomInDatabase(roomData: any) {
       fee: roomData.fee,
       visibility: 'public',
     }
-    
+
     const { data, error } = await (supabaseAdmin as any)
       .from('rooms')
       .insert(roomInsertData)
@@ -194,31 +200,37 @@ export async function generateBotsForCurrentTime() {
 
   const now = new Date()
   const currentHour = now.getHours()
-  
+
   // 같은 시간대에 이미 생성했으면 스킵
-  if (generationState.currentHourGenerated && 
-      now.getHours() === generationState.lastGeneration.getHours()) {
+  if (
+    generationState.currentHourGenerated &&
+    now.getHours() === generationState.lastGeneration.getHours()
+  ) {
     return
   }
 
   // 시간대별 생성 빈도 확인
   const timeOfDay = getTimeOfDay(currentHour)
-  const frequency = naturalPatterns.generationFrequency[timeOfDay as keyof typeof naturalPatterns.generationFrequency]
-  
+  const frequency =
+    naturalPatterns.generationFrequency[
+      timeOfDay as keyof typeof naturalPatterns.generationFrequency
+    ]
+
   if (frequency === 0) return
 
   try {
     // 요일별 조정 팩터 적용
     const dayOfWeek = getDayOfWeek(now)
-    const dayPattern = naturalPatterns.weeklyPatterns[dayOfWeek as keyof typeof naturalPatterns.weeklyPatterns]
+    const dayPattern =
+      naturalPatterns.weeklyPatterns[dayOfWeek as keyof typeof naturalPatterns.weeklyPatterns]
     const adjustedFrequency = Math.ceil(frequency * dayPattern.factor)
 
     // 봇 방 생성
     const rooms = await generateTimeBasedBotRooms(adjustedFrequency)
-    
+
     for (const roomData of rooms) {
       await createBotRoomInDatabase(roomData)
-      
+
       // 생성 간격 추가 (자연스러운 패턴)
       await new Promise(resolve => setTimeout(resolve, Math.random() * 30000 + 10000)) // 10-40초
     }
@@ -239,15 +251,15 @@ export async function generateBotsForCurrentTime() {
  */
 export async function generatePopularDistrictBots() {
   const popularDistricts = ['강남구', '마포구', '용산구', '성동구']
-  
+
   for (const district of popularDistricts) {
     try {
       const rooms = await generatePopularTimeRooms(district, 1)
-      
+
       for (const roomData of rooms) {
         await createBotRoomInDatabase(roomData)
       }
-      
+
       // 지역간 생성 간격
       await new Promise(resolve => setTimeout(resolve, Math.random() * 20000 + 5000))
     } catch (error) {
@@ -277,7 +289,9 @@ export async function cleanupOldBotRooms() {
     const botRooms: string[] = []
     for (const room of oldRooms) {
       try {
-        const { data: profile } = await (supabaseAdmin as any).auth.admin.getUserById((room as any).host_uid)
+        const { data: profile } = await (supabaseAdmin as any).auth.admin.getUserById(
+          (room as any).host_uid
+        )
         if (profile.user?.user_metadata?.is_bot) {
           botRooms.push((room as any).id)
         }
@@ -309,7 +323,7 @@ export async function cleanupOldBotRooms() {
 export function resetDailyStats() {
   const now = new Date()
   const lastReset = generationState.lastGeneration
-  
+
   if (now.getDate() !== lastReset.getDate()) {
     generationState.dailyCount = 0
     generationState.currentHourGenerated = false
@@ -337,32 +351,41 @@ export const BotManager = {
   async start() {
     generationState.isActive = true
     console.log('🤖 봇 시스템 시작')
-    
+
     // 초기 봇 방 생성
     await generateBotsForCurrentTime()
-    
+
     // 주기적 실행 설정 (15분마다)
-    setInterval(async () => {
-      resetDailyStats()
-      await generateBotsForCurrentTime()
-    }, 15 * 60 * 1000)
-    
+    setInterval(
+      async () => {
+        resetDailyStats()
+        await generateBotsForCurrentTime()
+      },
+      15 * 60 * 1000
+    )
+
     // 인기 지역 봇 방 생성 (1시간마다)
-    setInterval(async () => {
-      await generatePopularDistrictBots()
-    }, 60 * 60 * 1000)
-    
+    setInterval(
+      async () => {
+        await generatePopularDistrictBots()
+      },
+      60 * 60 * 1000
+    )
+
     // 오래된 방 정리 (6시간마다)
-    setInterval(async () => {
-      await cleanupOldBotRooms()
-    }, 6 * 60 * 60 * 1000)
+    setInterval(
+      async () => {
+        await cleanupOldBotRooms()
+      },
+      6 * 60 * 60 * 1000
+    )
   },
-  
+
   stop() {
     generationState.isActive = false
     console.log('🤖 봇 시스템 중지')
   },
-  
+
   getStats() {
     return {
       isActive: generationState.isActive,
@@ -370,18 +393,18 @@ export const BotManager = {
       lastGeneration: generationState.lastGeneration,
     }
   },
-  
+
   // 수동 봇 방 생성
   async createManualBots(count: number = 3) {
     console.log(`🎯 수동 봇 방 ${count}개 생성 시작`)
     const rooms = await generateTimeBasedBotRooms(count)
-    
+
     for (const roomData of rooms) {
       await createBotRoomInDatabase(roomData)
     }
-    
+
     return rooms
-  }
+  },
 }
 
 export default BotManager

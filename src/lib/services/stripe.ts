@@ -7,15 +7,15 @@ let stripePromise: Promise<Stripe | null>
 export const getStripe = (): Promise<Stripe | null> => {
   if (!stripePromise) {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    
+
     if (!publishableKey) {
       console.warn('Stripe publishable key not found')
       return Promise.resolve(null)
     }
-    
+
     stripePromise = loadStripe(publishableKey)
   }
-  
+
   return stripePromise
 }
 
@@ -28,12 +28,8 @@ export const BOOST_PLANS = {
     price: 1000,
     duration: 1,
     unit: 'day',
-    features: [
-      '24시간 상단 노출',
-      '더 많은 참가자 확보',
-      '즉시 활성화'
-    ],
-    popular: false
+    features: ['24시간 상단 노출', '더 많은 참가자 확보', '즉시 활성화'],
+    popular: false,
   },
   '3': {
     id: '3',
@@ -42,12 +38,8 @@ export const BOOST_PLANS = {
     price: 2500,
     duration: 3,
     unit: 'day',
-    features: [
-      '3일 연속 상단 노출',
-      '최대 효과를 위한 권장 옵션',
-      '더 오랜 기간 노출'
-    ],
-    popular: true
+    features: ['3일 연속 상단 노출', '최대 효과를 위한 권장 옵션', '더 오랜 기간 노출'],
+    popular: true,
   },
   '7': {
     id: '7',
@@ -56,13 +48,9 @@ export const BOOST_PLANS = {
     price: 5000,
     duration: 7,
     unit: 'day',
-    features: [
-      '일주일 연속 상단 노출',
-      '장기간 모집을 위한 최적 선택',
-      '가장 경제적인 옵션'
-    ],
-    popular: false
-  }
+    features: ['일주일 연속 상단 노출', '장기간 모집을 위한 최적 선택', '가장 경제적인 옵션'],
+    popular: false,
+  },
 } as const
 
 export type BoostPlanId = keyof typeof BOOST_PLANS
@@ -92,7 +80,7 @@ export function formatPrice(amount: number): string {
   return new Intl.NumberFormat('ko-KR', {
     style: 'currency',
     currency: 'KRW',
-    minimumFractionDigits: 0
+    minimumFractionDigits: 0,
   }).format(amount)
 }
 
@@ -105,14 +93,14 @@ export function getRemainingTime(expiresAt: string): {
   const now = new Date().getTime()
   const expires = new Date(expiresAt).getTime()
   const diff = expires - now
-  
+
   if (diff <= 0) {
     return { hours: 0, minutes: 0, isExpired: true }
   }
-  
+
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  
+
   return { hours, minutes, isExpired: false }
 }
 
@@ -121,17 +109,17 @@ export function getBoostStatusText(status: BoostStatus): string {
   if (!status.isActive) {
     return '부스트 비활성화'
   }
-  
+
   if (!status.expiresAt) {
     return '부스트 활성화'
   }
-  
+
   const { hours, minutes, isExpired } = getRemainingTime(status.expiresAt)
-  
+
   if (isExpired) {
     return '부스트 만료됨'
   }
-  
+
   if (hours > 24) {
     const days = Math.floor(hours / 24)
     return `${days}일 ${hours % 24}시간 남음`
@@ -155,28 +143,28 @@ export async function createCheckoutSession(data: CreateCheckoutSessionData): Pr
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
-    
+
     const result = await response.json()
-    
+
     if (!response.ok) {
       return {
         success: false,
-        error: result.message || '결제 세션 생성에 실패했습니다'
+        error: result.message || '결제 세션 생성에 실패했습니다',
       }
     }
-    
+
     return {
       success: true,
       sessionId: result.sessionId,
-      url: result.url
+      url: result.url,
     }
   } catch (error: any) {
     console.error('Create checkout session error:', error)
     return {
       success: false,
-      error: '네트워크 오류가 발생했습니다'
+      error: '네트워크 오류가 발생했습니다',
     }
   }
 }
@@ -188,35 +176,38 @@ export async function redirectToCheckout(sessionId: string): Promise<{
 }> {
   try {
     const stripe = await getStripe()
-    
+
     if (!stripe) {
       return {
         success: false,
-        error: 'Stripe을 로드할 수 없습니다'
+        error: 'Stripe을 로드할 수 없습니다',
       }
     }
-    
+
     const { error } = await stripe.redirectToCheckout({ sessionId })
-    
+
     if (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       }
     }
-    
+
     return { success: true }
   } catch (error: any) {
     console.error('Redirect to checkout error:', error)
     return {
       success: false,
-      error: '결제 페이지로 이동하는데 실패했습니다'
+      error: '결제 페이지로 이동하는데 실패했습니다',
     }
   }
 }
 
-// 부스트 결제 완료 처리  
-export async function processBoostPayment(roomId: string, planId: BoostPlanId): Promise<{
+// 부스트 결제 완료 처리
+export async function processBoostPayment(
+  roomId: string,
+  planId: BoostPlanId
+): Promise<{
   success: boolean
   error?: string
   sessionId?: string
@@ -231,54 +222,57 @@ export async function processBoostPayment(roomId: string, planId: BoostPlanId): 
       },
       body: JSON.stringify({
         room_id: roomId,
-        days: planId
-      })
+        days: planId,
+      }),
     })
-    
+
     const result = await response.json()
-    
+
     if (!response.ok) {
       return {
         success: false,
-        error: result.message || '결제 세션 생성에 실패했습니다'
+        error: result.message || '결제 세션 생성에 실패했습니다',
       }
     }
-    
+
     // Stripe Checkout으로 리다이렉트
     if (result.data?.checkout_url) {
       window.location.href = result.data.checkout_url
     }
-    
+
     return {
       success: true,
       sessionId: result.data?.session_id,
-      url: result.data?.checkout_url
+      url: result.data?.checkout_url,
     }
   } catch (error: any) {
     console.error('Process boost payment error:', error)
     return {
       success: false,
-      error: '결제 처리 중 오류가 발생했습니다'
+      error: '결제 처리 중 오류가 발생했습니다',
     }
   }
 }
 
 // 개발 모드에서 사용할 모의 결제 처리
-export async function mockPaymentProcess(_roomId: string, _planId: BoostPlanId): Promise<{
+export async function mockPaymentProcess(
+  _roomId: string,
+  _planId: BoostPlanId
+): Promise<{
   success: boolean
   error?: string
 }> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       // 90% 확률로 성공
       if (Math.random() > 0.1) {
         resolve({
-          success: true
+          success: true,
         })
       } else {
         resolve({
           success: false,
-          error: '결제가 취소되었습니다'
+          error: '결제가 취소되었습니다',
         })
       }
     }, 2000) // 2초 지연으로 실제 결제 과정 모방

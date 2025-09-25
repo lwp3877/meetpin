@@ -26,7 +26,7 @@ export async function GET(): Promise<NextResponse> {
       checks.push({
         component: 'database',
         ready: true,
-        latency: 5
+        latency: 5,
       })
     } else {
       // 프로덕션: 실제 DB 연결 체크
@@ -34,32 +34,31 @@ export async function GET(): Promise<NextResponse> {
       try {
         const supabase = await createServerSupabaseClient()
         await supabase.from('profiles').select('uid').limit(1)
-        
+
         checks.push({
           component: 'database',
           ready: true,
-          latency: Date.now() - dbStart
+          latency: Date.now() - dbStart,
         })
       } catch (error: any) {
         checks.push({
           component: 'database',
           ready: false,
-          error: error.message
+          error: error.message,
         })
       }
     }
 
     // 2. 필수 환경변수 체크
-    const requiredEnvVars = isDevelopmentMode ? [] : [
-      'NEXT_PUBLIC_SUPABASE_URL',
-      'NEXT_PUBLIC_SUPABASE_ANON_KEY'
-    ]
+    const requiredEnvVars = isDevelopmentMode
+      ? []
+      : ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY']
 
     const missingEnvVars = requiredEnvVars.filter(key => !process.env[key])
     checks.push({
       component: 'environment',
       ready: missingEnvVars.length === 0,
-      error: missingEnvVars.length > 0 ? `Missing: ${missingEnvVars.join(', ')}` : undefined
+      error: missingEnvVars.length > 0 ? `Missing: ${missingEnvVars.join(', ')}` : undefined,
     })
 
     // 3. 메모리 사용량 체크 (512MB 임계값)
@@ -70,7 +69,7 @@ export async function GET(): Promise<NextResponse> {
     checks.push({
       component: 'memory',
       ready: memoryReady,
-      error: !memoryReady ? `High memory usage: ${Math.round(heapUsedMB)}MB` : undefined
+      error: !memoryReady ? `High memory usage: ${Math.round(heapUsedMB)}MB` : undefined,
     })
 
     // 전체 readiness 결정
@@ -85,8 +84,8 @@ export async function GET(): Promise<NextResponse> {
       summary: {
         total: checks.length,
         ready: checks.filter(c => c.ready).length,
-        not_ready: checks.filter(c => !c.ready).length
-      }
+        not_ready: checks.filter(c => !c.ready).length,
+      },
     }
 
     // 로깅
@@ -96,19 +95,21 @@ export async function GET(): Promise<NextResponse> {
       status: allReady ? 200 : 503,
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache'
-      }
+        Pragma: 'no-cache',
+      },
     })
-
   } catch (error: any) {
     console.error('[READY] Critical error:', error)
-    
-    return NextResponse.json({
-      ready: false,
-      timestamp: new Date().toISOString(),
-      error: error.message,
-      checks: [],
-      summary: { total: 0, ready: 0, not_ready: 1 }
-    }, { status: 503 })
+
+    return NextResponse.json(
+      {
+        ready: false,
+        timestamp: new Date().toISOString(),
+        error: error.message,
+        checks: [],
+        summary: { total: 0, ready: 0, not_ready: 1 },
+      },
+      { status: 503 }
+    )
   }
 }

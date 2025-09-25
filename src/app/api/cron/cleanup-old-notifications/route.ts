@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     const now = new Date()
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    
+
     // 30일 이상된 읽은 알림 찾기
     const { data: oldNotifications, error: selectError } = await supabase
       .from('host_messages')
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         message: 'No old notifications to clean up',
         deleted: 0,
         cutoff_date: thirtyDaysAgo,
-        timestamp: now.toISOString()
+        timestamp: now.toISOString(),
       })
     }
 
@@ -54,14 +54,16 @@ export async function GET(request: NextRequest) {
       message: 'Old notifications cleaned up successfully',
       deleted: oldNotifications.length,
       cutoff_date: thirtyDaysAgo,
-      timestamp: now.toISOString()
+      timestamp: now.toISOString(),
     })
-
   } catch (error) {
     console.error('Notification cleanup cron error:', error)
-    return NextResponse.json({
-      error: 'Internal server error',
-      timestamp: new Date().toISOString()
-    }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    )
   }
 }

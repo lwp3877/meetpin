@@ -23,14 +23,14 @@ export default function LoginPage() {
   const [isEmailFocused, setIsEmailFocused] = useState(false)
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
   const [formStatus, setFormStatus] = useState('')
-  
+
   // 키보드 네비게이션 설정
   const keyboardNav = useKeyboardNavigation({
     enableArrowKeys: false, // 폼에서는 Tab 키만 사용
     enableActivation: true,
-    loop: true
+    loop: true,
   })
-  
+
   // 키보드 단축키 설정
   useKeyboardShortcuts({
     'ctrl+enter': () => {
@@ -40,13 +40,13 @@ export default function LoginPage() {
         form.dispatchEvent(submitEvent)
       }
     },
-    'escape': () => {
+    escape: () => {
       // 필드 포커스 해제
       const activeElement = document.activeElement as HTMLElement
       if (activeElement) {
         activeElement.blur()
       }
-    }
+    },
   })
   const router = useRouter()
   const { user, loading, signIn } = useAuth()
@@ -124,7 +124,7 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // 전체 유효성 검사
     const isEmailValid = validateEmail(email)
     const isPasswordValid = validatePassword(password)
@@ -153,7 +153,7 @@ export default function LoginPage() {
 
     try {
       const result = await signIn(email, password)
-      
+
       if (result.success) {
         setFormStatus('로그인에 성공했습니다! 지도 페이지로 이동합니다.')
         toast.success('로그인 성공! 지도로 이동합니다 🚀')
@@ -175,7 +175,8 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.error('Login error:', error)
-      const errorMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.'
+      const errorMessage =
+        '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.'
       setFormStatus(`연결 오류: ${errorMessage}`)
       toast.error('네트워크 연결을 확인하고 다시 시도해주세요')
     } finally {
@@ -186,9 +187,9 @@ export default function LoginPage() {
   // 로딩 중일 때 스피너 표시
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           <p className="text-gray-600">로딩 중...</p>
         </div>
       </div>
@@ -198,291 +199,435 @@ export default function LoginPage() {
   return (
     <>
       <SkipLink href="#main-content">주 콘텐츠로 바로 가기</SkipLink>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8" role="main">
-        <div 
+      <div
+        className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-4 py-6 sm:px-6 lg:px-8"
+        role="main"
+      >
+        <div
           ref={keyboardNav.containerRef as React.RefObject<HTMLDivElement>}
-          className="w-full max-w-md space-y-6 sm:max-w-lg" 
+          className="w-full max-w-md space-y-6 sm:max-w-lg"
           id="main-content"
           data-keyboard-container="true"
         >
-        {/* Logo */}
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-full flex items-center justify-center mb-6 shadow-lg transition-transform hover:scale-105" role="img" aria-label="밋핀 로고">
-            <span className="text-2xl sm:text-3xl">📍</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 tracking-tight">
-            {brandMessages.appName}에 로그인
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
-            {brandMessages.tagline}
-          </p>
-        </div>
-
-        {/* Screen Reader Status Announcements */}
-        <div 
-          id="form-status" 
-          className="sr-only" 
-          aria-live="polite" 
-          aria-atomic="true"
-          role="status"
-        >
-          {formStatus}
-        </div>
-
-        {/* Login Form */}
-        <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 border border-gray-100 backdrop-blur-sm" role="form" aria-labelledby="login-heading" aria-describedby="form-instructions">
-          <h2 id="login-heading" className="sr-only">로그인 폼</h2>
-          <p id="form-instructions" className="sr-only">
-            이메일과 비밀번호를 입력하여 로그인하세요. 필드간 이동은 Tab 키를, 
-            양식 제출은 Ctrl+Enter를 사용하세요. 각 필드는 실시간으로 유효성을 검사합니다.
-          </p>
-          
-          {/* Social Login */}
-          <SocialLogin 
-            type="login" 
-            disabled={isLoading}
-            onSuccess={() => {
-              toast.success('소셜 로그인이 완료되었습니다!')
-              router.push('/map')
-            }}
-          />
-
-          {/* Divider */}
-          <div className="relative flex items-center my-6">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-sm text-gray-500 bg-white px-2">
-              또는 이메일로 로그인
-            </span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
-          
-          {/* 개발자용 임시 로그인 정보 */}
-          {isDevelopmentMode && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">🔧 개발자용 임시 로그인</h4>
-              <div className="text-sm text-blue-800 space-y-1">
-                <p><strong>관리자:</strong> admin@meetpin.com / 123456</p>
-                <p><strong>일반유저:</strong> test@test.com / 123456</p>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleEmailLogin} className="space-y-5 sm:space-y-6" noValidate role="form" aria-label="이메일 로그인">
-            <div role="group" aria-labelledby="email-label">
-              <label id="email-label" htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                이메일 주소 <span className="text-red-500" aria-label="필수 입력">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleEmailChange(e.target.value)}
-                  onFocus={() => setIsEmailFocused(true)}
-                  onBlur={() => setIsEmailFocused(false)}
-                  required
-                  className={`w-full px-4 py-3 sm:py-4 text-base border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-                    emailError 
-                      ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1' 
-                      : email && !emailError 
-                      ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
-                      : 'border-gray-300 focus:ring-primary focus:ring-offset-1'
-                  }`}
-                  placeholder="your@email.com"
-                  disabled={isLoading}
-                  autoComplete="email"
-                  inputMode="email"
-                  aria-describedby={`email-help ${emailError ? 'email-error' : ''}`.trim()}
-                  aria-invalid={!!emailError}
-                  aria-required="true"
-                />
-                <div id="email-help" className="sr-only">
-                  이메일 주소를 입력하세요. 예: user@example.com 형식으로 입력해주세요.
-                </div>
-                {email && !emailError && (
-                  <div className="absolute right-3 top-3 sm:top-4 text-green-500" role="img" aria-label="유효한 이메일">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-                {emailError && (
-                  <div className="absolute right-3 top-3 sm:top-4 text-red-500" role="img" aria-label="이메일 오류">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-              {emailError && (
-                <p id="email-error" className="mt-2 text-sm text-red-600 flex items-start" role="alert" aria-live="polite">
-                  <svg className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <span>{emailError}</span>
-                </p>
-              )}
-            </div>
-
-            <div role="group" aria-labelledby="password-label">
-              <label id="password-label" htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                비밀번호 <span className="text-red-500" aria-label="필수 입력">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => handlePasswordChange(e.target.value)}
-                  onFocus={() => setIsPasswordFocused(true)}
-                  onBlur={() => setIsPasswordFocused(false)}
-                  required
-                  className={`w-full px-4 py-3 sm:py-4 pr-16 sm:pr-20 text-base border rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed ${
-                    passwordError 
-                      ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1' 
-                      : password && !passwordError 
-                      ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
-                      : 'border-gray-300 focus:ring-primary focus:ring-offset-1'
-                  }`}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                  aria-describedby={`password-help ${passwordError ? 'password-error' : ''}`.trim()}
-                  aria-invalid={!!passwordError}
-                  aria-required="true"
-                />
-                <div id="password-help" className="sr-only">
-                  비밀번호를 입력하세요. 최소 6자 이상이어야 합니다. 
-                  비밀번호 표시 버튼을 사용하여 입력한 내용을 확인할 수 있습니다.
-                </div>
-                <div className="absolute right-3 sm:right-4 top-3 sm:top-4 flex items-center space-x-2">
-                  {password && !passwordError && (
-                    <div className="text-green-500" role="img" aria-label="유효한 비밀번호">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                  {passwordError && (
-                    <div className="text-red-500" role="img" aria-label="비밀번호 오류">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded transition-colors touch-manipulation"
-                    disabled={isLoading}
-                    aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'}
-                    aria-pressed={showPassword}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {showPassword ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                      ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              {passwordError && (
-                <p id="password-error" className="mt-2 text-sm text-red-600 flex items-start" role="alert" aria-live="polite">
-                  <svg className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <span>{passwordError}</span>
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 py-3 sm:py-4 text-base sm:text-lg font-medium rounded-lg transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed touch-manipulation"
-              disabled={isLoading}
-              aria-describedby="submit-help keyboard-shortcuts"
-              aria-label={isLoading ? '로그인 처리 중' : '이메일로 로그인하기'}
+          {/* Logo */}
+          <div className="text-center">
+            <div
+              className="bg-primary mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 sm:h-20 sm:w-20"
+              role="img"
+              aria-label="밋핀 로고"
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center" role="status" aria-label="로그인 처리 중입니다. 잠시만 기다려주세요.">
-                  <svg className="w-5 h-5 mr-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>로그인 중...</span>
-                </div>
-              ) : (
-                <span>이메일로 로그인</span>
-              )}
-            </Button>
-          </form>
-
-          <div className="sr-only">
-            <p id="submit-help">
-              이메일과 비밀번호로 로그인합니다. 모든 필드를 올바르게 입력한 후 로그인 버튼을 클릭하거나 Ctrl+Enter를 누르세요.
-            </p>
-            <p id="keyboard-shortcuts">
-              키보드 사용법: Tab으로 필드간 이동, Ctrl+Enter로 양식 제출, Escape로 포커스 해제
-            </p>
-          </div>
-          
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm sm:text-base text-gray-600">
-              계정이 없으신가요?{' '}
-              <Link 
-                href="/auth/signup" 
-                className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded font-medium transition-colors touch-manipulation"
-                aria-label="회원가입 페이지로 이동"
-              >
-                회원가입
-              </Link>
+              <span className="text-2xl sm:text-3xl">📍</span>
+            </div>
+            <h1 className="mb-3 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+              {brandMessages.appName}에 로그인
+            </h1>
+            <p className="text-base leading-relaxed text-gray-600 sm:text-lg">
+              {brandMessages.tagline}
             </p>
           </div>
 
-          {/* Forgot Password */}
-          <div className="mt-3 text-center">
-            <button 
-              type="button"
-              className="text-sm sm:text-base text-gray-500 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded p-1 transition-colors touch-manipulation"
-              aria-label="비밀번호 찾기"
-            >
-              비밀번호를 잊으셨나요?
-            </button>
-          </div>
-        </div>
-
-        {/* Back to Home */}
-        <div className="text-center">
-          <Link 
-            href="/" 
-            className="inline-flex items-center text-sm sm:text-base text-gray-500 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded p-2 transition-colors touch-manipulation"
-            aria-label="홈 페이지로 돌아가기"
+          {/* Screen Reader Status Announcements */}
+          <div
+            id="form-status"
+            className="sr-only"
+            aria-live="polite"
+            aria-atomic="true"
+            role="status"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            홈으로 돌아가기
-          </Link>
-        </div>
+            {formStatus}
+          </div>
 
-        {/* Features Preview */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center" role="region" aria-label="주요 기능">
-          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
-            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="지도">🗺️</div>
-            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">지도 기반<br />모임</div>
+          {/* Login Form */}
+          <div
+            className="rounded-xl border border-gray-100 bg-white p-6 shadow-xl backdrop-blur-sm sm:p-8"
+            role="form"
+            aria-labelledby="login-heading"
+            aria-describedby="form-instructions"
+          >
+            <h2 id="login-heading" className="sr-only">
+              로그인 폼
+            </h2>
+            <p id="form-instructions" className="sr-only">
+              이메일과 비밀번호를 입력하여 로그인하세요. 필드간 이동은 Tab 키를, 양식 제출은
+              Ctrl+Enter를 사용하세요. 각 필드는 실시간으로 유효성을 검사합니다.
+            </p>
+
+            {/* Social Login */}
+            <SocialLogin
+              type="login"
+              disabled={isLoading}
+              onSuccess={() => {
+                toast.success('소셜 로그인이 완료되었습니다!')
+                router.push('/map')
+              }}
+            />
+
+            {/* Divider */}
+            <div className="relative my-6 flex items-center">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="mx-4 bg-white px-2 text-sm text-gray-500">또는 이메일로 로그인</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+
+            {/* 개발자용 임시 로그인 정보 */}
+            {isDevelopmentMode && (
+              <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h4 className="mb-2 font-medium text-blue-900">🔧 개발자용 임시 로그인</h4>
+                <div className="space-y-1 text-sm text-blue-800">
+                  <p>
+                    <strong>관리자:</strong> admin@meetpin.com / 123456
+                  </p>
+                  <p>
+                    <strong>일반유저:</strong> test@test.com / 123456
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <form
+              onSubmit={handleEmailLogin}
+              className="space-y-5 sm:space-y-6"
+              noValidate
+              role="form"
+              aria-label="이메일 로그인"
+            >
+              <div role="group" aria-labelledby="email-label">
+                <label
+                  id="email-label"
+                  htmlFor="email"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  이메일 주소{' '}
+                  <span className="text-red-500" aria-label="필수 입력">
+                    *
+                  </span>
+                </label>
+                <div className="relative">
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={e => handleEmailChange(e.target.value)}
+                    onFocus={() => setIsEmailFocused(true)}
+                    onBlur={() => setIsEmailFocused(false)}
+                    required
+                    className={`w-full rounded-lg border px-4 py-3 text-base transition-all duration-200 focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 sm:py-4 ${
+                      emailError
+                        ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1'
+                        : email && !emailError
+                          ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
+                          : 'focus:ring-primary border-gray-300 focus:ring-offset-1'
+                    }`}
+                    placeholder="your@email.com"
+                    disabled={isLoading}
+                    autoComplete="email"
+                    inputMode="email"
+                    aria-describedby={`email-help ${emailError ? 'email-error' : ''}`.trim()}
+                    aria-invalid={!!emailError}
+                    aria-required="true"
+                  />
+                  <div id="email-help" className="sr-only">
+                    이메일 주소를 입력하세요. 예: user@example.com 형식으로 입력해주세요.
+                  </div>
+                  {email && !emailError && (
+                    <div
+                      className="absolute top-3 right-3 text-green-500 sm:top-4"
+                      role="img"
+                      aria-label="유효한 이메일"
+                    >
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                  {emailError && (
+                    <div
+                      className="absolute top-3 right-3 text-red-500 sm:top-4"
+                      role="img"
+                      aria-label="이메일 오류"
+                    >
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                {emailError && (
+                  <p
+                    id="email-error"
+                    className="mt-2 flex items-start text-sm text-red-600"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <svg
+                      className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>{emailError}</span>
+                  </p>
+                )}
+              </div>
+
+              <div role="group" aria-labelledby="password-label">
+                <label
+                  id="password-label"
+                  htmlFor="password"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  비밀번호{' '}
+                  <span className="text-red-500" aria-label="필수 입력">
+                    *
+                  </span>
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => handlePasswordChange(e.target.value)}
+                    onFocus={() => setIsPasswordFocused(true)}
+                    onBlur={() => setIsPasswordFocused(false)}
+                    required
+                    className={`w-full rounded-lg border px-4 py-3 pr-16 text-base transition-all duration-200 focus:border-transparent focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-100 sm:py-4 sm:pr-20 ${
+                      passwordError
+                        ? 'border-red-300 focus:ring-red-200 focus:ring-offset-1'
+                        : password && !passwordError
+                          ? 'border-green-300 focus:ring-green-200 focus:ring-offset-1'
+                          : 'focus:ring-primary border-gray-300 focus:ring-offset-1'
+                    }`}
+                    placeholder="••••••••"
+                    disabled={isLoading}
+                    autoComplete="current-password"
+                    aria-describedby={`password-help ${passwordError ? 'password-error' : ''}`.trim()}
+                    aria-invalid={!!passwordError}
+                    aria-required="true"
+                  />
+                  <div id="password-help" className="sr-only">
+                    비밀번호를 입력하세요. 최소 6자 이상이어야 합니다. 비밀번호 표시 버튼을 사용하여
+                    입력한 내용을 확인할 수 있습니다.
+                  </div>
+                  <div className="absolute top-3 right-3 flex items-center space-x-2 sm:top-4 sm:right-4">
+                    {password && !passwordError && (
+                      <div className="text-green-500" role="img" aria-label="유효한 비밀번호">
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    {passwordError && (
+                      <div className="text-red-500" role="img" aria-label="비밀번호 오류">
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="focus:ring-primary touch-manipulation rounded p-1 text-gray-400 transition-colors hover:text-gray-600 focus:ring-2 focus:ring-offset-1 focus:outline-none"
+                      disabled={isLoading}
+                      aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보이기'}
+                      aria-pressed={showPassword}
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        {showPassword ? (
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+                          />
+                        ) : (
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        )}
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                {passwordError && (
+                  <p
+                    id="password-error"
+                    className="mt-2 flex items-start text-sm text-red-600"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <svg
+                      className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>{passwordError}</span>
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                className="bg-primary hover:bg-primary/90 focus:ring-primary w-full touch-manipulation rounded-lg py-3 text-base font-medium transition-all duration-200 focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400 sm:py-4 sm:text-lg"
+                disabled={isLoading}
+                aria-describedby="submit-help keyboard-shortcuts"
+                aria-label={isLoading ? '로그인 처리 중' : '이메일로 로그인하기'}
+              >
+                {isLoading ? (
+                  <div
+                    className="flex items-center justify-center"
+                    role="status"
+                    aria-label="로그인 처리 중입니다. 잠시만 기다려주세요."
+                  >
+                    <svg className="mr-3 h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>로그인 중...</span>
+                  </div>
+                ) : (
+                  <span>이메일로 로그인</span>
+                )}
+              </Button>
+            </form>
+
+            <div className="sr-only">
+              <p id="submit-help">
+                이메일과 비밀번호로 로그인합니다. 모든 필드를 올바르게 입력한 후 로그인 버튼을
+                클릭하거나 Ctrl+Enter를 누르세요.
+              </p>
+              <p id="keyboard-shortcuts">
+                키보드 사용법: Tab으로 필드간 이동, Ctrl+Enter로 양식 제출, Escape로 포커스 해제
+              </p>
+            </div>
+
+            {/* Sign Up Link */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 sm:text-base">
+                계정이 없으신가요?{' '}
+                <Link
+                  href="/auth/signup"
+                  className="text-primary focus:ring-primary touch-manipulation rounded font-medium transition-colors hover:underline focus:ring-2 focus:ring-offset-1 focus:outline-none"
+                  aria-label="회원가입 페이지로 이동"
+                >
+                  회원가입
+                </Link>
+              </p>
+            </div>
+
+            {/* Forgot Password */}
+            <div className="mt-3 text-center">
+              <button
+                type="button"
+                className="hover:text-primary focus:ring-primary touch-manipulation rounded p-1 text-sm text-gray-500 transition-colors focus:ring-2 focus:ring-offset-1 focus:outline-none sm:text-base"
+                aria-label="비밀번호 찾기"
+              >
+                비밀번호를 잊으셨나요?
+              </button>
+            </div>
           </div>
-          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
-            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="채팅">💬</div>
-            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">실시간<br />채팅</div>
+
+          {/* Back to Home */}
+          <div className="text-center">
+            <Link
+              href="/"
+              className="hover:text-primary focus:ring-primary inline-flex touch-manipulation items-center rounded p-2 text-sm text-gray-500 transition-colors focus:ring-2 focus:ring-offset-1 focus:outline-none sm:text-base"
+              aria-label="홈 페이지로 돌아가기"
+            >
+              <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              홈으로 돌아가기
+            </Link>
           </div>
-          <div className="p-3 sm:p-4 bg-white/50 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/70 transition-all duration-200">
-            <div className="text-xl sm:text-2xl mb-2" role="img" aria-label="매칭">👥</div>
-            <div className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">쉬운<br />매칭</div>
+
+          {/* Features Preview */}
+          <div
+            className="grid grid-cols-3 gap-3 text-center sm:gap-4"
+            role="region"
+            aria-label="주요 기능"
+          >
+            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
+              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="지도">
+                🗺️
+              </div>
+              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
+                지도 기반
+                <br />
+                모임
+              </div>
+            </div>
+            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
+              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="채팅">
+                💬
+              </div>
+              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
+                실시간
+                <br />
+                채팅
+              </div>
+            </div>
+            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
+              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="매칭">
+                👥
+              </div>
+              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
+                쉬운
+                <br />
+                매칭
+              </div>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </>

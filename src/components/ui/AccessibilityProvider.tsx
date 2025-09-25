@@ -24,21 +24,21 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     // Detect reduced motion preference
     const motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setPrefersReducedMotion(motionMediaQuery.matches)
-    
+
     const handleMotionChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches)
     }
-    
+
     motionMediaQuery.addEventListener('change', handleMotionChange)
 
     // Detect high contrast preference
     const contrastMediaQuery = window.matchMedia('(prefers-contrast: high)')
     setHighContrastMode(contrastMediaQuery.matches)
-    
+
     const handleContrastChange = (e: MediaQueryListEvent) => {
       setHighContrastMode(e.matches)
     }
-    
+
     contrastMediaQuery.addEventListener('change', handleContrastChange)
 
     // Focus-visible detection for keyboard navigation
@@ -66,7 +66,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
   // Apply global CSS classes based on preferences
   useEffect(() => {
     const root = document.documentElement
-    
+
     if (prefersReducedMotion) {
       root.classList.add('reduce-motion')
     } else {
@@ -112,8 +112,8 @@ export function SkipLink({ href, children }: { href: string; children: React.Rea
   return (
     <a
       href={href}
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded-lg z-50 transition-all duration-200"
-      onFocus={(e) => e.currentTarget.scrollIntoView({ block: 'center' })}
+      className="bg-primary sr-only z-50 rounded-lg px-4 py-2 text-white transition-all duration-200 focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
+      onFocus={e => e.currentTarget.scrollIntoView({ block: 'center' })}
     >
       {children}
     </a>

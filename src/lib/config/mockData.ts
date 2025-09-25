@@ -24,7 +24,7 @@ export const mockUsers = [
     avatar_url: koreanAvatars.male[0], // 젊은 한국 남성
   },
   {
-    uid: '550e8400-e29b-41d4-a716-446655440002', 
+    uid: '550e8400-e29b-41d4-a716-446655440002',
     nickname: '이영희',
     age_range: '30s_early',
     role: 'user',
@@ -34,7 +34,7 @@ export const mockUsers = [
   {
     uid: '550e8400-e29b-41d4-a716-446655440003',
     nickname: '박민수',
-    age_range: '20s_early', 
+    age_range: '20s_early',
     role: 'admin',
     created_at: '2024-02-01T09:15:00Z',
     avatar_url: koreanAvatars.male[1], // 한국 남성 프로필
@@ -258,10 +258,10 @@ export const mockRooms = [
       nickname: '김철수',
       avatar_url: koreanAvatars.male[0],
       age_range: '20s_late',
-    }
+    },
   },
   {
-    id: '550e8400-e29b-41d4-a716-446655440011', 
+    id: '550e8400-e29b-41d4-a716-446655440011',
     title: '강남 와인바 투어 🍷',
     category: 'drink' as const,
     lat: 37.5632,
@@ -275,9 +275,9 @@ export const mockRooms = [
       nickname: '최소영',
       avatar_url: koreanAvatars.female[0],
       age_range: '30s_early',
-    }
+    },
   },
-  
+
   // 홍대 지역 - 활발한 밤 문화
   {
     id: '550e8400-e29b-41d4-a716-446655440012',
@@ -294,13 +294,13 @@ export const mockRooms = [
       nickname: '이영희',
       avatar_url: koreanAvatars.female[1],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440013',
     title: '홍대 포차 투어 🍻',
     category: 'drink' as const,
-    lat: 37.5580,
+    lat: 37.558,
     lng: 126.9256,
     place_text: '홍대 연남동 포차거리',
     start_at: getUpcomingDate(2), // 2시간 후
@@ -311,9 +311,9 @@ export const mockRooms = [
       nickname: '박대호',
       avatar_url: koreanAvatars.male[1],
       age_range: '20s_late',
-    }
+    },
   },
-  
+
   // 한강 지역 - 운동/피크닉
   {
     id: '550e8400-e29b-41d4-a716-446655440014',
@@ -330,7 +330,7 @@ export const mockRooms = [
       nickname: '박민수',
       avatar_url: koreanAvatars.male[2],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440015',
@@ -347,7 +347,7 @@ export const mockRooms = [
       nickname: '김지은',
       avatar_url: koreanAvatars.female[3],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440016',
@@ -364,9 +364,9 @@ export const mockRooms = [
       nickname: '이준호',
       avatar_url: koreanAvatars.male[6],
       age_range: '30s_early',
-    }
+    },
   },
-  
+
   // 이태원/용산 지역 - 다국적 문화
   {
     id: '550e8400-e29b-41d4-a716-446655440017',
@@ -383,13 +383,13 @@ export const mockRooms = [
       nickname: '정미영',
       avatar_url: koreanAvatars.female[5],
       age_range: '30s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440018',
     title: '용산 국립중앙박물관 관람 🏛️',
     category: 'other' as const,
-    lat: 37.5240,
+    lat: 37.524,
     lng: 126.9802,
     place_text: '국립중앙박물관',
     start_at: getUpcomingDate(34), // 모레 오전
@@ -400,9 +400,9 @@ export const mockRooms = [
       nickname: '문화애호가',
       avatar_url: koreanAvatars.male[2],
       age_range: '40s',
-    }
+    },
   },
-  
+
   // 성수/건대 지역 - 젊은 문화
   {
     id: '550e8400-e29b-41d4-a716-446655440019',
@@ -419,7 +419,7 @@ export const mockRooms = [
       nickname: '카페마니아',
       avatar_url: koreanAvatars.female[4],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440020',
@@ -436,9 +436,9 @@ export const mockRooms = [
       nickname: '스트라이크킹',
       avatar_url: koreanAvatars.male[5],
       age_range: '20s_early',
-    }
+    },
   },
-  
+
   // 잠실/송파 지역 - 레저/엔터테인먼트
   {
     id: '550e8400-e29b-41d4-a716-446655440021',
@@ -455,7 +455,7 @@ export const mockRooms = [
       nickname: '어드벤처러버',
       avatar_url: koreanAvatars.female[2],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440022',
@@ -472,9 +472,9 @@ export const mockRooms = [
       nickname: '산책러버',
       avatar_url: koreanAvatars.female[3],
       age_range: '30s_early',
-    }
+    },
   },
-  
+
   // 신촌/마포 지역 - 대학가 문화
   {
     id: '550e8400-e29b-41d4-a716-446655440023',
@@ -491,7 +491,7 @@ export const mockRooms = [
       nickname: '노래왕',
       avatar_url: koreanAvatars.male[6],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440024',
@@ -508,9 +508,9 @@ export const mockRooms = [
       nickname: '축구광',
       avatar_url: koreanAvatars.male[2],
       age_range: '30s_early',
-    }
+    },
   },
-  
+
   // 명동/중구 지역 - 관광/쇼핑
   {
     id: '550e8400-e29b-41d4-a716-446655440025',
@@ -527,16 +527,16 @@ export const mockRooms = [
       nickname: '쇼핑퀸',
       avatar_url: koreanAvatars.female[5],
       age_range: '30s_late',
-    }
+    },
   },
-  
+
   // 동대문/종로 지역 - 전통과 역사
   {
     id: '550e8400-e29b-41d4-a716-446655440026',
     title: '경복궁 야간 개장 관람 🏯',
     category: 'other' as const,
     lat: 37.5788,
-    lng: 126.9770,
+    lng: 126.977,
     place_text: '경복궁',
     start_at: getUpcomingDate(103), // 6일 후 저녁
     max_people: 8,
@@ -546,7 +546,7 @@ export const mockRooms = [
       nickname: '역사탐험가',
       avatar_url: koreanAvatars.male[5],
       age_range: '40s',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440027',
@@ -563,9 +563,9 @@ export const mockRooms = [
       nickname: '야행성인간',
       avatar_url: koreanAvatars.female[2],
       age_range: '20s_late',
-    }
+    },
   },
-  
+
   // 추가 다양한 지역과 모임들
   {
     id: '550e8400-e29b-41d4-a716-446655440028',
@@ -582,7 +582,7 @@ export const mockRooms = [
       nickname: '치킨러버',
       avatar_url: koreanAvatars.female[3],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440029',
@@ -599,13 +599,13 @@ export const mockRooms = [
       nickname: '헬스트레이너',
       avatar_url: koreanAvatars.male[6],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440030',
     title: '논현동 와인 시음회 🍷',
     category: 'drink' as const,
-    lat: 37.5110,
+    lat: 37.511,
     lng: 127.0268,
     place_text: '논현역 와인바',
     start_at: getUpcomingDate(32), // 모레 저녁
@@ -616,7 +616,7 @@ export const mockRooms = [
       nickname: '와인소믈리에',
       avatar_url: koreanAvatars.male[2],
       age_range: '30s_late',
-    }
+    },
   },
 
   // 더 많은 지역별 다양한 모임들 추가...
@@ -625,7 +625,7 @@ export const mockRooms = [
     title: '홍대 버스킹 관람 🎵',
     category: 'other' as const,
     lat: 37.5571,
-    lng: 126.9240,
+    lng: 126.924,
     place_text: '홍대 걷고싶은거리',
     start_at: getUpcomingDate(31), // 모레 저녁
     max_people: 6,
@@ -635,7 +635,7 @@ export const mockRooms = [
       nickname: '음악애호가',
       avatar_url: koreanAvatars.female[4],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440032',
@@ -652,7 +652,7 @@ export const mockRooms = [
       nickname: '직장인모임리더',
       avatar_url: koreanAvatars.female[2],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440033',
@@ -669,7 +669,7 @@ export const mockRooms = [
       nickname: '등산대장',
       avatar_url: koreanAvatars.male[5],
       age_range: '40s',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440034',
@@ -686,7 +686,7 @@ export const mockRooms = [
       nickname: '야구팬',
       avatar_url: koreanAvatars.male[6],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440035',
@@ -703,9 +703,9 @@ export const mockRooms = [
       nickname: '맥주브루어',
       avatar_url: koreanAvatars.female[3],
       age_range: '30s_late',
-    }
+    },
   },
-  
+
   // 여성 호스트들의 다양한 모임들 추가
   {
     id: '550e8400-e29b-41d4-a716-446655440036',
@@ -722,7 +722,7 @@ export const mockRooms = [
       nickname: '박서연',
       avatar_url: koreanAvatars.female[2],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440037',
@@ -739,7 +739,7 @@ export const mockRooms = [
       nickname: '김소희',
       avatar_url: koreanAvatars.female[3],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440038',
@@ -756,7 +756,7 @@ export const mockRooms = [
       nickname: '이지민',
       avatar_url: koreanAvatars.female[4],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440039',
@@ -773,7 +773,7 @@ export const mockRooms = [
       nickname: '윤하나',
       avatar_url: koreanAvatars.female[5],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440040',
@@ -790,7 +790,7 @@ export const mockRooms = [
       nickname: '강민지',
       avatar_url: koreanAvatars.female[6],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440041',
@@ -807,13 +807,13 @@ export const mockRooms = [
       nickname: '조예린',
       avatar_url: koreanAvatars.female[7],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440042',
     title: '성수 베이커리 투어 🧁',
     category: 'other' as const,
-    lat: 37.5440,
+    lat: 37.544,
     lng: 127.0563,
     place_text: '성수동 베이커리 카페',
     start_at: getUpcomingDate(56), // 3일 후 오후
@@ -824,7 +824,7 @@ export const mockRooms = [
       nickname: '한수지',
       avatar_url: koreanAvatars.female[8],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440043',
@@ -841,7 +841,7 @@ export const mockRooms = [
       nickname: '송다은',
       avatar_url: koreanAvatars.female[9],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440044',
@@ -858,7 +858,7 @@ export const mockRooms = [
       nickname: '임유진',
       avatar_url: koreanAvatars.female[10],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440045',
@@ -875,7 +875,7 @@ export const mockRooms = [
       nickname: '최애리',
       avatar_url: koreanAvatars.female[11],
       age_range: '30s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440046',
@@ -892,14 +892,14 @@ export const mockRooms = [
       nickname: '박서연',
       avatar_url: koreanAvatars.female[12],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440047',
     title: '마포 수제 케이크 만들기 🍰',
     category: 'other' as const,
-    lat: 37.5420,
-    lng: 126.9520,
+    lat: 37.542,
+    lng: 126.952,
     place_text: '마포구 베이킹 클래스',
     start_at: getUpcomingDate(65), // 4일 후 오후
     max_people: 8,
@@ -909,7 +909,7 @@ export const mockRooms = [
       nickname: '송다은',
       avatar_url: koreanAvatars.female[13],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440048',
@@ -926,7 +926,7 @@ export const mockRooms = [
       nickname: '최애리',
       avatar_url: koreanAvatars.female[14],
       age_range: '30s_late',
-    }
+    },
   },
 
   // 추가 방들 - 더 다양한 지역과 활동
@@ -945,7 +945,7 @@ export const mockRooms = [
       nickname: '강태준',
       avatar_url: koreanAvatars.male[3],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440050',
@@ -962,7 +962,7 @@ export const mockRooms = [
       nickname: '오민석',
       avatar_url: koreanAvatars.male[4],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440051',
@@ -979,7 +979,7 @@ export const mockRooms = [
       nickname: '신동욱',
       avatar_url: koreanAvatars.male[5],
       age_range: '30s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440052',
@@ -996,7 +996,7 @@ export const mockRooms = [
       nickname: '류준형',
       avatar_url: koreanAvatars.male[7],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440053',
@@ -1013,7 +1013,7 @@ export const mockRooms = [
       nickname: '홍지훈',
       avatar_url: koreanAvatars.male[8],
       age_range: '40s',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440054',
@@ -1030,7 +1030,7 @@ export const mockRooms = [
       nickname: '문성진',
       avatar_url: koreanAvatars.male[9],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440055',
@@ -1047,7 +1047,7 @@ export const mockRooms = [
       nickname: '유소정',
       avatar_url: koreanAvatars.female[12],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440056',
@@ -1064,7 +1064,7 @@ export const mockRooms = [
       nickname: '한예슬',
       avatar_url: koreanAvatars.female[13],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440057',
@@ -1081,7 +1081,7 @@ export const mockRooms = [
       nickname: '서민아',
       avatar_url: koreanAvatars.female[14],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440058',
@@ -1098,7 +1098,7 @@ export const mockRooms = [
       nickname: '장수빈',
       avatar_url: koreanAvatars.female[0],
       age_range: '30s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440059',
@@ -1115,7 +1115,7 @@ export const mockRooms = [
       nickname: '차현진',
       avatar_url: koreanAvatars.female[1],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440060',
@@ -1132,7 +1132,7 @@ export const mockRooms = [
       nickname: '김철수',
       avatar_url: koreanAvatars.male[0],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440061',
@@ -1149,7 +1149,7 @@ export const mockRooms = [
       nickname: '최소영',
       avatar_url: koreanAvatars.female[0],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440062',
@@ -1166,7 +1166,7 @@ export const mockRooms = [
       nickname: '이영희',
       avatar_url: koreanAvatars.female[1],
       age_range: '30s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440063',
@@ -1183,7 +1183,7 @@ export const mockRooms = [
       nickname: '박대호',
       avatar_url: koreanAvatars.male[1],
       age_range: '20s_late',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440064',
@@ -1200,7 +1200,7 @@ export const mockRooms = [
       nickname: '박민수',
       avatar_url: koreanAvatars.male[2],
       age_range: '20s_early',
-    }
+    },
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440065',
@@ -1217,8 +1217,8 @@ export const mockRooms = [
       nickname: '김지은',
       avatar_url: koreanAvatars.female[3],
       age_range: '20s_late',
-    }
-  }
+    },
+  },
 ]
 
 export const mockReports = [
@@ -1234,7 +1234,7 @@ export const mockReports = [
   {
     id: 'report-2',
     reason: '약속 시간 미준수',
-    status: 'reviewed', 
+    status: 'reviewed',
     created_at: '2024-02-27T10:15:00Z',
     reporter_profile: { nickname: '이영희' },
     target_profile: { nickname: '지각대장' },
@@ -1244,7 +1244,7 @@ export const mockReports = [
     id: 'report-3',
     reason: '사기 의심',
     status: 'resolved',
-    created_at: '2024-02-26T14:45:00Z', 
+    created_at: '2024-02-26T14:45:00Z',
     reporter_profile: { nickname: '박민수' },
     target_profile: { nickname: '사기꾼' },
     rooms: null,
@@ -1269,14 +1269,14 @@ export const mockLogin = async (email: string, password: string) => {
   if (email === 'test@test.com' && password === '123456') {
     return { success: true, user: { ...mockUser, role: 'user', nickname: '테스트유저' } }
   }
-  
+
   // localStorage에서 회원가입한 사용자들 확인
   if (typeof window !== 'undefined') {
     const registeredUsersStr = localStorage.getItem('meetpin_registered_users')
     if (registeredUsersStr) {
       const registeredUsers = JSON.parse(registeredUsersStr)
       const user = registeredUsers.find((u: any) => u.email === email && u.password === password)
-      
+
       if (user) {
         // password 필드는 제외하고 반환
         const { password: _password, ...userWithoutPassword } = user
@@ -1284,12 +1284,17 @@ export const mockLogin = async (email: string, password: string) => {
       }
     }
   }
-  
+
   throw new Error('이메일 또는 비밀번호가 올바르지 않습니다')
 }
 
 // Mock 회원가입 함수
-export const mockSignUp = async (email: string, password: string, nickname: string, ageRange: string) => {
+export const mockSignUp = async (
+  email: string,
+  password: string,
+  nickname: string,
+  ageRange: string
+) => {
   // 개발용 간단 검증
   if (!email || !password || !nickname || !ageRange) {
     throw new Error('모든 필드를 입력해주세요')
@@ -1297,18 +1302,18 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
   if (password.length < 6) {
     throw new Error('비밀번호는 6자 이상이어야 합니다')
   }
-  
+
   // localStorage에서 기존 사용자들 가져오기
   if (typeof window !== 'undefined') {
     const registeredUsersStr = localStorage.getItem('meetpin_registered_users')
     const registeredUsers = registeredUsersStr ? JSON.parse(registeredUsersStr) : []
-    
+
     // 이미 존재하는 이메일 확인
     const existingUser = registeredUsers.find((u: any) => u.email === email)
     if (existingUser) {
       throw new Error('이미 존재하는 이메일입니다')
     }
-    
+
     // 새 사용자 생성
     const newUser = {
       id: `550e8400-e29b-41d4-a716-${Date.now().toString().slice(-12).padStart(12, '0')}`,
@@ -1321,16 +1326,16 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
       avatar_url: null,
       intro: null,
     }
-    
+
     // localStorage에 추가
     registeredUsers.push(newUser)
     localStorage.setItem('meetpin_registered_users', JSON.stringify(registeredUsers))
-    
+
     // Mock 사용자 등록 완료 (개발용 로그 제거)
   }
-  
-  return { 
-    success: true, 
+
+  return {
+    success: true,
     message: '회원가입이 완료되었습니다. 로그인해주세요.',
     user: {
       id: `550e8400-e29b-41d4-a716-${Date.now().toString().slice(-12).padStart(12, '0')}`,
@@ -1338,7 +1343,7 @@ export const mockSignUp = async (email: string, password: string, nickname: stri
       nickname,
       age_range: ageRange,
       role: 'user',
-    }
+    },
   }
 }
 

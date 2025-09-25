@@ -216,7 +216,7 @@ export function CustomToaster() {
         },
       }}
     >
-      {(t) => (
+      {t => (
         <ToastBar toast={t}>
           {({ icon, message }) => (
             <div className="flex items-center">
@@ -225,11 +225,16 @@ export function CustomToaster() {
               {t.type !== 'loading' && (
                 <button
                   onClick={() => toast.dismiss(t.id)}
-                  className="ml-3 text-white/70 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+                  className="ml-3 rounded-full p-1 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                   aria-label="닫기"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               )}
@@ -247,28 +252,30 @@ export const NotificationPresets = {
   profileUpdated: () => Toast.success('프로필이 성공적으로 업데이트되었습니다! 🎉'),
   loginSuccess: (nickname?: string) => Toast.success(`안녕하세요, ${nickname || '사용자'}님! 🙋‍♂️`),
   logoutSuccess: () => Toast.success('안전하게 로그아웃되었습니다 👋'),
-  
+
   // Room actions
   roomCreated: () => Toast.success('새로운 모임이 생성되었습니다! 🎉'),
   roomUpdated: () => Toast.success('모임 정보가 수정되었습니다 ✏️'),
   roomDeleted: () => Toast.success('모임이 삭제되었습니다'),
   roomCancelled: () => Toast.warning('모임이 취소되었습니다'),
-  
+
   // Request actions
   requestSent: () => Toast.success('참가 신청이 전송되었습니다! 🚀'),
-  requestApproved: (roomTitle: string) => Toast.success(`"${roomTitle}" 모임 참가가 승인되었습니다! 🎉`),
-  requestRejected: (roomTitle: string) => Toast.warning(`"${roomTitle}" 모임 참가가 거절되었습니다`),
+  requestApproved: (roomTitle: string) =>
+    Toast.success(`"${roomTitle}" 모임 참가가 승인되었습니다! 🎉`),
+  requestRejected: (roomTitle: string) =>
+    Toast.warning(`"${roomTitle}" 모임 참가가 거절되었습니다`),
   requestCancelled: () => Toast.info('참가 신청이 취소되었습니다'),
-  
+
   // Chat actions
   newMessage: (senderName: string) => Toast.info(`${senderName}님이 메시지를 보냈습니다 💬`),
-  
+
   // Error messages
   networkError: () => Toast.error('네트워크 연결을 확인해주세요 📶'),
   unauthorizedError: () => Toast.error('로그인이 필요합니다 🔐'),
   serverError: () => Toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요'),
   validationError: (message: string) => Toast.error(message),
-  
+
   // Loading states
   savingData: () => Toast.loading('저장하는 중...'),
   loadingData: () => Toast.loading('불러오는 중...'),

@@ -68,7 +68,9 @@ export default function MyRoomsPage() {
         throw new Error(result.message || '상태 변경에 실패했습니다')
       }
 
-      toast.success(newStatus === 'cancelled' ? '모임이 취소되었습니다' : '모임이 재활성화되었습니다')
+      toast.success(
+        newStatus === 'cancelled' ? '모임이 취소되었습니다' : '모임이 재활성화되었습니다'
+      )
       await loadMyRooms()
     } catch (err: any) {
       toast.error(err.message)
@@ -120,9 +122,9 @@ export default function MyRoomsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           <p className="text-gray-600">내 모임을 불러오는 중...</p>
         </div>
       </div>
@@ -136,16 +138,11 @@ export default function MyRoomsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
+      <header className="sticky top-0 z-10 border-b border-white/20 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.back()}
-                className="mr-2"
-              >
+              <Button variant="ghost" size="sm" onClick={() => router.back()} className="mr-2">
                 ← 뒤로
               </Button>
               <h1 className="text-xl font-bold text-gray-900">내가 만든 모임</h1>
@@ -162,18 +159,26 @@ export default function MyRoomsPage() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b">
+      <div className="border-b bg-white">
         <div className="container mx-auto px-4">
           <div className="flex space-x-8">
             {[
-              { key: 'active', label: '활성 모임', count: rooms.filter(r => r.status === 'active').length },
-              { key: 'completed', label: '완료/취소', count: rooms.filter(r => r.status !== 'active').length },
+              {
+                key: 'active',
+                label: '활성 모임',
+                count: rooms.filter(r => r.status === 'active').length,
+              },
+              {
+                key: 'completed',
+                label: '완료/취소',
+                count: rooms.filter(r => r.status !== 'active').length,
+              },
               { key: 'all', label: '전체', count: rooms.length },
-            ].map((tab) => (
+            ].map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.key
                     ? 'border-primary text-primary'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -188,7 +193,7 @@ export default function MyRoomsPage() {
 
       <div className="container mx-auto px-4 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-red-600">{error}</p>
             <Button onClick={loadMyRooms} variant="outline" size="sm" className="mt-2">
               다시 시도
@@ -197,19 +202,23 @@ export default function MyRoomsPage() {
         )}
 
         {filteredRooms.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div className="py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
               <span className="text-2xl">🏠</span>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {activeTab === 'active' ? '활성 모임이 없습니다' : 
-               activeTab === 'completed' ? '완료된 모임이 없습니다' : 
-               '만든 모임이 없습니다'}
+            <h3 className="mb-2 text-lg font-medium text-gray-900">
+              {activeTab === 'active'
+                ? '활성 모임이 없습니다'
+                : activeTab === 'completed'
+                  ? '완료된 모임이 없습니다'
+                  : '만든 모임이 없습니다'}
             </h3>
-            <p className="text-gray-600 mb-6">
-              {activeTab === 'active' ? '새로운 모임을 만들어 사람들을 만나보세요!' :
-               activeTab === 'completed' ? '아직 완료된 모임이 없습니다.' :
-               '첫 번째 모임을 만들어보세요!'}
+            <p className="mb-6 text-gray-600">
+              {activeTab === 'active'
+                ? '새로운 모임을 만들어 사람들을 만나보세요!'
+                : activeTab === 'completed'
+                  ? '아직 완료된 모임이 없습니다.'
+                  : '첫 번째 모임을 만들어보세요!'}
             </p>
             <Button
               onClick={() => router.push('/room/new')}
@@ -220,67 +229,75 @@ export default function MyRoomsPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {filteredRooms.map((room) => {
+            {filteredRooms.map(room => {
               const categoryDisplay = getCategoryDisplay(room.category)
               const isUpcoming = new Date(room.start_at) > new Date()
-              const isStartingSoon = new Date(room.start_at).getTime() - new Date().getTime() < 30 * 60 * 1000
+              const isStartingSoon =
+                new Date(room.start_at).getTime() - new Date().getTime() < 30 * 60 * 1000
               const isBoosted = room.boost_until && new Date(room.boost_until) > new Date()
               const hasPendingRequests = room.pending_requests_count > 0
 
               return (
-                <div key={room.id} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <div
+                  key={room.id}
+                  className="rounded-xl border border-gray-100 bg-white p-6 shadow-lg"
+                >
                   <div className="flex items-start justify-between">
                     {/* Room Info */}
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span 
-                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
+                      <div className="mb-3 flex items-center gap-3">
+                        <span
+                          className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white"
                           style={{ backgroundColor: categoryDisplay.color }}
                         >
                           {categoryDisplay.emoji} {categoryDisplay.label}
                         </span>
-                        
+
                         {room.status === 'cancelled' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
                             취소됨
                           </span>
                         )}
-                        
+
                         {room.status === 'completed' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                             완료
                           </span>
                         )}
 
                         {isBoosted && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
                             ⭐ 부스트
                           </span>
                         )}
 
                         {isStartingSoon && isUpcoming && room.status === 'active' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
                             🔥 곧 시작
                           </span>
                         )}
 
                         {hasPendingRequests && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
                             📮 {room.pending_requests_count}개 신청
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{room.title}</h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900">{room.title}</h3>
+
+                      <div className="grid grid-cols-1 gap-3 text-sm text-gray-600 md:grid-cols-2">
                         <div className="flex items-center">
                           <span className="mr-2">📍</span>
                           {room.place_text}
                         </div>
                         <div className="flex items-center">
                           <span className="mr-2">🕐</span>
-                          {new Date(room.start_at).toLocaleDateString('ko-KR')} {new Date(room.start_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(room.start_at).toLocaleDateString('ko-KR')}{' '}
+                          {new Date(room.start_at).toLocaleTimeString('ko-KR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </div>
                         <div className="flex items-center">
                           <span className="mr-2">👥</span>
@@ -294,7 +311,7 @@ export default function MyRoomsPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col gap-2 ml-4">
+                    <div className="ml-4 flex flex-col gap-2">
                       <Button
                         onClick={() => router.push(`/room/${room.id}`)}
                         size="sm"
@@ -302,7 +319,7 @@ export default function MyRoomsPage() {
                       >
                         상세보기
                       </Button>
-                      
+
                       {room.status === 'active' && (
                         <>
                           <Button
@@ -312,17 +329,17 @@ export default function MyRoomsPage() {
                           >
                             수정
                           </Button>
-                          
+
                           {hasPendingRequests && (
                             <Button
                               onClick={() => router.push(`/room/${room.id}/requests`)}
                               size="sm"
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                              className="bg-blue-600 text-white hover:bg-blue-700"
                             >
                               신청 관리
                             </Button>
                           )}
-                          
+
                           <Button
                             onClick={() => toggleRoomStatus(room.id, 'cancelled')}
                             size="sm"
@@ -333,17 +350,17 @@ export default function MyRoomsPage() {
                           </Button>
                         </>
                       )}
-                      
+
                       {room.status === 'cancelled' && (
                         <Button
                           onClick={() => toggleRoomStatus(room.id, 'active')}
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-green-600 text-white hover:bg-green-700"
                         >
                           재활성화
                         </Button>
                       )}
-                      
+
                       <Button
                         onClick={() => deleteRoom(room.id, room.title)}
                         size="sm"
@@ -362,10 +379,10 @@ export default function MyRoomsPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="fixed bottom-6 right-6">
+      <div className="fixed right-6 bottom-6">
         <Button
           onClick={() => router.push('/room/new')}
-          className="bg-primary hover:bg-primary/90 rounded-full w-14 h-14 shadow-lg"
+          className="bg-primary hover:bg-primary/90 h-14 w-14 rounded-full shadow-lg"
           title="새 모임 만들기"
         >
           ➕

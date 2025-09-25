@@ -27,11 +27,11 @@ export default function Providers({ children }: ProvidersProps) {
 
     // 실제 사용자 테스트를 위한 모든 시스템 초기화
     console.log('🚀 실제 사용자 테스트 준비: 모든 시스템 초기화 시작')
-    
+
     const cleanupFunctions: (() => void)[] = []
 
     // 브라우저 호환성 및 성능 최적화
-    initializeBrowserCompatibility().then((cleanup) => {
+    initializeBrowserCompatibility().then(cleanup => {
       if (cleanup) cleanupFunctions.push(cleanup)
     })
 
@@ -84,12 +84,7 @@ export default function Providers({ children }: ProvidersProps) {
 
   return (
     <GlobalErrorBoundary>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-      >
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
         <AuthProvider>
           {children}
           {/* 봇 스케줄러 자동 초기화 */}
@@ -97,10 +92,10 @@ export default function Providers({ children }: ProvidersProps) {
           {/* Enhanced Toast 알림 */}
           <CustomToaster />
           {/* Sonner Toast (새로운 토스트 시스템) */}
-          <Toaster 
-            position="top-center" 
-            richColors 
-            closeButton 
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
             expand={true}
             duration={4000}
             toastOptions={{

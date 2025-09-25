@@ -3,12 +3,12 @@
 
 import { useState } from 'react'
 import { X, Star, Zap, Clock, Users, TrendingUp, CreditCard, Check } from 'lucide-react'
-import { 
-  BOOST_PLANS, 
-  type BoostPlanId, 
-  formatPrice, 
+import {
+  BOOST_PLANS,
+  type BoostPlanId,
+  formatPrice,
   processBoostPayment,
-  mockPaymentProcess 
+  mockPaymentProcess,
 } from '@/lib/services/stripe'
 import { useAuth } from '@/lib/useAuth'
 import { isDevelopmentMode } from '@/lib/config/mockData'
@@ -22,12 +22,12 @@ interface BoostModalProps {
   onBoostSuccess?: () => void
 }
 
-export function BoostModal({ 
-  isOpen, 
-  onClose, 
-  roomId, 
+export function BoostModal({
+  isOpen,
+  onClose,
+  roomId,
   roomTitle,
-  onBoostSuccess 
+  onBoostSuccess,
 }: BoostModalProps) {
   const { user } = useAuth()
   const [selectedPlan, setSelectedPlan] = useState<BoostPlanId>('3')
@@ -40,14 +40,14 @@ export function BoostModal({
     }
 
     setProcessing(true)
-    
+
     try {
       let result
-      
+
       if (isDevelopmentMode) {
         // 개발 모드에서는 모의 결제 처리
         result = await mockPaymentProcess(roomId, selectedPlan)
-        
+
         if (result.success) {
           toast.success('부스트가 활성화되었습니다! 🚀')
           onBoostSuccess?.()
@@ -58,7 +58,7 @@ export function BoostModal({
       } else {
         // 프로덕션 모드에서는 실제 Stripe 결제
         result = await processBoostPayment(roomId, selectedPlan)
-        
+
         if (!result.success) {
           toast.error(result.error || '결제 처리에 실패했습니다')
         }
@@ -77,64 +77,64 @@ export function BoostModal({
   const selectedPlanData = BOOST_PLANS[selectedPlan]
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-6">
+        <div className="sticky top-0 bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Star className="w-6 h-6 text-yellow-100 fill-current" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                <Star className="h-6 w-6 fill-current text-yellow-100" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold">모임 부스트</h2>
-                <p className="opacity-90 text-sm">더 많은 사람들에게 노출시키세요!</p>
+                <p className="text-sm opacity-90">더 많은 사람들에게 노출시키세요!</p>
               </div>
             </div>
             <button
               onClick={onClose}
               disabled={processing}
-              className="p-2 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50"
+              className="rounded-full p-2 transition-colors hover:bg-white/20 disabled:opacity-50"
             >
-              <X className="w-6 h-6" />
+              <X className="h-6 w-6" />
             </button>
           </div>
         </div>
 
-        <div className="p-6 space-y-6 max-h-[calc(90vh-140px)] overflow-y-auto">
+        <div className="max-h-[calc(90vh-140px)] space-y-6 overflow-y-auto p-6">
           {/* 모임 정보 */}
-          <div className="bg-gray-50 rounded-2xl p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">부스트할 모임</h3>
+          <div className="rounded-2xl bg-gray-50 p-4">
+            <h3 className="mb-2 font-semibold text-gray-900">부스트할 모임</h3>
             <div className="flex items-center space-x-3">
-              <Zap className="w-5 h-5 text-orange-500" />
+              <Zap className="h-5 w-5 text-orange-500" />
               <span className="font-medium text-gray-800">{roomTitle}</span>
             </div>
           </div>
 
           {/* 부스트 효과 */}
-          <div className="bg-blue-50 rounded-2xl p-6">
-            <h3 className="font-bold text-blue-900 mb-4 flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2" />
+          <div className="rounded-2xl bg-blue-50 p-6">
+            <h3 className="mb-4 flex items-center font-bold text-blue-900">
+              <TrendingUp className="mr-2 h-5 w-5" />
               부스트 효과
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="text-center">
-                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500">
+                  <Users className="h-6 w-6 text-white" />
                 </div>
                 <p className="text-sm font-medium text-blue-900">더 많은 노출</p>
                 <p className="text-xs text-blue-700">상단에 우선 표시</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Star className="w-6 h-6 text-white fill-current" />
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-500">
+                  <Star className="h-6 w-6 fill-current text-white" />
                 </div>
                 <p className="text-sm font-medium text-blue-900">특별한 표시</p>
                 <p className="text-xs text-blue-700">부스트 배지 표시</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Clock className="w-6 h-6 text-white" />
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
+                  <Clock className="h-6 w-6 text-white" />
                 </div>
                 <p className="text-sm font-medium text-blue-900">즉시 활성화</p>
                 <p className="text-xs text-blue-700">결제 후 바로 적용</p>
@@ -144,53 +144,51 @@ export function BoostModal({
 
           {/* 플랜 선택 */}
           <div>
-            <h3 className="font-bold text-gray-900 mb-4">부스트 기간 선택</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <h3 className="mb-4 font-bold text-gray-900">부스트 기간 선택</h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {Object.entries(BOOST_PLANS).map(([planId, plan]) => {
                 const isSelected = selectedPlan === planId
                 const isPopular = plan.popular
-                
+
                 return (
                   <div
                     key={planId}
-                    className={`relative rounded-2xl border-2 p-4 cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'border-orange-500 bg-orange-50 shadow-lg' 
+                    className={`relative cursor-pointer rounded-2xl border-2 p-4 transition-all ${
+                      isSelected
+                        ? 'border-orange-500 bg-orange-50 shadow-lg'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => setSelectedPlan(planId as BoostPlanId)}
                   >
                     {isPopular && (
-                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                        <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 transform">
+                        <div className="rounded-full bg-gradient-to-r from-pink-500 to-red-500 px-3 py-1 text-xs font-bold text-white">
                           인기
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
+                      <div className="mb-2 flex items-center justify-center">
                         {isSelected && (
-                          <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mr-2">
-                            <Check className="w-4 h-4 text-white" />
+                          <div className="mr-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-500">
+                            <Check className="h-4 w-4 text-white" />
                           </div>
                         )}
                         <h4 className="font-bold text-gray-900">{plan.name}</h4>
                       </div>
-                      
+
                       <div className="mb-3">
                         <div className="text-2xl font-black text-gray-900">
                           {formatPrice(plan.price)}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {plan.duration}일 동안
-                        </div>
+                        <div className="text-sm text-gray-600">{plan.duration}일 동안</div>
                       </div>
-                      
+
                       <div className="space-y-1">
                         {plan.features.map((feature, index) => (
-                          <div key={index} className="text-xs text-gray-700 flex items-center">
-                            <Check className="w-3 h-3 text-green-500 mr-1 flex-shrink-0" />
+                          <div key={index} className="flex items-center text-xs text-gray-700">
+                            <Check className="mr-1 h-3 w-3 flex-shrink-0 text-green-500" />
                             <span>{feature}</span>
                           </div>
                         ))}
@@ -203,16 +201,21 @@ export function BoostModal({
           </div>
 
           {/* 결제 정보 */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
+          <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
             <div className="flex items-start space-x-2">
-              <Star className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5 fill-current" />
+              <Star className="mt-0.5 h-5 w-5 flex-shrink-0 fill-current text-yellow-600" />
               <div className="text-sm text-yellow-800">
-                <p className="font-medium mb-1">결제 후 즉시 적용됩니다</p>
+                <p className="mb-1 font-medium">결제 후 즉시 적용됩니다</p>
                 <ul className="space-y-1 text-xs">
                   <li>• 부스트는 결제 완료 후 바로 활성화됩니다</li>
                   <li>• 모임 목록 상단에 우선 노출됩니다</li>
                   <li>• ⭐ 부스트 배지가 표시됩니다</li>
-                  <li>• {isDevelopmentMode ? '개발 모드: 실제 결제되지 않습니다' : '안전한 Stripe 결제 시스템을 사용합니다'}</li>
+                  <li>
+                    •{' '}
+                    {isDevelopmentMode
+                      ? '개발 모드: 실제 결제되지 않습니다'
+                      : '안전한 Stripe 결제 시스템을 사용합니다'}
+                  </li>
                 </ul>
               </div>
             </div>
@@ -220,30 +223,28 @@ export function BoostModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-gray-100 p-6 flex space-x-4">
+        <div className="sticky bottom-0 flex space-x-4 border-t border-gray-100 bg-white/95 p-6 backdrop-blur-md">
           <button
             onClick={onClose}
             disabled={processing}
-            className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1 rounded-xl border border-gray-200 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             나중에
           </button>
           <button
             onClick={handleBoostPurchase}
             disabled={processing || !user}
-            className="flex-2 px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="flex flex-2 items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 px-8 py-3 font-bold text-white shadow-lg transition-all hover:from-yellow-500 hover:to-orange-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
           >
             {processing ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 <span>{isDevelopmentMode ? '처리 중...' : '결제 페이지로 이동 중...'}</span>
               </>
             ) : (
               <>
-                <CreditCard className="w-5 h-5" />
-                <span>
-                  {formatPrice(selectedPlanData.price)} 결제하기
-                </span>
+                <CreditCard className="h-5 w-5" />
+                <span>{formatPrice(selectedPlanData.price)} 결제하기</span>
               </>
             )}
           </button>

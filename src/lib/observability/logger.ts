@@ -35,11 +35,11 @@ const PII_PATTERNS = [
 // PII 스크러빙 함수
 export function scrubPII(text: string): string {
   let scrubbed = text
-  
+
   PII_PATTERNS.forEach(pattern => {
     scrubbed = scrubbed.replace(pattern, '[REDACTED]')
   })
-  
+
   return scrubbed
 }
 
@@ -57,13 +57,13 @@ export function shouldSample(): boolean {
 // 구조화 로거 클래스
 export class StructuredLogger {
   private context: LogContext
-  
+
   constructor(context: LogContext = {}) {
     this.context = {
       ...context,
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'development',
-      service: 'meetpin-web'
+      service: 'meetpin-web',
     }
   }
 
@@ -71,7 +71,7 @@ export class StructuredLogger {
   with(additionalContext: LogContext): StructuredLogger {
     return new StructuredLogger({
       ...this.context,
-      ...additionalContext
+      ...additionalContext,
     })
   }
 
@@ -82,7 +82,7 @@ export class StructuredLogger {
       message: scrubPII(message),
       ...this.context,
       ...meta,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     // 개발 환경에서는 콘솔에 보기 좋게 출력
@@ -99,10 +99,10 @@ export class StructuredLogger {
   private colorizeLevel(level: LogLevel): string {
     const colors = {
       debug: '\x1b[36m[DEBUG]\x1b[0m',
-      info: '\x1b[32m[INFO]\x1b[0m', 
+      info: '\x1b[32m[INFO]\x1b[0m',
       warn: '\x1b[33m[WARN]\x1b[0m',
       error: '\x1b[31m[ERROR]\x1b[0m',
-      fatal: '\x1b[35m[FATAL]\x1b[0m'
+      fatal: '\x1b[35m[FATAL]\x1b[0m',
     }
     return colors[level] || level
   }
@@ -131,18 +131,16 @@ export class StructuredLogger {
 // Request 기반 로거 생성
 export async function createRequestLogger(request: NextRequest): Promise<StructuredLogger> {
   const requestId = generateRequestId()
-  const startTime = Date.now()
-  
+  const _startTime = Date.now()
+
   // 기본 컨텍스트 구성
   const context: LogContext = {
     requestId,
     path: request.nextUrl.pathname,
     method: request.method,
     userAgent: request.headers.get('user-agent')?.substring(0, 200) || undefined,
-    ip: request.headers.get('x-forwarded-for') || 
-        request.headers.get('x-real-ip') || 
-        'unknown',
-    sampling: shouldSample()
+    ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+    sampling: shouldSample(),
   }
 
   // 인증된 사용자 정보 추가 (에러 무시)
@@ -166,15 +164,14 @@ export function logApiRequest(
   error?: Error | string
 ) {
   const latency = Date.now() - startTime
-  const level: LogLevel = status >= 500 ? 'error' : 
-                        status >= 400 ? 'warn' : 'info'
-  
-  const message = error ? 
-    `API request failed: ${error instanceof Error ? error.message : error}` :
-    `API request completed`
+  const level: LogLevel = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info'
+
+  const message = error
+    ? `API request failed: ${error instanceof Error ? error.message : error}`
+    : `API request completed`
 
   const loggerWithContext = logger.with({ latency, status, error: error?.toString() })
-  
+
   if (level === 'error') {
     loggerWithContext.error(message)
   } else if (level === 'warn') {
@@ -202,21 +199,21 @@ export class PerformanceTimer {
   end(success: boolean = true, meta: Record<string, any> = {}) {
     const duration = Date.now() - this.startTime
     const level = success ? 'info' : 'warn'
-    
+
     const message = `Operation ${this.operation} ${success ? 'completed' : 'failed'}`
     const context = {
       operation: this.operation,
       duration,
       success,
-      ...meta
+      ...meta,
     }
-    
+
     if (level === 'warn') {
       this.logger.warn(message, context)
     } else {
       this.logger.info(message, context)
     }
-    
+
     return duration
   }
 }

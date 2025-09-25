@@ -48,7 +48,7 @@ export interface Room {
   boost_until?: string
   created_at: string
   updated_at: string
-  
+
   // Relations (populated when needed)
   host?: User
   participants_count?: number
@@ -81,7 +81,7 @@ export interface JoinRequest {
   status: 'pending' | 'accepted' | 'rejected'
   created_at: string
   updated_at: string
-  
+
   // Relations
   room?: Room
   requester?: User
@@ -93,7 +93,7 @@ export interface Match {
   requester_uid: string
   responder_uid: string
   created_at: string
-  
+
   // Relations
   room?: Room
   requester?: User
@@ -106,7 +106,7 @@ export interface Message {
   sender_uid: string
   text: string
   created_at: string
-  
+
   // Relations
   sender?: User
 }
@@ -227,13 +227,9 @@ export type RequestStatus = 'pending' | 'accepted' | 'rejected'
 declare global {
   interface Window {
     kakao?: any
-    gtag?: (
-      command: 'config' | 'event' | 'consent',
-      targetId: string | any,
-      config?: any
-    ) => void
+    gtag?: (command: 'config' | 'event' | 'consent', targetId: string | any, config?: any) => void
   }
-  
+
   namespace NodeJS {
     interface ProcessEnv {
       NEXT_PUBLIC_SUPABASE_URL: string
@@ -288,7 +284,7 @@ export interface Report {
   reason: string
   status: 'pending' | 'reviewed' | 'resolved'
   created_at: string
-  
+
   // Relations
   reporter?: User
   target?: User

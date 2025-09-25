@@ -11,11 +11,11 @@ interface PageTransitionProps {
   type?: 'fade' | 'slide' | 'scale' | 'none'
 }
 
-export default function PageTransition({ 
-  children, 
+export default function PageTransition({
+  children,
   className = '',
   duration = 300,
-  type = 'fade'
+  type = 'fade',
 }: PageTransitionProps) {
   const [isVisible, setIsVisible] = useState(true) // 초기값을 true로 변경
   const [isMounted, setIsMounted] = useState(false) // 마운트 상태 추가
@@ -28,9 +28,9 @@ export default function PageTransition({
 
   useEffect(() => {
     if (!isMounted) return // 마운트되지 않았으면 애니메이션 건너뛰기
-    
+
     setIsVisible(false)
-    
+
     const timer = setTimeout(() => {
       setIsVisible(true)
     }, 50)
@@ -40,54 +40,50 @@ export default function PageTransition({
 
   const getTransitionClasses = () => {
     if (!isMounted) return '' // 마운트되지 않았으면 애니메이션 없음
-    
+
     const baseClasses = `transition-all duration-${duration} ease-out`
-    
+
     switch (type) {
       case 'fade':
         return `${baseClasses} ${isVisible ? 'opacity-100' : 'opacity-0'}`
-      
+
       case 'slide':
         return `${baseClasses} ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`
-      
+
       case 'scale':
         return `${baseClasses} ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`
-      
+
       case 'none':
       default:
         return ''
     }
   }
 
-  return (
-    <div className={`${getTransitionClasses()} ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`${getTransitionClasses()} ${className}`}>{children}</div>
 }
 
 // Loading overlay component for page transitions
 export function PageLoadingOverlay({ show }: { show: boolean }) {
   return (
     <div
-      className={`fixed inset-0 bg-gradient-to-br from-emerald-50 via-white to-blue-50 z-50 flex items-center justify-center transition-all duration-300 ${
-        show ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 transition-all duration-300 ${
+        show ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
       }`}
     >
       <div className="text-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600 animate-pulse">페이지를 불러오는 중...</p>
+        <div className="border-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent" />
+        <p className="animate-pulse text-gray-600">페이지를 불러오는 중...</p>
       </div>
     </div>
   )
 }
 
 // Card animation wrapper
-export function CardAnimation({ 
-  children, 
+export function CardAnimation({
+  children,
   delay = 0,
-  className = ''
-}: { 
+  className = '',
+}: {
   children: React.ReactNode
   delay?: number
   className?: string
@@ -101,7 +97,7 @@ export function CardAnimation({
 
   useEffect(() => {
     if (!isMounted) return
-    
+
     setIsVisible(false)
     const timer = setTimeout(() => {
       setIsVisible(true)
@@ -113,7 +109,11 @@ export function CardAnimation({
   return (
     <div
       className={`${isMounted ? 'transition-all duration-500 ease-out' : ''} ${
-        isMounted && isVisible ? 'opacity-100 translate-y-0' : isMounted ? 'opacity-0 translate-y-4' : ''
+        isMounted && isVisible
+          ? 'translate-y-0 opacity-100'
+          : isMounted
+            ? 'translate-y-4 opacity-0'
+            : ''
       } ${className}`}
     >
       {children}
@@ -122,11 +122,11 @@ export function CardAnimation({
 }
 
 // Staggered list animation
-export function StaggeredList({ 
-  children, 
+export function StaggeredList({
+  children,
   staggerDelay = 100,
-  className = ''
-}: { 
+  className = '',
+}: {
   children: React.ReactNode[]
   staggerDelay?: number
   className?: string
@@ -143,11 +143,11 @@ export function StaggeredList({
 }
 
 // Modal animation wrapper
-export function ModalAnimation({ 
-  show, 
+export function ModalAnimation({
+  show,
   children,
-  onClose
-}: { 
+  onClose,
+}: {
   show: boolean
   children: React.ReactNode
   onClose?: () => void
@@ -176,12 +176,12 @@ export function ModalAnimation({
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4 text-center">
         <div
           className={`relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all duration-300 ${
-            show ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
+            show ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-4 scale-95 opacity-0'
           }`}
         >
           {children}
@@ -192,11 +192,11 @@ export function ModalAnimation({
 }
 
 // Toast-like notification animation
-export function NotificationSlide({ 
-  show, 
+export function NotificationSlide({
+  show,
   children,
-  position = 'top-right'
-}: { 
+  position = 'top-right',
+}: {
   show: boolean
   children: React.ReactNode
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
@@ -219,9 +219,7 @@ export function NotificationSlide({
     <div
       className={`fixed z-50 max-w-sm transition-all duration-300 ease-out ${
         positionClasses[position]
-      } ${slideClasses[position]} ${
-        show ? 'opacity-100' : 'opacity-0'
-      }`}
+      } ${slideClasses[position]} ${show ? 'opacity-100' : 'opacity-0'}`}
     >
       {children}
     </div>
@@ -229,36 +227,34 @@ export function NotificationSlide({
 }
 
 // Progress animation
-export function ProgressAnimation({ 
-  progress, 
+export function ProgressAnimation({
+  progress,
   className = '',
-  showPercentage = false
-}: { 
+  showPercentage = false,
+}: {
   progress: number
   className?: string
   showPercentage?: boolean
 }) {
   return (
-    <div className={`w-full bg-gray-200 rounded-full h-2.5 ${className}`}>
+    <div className={`h-2.5 w-full rounded-full bg-gray-200 ${className}`}>
       <div
-        className="bg-gradient-to-r from-primary to-primary-deep h-2.5 rounded-full transition-all duration-500 ease-out"
+        className="from-primary to-primary-deep h-2.5 rounded-full bg-gradient-to-r transition-all duration-500 ease-out"
         style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
       />
       {showPercentage && (
-        <div className="text-center mt-2 text-sm text-gray-600">
-          {Math.round(progress)}%
-        </div>
+        <div className="mt-2 text-center text-sm text-gray-600">{Math.round(progress)}%</div>
       )}
     </div>
   )
 }
 
 // Skeleton loading animation
-export function SkeletonLoader({ 
-  lines = 3, 
+export function SkeletonLoader({
+  lines = 3,
   className = '',
-  width = 'full'
-}: { 
+  width = 'full',
+}: {
   lines?: number
   className?: string
   width?: 'full' | 'half' | 'quarter'
@@ -274,9 +270,9 @@ export function SkeletonLoader({
       {Array.from({ length: lines }).map((_, index) => (
         <div
           key={index}
-          className={`h-4 bg-gray-200 rounded mb-3 ${widthClasses[width]}`}
+          className={`mb-3 h-4 rounded bg-gray-200 ${widthClasses[width]}`}
           style={{
-            width: width === 'full' ? `${100 - Math.random() * 25}%` : undefined
+            width: width === 'full' ? `${100 - Math.random() * 25}%` : undefined,
           }}
         />
       ))}
@@ -285,11 +281,11 @@ export function SkeletonLoader({
 }
 
 // Bounce entrance animation
-export function BounceIn({ 
-  children, 
+export function BounceIn({
+  children,
   delay = 0,
-  className = ''
-}: { 
+  className = '',
+}: {
   children: React.ReactNode
   delay?: number
   className?: string
@@ -303,7 +299,7 @@ export function BounceIn({
 
   useEffect(() => {
     if (!isMounted) return
-    
+
     setIsVisible(false)
     const timer = setTimeout(() => {
       setIsVisible(true)
@@ -315,12 +311,15 @@ export function BounceIn({
   return (
     <div
       className={`${isMounted ? 'transition-all duration-600 ease-out' : ''} ${
-        isMounted && isVisible 
-          ? 'opacity-100 translate-y-0 scale-100' 
-          : isMounted ? 'opacity-0 translate-y-8 scale-95' : ''
+        isMounted && isVisible
+          ? 'translate-y-0 scale-100 opacity-100'
+          : isMounted
+            ? 'translate-y-8 scale-95 opacity-0'
+            : ''
       } ${className}`}
       style={{
-        transitionTimingFunction: isMounted && isVisible ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' : undefined
+        transitionTimingFunction:
+          isMounted && isVisible ? 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' : undefined,
       }}
     >
       {children}

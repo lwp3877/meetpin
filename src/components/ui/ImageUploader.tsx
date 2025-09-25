@@ -4,7 +4,14 @@
 import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import { Upload, X, Loader2, Camera, Image as ImageIcon } from 'lucide-react'
-import { uploadImage, deleteImage, createImagePreview, handleImageDrop, type ImageUploadOptions, type ImageUploadResult } from '@/lib/services/imageUpload'
+import {
+  uploadImage,
+  deleteImage,
+  createImagePreview,
+  handleImageDrop,
+  type ImageUploadOptions,
+  type ImageUploadResult,
+} from '@/lib/services/imageUpload'
 import { useAuth } from '@/lib/useAuth'
 import toast from 'react-hot-toast'
 
@@ -35,7 +42,7 @@ export function ImageUploader({
   shape = 'square',
   showDeleteButton = true,
   dragAndDrop = true,
-  multiple = false
+  multiple = false,
 }: ImageUploaderProps) {
   const { user } = useAuth()
   const [uploading, setUploading] = useState(false)
@@ -47,79 +54,82 @@ export function ImageUploader({
   // 크기별 스타일
   const sizeStyles = {
     small: 'w-20 h-20',
-    medium: 'w-32 h-32', 
-    large: 'w-48 h-48'
+    medium: 'w-32 h-32',
+    large: 'w-48 h-48',
   }
 
   // 모양별 스타일
   const shapeStyles = {
     square: 'rounded-xl',
     circle: 'rounded-full',
-    rectangle: 'rounded-xl aspect-video'
+    rectangle: 'rounded-xl aspect-video',
   }
 
-  const handleFileSelect = useCallback(async (files: FileList) => {
-    if (!user) {
-      toast.error('로그인이 필요합니다')
-      return
-    }
-
-    if (files.length === 0) return
-
-    const file = files[0] // 단일 파일만 처리
-    if (!file.type.startsWith('image/')) {
-      toast.error('이미지 파일만 업로드 가능합니다')
-      return
-    }
-
-    try {
-      setUploading(true)
-      
-      // 미리보기 생성
-      const previewUrl = await createImagePreview(file)
-      setPreview(previewUrl)
-
-      // 이미지 업로드
-      const result = await uploadImage(file, folder, user.id, {
-        maxSizeMB: 5,
-        maxWidth: folder === 'avatars' ? 400 : 1200,
-        maxHeight: folder === 'avatars' ? 400 : 800,
-        quality: 0.85,
-        format: 'webp',
-        ...options
-      })
-
-      if (result.success) {
-        toast.success('이미지가 성공적으로 업로드되었습니다!')
-        onImageUploaded(result)
-        setPreview(null) // 성공시 미리보기 제거
-      } else {
-        toast.error(result.error || '이미지 업로드에 실패했습니다')
-        setPreview(null)
+  const handleFileSelect = useCallback(
+    async (files: FileList) => {
+      if (!user) {
+        toast.error('로그인이 필요합니다')
+        return
       }
-    } catch (error: any) {
-      console.error('Image upload error:', error)
-      toast.error('이미지 업로드 중 오류가 발생했습니다')
-      setPreview(null)
-    } finally {
-      setUploading(false)
-    }
-  }, [user, folder, options, onImageUploaded])
+
+      if (files.length === 0) return
+
+      const file = files[0] // 단일 파일만 처리
+      if (!file.type.startsWith('image/')) {
+        toast.error('이미지 파일만 업로드 가능합니다')
+        return
+      }
+
+      try {
+        setUploading(true)
+
+        // 미리보기 생성
+        const previewUrl = await createImagePreview(file)
+        setPreview(previewUrl)
+
+        // 이미지 업로드
+        const result = await uploadImage(file, folder, user.id, {
+          maxSizeMB: 5,
+          maxWidth: folder === 'avatars' ? 400 : 1200,
+          maxHeight: folder === 'avatars' ? 400 : 800,
+          quality: 0.85,
+          format: 'webp',
+          ...options,
+        })
+
+        if (result.success) {
+          toast.success('이미지가 성공적으로 업로드되었습니다!')
+          onImageUploaded(result)
+          setPreview(null) // 성공시 미리보기 제거
+        } else {
+          toast.error(result.error || '이미지 업로드에 실패했습니다')
+          setPreview(null)
+        }
+      } catch (error: any) {
+        console.error('Image upload error:', error)
+        toast.error('이미지 업로드 중 오류가 발생했습니다')
+        setPreview(null)
+      } finally {
+        setUploading(false)
+      }
+    },
+    [user, folder, options, onImageUploaded]
+  )
 
   const handleDelete = async () => {
     if (!currentImageUrl || deleting) return
 
     try {
       setDeleting(true)
-      
+
       // Supabase Storage 파일 경로 추출
       const url = new URL(currentImageUrl)
       const pathMatch = url.pathname.match(/\/storage\/v1\/object\/public\/images\/(.+)/)
-      
+
       if (pathMatch) {
         const filePath = pathMatch[1]
         const success = await deleteImage(filePath)
-        
+
         if (success) {
           toast.success('이미지가 삭제되었습니다')
           onImageDeleted?.()
@@ -155,7 +165,7 @@ export function ImageUploader({
     if (!dragAndDrop) return
     e.preventDefault()
     setDragOver(false)
-    
+
     handleImageDrop(e.nativeEvent, handleFileSelect)
   }
 
@@ -172,27 +182,20 @@ export function ImageUploader({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={(e) => e.target.files && handleFileSelect(e.target.files)}
+        onChange={e => e.target.files && handleFileSelect(e.target.files)}
         className="hidden"
         multiple={multiple}
       />
-      
+
       <div
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`
-          ${sizeStyles[size]} ${shapeStyles[shape]}
-          border-2 border-dashed border-gray-300 
-          hover:border-primary transition-all duration-200 
-          cursor-pointer group overflow-hidden
-          ${dragOver ? 'border-primary bg-primary/5 scale-105' : ''}
-          ${isLoading ? 'cursor-wait' : 'hover:shadow-lg'}
-        `}
+        className={` ${sizeStyles[size]} ${shapeStyles[shape]} hover:border-primary group cursor-pointer overflow-hidden border-2 border-dashed border-gray-300 transition-all duration-200 ${dragOver ? 'border-primary bg-primary/5 scale-105' : ''} ${isLoading ? 'cursor-wait' : 'hover:shadow-lg'} `}
       >
         {currentImage ? (
-          <div className="relative w-full h-full">
+          <div className="relative h-full w-full">
             <Image
               src={currentImage}
               alt="업로드된 이미지"
@@ -200,40 +203,40 @@ export function ImageUploader({
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
             />
-            
+
             {/* 로딩 오버레이 */}
             {isLoading && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-white animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <Loader2 className="h-8 w-8 animate-spin text-white" />
               </div>
             )}
-            
+
             {/* 호버 오버레이 */}
             {!isLoading && (
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-200 group-hover:bg-black/30">
+                <div className="opacity-0 transition-opacity group-hover:opacity-100">
+                  <Camera className="h-6 w-6 text-white" />
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 group-hover:text-primary transition-colors">
+          <div className="group-hover:text-primary flex h-full w-full flex-col items-center justify-center text-gray-400 transition-colors">
             {isLoading ? (
               <>
-                <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                <Loader2 className="mb-2 h-8 w-8 animate-spin" />
                 <span className="text-sm">업로드 중...</span>
               </>
             ) : (
               <>
                 {dragAndDrop ? (
-                  <Upload className="w-8 h-8 mb-2" />
+                  <Upload className="mb-2 h-8 w-8" />
                 ) : (
-                  <ImageIcon className="w-8 h-8 mb-2" />
+                  <ImageIcon className="mb-2 h-8 w-8" />
                 )}
-                <span className="text-sm text-center px-2">{placeholder}</span>
+                <span className="px-2 text-center text-sm">{placeholder}</span>
                 {dragAndDrop && (
-                  <span className="text-xs text-gray-400 mt-1">드래그하거나 클릭</span>
+                  <span className="mt-1 text-xs text-gray-400">드래그하거나 클릭</span>
                 )}
               </>
             )}
@@ -244,20 +247,20 @@ export function ImageUploader({
       {/* 삭제 버튼 */}
       {showDeleteButton && currentImage && !isLoading && (
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             handleDelete()
           }}
-          className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-colors z-10"
+          className="absolute -top-2 -right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
       )}
 
       {/* 업로드 진행률 (필요시 추가) */}
       {uploading && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 rounded-b-xl overflow-hidden">
-          <div className="h-full bg-primary animate-pulse"></div>
+        <div className="absolute right-0 bottom-0 left-0 h-1 overflow-hidden rounded-b-xl bg-gray-200">
+          <div className="bg-primary h-full animate-pulse"></div>
         </div>
       )}
     </div>

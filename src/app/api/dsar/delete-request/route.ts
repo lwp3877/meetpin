@@ -5,7 +5,7 @@ export async function GET(): Promise<Response> {
   return Response.json({ pending: false })
 }
 
-export async function POST(req: NextRequest): Promise<Response> {
+export async function POST(_req: NextRequest): Promise<Response> {
   return Response.json({ requested: true }, { status: 201 })
 }
 

@@ -35,7 +35,7 @@ export function safeNavigate(path: string): void {
 // 안전한 리다이렉트 (HOC에서 사용)
 export function safeRedirect(path: string): void {
   if (typeof window === 'undefined') return
-  
+
   // 즉시 실행이 아닌 다음 tick에서 실행
   setTimeout(() => {
     safeNavigate(path)
@@ -55,7 +55,7 @@ export function redirectToHome(): void {
 // 이전 페이지로 이동
 export function goBack(): void {
   if (typeof window === 'undefined') return
-  
+
   if (window.history.length > 1) {
     window.history.back()
   } else {
@@ -66,7 +66,7 @@ export function goBack(): void {
 // URL에 쿼리 파라미터 추가
 export function addQueryParams(path: string, params: Record<string, string>): string {
   if (typeof window === 'undefined') return path
-  
+
   const url = new URL(path, window.location.origin)
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.set(key, value)
@@ -77,9 +77,9 @@ export function addQueryParams(path: string, params: Record<string, string>): st
 // 현재 페이지에서 특정 파라미터만 업데이트
 export function updateQueryParams(params: Record<string, string | null>): void {
   if (typeof window === 'undefined') return
-  
+
   const url = new URL(window.location.href)
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value === null) {
       url.searchParams.delete(key)
@@ -87,7 +87,7 @@ export function updateQueryParams(params: Record<string, string | null>): void {
       url.searchParams.set(key, value)
     }
   })
-  
+
   const newUrl = url.pathname + url.search
   window.history.replaceState({}, '', newUrl)
 }

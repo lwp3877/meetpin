@@ -54,11 +54,11 @@ export async function createCheckoutSession(
   cancelUrl: string
 ): Promise<Stripe.Checkout.Session> {
   const product = boostProducts[days]
-  
+
   if (!flags.stripeCheckoutEnabled) {
     throw new Error('Stripe Checkout이 비활성화되어 있습니다')
   }
-  
+
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'payment',
     customer_email: undefined, // 필요시 사용자 이메일 추가
@@ -71,14 +71,14 @@ export async function createCheckoutSession(
       days: days,
     },
   }
-  
+
   // Price ID가 설정된 경우 사용, 아니면 동적으로 생성
   if (product.priceId) {
     sessionParams.line_items = [
       {
         price: product.priceId,
         quantity: 1,
-      }
+      },
     ]
   } else {
     sessionParams.line_items = [
@@ -92,10 +92,10 @@ export async function createCheckoutSession(
           unit_amount: product.price,
         },
         quantity: 1,
-      }
+      },
     ]
   }
-  
+
   return await stripe.checkout.sessions.create(sessionParams)
 }
 
@@ -107,7 +107,7 @@ export async function createPaymentLink(
   roomId: string
 ): Promise<Stripe.PaymentLink> {
   const product = boostProducts[days]
-  
+
   // 먼저 상품 생성
   const stripeProduct = await stripe.products.create({
     name: product.name,
@@ -118,21 +118,21 @@ export async function createPaymentLink(
       room_id: roomId,
     },
   })
-  
+
   // 가격 생성
   const price = await stripe.prices.create({
     currency: 'krw',
     unit_amount: product.price,
     product: stripeProduct.id,
   })
-  
+
   // Payment Link 생성
   const paymentLink = await stripe.paymentLinks.create({
     line_items: [
       {
         price: price.id,
         quantity: 1,
-      }
+      },
     ],
     metadata: {
       type: 'boost',
@@ -140,23 +140,20 @@ export async function createPaymentLink(
       days: days,
     },
   })
-  
+
   return paymentLink
 }
 
 /**
  * 웹훅 서명 검증
  */
-export function verifyWebhookSignature(
-  payload: string | Buffer,
-  signature: string
-): Stripe.Event {
+export function verifyWebhookSignature(payload: string | Buffer, signature: string): Stripe.Event {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
-  
+
   if (!webhookSecret) {
     throw new Error('STRIPE_WEBHOOK_SECRET이 설정되지 않았습니다')
   }
-  
+
   try {
     return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
   } catch (error: any) {
@@ -185,17 +182,17 @@ export function extractSessionMetadata(session: Stripe.Checkout.Session): {
   if (!session.metadata) {
     return null
   }
-  
+
   const { type, room_id, user_id, days } = session.metadata
-  
+
   if (type !== 'boost' || !room_id || !user_id || !days) {
     return null
   }
-  
+
   if (!['1', '3', '7'].includes(days)) {
     return null
   }
-  
+
   return {
     type,
     roomId: room_id,
@@ -220,7 +217,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const metadata = extractSessionMetadata(session)
-        
+
         if (!metadata) {
           return {
             type: event.type,
@@ -228,7 +225,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
             error: '메타데이터를 찾을 수 없습니다',
           }
         }
-        
+
         // DB 업데이트는 웹훅 라우트에서 처리하도록 데이터만 반환
         return {
           type: event.type,
@@ -238,7 +235,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
           success: true,
         }
       }
-      
+
       case 'payment_intent.succeeded': {
         // Payment Intent에서 추가 처리가 필요한 경우
         return {
@@ -246,7 +243,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
           success: true,
         }
       }
-      
+
       case 'payment_intent.payment_failed': {
         return {
           type: event.type,
@@ -254,7 +251,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
           error: '결제 실패',
         }
       }
-      
+
       default:
         return {
           type: event.type,
@@ -283,11 +280,11 @@ export async function findOrCreateCustomer(
     email,
     limit: 1,
   })
-  
+
   if (existingCustomers.data.length > 0) {
     return existingCustomers.data[0]
   }
-  
+
   // 새 고객 생성
   const customer = await stripe.customers.create({
     email,
@@ -296,7 +293,7 @@ export async function findOrCreateCustomer(
       user_id: userId || '',
     },
   })
-  
+
   return customer
 }
 
@@ -336,19 +333,17 @@ export async function createRefund(
 /**
  * 결제 정보 조회
  */
-export async function getPaymentDetails(
-  sessionId: string
-): Promise<{
+export async function getPaymentDetails(sessionId: string): Promise<{
   session: Stripe.Checkout.Session
   paymentIntent?: Stripe.PaymentIntent
 }> {
   const session = await stripe.checkout.sessions.retrieve(sessionId)
-  
+
   let paymentIntent: Stripe.PaymentIntent | undefined
   if (session.payment_intent && typeof session.payment_intent === 'string') {
     paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent)
   }
-  
+
   return { session, paymentIntent }
 }
 
@@ -367,7 +362,7 @@ export async function createBoostCheckoutSession({
   cancelUrl: string
 }) {
   const product = boostProducts[days]
-  
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -398,9 +393,9 @@ export async function createBoostCheckoutSession({
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
-      expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // 30분 후 만료
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30분 후 만료
     })
-    
+
     return session
   } catch (error) {
     console.error('Stripe checkout session creation failed:', error)

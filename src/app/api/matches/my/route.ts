@@ -1,6 +1,13 @@
 /* src/app/api/matches/my/route.ts */
 import { NextRequest } from 'next/server'
-import { createMethodRouter, parseQueryParams, parsePaginationParams, withRateLimit, apiUtils, getAuthenticatedUser } from '@/lib/api'
+import {
+  createMethodRouter,
+  parseQueryParams,
+  parsePaginationParams,
+  withRateLimit,
+  apiUtils,
+  getAuthenticatedUser,
+} from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 
 // GET /api/matches/my - 내 매치 목록 조회
@@ -13,7 +20,8 @@ async function getMyMatches(request: NextRequest) {
   // 내가 호스트이거나 게스트인 매치들 조회
   const { data: matches, error } = await supabase
     .from('matches')
-    .select(`
+    .select(
+      `
       *,
       rooms:room_id (
         id,
@@ -35,7 +43,8 @@ async function getMyMatches(request: NextRequest) {
         avatar_url,
         age_range
       )
-    `)
+    `
+    )
     .or(`host_uid.eq.${user.id},guest_uid.eq.${user.id}`)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)

@@ -5,12 +5,13 @@ import { Redis } from '@upstash/redis'
 import { Ratelimit } from '@upstash/ratelimit'
 
 // Redis 클라이언트 초기화
-const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  ? new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    })
-  : null
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      })
+    : null
 
 // 개발 환경용 메모리 기반 폴백
 const memoryStore = new Map<string, { count: number; resetTime: number }>()
@@ -31,76 +32,78 @@ interface RateLimitResult {
 export const RATE_LIMIT_PRESETS = {
   // 인증 관련
   auth: {
-    login: { requests: 5, window: 15 * 60 * 1000 },        // 5회/15분
-    signup: { requests: 3, window: 60 * 60 * 1000 },       // 3회/1시간
+    login: { requests: 5, window: 15 * 60 * 1000 }, // 5회/15분
+    signup: { requests: 3, window: 60 * 60 * 1000 }, // 3회/1시간
     passwordReset: { requests: 3, window: 60 * 60 * 1000 }, // 3회/1시간
   },
-  
+
   // API 요청
   api: {
-    general: { requests: 100, window: 60 * 1000 },         // 100회/분
-    search: { requests: 30, window: 60 * 1000 },           // 30회/분
-    upload: { requests: 10, window: 60 * 1000 },           // 10회/분
+    general: { requests: 100, window: 60 * 1000 }, // 100회/분
+    search: { requests: 30, window: 60 * 1000 }, // 30회/분
+    upload: { requests: 10, window: 60 * 1000 }, // 10회/분
   },
-  
+
   // 콘텐츠 생성
   content: {
-    roomCreate: { requests: 5, window: 60 * 1000 },        // 5회/분
-    messageCreate: { requests: 50, window: 60 * 1000 },    // 50회/분
-    reportCreate: { requests: 3, window: 60 * 1000 },      // 3회/분
+    roomCreate: { requests: 5, window: 60 * 1000 }, // 5회/분
+    messageCreate: { requests: 50, window: 60 * 1000 }, // 50회/분
+    reportCreate: { requests: 3, window: 60 * 1000 }, // 3회/분
   },
-  
+
   // 보안 관련
   security: {
-    cspReport: { requests: 100, window: 60 * 1000 },       // 100회/분
-    failedAuth: { requests: 10, window: 15 * 60 * 1000 },  // 10회/15분
-  }
+    cspReport: { requests: 100, window: 60 * 1000 }, // 100회/분
+    failedAuth: { requests: 10, window: 15 * 60 * 1000 }, // 10회/15분
+  },
 } as const
 
 /**
  * Upstash 기반 레이트 리밋 인스턴스들
  */
-const rateLimiters = redis ? {
-  // 인증 레이트 리밋
-  auth: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(5, '15m'),
-    analytics: true,
-    prefix: 'meetpin:auth'
-  }),
-  
-  // 일반 API 레이트 리밋  
-  api: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(100, '1m'),
-    analytics: true,
-    prefix: 'meetpin:api'
-  }),
-  
-  // 콘텐츠 생성 레이트 리밋
-  content: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(10, '1m'),
-    analytics: true,
-    prefix: 'meetpin:content'
-  }),
-  
-  // 업로드 레이트 리밋
-  upload: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(10, '1m'),
-    analytics: true,
-    prefix: 'meetpin:upload'
-  }),
-  
-  // 보안 이벤트 레이트 리밋
-  security: new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(100, '1m'),
-    analytics: true,
-    prefix: 'meetpin:security'
-  })
-} : null
+const rateLimiters = redis
+  ? {
+      // 인증 레이트 리밋
+      auth: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(5, '15m'),
+        analytics: true,
+        prefix: 'meetpin:auth',
+      }),
+
+      // 일반 API 레이트 리밋
+      api: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(100, '1m'),
+        analytics: true,
+        prefix: 'meetpin:api',
+      }),
+
+      // 콘텐츠 생성 레이트 리밋
+      content: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(10, '1m'),
+        analytics: true,
+        prefix: 'meetpin:content',
+      }),
+
+      // 업로드 레이트 리밋
+      upload: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(10, '1m'),
+        analytics: true,
+        prefix: 'meetpin:upload',
+      }),
+
+      // 보안 이벤트 레이트 리밋
+      security: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(100, '1m'),
+        analytics: true,
+        prefix: 'meetpin:security',
+      }),
+    }
+  : null
 
 /**
  * 메인 레이트 리밋 함수
@@ -118,25 +121,24 @@ export async function rateLimit(
         redis,
         limiter: Ratelimit.slidingWindow(limit, `${Math.floor(windowMs / 1000)}s`),
         analytics: true,
-        prefix: 'meetpin:custom'
+        prefix: 'meetpin:custom',
       })
-      
+
       const result = await limiter.limit(key)
-      
+
       return {
         success: result.success,
         remaining: result.remaining,
         resetTime: result.reset,
-        limit: result.limit
+        limit: result.limit,
       }
     }
-    
+
     // 폴백: 메모리 기반 레이트 리밋
     return memoryRateLimit(key, limit, windowMs)
-    
   } catch (error) {
     console.error('Rate limit error:', error)
-    
+
     // 에러 시 폴백
     return memoryRateLimit(key, limit, windowMs)
   }
@@ -155,25 +157,32 @@ export async function rateLimitWithPreset(
       const limiter = rateLimiters[preset as keyof typeof rateLimiters]
       if (limiter) {
         const result = await limiter.limit(`${key}:${identifier}`)
-        
+
         return {
           success: result.success,
           remaining: result.remaining,
           resetTime: result.reset,
-          limit: result.limit
+          limit: result.limit,
         }
       }
     }
-    
+
     // 폴백 설정
     const presetConfig = getPresetConfig(preset)
-    return memoryRateLimit(`${preset}:${key}:${identifier}`, presetConfig.requests, presetConfig.window)
-    
+    return memoryRateLimit(
+      `${preset}:${key}:${identifier}`,
+      presetConfig.requests,
+      presetConfig.window
+    )
   } catch (error) {
     console.error('Preset rate limit error:', error)
-    
+
     const presetConfig = getPresetConfig(preset)
-    return memoryRateLimit(`${preset}:${key}:${identifier}`, presetConfig.requests, presetConfig.window)
+    return memoryRateLimit(
+      `${preset}:${key}:${identifier}`,
+      presetConfig.requests,
+      presetConfig.window
+    )
   }
 }
 
@@ -187,7 +196,7 @@ export async function rateLimitEndpoint(
 ): Promise<RateLimitResult> {
   const identifier = userId ? `user:${userId}` : `ip:${ip}`
   const key = `endpoint:${endpoint}:${identifier}`
-  
+
   // 엔드포인트별 제한 설정
   const endpointLimits: Record<string, { requests: number; window: number }> = {
     '/api/auth/login': RATE_LIMIT_PRESETS.auth.login,
@@ -198,9 +207,9 @@ export async function rateLimitEndpoint(
     '/api/upload': RATE_LIMIT_PRESETS.api.upload,
     '/api/search': RATE_LIMIT_PRESETS.api.search,
   }
-  
+
   const config = endpointLimits[endpoint] || RATE_LIMIT_PRESETS.api.general
-  
+
   return rateLimit(key, config.requests, config.window)
 }
 
@@ -216,16 +225,16 @@ export async function rateLimitGlobal(ip: string): Promise<RateLimitResult> {
  */
 export async function rateLimitUser(userId: string, action: string): Promise<RateLimitResult> {
   const key = `user:${userId}:${action}`
-  
+
   const actionLimits: Record<string, { requests: number; window: number }> = {
-    'room_create': { requests: 5, window: 60 * 1000 },
-    'message_send': { requests: 50, window: 60 * 1000 },
-    'report_create': { requests: 3, window: 60 * 1000 },
-    'profile_update': { requests: 10, window: 60 * 1000 },
+    room_create: { requests: 5, window: 60 * 1000 },
+    message_send: { requests: 50, window: 60 * 1000 },
+    report_create: { requests: 3, window: 60 * 1000 },
+    profile_update: { requests: 10, window: 60 * 1000 },
   }
-  
+
   const config = actionLimits[action] || { requests: 30, window: 60 * 1000 }
-  
+
   return rateLimit(key, config.requests, config.window)
 }
 
@@ -235,9 +244,9 @@ export async function rateLimitUser(userId: string, action: string): Promise<Rat
 function memoryRateLimit(key: string, limit: number, windowMs: number): RateLimitResult {
   const now = Date.now()
   const resetTime = now + windowMs
-  
+
   const existing = memoryStore.get(key)
-  
+
   if (!existing || now > existing.resetTime) {
     // 새로운 윈도우 시작
     memoryStore.set(key, { count: 1, resetTime })
@@ -245,29 +254,29 @@ function memoryRateLimit(key: string, limit: number, windowMs: number): RateLimi
       success: true,
       remaining: limit - 1,
       resetTime,
-      limit
+      limit,
     }
   }
-  
+
   if (existing.count >= limit) {
     // 제한 초과
     return {
       success: false,
       remaining: 0,
       resetTime: existing.resetTime,
-      limit
+      limit,
     }
   }
-  
+
   // 요청 카운트 증가
   existing.count++
   memoryStore.set(key, existing)
-  
+
   return {
     success: true,
     remaining: limit - existing.count,
     resetTime: existing.resetTime,
-    limit
+    limit,
   }
 }
 
@@ -297,25 +306,25 @@ export async function getRateLimitStats(): Promise<any> {
     return {
       provider: 'memory',
       keys: memoryStore.size,
-      activeConnections: 0
+      activeConnections: 0,
     }
   }
-  
+
   try {
     // Redis 키 스캔 (prefix 기준)
     const keys = await redis.keys('meetpin:*')
-    
+
     return {
       provider: 'upstash',
       totalKeys: keys.length,
       activeConnections: 1, // Upstash는 connection pool 사용
-      memoryFallback: false
+      memoryFallback: false,
     }
   } catch (error) {
     return {
       provider: 'upstash',
       error: error instanceof Error ? error.message : 'Unknown error',
-      memoryFallback: true
+      memoryFallback: true,
     }
   }
 }
@@ -360,7 +369,10 @@ setInterval(() => {
 /**
  * 레거시 지원: checkRateLimit 함수 (async)
  */
-export async function checkRateLimit(identifier: string, options?: { requests: number; windowMs: number }): Promise<boolean> {
+export async function checkRateLimit(
+  identifier: string,
+  options?: { requests: number; windowMs: number }
+): Promise<boolean> {
   if (options) {
     const result = await rateLimit(identifier, options.requests, options.windowMs)
     return result.success
@@ -383,7 +395,7 @@ export async function checkTypedRateLimit(identifier: string, type: string): Pro
 /**
  * 레거시 지원: IP 기반 레이트리밋
  */
-export async function checkIPRateLimit(ip: string, type: string = 'api'): Promise<boolean> {
+export async function checkIPRateLimit(ip: string, _type: string = 'api'): Promise<boolean> {
   const result = await rateLimitGlobal(ip)
   return result.success
 }
@@ -399,7 +411,11 @@ export async function checkUserRateLimit(uid: string, type: string): Promise<boo
 /**
  * 레거시 지원: 사용자+IP 기반 레이트리밋
  */
-export async function checkUserIPRateLimit(uid: string, ip: string, type: string): Promise<boolean> {
+export async function checkUserIPRateLimit(
+  uid: string,
+  ip: string,
+  type: string
+): Promise<boolean> {
   const result = await rateLimitUser(uid, `${type}_${ip}`)
   return result.success
 }
@@ -407,7 +423,7 @@ export async function checkUserIPRateLimit(uid: string, ip: string, type: string
 /**
  * 레거시 지원: 레이트리밋 정보 조회
  */
-export async function getRateLimitInfo(identifier: string): Promise<any> {
+export async function getRateLimitInfo(_identifier: string): Promise<any> {
   // 기존 호환성을 위해 null 반환
   return null
 }
@@ -448,7 +464,7 @@ export interface RateLimitOptions {
 }
 
 // 기본 export
-export default {
+const defaultExport = {
   rateLimit,
   rateLimitGlobal,
   rateLimitUser,
@@ -465,3 +481,4 @@ export default {
   getRateLimitInfo,
   presets: RATE_LIMIT_PRESETS,
 }
+export default defaultExport

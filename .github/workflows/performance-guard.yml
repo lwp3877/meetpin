@@ -15,72 +15,72 @@ on:
       - 'next.config.js'
       - 'tailwind.config.ts'
   workflow_dispatch: # 수동 실행 가능
-  
+
 env:
   NODE_VERSION: '18'
   PNPM_VERSION: '8'
-  
+
 jobs:
   performance-audit:
     name: 성능 감사 및 예산 검증
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: 체크아웃
         uses: actions/checkout@v4
         with:
           fetch-depth: 2 # 이전 커밋과 비교를 위해
-          
+
       - name: pnpm 설정
         uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
-          
+
       - name: Node.js 설정
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-          
+
       - name: 의존성 설치
         run: pnpm install --frozen-lockfile
-        
+
       - name: 프로덕션 빌드
         run: |
           echo "🏗️ 프로덕션 빌드 중..."
           pnpm build
-          
+
       - name: 빌드 사이즈 분석
         run: |
           echo "📊 빌드 사이즈 분석 중..."
-          
+
           # 번들 사이즈 측정
           BUNDLE_SIZE=$(du -sh .next/static | cut -f1)
           echo "번들 사이즈: $BUNDLE_SIZE"
           echo "bundle_size=$BUNDLE_SIZE" >> $GITHUB_OUTPUT
-          
+
           # JavaScript 번들 상세 분석
           echo "=== JavaScript 번들 분석 ==="
           find .next/static/chunks -name "*.js" -exec ls -lh {} \; | sort -k5 -hr | head -10
-          
+
           # 큰 파일 경고 (1MB 초과)
           LARGE_FILES=$(find .next/static -size +1M -type f)
           if [ -n "$LARGE_FILES" ]; then
             echo "⚠️ 1MB 초과 파일 발견:"
             echo "$LARGE_FILES"
           fi
-          
+
       - name: Lighthouse CI 설치
         run: |
           echo "🏠 Lighthouse CI 설치 중..."
           npm install -g @lhci/cli@0.12.x
-          
+
       - name: 개발 서버 시작 (백그라운드)
         run: |
           echo "🚀 개발 서버 시작 중..."
           pnpm start &
-          
+
           # 서버 준비 대기 (최대 60초)
           for i in {1..60}; do
             if curl -s http://localhost:3000/api/healthz > /dev/null; then
@@ -90,11 +90,11 @@ jobs:
             echo "⏳ 서버 시작 대기 중... ($i/60)"
             sleep 1
           done
-          
+
       - name: Lighthouse 성능 감사
         run: |
           echo "🔍 Lighthouse 성능 감사 실행 중..."
-          
+
           # Lighthouse CI 설정 파일 생성
           cat > lighthouserc.js << 'EOF'
           module.exports = {
@@ -145,15 +145,15 @@ jobs:
             }
           }
           EOF
-          
+
           # Lighthouse CI 실행
           lhci autorun
-          
+
       - name: 성능 예산 검증
         id: perf-budget
         run: |
           echo "💰 성능 예산 검증 중..."
-          
+
           # Lighthouse 결과 파싱
           RESULTS_DIR=".lighthouseci"
           if [ -d "$RESULTS_DIR" ]; then
@@ -187,21 +187,21 @@ jobs:
               fi
             done
           fi
-          
+
       - name: 이전 버전과 성능 비교
         run: |
           echo "📊 성능 변화 분석 중..."
-          
+
           # 기준 브랜치 체크아웃
           git fetch origin main
-          
+
           # 현재 브랜치의 번들 사이즈
           CURRENT_SIZE=$(du -s .next/static | cut -f1)
-          
+
           # main 브랜치로 임시 전환
           git stash push -m "temp-stash-for-comparison"
           git checkout origin/main
-          
+
           # 기준 버전 빌드 (실패해도 계속)
           if pnpm build; then
             BASELINE_SIZE=$(du -s .next/static | cut -f1)
@@ -220,22 +220,22 @@ jobs:
           else
             echo "⚠️ 기준 버전 빌드 실패 - 비교 생략"
           fi
-          
+
           # 원래 브랜치로 복원
           git checkout -
           git stash pop || true
-          
+
       - name: 성능 리포트 생성
         if: always()
         run: |
           echo "📋 성능 리포트 생성 중..."
-          
+
           cat > perf-report.md << 'EOF'
           ## 🚀 성능 감사 결과
-          
+
           ### 📊 Lighthouse 점수
           EOF
-          
+
           # Lighthouse 결과가 있으면 추가
           if [ -d ".lighthouseci" ]; then
             echo "| 메트릭 | 점수/값 | 상태 |" >> perf-report.md
@@ -262,11 +262,11 @@ jobs:
               fi
             done
           fi
-          
+
           echo "" >> perf-report.md
           echo "### 📦 번들 분석" >> perf-report.md
           echo "- 현재 번들 사이즈: $(du -sh .next/static | cut -f1)" >> perf-report.md
-          
+
           # 예산 위반 요약
           if [ -n "${{ steps.perf-budget.outputs.budget_violation }}" ]; then
             echo "" >> perf-report.md
@@ -274,14 +274,14 @@ jobs:
             echo "- 위반 항목: ${{ steps.perf-budget.outputs.budget_violation }}" >> perf-report.md
             echo "- **이 PR은 성능 기준을 충족하지 않습니다.**" >> perf-report.md
           fi
-          
+
       - name: PR에 성능 리포트 댓글 추가
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            
+
             try {
               const report = fs.readFileSync('perf-report.md', 'utf8');
               
@@ -317,7 +317,7 @@ jobs:
             } catch (error) {
               console.log('성능 리포트 댓글 추가 실패:', error);
             }
-            
+
       - name: 성능 예산 위반 시 실패 처리
         if: steps.perf-budget.outputs.budget_violation
         run: |
@@ -330,7 +330,7 @@ jobs:
           echo "3. 코드 스플리팅 적용"
           echo "4. 번들 분석: pnpm analyze:bundle"
           exit 1
-          
+
       - name: 아티팩트 업로드
         if: always()
         uses: actions/upload-artifact@v4

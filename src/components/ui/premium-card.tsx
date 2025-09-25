@@ -12,16 +12,18 @@ interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
-  ({
-    className,
-    variant = 'default',
-    padding = 'md',
-    hover = false,
-    glow = false,
-    children,
-    ...props
-  }, ref) => {
-    
+  (
+    {
+      className,
+      variant = 'default',
+      padding = 'md',
+      hover = false,
+      glow = false,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const baseClasses = `
       relative
       rounded-2xl
@@ -75,22 +77,15 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          baseClasses,
-          variants[variant],
-          paddings[padding],
-          className
-        )}
+        className={cn(baseClasses, variants[variant], paddings[padding], className)}
         {...props}
       >
         {/* 내용 */}
-        <div className="relative z-10">
-          {children}
-        </div>
-        
+        <div className="relative z-10">{children}</div>
+
         {/* 호버 효과 오버레이 */}
         {hover && (
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-500/5 to-boost-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          <div className="from-primary-500/5 to-boost-500/5 absolute inset-0 rounded-2xl bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         )}
       </div>
     )
@@ -110,7 +105,7 @@ export const RoomCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
       padding="lg"
       hover
       glow
-      className={cn("overflow-hidden", className)}
+      className={cn('overflow-hidden', className)}
       {...props}
     >
       {children}
@@ -124,7 +119,7 @@ export const ProfileCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
       ref={ref}
       variant="gradient"
       padding="xl"
-      className={cn("text-center", className)}
+      className={cn('text-center', className)}
       {...props}
     >
       {children}
@@ -139,7 +134,7 @@ export const StatsCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(
       variant="glass"
       padding="md"
       hover
-      className={cn("backdrop-blur-lg", className)}
+      className={cn('backdrop-blur-lg', className)}
       {...props}
     >
       {children}

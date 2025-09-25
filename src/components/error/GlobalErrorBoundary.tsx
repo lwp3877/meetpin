@@ -43,7 +43,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error Boundary caught an error:', error, errorInfo)
-    
+
     this.setState({
       error,
       errorInfo,
@@ -60,11 +60,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
     // 에러 보고 (실제 운영에서는 외부 서비스로 전송)
     this.reportError(error, errorInfo)
-    
+
     // 사용자에게 알림
     toast.error('앱에서 예기치 못한 오류가 발생했습니다', {
       duration: 5000,
-      icon: '⚠️'
+      icon: '⚠️',
     })
   }
 
@@ -112,7 +112,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       errorInfo: null,
       errorId: this.generateErrorId(),
     })
-    
+
     toast.success('페이지를 다시 로드합니다', { icon: '🔄' })
   }
 
@@ -131,19 +131,19 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     if (message.includes('chunk') || message.includes('loading') || stack.includes('chunk')) {
       return 'LOADING_ERROR'
     }
-    
+
     if (message.includes('network') || message.includes('fetch')) {
       return 'NETWORK_ERROR'
     }
-    
+
     if (message.includes('permission') || message.includes('auth')) {
       return 'AUTH_ERROR'
     }
-    
+
     if (stack.includes('react') || stack.includes('hook')) {
       return 'REACT_ERROR'
     }
-    
+
     return 'UNKNOWN_ERROR'
   }
 
@@ -174,17 +174,17 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       const solution = this.getErrorSolution(errorCategory)
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-950 dark:via-orange-950 dark:to-yellow-950 flex items-center justify-center p-4">
-          <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-red-200/50 dark:border-red-800/50 shadow-2xl max-w-2xl mx-auto">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 p-4 dark:from-red-950 dark:via-orange-950 dark:to-yellow-950">
+          <Card className="mx-auto max-w-2xl border-red-200/50 bg-white/95 shadow-2xl backdrop-blur-lg dark:border-red-800/50 dark:bg-slate-900/95">
             <CardContent className="pt-12 pb-12">
-              <div className="text-center space-y-6">
+              <div className="space-y-6 text-center">
                 {/* 에러 아이콘 */}
                 <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-orange-500 rounded-full mx-auto flex items-center justify-center shadow-2xl">
-                    <AlertTriangle className="w-12 h-12 text-white" />
+                  <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 shadow-2xl">
+                    <AlertTriangle className="h-12 w-12 text-white" />
                   </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-                    <Bug className="w-4 h-4 text-yellow-900" />
+                  <div className="absolute -top-2 -right-2 flex h-8 w-8 animate-pulse items-center justify-center rounded-full bg-yellow-400">
+                    <Bug className="h-4 w-4 text-yellow-900" />
                   </div>
                 </div>
 
@@ -193,18 +193,18 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                   <h1 className="text-3xl font-black text-gray-900 dark:text-white">
                     앗! 예기치 못한 문제가 발생했어요
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md mx-auto leading-relaxed">
+                  <p className="mx-auto max-w-md text-lg leading-relaxed text-gray-600 dark:text-gray-300">
                     {solution}
                   </p>
                 </div>
 
                 {/* 에러 상세 정보 (개발 모드에서만) */}
                 {process.env.NODE_ENV === 'development' && (
-                  <details className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl text-left max-w-lg mx-auto">
-                    <summary className="cursor-pointer font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <details className="mx-auto mt-6 max-w-lg rounded-xl bg-gray-100 p-4 text-left dark:bg-gray-800">
+                    <summary className="mb-2 cursor-pointer font-medium text-gray-700 dark:text-gray-300">
                       개발자 정보 (클릭하여 펼치기)
                     </summary>
-                    <div className="space-y-2 text-sm font-mono">
+                    <div className="space-y-2 font-mono text-sm">
                       <div>
                         <strong>에러 ID:</strong> {this.state.errorId}
                       </div>
@@ -217,7 +217,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                       {error.stack && (
                         <div>
                           <strong>스택:</strong>
-                          <pre className="mt-1 p-2 bg-gray-200 dark:bg-gray-700 rounded text-xs overflow-auto max-h-32">
+                          <pre className="mt-1 max-h-32 overflow-auto rounded bg-gray-200 p-2 text-xs dark:bg-gray-700">
                             {error.stack}
                           </pre>
                         </div>
@@ -227,50 +227,50 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 )}
 
                 {/* 액션 버튼들 */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+                <div className="flex flex-col justify-center gap-4 pt-6 sm:flex-row">
                   <Button
                     onClick={this.handleRetry}
-                    className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-105"
+                    className="from-primary hover:from-primary/90 bg-gradient-to-r to-emerald-600 text-white shadow-xl transition-all duration-200 hover:scale-105 hover:to-emerald-600/90 hover:shadow-2xl"
                     size="lg"
                   >
-                    <RefreshCw className="w-5 h-5 mr-2" />
+                    <RefreshCw className="mr-2 h-5 w-5" />
                     다시 시도
                   </Button>
-                  
+
                   <Button
                     onClick={this.handleReload}
                     variant="outline"
                     size="lg"
                     className="border-2 hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <RefreshCw className="w-5 h-5 mr-2" />
+                    <RefreshCw className="mr-2 h-5 w-5" />
                     페이지 새로고침
                   </Button>
-                  
+
                   <Button
                     onClick={this.handleGoHome}
                     variant="outline"
                     size="lg"
                     className="border-2 hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <Home className="w-5 h-5 mr-2" />
+                    <Home className="mr-2 h-5 w-5" />
                     홈으로 가기
                   </Button>
                 </div>
 
                 {/* 추가 도움말 */}
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     문제가 계속 발생하면{' '}
-                    <button 
+                    <button
                       onClick={() => toast('곧 고객센터 기능이 추가됩니다', { icon: '📞' })}
-                      className="text-primary hover:underline font-medium"
+                      className="text-primary font-medium hover:underline"
                     >
                       고객센터
                     </button>
                     로 문의해주세요
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                  <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
                     에러 ID: {this.state.errorId}
                   </p>
                 </div>

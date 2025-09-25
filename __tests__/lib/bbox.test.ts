@@ -1,5 +1,11 @@
 /* 파일경로: __tests__/lib/bbox.test.ts */
-import { parseBBoxParam, calculateDistance, isValidBBox, KOREA_BBOX, SEOUL_BBOX } from '@/lib/utils/bbox'
+import {
+  parseBBoxParam,
+  calculateDistance,
+  isValidBBox,
+  KOREA_BBOX,
+  SEOUL_BBOX,
+} from '@/lib/utils/bbox'
 
 describe('BBox utilities', () => {
   describe('parseBBoxParam', () => {
@@ -9,7 +15,7 @@ describe('BBox utilities', () => {
         south: 33.0,
         west: 124.0,
         north: 43.0,
-        east: 132.0
+        east: 132.0,
       })
     })
 
@@ -28,25 +34,25 @@ describe('BBox utilities', () => {
       expect(parseBBoxParam('33.0,181.0,43.0,132.0')).toBeNull()
       // South > North
       expect(parseBBoxParam('43.0,124.0,33.0,132.0')).toBeNull()
-      // West > East  
+      // West > East
       expect(parseBBoxParam('33.0,132.0,43.0,124.0')).toBeNull()
     })
   })
 
   describe('calculateDistance', () => {
     it('should calculate distance between Seoul and Busan', () => {
-      const seoul = { lat: 37.5665, lng: 126.9780 }
+      const seoul = { lat: 37.5665, lng: 126.978 }
       const busan = { lat: 35.1796, lng: 129.0756 }
-      
+
       const distance = calculateDistance(seoul, busan)
-      
+
       // Seoul to Busan is approximately 325km
       expect(distance).toBeGreaterThan(320)
       expect(distance).toBeLessThan(330)
     })
 
     it('should return 0 for same coordinates', () => {
-      const point = { lat: 37.5665, lng: 126.9780 }
+      const point = { lat: 37.5665, lng: 126.978 }
       const distance = calculateDistance(point, point)
       expect(distance).toBe(0)
     })
@@ -54,9 +60,9 @@ describe('BBox utilities', () => {
     it('should calculate short distances accurately', () => {
       const gangnam = { lat: 37.4979, lng: 127.0276 }
       const hongdae = { lat: 37.5563, lng: 126.9229 }
-      
+
       const distance = calculateDistance(gangnam, hongdae)
-      
+
       // Gangnam to Hongdae is approximately 15km
       expect(distance).toBeGreaterThan(10)
       expect(distance).toBeLessThan(20)

@@ -11,13 +11,13 @@ import { z } from 'zod'
 
 const privacyRightsRequestSchema = z.object({
   requestType: z.enum([
-    'data_access',        // 개인정보 열람권
-    'data_correction',    // 개인정보 정정·삭제권
-    'data_deletion',      // 개인정보 삭제권 (잊혀질 권리)
-    'data_portability',   // 개인정보 이동권
+    'data_access', // 개인정보 열람권
+    'data_correction', // 개인정보 정정·삭제권
+    'data_deletion', // 개인정보 삭제권 (잊혀질 권리)
+    'data_portability', // 개인정보 이동권
     'processing_restriction', // 개인정보 처리정지권
-    'withdraw_consent',   // 동의철회권
-    'objection_processing' // 개인정보 처리거부권
+    'withdraw_consent', // 동의철회권
+    'objection_processing', // 개인정보 처리거부권
   ]),
   reason: z.string().min(10, '요청 사유를 최소 10자 이상 입력해주세요').max(1000),
   specificData: z.string().max(500).optional(), // 특정 데이터에 대한 요청인 경우
@@ -25,18 +25,18 @@ const privacyRightsRequestSchema = z.object({
   urgency: z.enum(['low', 'medium', 'high']).default('medium'),
   legalBasis: z.string().max(300).optional(), // 법적 근거 (필요시)
   preferredResponseMethod: z.enum(['email', 'app_notification', 'postal_mail']).default('email'),
-  additionalInfo: z.string().max(1000).optional()
+  additionalInfo: z.string().max(1000).optional(),
 })
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Rate limiting - 개인정보 권리 요청 남용 방지
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     '127.0.0.1'
+    const clientIP =
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
     const rateLimitKey = `privacy-rights:${clientIP}`
-    
-    if (!rateLimit.check(rateLimitKey, { requests: 3, windowMs: 60 * 60 * 1000 })) { // 1시간에 3번
+
+    if (!rateLimit.check(rateLimitKey, { requests: 3, windowMs: 60 * 60 * 1000 })) {
+      // 1시간에 3번
       throw new ApiError('개인정보 권리 요청이 너무 많습니다. 1시간 후 다시 시도해주세요.', 429)
     }
 
@@ -46,12 +46,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 요청 데이터 검증
     const body = await request.json()
     const validationResult = privacyRightsRequestSchema.safeParse(body)
-    
+
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
       throw new ApiError(firstError.message || '입력 데이터가 올바르지 않습니다.', 400)
     }
-    
+
     const {
       requestType,
       reason,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       urgency,
       legalBasis,
       preferredResponseMethod,
-      additionalInfo
+      additionalInfo,
     } = validationResult.data
 
     // Supabase 클라이언트 생성
@@ -68,16 +68,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 사용자별 rate limiting 추가
     const userRateLimitKey = `privacy-rights-user:${user.id}`
-    if (!rateLimit.check(userRateLimitKey, { requests: 5, windowMs: 24 * 60 * 60 * 1000 })) { // 24시간에 5번
+    if (!rateLimit.check(userRateLimitKey, { requests: 5, windowMs: 24 * 60 * 60 * 1000 })) {
+      // 24시간에 5번
       throw new ApiError('일일 개인정보 권리 요청 한도를 초과했습니다.', 429)
     }
 
     // 사용자 정보 조회 (연락처 정보 확인)
-    const { data: profile } = await supabase
+    const { data: profile } = (await supabase
       .from('profiles')
       .select('email, nickname')
       .eq('id', user.id)
-      .single() as { data: any | null, error: any }
+      .single()) as { data: any | null; error: any }
 
     // 기본 연락처 설정
     const finalContactEmail = contactEmail || profile?.email || ''
@@ -98,22 +99,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         user_agent: request.headers.get('user-agent'),
         ip_address: clientIP !== 'unknown' ? clientIP : null,
         timestamp: new Date().toISOString(),
-        user_nickname: profile?.nickname
-      }
+        user_nickname: profile?.nickname,
+      },
     }
 
     // 데이터베이스에 요청 저장
-    const { data: privacyRequest, error: insertError } = await ((supabase as any)
+    const { data: privacyRequest, error: insertError } = (await (supabase as any)
       .from('privacy_rights_requests')
       .insert([requestData])
-      .select(`
+      .select(
+        `
         id,
         request_type,
         status,
         urgency,
         created_at
-      `)
-      .single()) as { data: any | null, error: any }
+      `
+      )
+      .single()) as { data: any | null; error: any }
 
     if (insertError) {
       console.error('Privacy rights request insert error:', insertError)
@@ -130,17 +133,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       metadata: {
         user_id: user.id,
         request_type: requestType,
-        urgency
-      }
+        urgency,
+      },
     }
 
-    await ((supabase as any)
-      .from('admin_notifications')
-      .insert([notificationData]))
+    await (supabase as any).from('admin_notifications').insert([notificationData])
 
     // 요청 유형별 예상 처리 시간 안내
     const expectedResponseTime = getExpectedResponseTime(requestType)
-    
+
     // 성공 응답
     return NextResponse.json({
       ok: true,
@@ -152,9 +153,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         submittedAt: privacyRequest.created_at,
         expectedResponseTime,
         contactEmail: finalContactEmail,
-        message: `${getRequestTypeKorean(requestType)} 요청이 접수되었습니다. ${expectedResponseTime} 내에 처리됩니다.`
+        message: `${getRequestTypeKorean(requestType)} 요청이 접수되었습니다. ${expectedResponseTime} 내에 처리됩니다.`,
       },
-      message: '개인정보 권리 요청이 성공적으로 접수되었습니다.'
+      message: '개인정보 권리 요청이 성공적으로 접수되었습니다.',
     } satisfies ApiResponse<{
       requestId: string
       requestType: string
@@ -165,23 +166,28 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       contactEmail: string
       message: string
     }>)
-    
   } catch (error) {
     console.error('Privacy rights request API error:', error)
-    
+
     if (error instanceof ApiError) {
-      return NextResponse.json({
-        ok: false,
-        message: error.message,
-        code: 'PRIVACY_RIGHTS_REQUEST_ERROR'
-      } satisfies ApiResponse<null>, { status: error.status })
+      return NextResponse.json(
+        {
+          ok: false,
+          message: error.message,
+          code: 'PRIVACY_RIGHTS_REQUEST_ERROR',
+        } satisfies ApiResponse<null>,
+        { status: error.status }
+      )
     }
-    
-    return NextResponse.json({
-      ok: false,
-      message: '개인정보 권리 요청 처리 중 오류가 발생했습니다.',
-      code: 'INTERNAL_ERROR'
-    } satisfies ApiResponse<null>, { status: 500 })
+
+    return NextResponse.json(
+      {
+        ok: false,
+        message: '개인정보 권리 요청 처리 중 오류가 발생했습니다.',
+        code: 'INTERNAL_ERROR',
+      } satisfies ApiResponse<null>,
+      { status: 500 }
+    )
   }
 }
 
@@ -200,7 +206,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // 사용자의 개인정보 권리 요청 내역 조회
     let query = supabase
       .from('privacy_rights_requests')
-      .select(`
+      .select(
+        `
         id,
         request_type,
         reason,
@@ -210,7 +217,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         updated_at,
         admin_response,
         processed_at
-      `)
+      `
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
@@ -226,11 +234,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // 요청 유형을 한국어로 변환
-    const formattedRequests = requests?.map((req: any) => ({
-      ...req,
-      request_type_korean: getRequestTypeKorean(req.request_type),
-      status_korean: getStatusKorean(req.status)
-    })) || []
+    const formattedRequests =
+      requests?.map((req: any) => ({
+        ...req,
+        request_type_korean: getRequestTypeKorean(req.request_type),
+        status_korean: getStatusKorean(req.status),
+      })) || []
 
     return NextResponse.json({
       ok: true,
@@ -239,9 +248,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         pagination: {
           limit,
           offset,
-          hasMore: requests?.length === limit
-        }
-      }
+          hasMore: requests?.length === limit,
+        },
+      },
     } satisfies ApiResponse<{
       requests: any[]
       pagination: {
@@ -250,58 +259,63 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         hasMore: boolean
       }
     }>)
-    
   } catch (error) {
     console.error('Get privacy rights requests error:', error)
-    
+
     if (error instanceof ApiError) {
-      return NextResponse.json({
-        ok: false,
-        message: error.message
-      } satisfies ApiResponse<null>, { status: error.status })
+      return NextResponse.json(
+        {
+          ok: false,
+          message: error.message,
+        } satisfies ApiResponse<null>,
+        { status: error.status }
+      )
     }
-    
-    return NextResponse.json({
-      ok: false,
-      message: '권리 요청 내역 조회 중 오류가 발생했습니다.'
-    } satisfies ApiResponse<null>, { status: 500 })
+
+    return NextResponse.json(
+      {
+        ok: false,
+        message: '권리 요청 내역 조회 중 오류가 발생했습니다.',
+      } satisfies ApiResponse<null>,
+      { status: 500 }
+    )
   }
 }
 
 // 유틸리티 함수들
 function getRequestTypeKorean(requestType: string): string {
   const typeMap: Record<string, string> = {
-    'data_access': '개인정보 열람',
-    'data_correction': '개인정보 정정·삭제',
-    'data_deletion': '개인정보 삭제 (잊혀질 권리)',
-    'data_portability': '개인정보 이동',
-    'processing_restriction': '개인정보 처리정지',
-    'withdraw_consent': '동의철회',
-    'objection_processing': '개인정보 처리거부'
+    data_access: '개인정보 열람',
+    data_correction: '개인정보 정정·삭제',
+    data_deletion: '개인정보 삭제 (잊혀질 권리)',
+    data_portability: '개인정보 이동',
+    processing_restriction: '개인정보 처리정지',
+    withdraw_consent: '동의철회',
+    objection_processing: '개인정보 처리거부',
   }
   return typeMap[requestType] || requestType
 }
 
 function getStatusKorean(status: string): string {
   const statusMap: Record<string, string> = {
-    'pending': '접수',
-    'processing': '처리중',
-    'completed': '완료',
-    'rejected': '거부',
-    'cancelled': '취소'
+    pending: '접수',
+    processing: '처리중',
+    completed: '완료',
+    rejected: '거부',
+    cancelled: '취소',
   }
   return statusMap[status] || status
 }
 
 function getExpectedResponseTime(requestType: string): string {
   const timeMap: Record<string, string> = {
-    'data_access': '10일',
-    'data_correction': '10일',
-    'data_deletion': '10일',
-    'data_portability': '20일',
-    'processing_restriction': '10일',
-    'withdraw_consent': '즉시',
-    'objection_processing': '10일'
+    data_access: '10일',
+    data_correction: '10일',
+    data_deletion: '10일',
+    data_portability: '20일',
+    processing_restriction: '10일',
+    withdraw_consent: '즉시',
+    objection_processing: '10일',
   }
   return timeMap[requestType] || '10일'
 }

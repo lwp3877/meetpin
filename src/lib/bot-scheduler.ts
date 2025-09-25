@@ -24,16 +24,16 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 1,
     categories: ['other'],
-    locationWeight: { '강남구': 0.8, '서초구': 0.2 },
-    description: '새벽 올빼미족을 위한 심야 모임'
+    locationWeight: { 강남구: 0.8, 서초구: 0.2 },
+    description: '새벽 올빼미족을 위한 심야 모임',
   },
   {
     hour: 4,
     minute: 0,
     roomCount: 1,
     categories: ['exercise'],
-    locationWeight: { '한강공원': 1.0 },
-    description: '새벽 운동 모임'
+    locationWeight: { 한강공원: 1.0 },
+    description: '새벽 운동 모임',
   },
 
   // 아침 시간대 (06:00-09:00) - 출근 전 활동
@@ -42,16 +42,16 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 3,
     categories: ['exercise', 'other'],
-    locationWeight: { '강남구': 0.4, '서초구': 0.3, '송파구': 0.3 },
-    description: '아침 운동 및 모닝 카페 모임'
+    locationWeight: { 강남구: 0.4, 서초구: 0.3, 송파구: 0.3 },
+    description: '아침 운동 및 모닝 카페 모임',
   },
   {
     hour: 7,
     minute: 45,
     roomCount: 2,
     categories: ['other'],
-    locationWeight: { '강남구': 0.6, '마포구': 0.4 },
-    description: '출근 전 모닝 커피 모임'
+    locationWeight: { 강남구: 0.6, 마포구: 0.4 },
+    description: '출근 전 모닝 커피 모임',
   },
 
   // 점심 시간대 (11:00-14:00) - 직장인 활동
@@ -60,24 +60,24 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 4,
     categories: ['other', 'drink'],
-    locationWeight: { '강남구': 0.5, '서초구': 0.3, '영등포구': 0.2 },
-    description: '점심시간 만남 모임'
+    locationWeight: { 강남구: 0.5, 서초구: 0.3, 영등포구: 0.2 },
+    description: '점심시간 만남 모임',
   },
   {
     hour: 12,
     minute: 15,
     roomCount: 5,
     categories: ['other'],
-    locationWeight: { '강남구': 0.4, '서초구': 0.3, '중구': 0.3 },
-    description: '점심 식사 및 카페 모임'
+    locationWeight: { 강남구: 0.4, 서초구: 0.3, 중구: 0.3 },
+    description: '점심 식사 및 카페 모임',
   },
   {
     hour: 13,
     minute: 0,
     roomCount: 3,
     categories: ['other', 'exercise'],
-    locationWeight: { '강남구': 0.6, '서초구': 0.4 },
-    description: '점심 후 디저트 모임'
+    locationWeight: { 강남구: 0.6, 서초구: 0.4 },
+    description: '점심 후 디저트 모임',
   },
 
   // 오후 시간대 (14:00-17:00) - 여유 시간
@@ -86,16 +86,16 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 3,
     categories: ['other', 'exercise'],
-    locationWeight: { '강남구': 0.3, '홍대': 0.4, '성수구': 0.3 },
-    description: '오후 여유 시간 모임'
+    locationWeight: { 강남구: 0.3, 홍대: 0.4, 성수구: 0.3 },
+    description: '오후 여유 시간 모임',
   },
   {
     hour: 16,
     minute: 45,
     roomCount: 2,
     categories: ['other'],
-    locationWeight: { '강남구': 0.5, '홍대': 0.5 },
-    description: '오후 카페 모임'
+    locationWeight: { 강남구: 0.5, 홍대: 0.5 },
+    description: '오후 카페 모임',
   },
 
   // 저녁 시간대 (17:00-21:00) - 가장 활발한 시간
@@ -104,40 +104,40 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 6,
     categories: ['drink', 'other'],
-    locationWeight: { '강남구': 0.3, '홍대': 0.3, '이태원': 0.2, '건대': 0.2 },
-    description: '퇴근 후 첫 모임'
+    locationWeight: { 강남구: 0.3, 홍대: 0.3, 이태원: 0.2, 건대: 0.2 },
+    description: '퇴근 후 첫 모임',
   },
   {
     hour: 18,
     minute: 0,
     roomCount: 8,
     categories: ['drink', 'other', 'exercise'],
-    locationWeight: { '홍대': 0.4, '강남구': 0.3, '이태원': 0.3 },
-    description: '저녁 골든타임 모임'
+    locationWeight: { 홍대: 0.4, 강남구: 0.3, 이태원: 0.3 },
+    description: '저녁 골든타임 모임',
   },
   {
     hour: 18,
     minute: 45,
     roomCount: 7,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.4, '강남구': 0.2, '이태원': 0.2, '건대': 0.2 },
-    description: '저녁 식사 및 술모임'
+    locationWeight: { 홍대: 0.4, 강남구: 0.2, 이태원: 0.2, 건대: 0.2 },
+    description: '저녁 식사 및 술모임',
   },
   {
     hour: 19,
     minute: 30,
     roomCount: 9,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.3, '강남구': 0.3, '이태원': 0.2, '건대': 0.2 },
-    description: '저녁 피크타임 모임'
+    locationWeight: { 홍대: 0.3, 강남구: 0.3, 이태원: 0.2, 건대: 0.2 },
+    description: '저녁 피크타임 모임',
   },
   {
     hour: 20,
     minute: 15,
     roomCount: 6,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.4, '강남구': 0.3, '이태원': 0.3 },
-    description: '저녁 후반 모임'
+    locationWeight: { 홍대: 0.4, 강남구: 0.3, 이태원: 0.3 },
+    description: '저녁 후반 모임',
   },
 
   // 밤 시간대 (21:00-24:00) - 야간 활동
@@ -146,33 +146,33 @@ const DAILY_SCHEDULE: ScheduleSlot[] = [
     minute: 30,
     roomCount: 4,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.5, '이태원': 0.3, '강남구': 0.2 },
-    description: '밤 모임의 시작'
+    locationWeight: { 홍대: 0.5, 이태원: 0.3, 강남구: 0.2 },
+    description: '밤 모임의 시작',
   },
   {
     hour: 22,
     minute: 15,
     roomCount: 5,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.4, '이태원': 0.4, '강남구': 0.2 },
-    description: '야간 핫플레이스 모임'
+    locationWeight: { 홍대: 0.4, 이태원: 0.4, 강남구: 0.2 },
+    description: '야간 핫플레이스 모임',
   },
   {
     hour: 23,
     minute: 0,
     roomCount: 3,
     categories: ['drink', 'other'],
-    locationWeight: { '홍대': 0.6, '이태원': 0.4 },
-    description: '심야 모임'
+    locationWeight: { 홍대: 0.6, 이태원: 0.4 },
+    description: '심야 모임',
   },
   {
     hour: 23,
     minute: 45,
     roomCount: 2,
     categories: ['drink'],
-    locationWeight: { '홍대': 0.7, '이태원': 0.3 },
-    description: '막차 전 마지막 모임'
-  }
+    locationWeight: { 홍대: 0.7, 이태원: 0.3 },
+    description: '막차 전 마지막 모임',
+  },
 ]
 
 // 요일별 가중치 (월요일=0, 일요일=6)
@@ -183,7 +183,7 @@ const WEEKDAY_MULTIPLIER = {
   3: 1.1, // 목요일
   4: 1.3, // 금요일 - 많음
   5: 1.4, // 토요일 - 가장 많음
-  6: 1.2  // 일요일 - 많음
+  6: 1.2, // 일요일 - 많음
 }
 
 export class BotRoomScheduler {
@@ -250,7 +250,7 @@ export class BotRoomScheduler {
    */
   private scheduleRoomGeneration(scheduleTime: Date, slot: ScheduleSlot): void {
     const delay = scheduleTime.getTime() - Date.now()
-    
+
     if (delay < 0) return // 이미 지난 시간
 
     const timer = setTimeout(() => {
@@ -259,7 +259,9 @@ export class BotRoomScheduler {
 
     this.timers.push(timer)
 
-    console.log(`📅 봇 방 생성 예약: ${scheduleTime.toLocaleString('ko-KR')} - ${slot.roomCount}개 방`)
+    console.log(
+      `📅 봇 방 생성 예약: ${scheduleTime.toLocaleString('ko-KR')} - ${slot.roomCount}개 방`
+    )
   }
 
   /**
@@ -276,10 +278,10 @@ export class BotRoomScheduler {
       for (let i = 0; i < adjustedRoomCount; i++) {
         // 카테고리 랜덤 선택
         const _category = slot.categories[Math.floor(Math.random() * slot.categories.length)]
-        
+
         // 위치 가중치에 따른 랜덤 선택
         const _location = this.selectWeightedLocation(slot.locationWeight)
-        
+
         // 약간의 시간 간격을 두고 생성 (너무 동시에 생성되지 않도록)
         setTimeout(() => {
           smartRoomGenerator.generateSingleBotRoom()
@@ -299,16 +301,16 @@ export class BotRoomScheduler {
     const locations = Object.keys(locationWeight)
     const weights = Object.values(locationWeight)
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
-    
+
     let random = Math.random() * totalWeight
-    
+
     for (let i = 0; i < locations.length; i++) {
       random -= weights[i]
       if (random <= 0) {
         return locations[i]
       }
     }
-    
+
     return locations[0] // fallback
   }
 
@@ -342,18 +344,20 @@ export class BotRoomScheduler {
 
     if (this.timers.length > 0) {
       const now = Date.now()
-      const nextDelay = Math.min(...this.timers.map(_timer => {
-        // TypeScript에서 timeout의 시간 정보에 직접 접근할 수 없으므로
-        // 대략적인 다음 스케줄 시간을 계산
-        return 60000 // 1분 후 (예시)
-      }))
+      const nextDelay = Math.min(
+        ...this.timers.map(_timer => {
+          // TypeScript에서 timeout의 시간 정보에 직접 접근할 수 없으므로
+          // 대략적인 다음 스케줄 시간을 계산
+          return 60000 // 1분 후 (예시)
+        })
+      )
       nextSchedule = new Date(now + nextDelay)
     }
 
     return {
       isRunning: this.isRunning,
       activeTimers: this.timers.length,
-      nextSchedule
+      nextSchedule,
     }
   }
 
@@ -362,9 +366,10 @@ export class BotRoomScheduler {
    */
   async generateTestRooms(count: number = 3, category?: string): Promise<void> {
     console.log(`🧪 테스트 봇 방 ${count}개 생성 시작`)
-    
+
     for (let i = 0; i < count; i++) {
-      const _testCategory = category || ['drink', 'exercise', 'other'][Math.floor(Math.random() * 3)]
+      const _testCategory =
+        category || ['drink', 'exercise', 'other'][Math.floor(Math.random() * 3)]
       setTimeout(() => {
         smartRoomGenerator.generateSingleBotRoom()
       }, i * 1500) // 1.5초 간격
@@ -392,7 +397,7 @@ export function initializeBotScheduler(): void {
   if (typeof window !== 'undefined') {
     const scheduler = getBotScheduler()
     scheduler.start()
-    
+
     // 페이지 언로드 시 정리
     window.addEventListener('beforeunload', () => {
       scheduler.stop()

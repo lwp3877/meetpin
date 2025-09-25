@@ -88,16 +88,20 @@ export default function RoomRequestsPage() {
   }, [roomId])
 
   // 요청 처리 (승인/거절)
-  const handleRequestAction = async (requestId: string, action: 'approve' | 'reject', reason?: string) => {
+  const handleRequestAction = async (
+    requestId: string,
+    action: 'approve' | 'reject',
+    reason?: string
+  ) => {
     try {
       setProcessing(requestId)
 
       const response = await fetch(`/api/requests/${requestId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           status: action === 'approve' ? 'accepted' : 'rejected',
-          reason
+          reason,
         }),
       })
 
@@ -108,7 +112,7 @@ export default function RoomRequestsPage() {
       }
 
       toast.success(action === 'approve' ? '참가 요청을 승인했습니다!' : '참가 요청을 거절했습니다')
-      
+
       // 데이터 새로고침
       await loadData()
     } catch (err: any) {
@@ -124,7 +128,7 @@ export default function RoomRequestsPage() {
     if (!room) return
 
     const remainingSlots = room.max_people - room.participants_count
-    
+
     if (remainingSlots <= 0) {
       toast.error('모집 인원이 가득 찼습니다')
       return
@@ -140,7 +144,7 @@ export default function RoomRequestsPage() {
     const reason = window.prompt(
       `${request.user.nickname}님의 참가 요청을 거절하는 이유를 입력해주세요 (선택사항):`
     )
-    
+
     // null이면 취소, 빈 문자열이면 계속 진행
     if (reason !== null) {
       handleRequestAction(request.id, 'reject', reason || undefined)
@@ -156,9 +160,9 @@ export default function RoomRequestsPage() {
   // 인증 체크
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           <p className="text-gray-600">요청 목록을 불러오는 중...</p>
         </div>
       </div>
@@ -168,14 +172,12 @@ export default function RoomRequestsPage() {
   // 인증 실패
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">🔐</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">로그인 필요</h2>
-          <p className="text-gray-600 mb-6">요청을 관리하려면 로그인이 필요합니다.</p>
-          <Button onClick={() => router.push('/auth/login')}>
-            로그인하기
-          </Button>
+          <div className="mb-4 text-4xl">🔐</div>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">로그인 필요</h2>
+          <p className="mb-6 text-gray-600">요청을 관리하려면 로그인이 필요합니다.</p>
+          <Button onClick={() => router.push('/auth/login')}>로그인하기</Button>
         </div>
       </div>
     )
@@ -184,18 +186,16 @@ export default function RoomRequestsPage() {
   // 오류 또는 방 없음
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">❌</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">요청을 불러올 수 없습니다</h2>
-          <p className="text-gray-600 mb-6">{error || '존재하지 않는 방이거나 권한이 없습니다.'}</p>
+          <div className="mb-4 text-4xl">❌</div>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">요청을 불러올 수 없습니다</h2>
+          <p className="mb-6 text-gray-600">{error || '존재하지 않는 방이거나 권한이 없습니다.'}</p>
           <div className="space-x-4">
             <Button onClick={() => router.push('/rooms')} variant="outline">
               내 모임으로
             </Button>
-            <Button onClick={loadData}>
-              다시 시도
-            </Button>
+            <Button onClick={loadData}>다시 시도</Button>
           </div>
         </div>
       </div>
@@ -210,7 +210,7 @@ export default function RoomRequestsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
+      <header className="sticky top-0 z-10 border-b border-white/20 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -228,39 +228,41 @@ export default function RoomRequestsPage() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-4 py-8">
         {/* Room Info */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
-          <div className="flex items-center gap-3 mb-3">
-            <span 
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
+        <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-lg">
+          <div className="mb-3 flex items-center gap-3">
+            <span
+              className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white"
               style={{ backgroundColor: categoryDisplay.color }}
             >
               {categoryDisplay.emoji} {categoryDisplay.label}
             </span>
             <h2 className="text-xl font-bold text-gray-900">{room.title}</h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+
+          <div className="grid grid-cols-1 gap-4 text-sm text-gray-600 md:grid-cols-3">
             <div className="flex items-center">
               <span className="mr-2">📍</span>
               {room.place_text}
             </div>
             <div className="flex items-center">
               <span className="mr-2">🕐</span>
-              {new Date(room.start_at).toLocaleDateString('ko-KR')} {new Date(room.start_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+              {new Date(room.start_at).toLocaleDateString('ko-KR')}{' '}
+              {new Date(room.start_at).toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </div>
             <div className="flex items-center">
               <span className="mr-2">👥</span>
-              {room.participants_count}/{room.max_people}명 
-              <span className="ml-2 text-primary">
-                (남은 자리: {remainingSlots}개)
-              </span>
+              {room.participants_count}/{room.max_people}명
+              <span className="text-primary ml-2">(남은 자리: {remainingSlots}개)</span>
             </div>
           </div>
 
           {remainingSlots <= 0 && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
               <p className="text-sm text-yellow-800">
                 ⚠️ 모집 인원이 가득 찼습니다. 추가 승인 시 최대 인원을 초과하게 됩니다.
               </p>
@@ -269,17 +271,17 @@ export default function RoomRequestsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-t-xl border border-gray-100 border-b-0">
+        <div className="rounded-t-xl border border-b-0 border-gray-100 bg-white">
           <div className="px-6">
             <div className="flex space-x-8">
               {[
                 { key: 'pending', label: '대기 중', count: pendingRequests.length },
                 { key: 'all', label: '전체', count: requests.length },
-              ].map((tab) => (
+              ].map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as any)}
-                  className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     activeTab === tab.key
                       ? 'border-primary text-primary'
                       : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -293,72 +295,90 @@ export default function RoomRequestsPage() {
         </div>
 
         {/* Requests List */}
-        <div className="bg-white rounded-b-xl border border-gray-100 shadow-lg">
+        <div className="rounded-b-xl border border-gray-100 bg-white shadow-lg">
           {filteredRequests.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                 <span className="text-2xl">📮</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="mb-2 text-lg font-medium text-gray-900">
                 {activeTab === 'pending' ? '대기 중인 요청이 없습니다' : '요청이 없습니다'}
               </h3>
               <p className="text-gray-600">
-                {activeTab === 'pending' 
-                  ? '새로운 참가 요청이 들어오면 여기에 표시됩니다.' 
+                {activeTab === 'pending'
+                  ? '새로운 참가 요청이 들어오면 여기에 표시됩니다.'
                   : '아직 아무도 참가 요청을 보내지 않았습니다.'}
               </p>
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {filteredRequests.map((request) => (
+              {filteredRequests.map(request => (
                 <div key={request.id} className="p-6">
                   <div className="flex items-start justify-between">
                     {/* User Info */}
-                    <div className="flex items-start flex-1">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mr-4 shadow-lg">
+                    <div className="flex flex-1 items-start">
+                      <div className="from-primary to-accent mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br shadow-lg">
                         {request.user.avatar_url ? (
                           <Image
                             src={request.user.avatar_url}
                             alt={request.user.nickname}
                             width={48}
                             height={48}
-                            className="w-full h-full rounded-full object-cover"
+                            className="h-full w-full rounded-full object-cover"
                           />
                         ) : (
-                          <span className="text-white font-bold">
+                          <span className="font-bold text-white">
                             {request.user.nickname.charAt(0).toUpperCase()}
                           </span>
                         )}
                       </div>
 
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="mb-2 flex items-center gap-3">
                           <h3 className="text-lg font-semibold text-gray-900">
                             {request.user.nickname}
                           </h3>
-                          <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                          <span className="rounded-full bg-gray-100 px-2 py-1 text-sm text-gray-600">
                             {request.user.age_range}
                           </span>
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            request.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {request.status === 'pending' ? '⏳ 대기 중' :
-                             request.status === 'accepted' ? '✅ 승인됨' :
-                             '❌ 거절됨'}
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs font-medium ${
+                              request.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : request.status === 'accepted'
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                            }`}
+                          >
+                            {request.status === 'pending'
+                              ? '⏳ 대기 중'
+                              : request.status === 'accepted'
+                                ? '✅ 승인됨'
+                                : '❌ 거절됨'}
                           </span>
                         </div>
 
-                        <div className="text-sm text-gray-600 mb-3">
-                          <p>신청일: {new Date(request.created_at).toLocaleDateString('ko-KR')} {new Date(request.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <div className="mb-3 text-sm text-gray-600">
+                          <p>
+                            신청일: {new Date(request.created_at).toLocaleDateString('ko-KR')}{' '}
+                            {new Date(request.created_at).toLocaleTimeString('ko-KR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
                           {request.status !== 'pending' && (
-                            <p>처리일: {new Date(request.updated_at).toLocaleDateString('ko-KR')} {new Date(request.updated_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p>
+                              처리일: {new Date(request.updated_at).toLocaleDateString('ko-KR')}{' '}
+                              {new Date(request.updated_at).toLocaleTimeString('ko-KR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
                           )}
                         </div>
 
                         {request.user.intro && (
-                          <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="mb-3 rounded-lg bg-gray-50 p-3">
                             <p className="text-sm text-gray-700">
                               <span className="font-medium">자기소개:</span> {request.user.intro}
                             </p>
@@ -366,7 +386,7 @@ export default function RoomRequestsPage() {
                         )}
 
                         {request.message && (
-                          <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+                          <div className="mb-3 rounded-lg bg-blue-50 p-3">
                             <p className="text-sm text-blue-800">
                               <span className="font-medium">요청 메시지:</span> {request.message}
                             </p>
@@ -377,11 +397,11 @@ export default function RoomRequestsPage() {
 
                     {/* Action Buttons */}
                     {request.status === 'pending' && (
-                      <div className="flex gap-2 ml-4">
+                      <div className="ml-4 flex gap-2">
                         <Button
                           onClick={() => confirmApprove(request)}
                           disabled={processing === request.id}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-green-600 text-white hover:bg-green-700"
                           size="sm"
                         >
                           {processing === request.id ? '처리 중...' : '✅ 승인'}
@@ -406,22 +426,26 @@ export default function RoomRequestsPage() {
 
         {/* Statistics */}
         {requests.length > 0 && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-gray-100">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-gray-100 bg-white p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">{pendingRequests.length}</div>
                 <div className="text-sm text-gray-600">대기 중</div>
               </div>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-100">
+            <div className="rounded-lg border border-gray-100 bg-white p-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{requests.filter(r => r.status === 'accepted').length}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {requests.filter(r => r.status === 'accepted').length}
+                </div>
                 <div className="text-sm text-gray-600">승인됨</div>
               </div>
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-100">
+            <div className="rounded-lg border border-gray-100 bg-white p-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{requests.filter(r => r.status === 'rejected').length}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {requests.filter(r => r.status === 'rejected').length}
+                </div>
                 <div className="text-sm text-gray-600">거절됨</div>
               </div>
             </div>

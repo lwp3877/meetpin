@@ -13,14 +13,14 @@ export async function GET(): Promise<NextResponse> {
     timestamp: new Date().toISOString(),
     pid: process.pid,
     uptime: Math.round(process.uptime()),
-    memory_mb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024)
+    memory_mb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
   }
 
   return NextResponse.json(response, {
     status: 200,
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache'
-    }
+      Pragma: 'no-cache',
+    },
   })
 }

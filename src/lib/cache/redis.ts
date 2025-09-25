@@ -16,7 +16,7 @@ export function getRedisClient(): Redis | null {
   if (!redis) {
     try {
       const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL
-      
+
       if (!redisUrl) {
         console.warn('[Redis] No Redis URL configured - caching disabled')
         return null
@@ -33,14 +33,13 @@ export function getRedisClient(): Redis | null {
         console.log('[Redis] Connected successfully')
       })
 
-      redis.on('error', (err) => {
+      redis.on('error', err => {
         console.error('[Redis] Connection error:', err.message)
         // 개발 환경에서는 Redis 연결 실패를 허용
         if (process.env.NODE_ENV === 'development') {
           redis = null
         }
       })
-
     } catch (error) {
       console.error('[Redis] Failed to initialize Redis client:', error)
       return null
@@ -65,12 +64,12 @@ export const CacheKeys = {
 
 // 캐시 TTL 설정 (초 단위)
 export const CacheTTL = {
-  rooms: 60,           // 1분 - 방 목록은 자주 변경됨
-  roomDetail: 300,     // 5분 - 방 상세 정보는 상대적으로 안정적
-  messages: 30,        // 30초 - 메시지는 실시간성이 중요
-  notifications: 60,   // 1분 - 알림도 실시간성이 중요
-  userProfile: 600,    // 10분 - 프로필은 상대적으로 변경이 적음
-  hostMessages: 60,    // 1분 - 호스트 메시지는 실시간성이 중요
+  rooms: 60, // 1분 - 방 목록은 자주 변경됨
+  roomDetail: 300, // 5분 - 방 상세 정보는 상대적으로 안정적
+  messages: 30, // 30초 - 메시지는 실시간성이 중요
+  notifications: 60, // 1분 - 알림도 실시간성이 중요
+  userProfile: 600, // 10분 - 프로필은 상대적으로 변경이 적음
+  hostMessages: 60, // 1분 - 호스트 메시지는 실시간성이 중요
 } as const
 
 // 캐시 래퍼 함수
@@ -80,7 +79,7 @@ export async function withCache<T>(
   fetcher: () => Promise<T>
 ): Promise<T> {
   const client = getRedisClient()
-  
+
   // Redis가 없으면 직접 DB에서 가져오기
   if (!client) {
     return await fetcher()
@@ -89,7 +88,7 @@ export async function withCache<T>(
   try {
     // 캐시에서 확인
     const cached = await client.get(key)
-    
+
     if (cached) {
       try {
         return JSON.parse(cached) as T
@@ -102,16 +101,15 @@ export async function withCache<T>(
 
     // 캐시 미스 - DB에서 가져와서 캐시에 저장
     const data = await fetcher()
-    
+
     // Redis에 저장 (에러가 나도 데이터는 반환)
     try {
       await client.setex(key, ttl, JSON.stringify(data))
     } catch (setError) {
       console.warn('[Redis] Failed to cache data:', setError)
     }
-    
+
     return data
-    
   } catch (error) {
     console.error('[Redis] Cache operation failed:', error)
     // Redis 에러시 DB에서 직접 가져오기
@@ -174,7 +172,7 @@ export async function getCacheStats(): Promise<{
   memoryUsage?: string
 }> {
   const client = getRedisClient()
-  
+
   if (!client) {
     return { connected: false, keyCount: 0 }
   }
@@ -188,7 +186,7 @@ export async function getCacheStats(): Promise<{
     return {
       connected: true,
       keyCount,
-      memoryUsage
+      memoryUsage,
     }
   } catch (error) {
     console.error('[Redis] Failed to get cache stats:', error)
@@ -196,7 +194,7 @@ export async function getCacheStats(): Promise<{
   }
 }
 
-export default {
+const defaultExport = {
   getClient: getRedisClient,
   withCache,
   invalidateCache,
@@ -208,3 +206,4 @@ export default {
   CacheKeys,
   CacheTTL,
 }
+export default defaultExport

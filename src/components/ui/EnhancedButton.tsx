@@ -14,16 +14,21 @@ interface EnhancedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   children?: React.ReactNode
 }
 
-const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2'
+const baseClasses =
+  'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2'
 
 const variantClasses = {
   primary: `bg-gradient-to-r from-primary to-primary-deep text-white hover:from-primary-deep hover:to-primary shadow-lg hover:shadow-xl focus:ring-primary`,
   secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
-  outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary',
+  outline:
+    'border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary',
   ghost: 'text-primary hover:bg-primary/10 focus:ring-primary',
-  danger: 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl focus:ring-red-500',
-  success: 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl focus:ring-green-500',
-  warning: 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 shadow-lg hover:shadow-xl focus:ring-yellow-500',
+  danger:
+    'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl focus:ring-red-500',
+  success:
+    'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl focus:ring-green-500',
+  warning:
+    'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 shadow-lg hover:shadow-xl focus:ring-yellow-500',
 }
 
 const sizeClasses = {
@@ -83,23 +88,18 @@ export default function EnhancedButton({
     fullWidth ? 'w-full' : '',
     loading || disabled ? 'pointer-events-none' : '',
     className,
-  ].filter(Boolean).join(' ')
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const LoadingSpinner = () => (
     <svg
-      className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+      className="mr-2 -ml-1 h-4 w-4 animate-spin text-current"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
     >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -109,19 +109,11 @@ export default function EnhancedButton({
   )
 
   return (
-    <button
-      className={classes}
-      disabled={disabled || loading}
-      {...props}
-    >
+    <button className={classes} disabled={disabled || loading} {...props}>
       {loading && <LoadingSpinner />}
-      {!loading && icon && iconPosition === 'left' && (
-        <span className="mr-2">{icon}</span>
-      )}
+      {!loading && icon && iconPosition === 'left' && <span className="mr-2">{icon}</span>}
       {children}
-      {!loading && icon && iconPosition === 'right' && (
-        <span className="ml-2">{icon}</span>
-      )}
+      {!loading && icon && iconPosition === 'right' && <span className="ml-2">{icon}</span>}
     </button>
   )
 }
@@ -156,98 +148,60 @@ export const ButtonPresets = {
   ),
 
   StartChat: ({ onClick }: { onClick: () => void }) => (
-    <EnhancedButton
-      variant="primary"
-      size="md"
-      icon="💬"
-      onClick={onClick}
-    >
+    <EnhancedButton variant="primary" size="md" icon="💬" onClick={onClick}>
       채팅 시작
     </EnhancedButton>
   ),
 
   // Status buttons
   Approve: ({ onClick, loading }: { onClick: () => void; loading?: boolean }) => (
-    <EnhancedButton
-      variant="success"
-      size="sm"
-      icon="✅"
-      loading={loading}
-      onClick={onClick}
-    >
+    <EnhancedButton variant="success" size="sm" icon="✅" loading={loading} onClick={onClick}>
       승인
     </EnhancedButton>
   ),
 
   Reject: ({ onClick, loading }: { onClick: () => void; loading?: boolean }) => (
-    <EnhancedButton
-      variant="danger"
-      size="sm"
-      icon="❌"
-      loading={loading}
-      onClick={onClick}
-    >
+    <EnhancedButton variant="danger" size="sm" icon="❌" loading={loading} onClick={onClick}>
       거절
     </EnhancedButton>
   ),
 
   Cancel: ({ onClick }: { onClick: () => void }) => (
-    <EnhancedButton
-      variant="outline"
-      size="sm"
-      icon="🚫"
-      onClick={onClick}
-    >
+    <EnhancedButton variant="outline" size="sm" icon="🚫" onClick={onClick}>
       취소
     </EnhancedButton>
   ),
 
   // Navigation buttons
   BackButton: ({ onClick }: { onClick: () => void }) => (
-    <EnhancedButton
-      variant="ghost"
-      size="sm"
-      icon="←"
-      onClick={onClick}
-    >
+    <EnhancedButton variant="ghost" size="sm" icon="←" onClick={onClick}>
       뒤로
     </EnhancedButton>
   ),
 
   ViewOnMap: ({ onClick }: { onClick: () => void }) => (
-    <EnhancedButton
-      variant="outline"
-      size="sm"
-      icon="🗺️"
-      onClick={onClick}
-    >
+    <EnhancedButton variant="outline" size="sm" icon="🗺️" onClick={onClick}>
       지도에서 보기
     </EnhancedButton>
   ),
 
   // Social buttons
   Share: ({ onClick }: { onClick: () => void }) => (
-    <EnhancedButton
-      variant="secondary"
-      size="sm"
-      icon="📤"
-      onClick={onClick}
-      rounded="full"
-    >
+    <EnhancedButton variant="secondary" size="sm" icon="📤" onClick={onClick} rounded="full">
       공유
     </EnhancedButton>
   ),
 
   Like: ({ liked, onClick }: { liked: boolean; onClick: () => void }) => (
     <EnhancedButton
-      variant={liked ? "danger" : "outline"}
+      variant={liked ? 'danger' : 'outline'}
       size="sm"
-      icon={liked ? "❤️" : "🤍"}
+      icon={liked ? '❤️' : '🤍'}
       onClick={onClick}
       rounded="full"
       animation="pulse"
     >
-      {liked ? "좋아요" : "좋아요"}
+      {liked ? '좋아요' : '좋아요'}
     </EnhancedButton>
   ),
 
@@ -280,14 +234,14 @@ export const ButtonPresets = {
   ),
 
   // Floating Action Button
-  FloatingAction: ({ 
-    onClick, 
-    icon = "➕", 
-    className = "fixed bottom-6 right-6 z-50" 
-  }: { 
-    onClick: () => void; 
-    icon?: React.ReactNode; 
-    className?: string 
+  FloatingAction: ({
+    onClick,
+    icon = '➕',
+    className = 'fixed bottom-6 right-6 z-50',
+  }: {
+    onClick: () => void
+    icon?: React.ReactNode
+    className?: string
   }) => (
     <EnhancedButton
       variant="primary"
@@ -297,7 +251,7 @@ export const ButtonPresets = {
       rounded="full"
       shadow="xl"
       animation="scale"
-      className={`w-14 h-14 ${className}`}
+      className={`h-14 w-14 ${className}`}
     >
       <span className="sr-only">빠른 액션</span>
     </EnhancedButton>
