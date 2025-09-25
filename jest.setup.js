@@ -61,7 +61,7 @@ global.fetch = jest.fn()
 // Mock global kakao
 global.kakao = {
   maps: {
-    load: jest.fn((callback) => callback()),
+    load: jest.fn(callback => callback()),
     LatLng: jest.fn(),
     Map: jest.fn(),
     Marker: jest.fn(),

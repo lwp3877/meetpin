@@ -89,10 +89,10 @@ const config: Config = {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
-        'shimmer': 'shimmer 2s linear infinite',
+        shimmer: 'shimmer 2s linear infinite',
         'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 2s infinite',
-        'float': 'float 3s ease-in-out infinite',
+        float: 'float 3s ease-in-out infinite',
       },
 
       keyframes: {
@@ -132,8 +132,8 @@ const config: Config = {
       transitionTimingFunction: {
         'in-expo': 'cubic-bezier(0.95, 0.05, 0.795, 0.035)',
         'out-expo': 'cubic-bezier(0.19, 1, 0.22, 1)',
-        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-        'smooth': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        smooth: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       },
 
       // Backdrop blur
@@ -162,36 +162,36 @@ const config: Config = {
     require('@tailwindcss/typography'),
     require('@tailwindcss/aspect-ratio'),
     // Custom plugin for premium effects
-    function({ addUtilities }: any) {
+    function ({ addUtilities }: any) {
       const newUtilities = {
         '.text-gradient': {
-          'background': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
           '-webkit-background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
           'background-clip': 'text',
         },
         '.glass': {
-          'background': 'rgba(255, 255, 255, 0.25)',
+          background: 'rgba(255, 255, 255, 0.25)',
           'backdrop-filter': 'blur(12px)',
-          'border': '1px solid rgba(255, 255, 255, 0.18)',
+          border: '1px solid rgba(255, 255, 255, 0.18)',
         },
         '.glass-dark': {
-          'background': 'rgba(0, 0, 0, 0.25)',
+          background: 'rgba(0, 0, 0, 0.25)',
           'backdrop-filter': 'blur(12px)',
-          'border': '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
         },
         '.shimmer': {
-          'position': 'relative',
-          'overflow': 'hidden',
+          position: 'relative',
+          overflow: 'hidden',
           '&::before': {
-            'content': '""',
-            'position': 'absolute',
-            'top': '0',
-            'left': '-100%',
-            'width': '100%',
-            'height': '100%',
-            'background': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
-            'animation': 'shimmer 2s infinite',
+            content: '""',
+            position: 'absolute',
+            top: '0',
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+            animation: 'shimmer 2s infinite',
           },
         },
       }

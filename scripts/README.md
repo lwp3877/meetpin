@@ -5,13 +5,16 @@
 ## 📂 스크립트 구성
 
 ### 1. `001-create-tables.sql`
+
 **데이터베이스 테이블 생성 스크립트**
+
 - 12개 핵심 테이블 생성
 - 50개 이상의 최적화된 인덱스
 - 데이터 무결성을 위한 제약조건
 - 자동 업데이트 트리거 설정
 
 **포함된 테이블:**
+
 - `profiles` - 사용자 프로필
 - `rooms` - 모임방 정보
 - `requests` - 참가 신청
@@ -26,26 +29,32 @@
 - `analytics_events` - 사용자 행동 분석
 
 ### 2. `002-row-level-security.sql`
+
 **Row Level Security (RLS) 정책 설정**
+
 - 30개 이상의 보안 정책
 - 사용자별 데이터 접근 제어
 - 차단 사용자 간 데이터 격리
 - 관리자 권한 분리
 
 **주요 보안 기능:**
+
 - 개인정보 보호
 - 차단 사용자 간 상호 격리
 - 역할 기반 접근 제어 (RBAC)
 - 데이터 유출 방지
 
 ### 3. `003-triggers.sql`
+
 **비즈니스 로직 및 트리거 설정**
+
 - 12개 핵심 비즈니스 트리거
 - 자동 알림 시스템
 - 실시간 데이터 동기화
 - 데이터 검증 및 무결성 보장
 
 **주요 자동화 기능:**
+
 - 회원가입 시 프로필 자동 생성
 - 참가 수락 시 매칭 자동 생성
 - 새 메시지 실시간 알림
@@ -53,7 +62,9 @@
 - 방 정원 초과 방지
 
 ### 4. `004-seed-data.sql`
+
 **개발용 테스트 데이터**
+
 - 9명의 테스트 사용자 (관리자 1명 포함)
 - 10개의 다양한 카테고리 모임
 - 실제 서울 지역 기반 위치 데이터
@@ -66,6 +77,7 @@
 ### Supabase 대시보드에서 실행
 
 1. **Supabase 프로젝트 접속**
+
    ```
    https://supabase.com/dashboard/project/YOUR_PROJECT_ID
    ```
@@ -74,16 +86,17 @@
    - 좌측 메뉴 → SQL Editor
 
 3. **스크립트 순차 실행**
+
    ```sql
    -- 1단계: 테이블 생성
    -- 001-create-tables.sql 내용 복사 후 실행
-   
+
    -- 2단계: 보안 정책 적용
    -- 002-row-level-security.sql 내용 복사 후 실행
-   
+
    -- 3단계: 트리거 설정
    -- 003-triggers.sql 내용 복사 후 실행
-   
+
    -- 4단계: 테스트 데이터 (개발 환경만)
    -- 004-seed-data.sql 내용 복사 후 실행
    ```
@@ -110,21 +123,23 @@ psql -f scripts/004-seed-data.sql
 ## 🔍 검증 방법
 
 ### 1. 테이블 생성 확인
+
 ```sql
 -- 모든 테이블이 생성되었는지 확인
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 ORDER BY table_name;
 
 -- 예상 결과: 12개 테이블
 ```
 
 ### 2. RLS 정책 확인
+
 ```sql
 -- RLS 정책이 적용되었는지 확인
 SELECT schemaname, tablename, policyname, permissive, cmd
-FROM pg_policies 
+FROM pg_policies
 WHERE schemaname = 'public'
 ORDER BY tablename, policyname;
 
@@ -132,10 +147,11 @@ ORDER BY tablename, policyname;
 ```
 
 ### 3. 트리거 확인
+
 ```sql
 -- 트리거가 생성되었는지 확인
 SELECT trigger_name, event_object_table, action_timing, event_manipulation
-FROM information_schema.triggers 
+FROM information_schema.triggers
 WHERE trigger_schema = 'public'
 ORDER BY event_object_table, trigger_name;
 
@@ -143,9 +159,10 @@ ORDER BY event_object_table, trigger_name;
 ```
 
 ### 4. 테스트 데이터 확인 (개발 환경)
+
 ```sql
 -- 테스트 데이터가 삽입되었는지 확인
-SELECT 
+SELECT
   (SELECT COUNT(*) FROM profiles) as profiles_count,
   (SELECT COUNT(*) FROM rooms) as rooms_count,
   (SELECT COUNT(*) FROM requests) as requests_count,
@@ -194,6 +211,7 @@ reports
 ## 🚨 프로덕션 배포 주의사항
 
 1. **백업 필수**
+
    ```sql
    -- 배포 전 현재 데이터베이스 백업
    pg_dump -h hostname -U username -d database > backup.sql

@@ -37,7 +37,8 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
   useEffect(() => {
     if (isOpen && userData) {
       setReferralData({
-        referralCode: userData.referralCode || 'MEET' + userData.nickname?.toUpperCase()?.slice(0, 4) || 'USER',
+        referralCode:
+          userData.referralCode || 'MEET' + userData.nickname?.toUpperCase()?.slice(0, 4) || 'USER',
         referralLink: `https://meetpin.app/invite/${userData.referralCode || 'demo'}`,
         totalReferrals: 3,
         successfulReferrals: 2,
@@ -45,15 +46,15 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
         rewards: {
           points: 150,
           level: 'Bronze',
-          nextLevelRequirement: 5
-        }
+          nextLevelRequirement: 5,
+        },
       })
     }
   }, [isOpen, userData])
 
   const handleCopyCode = async () => {
     if (!referralData) return
-    
+
     try {
       await navigator.clipboard.writeText(referralData.referralCode)
       setCopiedText('code')
@@ -66,7 +67,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
 
   const handleCopyLink = async () => {
     if (!referralData) return
-    
+
     try {
       await navigator.clipboard.writeText(referralData.referralLink)
       setCopiedText('link')
@@ -103,58 +104,65 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
 
   return (
     <ModalAnimation show={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg mx-auto m-4 overflow-hidden">
+      <div className="m-4 mx-auto max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-primary-deep p-6 text-white">
+        <div className="from-primary to-primary-deep bg-gradient-to-r p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold mb-1">친구 초대하기</h2>
+              <h2 className="mb-1 text-2xl font-bold">친구 초대하기</h2>
               <p className="text-primary-light">친구를 초대하고 함께 밋핀을 즐겨보세요!</p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white text-2xl"
-            >
+            <button onClick={onClose} className="text-2xl text-white/80 hover:text-white">
               ×
             </button>
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           {/* 리워드 현황 */}
           <CardAnimation delay={0}>
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
-              <div className="flex items-center justify-between mb-3">
+            <div className="rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
+              <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-semibold text-amber-900">🏆 나의 추천 현황</h3>
-                <span className="bg-amber-200 text-amber-800 px-2 py-1 rounded-full text-sm font-semibold">
+                <span className="rounded-full bg-amber-200 px-2 py-1 text-sm font-semibold text-amber-800">
                   {referralData.rewards.level}
                 </span>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-xl font-bold text-amber-900">{referralData.totalReferrals}</div>
+                  <div className="text-xl font-bold text-amber-900">
+                    {referralData.totalReferrals}
+                  </div>
                   <div className="text-xs text-amber-700">총 초대</div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-green-600">{referralData.successfulReferrals}</div>
+                  <div className="text-xl font-bold text-green-600">
+                    {referralData.successfulReferrals}
+                  </div>
                   <div className="text-xs text-amber-700">가입 완료</div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-amber-900">{referralData.rewards.points}</div>
+                  <div className="text-xl font-bold text-amber-900">
+                    {referralData.rewards.points}
+                  </div>
                   <div className="text-xs text-amber-700">포인트</div>
                 </div>
               </div>
 
               <div className="mt-3">
-                <div className="flex justify-between text-xs text-amber-700 mb-1">
+                <div className="mb-1 flex justify-between text-xs text-amber-700">
                   <span>다음 레벨까지</span>
-                  <span>{referralData.successfulReferrals}/{referralData.rewards.nextLevelRequirement}</span>
+                  <span>
+                    {referralData.successfulReferrals}/{referralData.rewards.nextLevelRequirement}
+                  </span>
                 </div>
-                <div className="bg-amber-200 rounded-full h-2">
+                <div className="h-2 rounded-full bg-amber-200">
                   <div
-                    className="bg-gradient-to-r from-amber-400 to-orange-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(referralData.successfulReferrals / referralData.rewards.nextLevelRequirement) * 100}%` }}
+                    className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
+                    style={{
+                      width: `${(referralData.successfulReferrals / referralData.rewards.nextLevelRequirement) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -164,9 +172,9 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
           {/* 추천 코드 */}
           <CardAnimation delay={100}>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">📱 추천 코드</h3>
+              <h3 className="mb-3 font-semibold text-gray-900">📱 추천 코드</h3>
               <div className="flex items-center space-x-2">
-                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 font-mono text-lg text-center font-bold text-primary">
+                <div className="text-primary flex-1 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-center font-mono text-lg font-bold">
                   {referralData.referralCode}
                 </div>
                 <EnhancedButton
@@ -179,7 +187,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
                   {copiedText === 'code' ? '복사됨' : '복사'}
                 </EnhancedButton>
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="mt-2 text-sm text-gray-600">
                 친구가 가입할 때 이 코드를 입력하면 둘 다 혜택을 받을 수 있어요!
               </p>
             </div>
@@ -188,9 +196,9 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
           {/* 추천 링크 */}
           <CardAnimation delay={200}>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">🔗 추천 링크</h3>
+              <h3 className="mb-3 font-semibold text-gray-900">🔗 추천 링크</h3>
               <div className="flex items-center space-x-2">
-                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 truncate">
+                <div className="flex-1 truncate rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
                   {referralData.referralLink}
                 </div>
                 <EnhancedButton
@@ -218,7 +226,7 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
               >
                 바로 공유하기
               </EnhancedButton>
-              
+
               <EnhancedButton
                 onClick={() => {
                   const message = `친구야! 밋핀에서 새로운 사람들과 만나보자! 내 추천코드: ${referralData.referralCode} 또는 링크: ${referralData.referralLink}`
@@ -237,19 +245,19 @@ export function ReferralModal({ isOpen, onClose, userData }: ReferralModalProps)
 
           {/* 혜택 안내 */}
           <CardAnimation delay={400}>
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-2">🎁 추천 혜택</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+              <h4 className="mb-2 font-semibold text-blue-900">🎁 추천 혜택</h4>
+              <ul className="space-y-1 text-sm text-blue-800">
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 flex-shrink-0" />
+                  <span className="mr-2 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                   친구 가입 시: 나와 친구 각각 100 포인트
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 flex-shrink-0" />
+                  <span className="mr-2 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                   친구 첫 모임 참가 시: 추가 50 포인트
                 </li>
                 <li className="flex items-center">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 flex-shrink-0" />
+                  <span className="mr-2 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                   5명 추천 달성 시: 실버 배지 + 부스트 쿠폰
                 </li>
               </ul>
@@ -278,7 +286,7 @@ export function ReferralInput({ onSubmit, isLoading = false }: ReferralInputProp
   }
 
   return (
-    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+    <div className="rounded-xl border border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <span className="text-2xl">🎁</span>
@@ -286,7 +294,7 @@ export function ReferralInput({ onSubmit, isLoading = false }: ReferralInputProp
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-purple-600 hover:text-purple-800 font-medium"
+          className="font-medium text-purple-600 hover:text-purple-800"
         >
           {isExpanded ? '접기' : '입력하기'}
         </button>
@@ -298,9 +306,9 @@ export function ReferralInput({ onSubmit, isLoading = false }: ReferralInputProp
             <input
               type="text"
               value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+              onChange={e => setReferralCode(e.target.value.toUpperCase())}
               placeholder="추천코드를 입력해주세요"
-              className="flex-1 px-3 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="flex-1 rounded-lg border border-purple-200 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500"
               maxLength={10}
             />
             <EnhancedButton
@@ -314,7 +322,7 @@ export function ReferralInput({ onSubmit, isLoading = false }: ReferralInputProp
               적용
             </EnhancedButton>
           </div>
-          <p className="text-sm text-purple-600 mt-2">
+          <p className="mt-2 text-sm text-purple-600">
             추천코드를 입력하면 100 포인트를 받을 수 있어요!
           </p>
         </CardAnimation>
@@ -332,7 +340,7 @@ export function ReferralFloatingButton() {
 
   return (
     <>
-      <div className="fixed bottom-32 right-6 z-40">
+      <div className="fixed right-6 bottom-32 z-40">
         <EnhancedButton
           onClick={() => setShowModal(true)}
           variant="secondary"
@@ -341,10 +349,8 @@ export function ReferralFloatingButton() {
           rounded="full"
           shadow="lg"
           animation="pulse"
-          className="w-12 h-12"
-        >
-          
-        </EnhancedButton>
+          className="h-12 w-12"
+        ></EnhancedButton>
       </div>
 
       <ReferralModal
@@ -352,7 +358,7 @@ export function ReferralFloatingButton() {
         onClose={() => setShowModal(false)}
         userData={{
           nickname: user.nickname,
-          referralCode: user.referral_code
+          referralCode: user.referral_code,
         }}
       />
     </>
@@ -369,48 +375,46 @@ export function ReferralProgram() {
       icon: '🎯',
       title: '친구 초대하기',
       description: '추천코드나 링크로 친구들을 초대해보세요',
-      reward: '각각 100포인트'
+      reward: '각각 100포인트',
     },
     {
       icon: '🚀',
       title: '첫 모임 참가',
       description: '초대한 친구가 첫 모임에 참가하면',
-      reward: '추가 50포인트'
+      reward: '추가 50포인트',
     },
     {
       icon: '👑',
       title: '레벨 업 혜택',
       description: '5명 이상 초대 시 특별 혜택',
-      reward: '부스트 쿠폰 + 배지'
+      reward: '부스트 쿠폰 + 배지',
     },
     {
       icon: '🎉',
       title: '이벤트 참여',
       description: '특별 이벤트와 경품 추첨 기회',
-      reward: '한정판 굿즈'
-    }
+      reward: '한정판 굿즈',
+    },
   ]
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="mx-auto max-w-2xl p-6">
       {/* 헤더 */}
-      <div className="text-center mb-8">
-        <div className="text-6xl mb-4">🎁</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">친구 추천 프로그램</h1>
-        <p className="text-gray-600">
-          친구들을 밋핀에 초대하고 함께 특별한 혜택을 받아보세요!
-        </p>
+      <div className="mb-8 text-center">
+        <div className="mb-4 text-6xl">🎁</div>
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">친구 추천 프로그램</h1>
+        <p className="text-gray-600">친구들을 밋핀에 초대하고 함께 특별한 혜택을 받아보세요!</p>
       </div>
 
       {/* 혜택 카드들 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         {benefits.map((benefit, index) => (
           <CardAnimation key={index} delay={index * 100}>
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:border-primary hover:shadow-xl transition-all">
-              <div className="text-3xl mb-3">{benefit.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-              <p className="text-gray-600 text-sm mb-3">{benefit.description}</p>
-              <div className="bg-primary-light px-3 py-1 rounded-full text-primary text-sm font-semibold">
+            <div className="hover:border-primary rounded-xl border border-gray-100 bg-white p-6 shadow-lg transition-all hover:shadow-xl">
+              <div className="mb-3 text-3xl">{benefit.icon}</div>
+              <h3 className="mb-2 font-semibold text-gray-900">{benefit.title}</h3>
+              <p className="mb-3 text-sm text-gray-600">{benefit.description}</p>
+              <div className="bg-primary-light text-primary rounded-full px-3 py-1 text-sm font-semibold">
                 {benefit.reward}
               </div>
             </div>
@@ -437,7 +441,7 @@ export function ReferralProgram() {
         onClose={() => setShowModal(false)}
         userData={{
           nickname: user?.nickname,
-          referralCode: user?.referral_code
+          referralCode: user?.referral_code,
         }}
       />
     </div>

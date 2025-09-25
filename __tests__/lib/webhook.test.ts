@@ -16,23 +16,23 @@ const mockWebhookEvent: Stripe.Event = {
       currency: 'krw',
       customer_details: {
         email: 'test@example.com',
-        name: 'Test User'
+        name: 'Test User',
       },
       metadata: {
         user_id: 'test-user-id',
-        boost_days: '3'
+        boost_days: '3',
       },
       payment_status: 'paid',
-      status: 'complete'
-    } as unknown as Stripe.Checkout.Session
+      status: 'complete',
+    } as unknown as Stripe.Checkout.Session,
   },
   livemode: false,
   pending_webhooks: 1,
   request: {
     id: 'req_test_request',
-    idempotency_key: null
+    idempotency_key: null,
   },
-  type: 'checkout.session.completed'
+  type: 'checkout.session.completed',
 }
 
 describe('Stripe Webhook Processing', () => {
@@ -64,9 +64,9 @@ describe('Stripe Webhook Processing', () => {
   describe('Payment Validation', () => {
     it('should validate successful payment', () => {
       const session = mockWebhookEvent.data.object as Stripe.Checkout.Session
-      
-      const isValidPayment = 
-        session.payment_status === 'paid' && 
+
+      const isValidPayment =
+        session.payment_status === 'paid' &&
         session.status === 'complete' &&
         session.amount_total !== null &&
         session.amount_total > 0
@@ -82,7 +82,7 @@ describe('Stripe Webhook Processing', () => {
     it('should validate amount is reasonable for boost', () => {
       const session = mockWebhookEvent.data.object as Stripe.Checkout.Session
       const amount = session.amount_total || 0
-      
+
       // Boost prices should be between 1,000 and 50,000 KRW
       expect(amount).toBeGreaterThanOrEqual(1000)
       expect(amount).toBeLessThanOrEqual(50000)
@@ -93,16 +93,16 @@ describe('Stripe Webhook Processing', () => {
     it('should calculate correct boost end time for 3 days', () => {
       const session = mockWebhookEvent.data.object as Stripe.Checkout.Session
       const boostDays = parseInt(session.metadata?.boost_days || '0')
-      
+
       expect(boostDays).toBe(3)
-      
+
       const now = new Date()
       const boostUntil = new Date(now.getTime() + boostDays * 24 * 60 * 60 * 1000)
-      
+
       // Should be approximately 3 days from now
       const expectedTime = now.getTime() + 3 * 24 * 60 * 60 * 1000
       const tolerance = 10000 // 10 seconds tolerance
-      
+
       expect(Math.abs(boostUntil.getTime() - expectedTime)).toBeLessThan(tolerance)
     })
 
@@ -111,8 +111,8 @@ describe('Stripe Webhook Processing', () => {
         ...mockWebhookEvent.data.object,
         metadata: {
           user_id: 'test-user-id',
-          boost_days: 'invalid'
-        }
+          boost_days: 'invalid',
+        },
       } as Stripe.Checkout.Session
 
       const boostDays = parseInt(invalidSession.metadata?.boost_days || '0', 10) || 0
@@ -124,7 +124,7 @@ describe('Stripe Webhook Processing', () => {
     it('should handle missing metadata', () => {
       const sessionWithoutMetadata = {
         ...mockWebhookEvent.data.object,
-        metadata: null
+        metadata: null,
       } as Stripe.Checkout.Session
 
       const userId = sessionWithoutMetadata.metadata?.user_id
@@ -138,12 +138,11 @@ describe('Stripe Webhook Processing', () => {
       const incompleteSession = {
         ...mockWebhookEvent.data.object,
         payment_status: 'unpaid',
-        status: 'open'
+        status: 'open',
       } as Stripe.Checkout.Session
 
-      const isComplete = 
-        incompleteSession.payment_status === 'paid' && 
-        incompleteSession.status === 'complete'
+      const isComplete =
+        incompleteSession.payment_status === 'paid' && incompleteSession.status === 'complete'
 
       expect(isComplete).toBe(false)
     })

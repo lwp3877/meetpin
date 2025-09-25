@@ -10,7 +10,7 @@ export const koreanAvatars = {
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', // 정장 남성
     'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', // 웃는 남성
   ],
-  
+
   // 한국인 여성 프로필들
   female: [
     'https://images.unsplash.com/photo-1601233749202-95d04d5b3c00?w=150&h=150&fit=crop&crop=face', // 한국 여성 프로필
@@ -28,7 +28,7 @@ export const koreanAvatars = {
     'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face', // 지적인 여성
     'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face', // 우아한 여성
     'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=150&fit=crop&crop=face', // 모던한 여성
-  ]
+  ],
 }
 
 // 랜덤하게 한국인 프로필 이미지 선택
@@ -39,7 +39,7 @@ export const getRandomKoreanAvatar = (gender?: 'male' | 'female') => {
   if (gender === 'female') {
     return koreanAvatars.female[Math.floor(Math.random() * koreanAvatars.female.length)]
   }
-  
+
   // 성별 미지정시 모든 프로필에서 랜덤 선택
   const allAvatars = [...koreanAvatars.male, ...koreanAvatars.female]
   return allAvatars[Math.floor(Math.random() * allAvatars.length)]

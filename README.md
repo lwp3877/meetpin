@@ -1,9 +1,10 @@
 # 밋핀 (MeetPin) - 지도 기반 소셜 만남 플랫폼
 
-> 📍 핀 찍고, 지금 모여요! 
+> 📍 핀 찍고, 지금 모여요!
 > 지도에서 방을 만들어 근처 사람들과 만나고, 새로운 인연을 만들어보세요.
 
 ## 🌐 **현재 서비스 중!**
+
 **🚀 라이브 서비스**: [https://meetpin-weld.vercel.app](https://meetpin-weld.vercel.app)
 
 **밋핀**은 위치 기반 소셜 모임 플랫폼으로, 사용자가 지도에서 직접 모임을 생성하고 주변 사람들과 연결될 수 있도록 돕습니다. 술, 운동, 취미 활동 등 다양한 카테고리의 모임을 통해 새로운 인연을 만들어보세요.
@@ -20,6 +21,7 @@
 ## 🛠️ 기술 스택
 
 ### 프론트엔드
+
 - **Next.js 15** (App Router) - React 프레임워크
 - **React 19** - React 라이브러리
 - **TypeScript** - 타입 안전성
@@ -28,11 +30,13 @@
 - **Zod** - 스키마 검증
 
 ### 백엔드 & 인프라
+
 - **Supabase** - 백엔드 서비스 (Database, Auth, Realtime, Storage)
 - **PostgreSQL** - 관계형 데이터베이스
 - **Row Level Security** - 데이터 보안
 
 ### 외부 서비스
+
 - **카카오맵 API** - 지도 및 위치 서비스
 - **Stripe** - 결제 시스템
 - **Vercel** - 배포 플랫폼
@@ -76,6 +80,7 @@ NEXT_PUBLIC_FORCE_MOCK=true  # 개발 시: true, 배포 시: false
 ### 3. 데이터베이스 설정
 
 Supabase SQL Editor에서 순서대로 실행:
+
 1. `scripts/migrate.sql` - 테이블 생성
 2. `scripts/rls.sql` - 보안 정책 적용
 3. `scripts/seed.sql` - 샘플 데이터 (선택)
@@ -125,7 +130,7 @@ meetpin/
 
 ```bash
 # 개발 환경
-pnpm dev          # 개발 서버 (localhost:3001)
+pnpm dev          # 개발 서버 (localhost:3000)
 pnpm build        # 프로덕션 빌드
 pnpm start        # 프로덕션 서버
 pnpm preview      # 빌드 후 미리보기
@@ -173,7 +178,7 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 1. 이 저장소를 Fork하세요
 2. 기능 브랜치를 만드세요 (`git checkout -b feature/AmazingFeature`)
 3. 변경사항을 커밋하세요 (`git commit -m 'Add some AmazingFeature'`)
-4. 브랜치에 푸시하세요 (`git push origin feature/AmazingFeature`)  
+4. 브랜치에 푸시하세요 (`git push origin feature/AmazingFeature`)
 5. Pull Request를 생성하세요
 
 ## ⚠️ 라이선스
@@ -184,7 +189,7 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 
 ### 자주 발생하는 문제
 
-1. **포트 충돌**: 기본 포트 3001 사용 중이면 `npx kill-port 3001` 후 재시작
+1. **포트 충돌**: 기본 포트 3000 사용 중이면 `npx kill-port 3000` 후 재시작
 2. **패키지 오류**: `pnpm store prune && pnpm install && pnpm approve-builds`로 재설치
 3. **빌드 오류**: `pnpm repo:doctor`로 종합 검사 실행
 4. **환경 변수**: `.env.local` 파일이 올바르게 설정되었는지 확인
@@ -195,12 +200,14 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 ### 🔧 개발 모드 vs 프로덕션 모드 전환
 
 #### 개발 모드 (Mock 모드)
+
 - **설정**: `.env.local`에 `NEXT_PUBLIC_FORCE_MOCK=true` 추가
 - **특징**: Supabase 없이도 로컬에서 완전한 테스트 가능
 - **테스트 계정**: `admin@meetpin.com` / `123456`
 - **샘플 데이터**: 서울 중심 가짜 모임 데이터 자동 로딩
 
 #### 프로덕션 모드
+
 - **설정**: `.env.local`에 `NEXT_PUBLIC_FORCE_MOCK=false` (또는 삭제)
 - **특징**: 실제 Supabase, Stripe, 카카오맵 연동
 - **필수 환경 변수**: 모든 API 키가 실제 값이어야 함
@@ -209,6 +216,7 @@ pnpm repo:doctor  # 타입검사 + 린트 + 빌드 (종합 품질 검사)
 #### 빠른 전환 방법
 
 **Mock → 프로덕션 전환:**
+
 ```bash
 # .env.local 파일에서
 NEXT_PUBLIC_FORCE_MOCK=false  # true → false로 변경
@@ -216,8 +224,9 @@ pnpm dev  # 서버 재시작
 ```
 
 **프로덕션 → Mock 전환:**
+
 ```bash
-# .env.local 파일에서  
+# .env.local 파일에서
 NEXT_PUBLIC_FORCE_MOCK=true   # false → true로 변경
 pnpm dev  # 서버 재시작
 ```

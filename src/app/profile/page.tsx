@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     nickname: '',
     age_range: '',
-    intro: ''
+    intro: '',
   })
   const router = useRouter()
 
@@ -39,7 +39,7 @@ export default function ProfilePage() {
       setFormData({
         nickname: user.nickname || '',
         age_range: user.age_range || '',
-        intro: user.intro || ''
+        intro: user.intro || '',
       })
       setCurrentAvatarUrl(user.avatar_url || null)
     }
@@ -51,7 +51,7 @@ export default function ProfilePage() {
 
   const handleAvatarChanged = (newAvatarUrl: string | null) => {
     setCurrentAvatarUrl(newAvatarUrl)
-    // useAuth의 user 상태도 업데이트하면 더 좋지만, 
+    // useAuth의 user 상태도 업데이트하면 더 좋지만,
     // 다음 페이지 로드시 최신 정보가 반영됩니다
   }
 
@@ -80,7 +80,7 @@ export default function ProfilePage() {
 
     try {
       const result = await updateProfile(formData)
-      
+
       if (result.success) {
         Toast.success('프로필이 성공적으로 업데이트되었습니다!')
         setIsEditing(false)
@@ -93,7 +93,6 @@ export default function ProfilePage() {
       setIsLoading(false)
     }
   }
-
 
   const ageRanges = [
     { value: '20s_early', label: '20대 초반' },
@@ -122,370 +121,434 @@ export default function ProfilePage() {
     <PageTransition type="slide">
       <div className="min-h-screen bg-gradient-to-br from-emerald-500/10 via-blue-500/5 to-purple-500/10">
         {/* Header */}
-        <header className="bg-white/90 backdrop-blur-md border-b border-white/20 sticky top-0 z-50">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <Link href="/map" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <header className="sticky top-0 z-50 border-b border-white/20 bg-white/90 backdrop-blur-md">
+          <div className="flex items-center justify-between px-4 py-4">
+            <Link href="/map" className="rounded-full p-2 transition-colors hover:bg-gray-100">
+              <svg
+                className="h-6 w-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </Link>
-            <h1 className="text-xl font-bold text-gray-900">
-              내 프로필
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900">내 프로필</h1>
             <div className="w-10" /> {/* Spacer */}
           </div>
         </header>
 
-      <div className="px-4 py-6 max-w-lg mx-auto">
-        {/* Profile Header Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-6 border border-white/50">
-          <div className="text-center">
-            {/* Avatar with gradient ring */}
-            <div className="relative mx-auto w-28 h-28 mb-6">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500 rounded-full p-1">
-                <div className="w-full h-full bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {currentAvatarUrl ? (
-                    <Image 
-                      src={currentAvatarUrl} 
-                      alt="프로필 사진" 
-                      width={112}
-                      height={112}
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <span className="text-4xl text-white font-bold">
-                      {user.nickname ? user.nickname.charAt(0).toUpperCase() : '?'}
-                    </span>
-                  )}
+        <div className="mx-auto max-w-lg px-4 py-6">
+          {/* Profile Header Card */}
+          <div className="mb-6 rounded-3xl border border-white/50 bg-white/80 p-8 shadow-xl backdrop-blur-sm">
+            <div className="text-center">
+              {/* Avatar with gradient ring */}
+              <div className="relative mx-auto mb-6 h-28 w-28">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-500 p-1">
+                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-emerald-500 to-blue-600">
+                    {currentAvatarUrl ? (
+                      <Image
+                        src={currentAvatarUrl}
+                        alt="프로필 사진"
+                        width={112}
+                        height={112}
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-4xl font-bold text-white">
+                        {user.nickname ? user.nickname.charAt(0).toUpperCase() : '?'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status indicator */}
+                <div className="absolute right-1 bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-green-500">
+                  <span className="text-xs">✓</span>
                 </div>
               </div>
-              
-              {/* Status indicator */}
-              <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                <span className="text-xs">✓</span>
+
+              <h2 className="mb-2 text-3xl font-bold text-gray-800">
+                {user.nickname || '닉네임 설정 필요'}
+              </h2>
+
+              <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+                <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-800">
+                  {user.age_range ? getAgeRangeLabel(user.age_range) : '연령대 미설정'}
+                </span>
+                {user.role === 'admin' && (
+                  <span className="rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white">
+                    👑 관리자
+                  </span>
+                )}
               </div>
+
+              <p className="text-sm text-gray-500">
+                {new Date(user.created_at).toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+                부터 밋핀과 함께
+              </p>
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              {user.nickname || '닉네임 설정 필요'}
-            </h2>
-            
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-              <span className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium">
-                {user.age_range ? getAgeRangeLabel(user.age_range) : '연령대 미설정'}
-              </span>
-              {user.role === 'admin' && (
-                <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold">
-                  👑 관리자
-                </span>
+            {/* Edit/Save Buttons */}
+            <div className="mt-8">
+              {!isEditing ? (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full transform rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 px-6 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:from-emerald-600 hover:to-blue-600"
+                >
+                  ✏️ 프로필 편집하기
+                </button>
+              ) : (
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isLoading}
+                    className="flex-1 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:from-green-600 hover:to-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                        저장 중...
+                      </div>
+                    ) : (
+                      '💾 저장'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false)
+                      setFormData({
+                        nickname: user.nickname || '',
+                        age_range: user.age_range || '',
+                        intro: user.intro || '',
+                      })
+                    }}
+                    className="rounded-2xl border-2 border-gray-300 px-6 py-4 font-semibold text-gray-700 transition-all hover:border-gray-400"
+                  >
+                    취소
+                  </button>
+                </div>
               )}
             </div>
-
-            <p className="text-gray-500 text-sm">
-              {new Date(user.created_at).toLocaleDateString('ko-KR', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}부터 밋핀과 함께
-            </p>
           </div>
 
-          {/* Edit/Save Buttons */}
-          <div className="mt-8">
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white py-4 px-6 rounded-2xl font-semibold text-lg transition-all transform hover:scale-105 shadow-lg"
-              >
-                ✏️ 프로필 편집하기
-              </button>
-            ) : (
-              <div className="flex gap-3">
-                <button
-                  onClick={handleSaveProfile}
-                  disabled={isLoading}
-                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-4 px-6 rounded-2xl font-semibold text-lg transition-all shadow-lg"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      저장 중...
+          {/* Profile Form */}
+          {isEditing && (
+            <div className="space-y-6">
+              {/* Profile Image Uploader */}
+              <div className="rounded-3xl border border-white/50 bg-white/80 p-6 shadow-xl backdrop-blur-sm">
+                <h3 className="mb-6 text-center text-xl font-bold text-gray-800">
+                  📷 프로필 사진 변경
+                </h3>
+                <ProfileImageUploader
+                  currentAvatarUrl={currentAvatarUrl || undefined}
+                  onAvatarChanged={handleAvatarChanged}
+                  size="large"
+                  showRandomGenerator={true}
+                />
+              </div>
+
+              {/* Profile Details Form */}
+              <div className="rounded-3xl border border-white/50 bg-white/80 p-6 shadow-xl backdrop-blur-sm">
+                <h3 className="mb-6 text-center text-xl font-bold text-gray-800">
+                  ✨ 기본 정보 편집
+                </h3>
+
+                <div className="space-y-6">
+                  {/* Email (Read-only) */}
+                  <div>
+                    <label className="mb-3 block text-sm font-bold text-gray-700">📧 이메일</label>
+                    <div className="w-full rounded-2xl border-2 border-gray-200 bg-gray-100 px-5 py-4 font-medium text-gray-600">
+                      {user.email}
                     </div>
-                  ) : (
-                    '💾 저장'
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditing(false)
-                    setFormData({
-                      nickname: user.nickname || '',
-                      age_range: user.age_range || '',
-                      intro: user.intro || ''
-                    })
-                  }}
-                  className="px-6 py-4 border-2 border-gray-300 hover:border-gray-400 text-gray-700 rounded-2xl font-semibold transition-all"
-                >
-                  취소
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Profile Form */}
-        {isEditing && (
-          <div className="space-y-6">
-            {/* Profile Image Uploader */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/50">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">📷 프로필 사진 변경</h3>
-              <ProfileImageUploader
-                currentAvatarUrl={currentAvatarUrl || undefined}
-                onAvatarChanged={handleAvatarChanged}
-                size="large"
-                showRandomGenerator={true}
-              />
-            </div>
-
-            {/* Profile Details Form */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/50">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">✨ 기본 정보 편집</h3>
-            
-              <div className="space-y-6">
-                {/* Email (Read-only) */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    📧 이메일
-                  </label>
-                  <div className="w-full px-5 py-4 bg-gray-100 border-2 border-gray-200 rounded-2xl text-gray-600 font-medium">
-                    {user.email}
+                    <p className="mt-2 text-xs text-gray-500">이메일은 변경할 수 없어요</p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">이메일은 변경할 수 없어요</p>
-                </div>
 
-                {/* Nickname */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    ✨ 닉네임 *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.nickname}
-                    onChange={(e) => handleInputChange('nickname', e.target.value)}
-                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all text-gray-800 font-medium placeholder:text-gray-400"
-                    placeholder="멋진 닉네임을 입력하세요"
-                    maxLength={20}
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs text-gray-500">다른 사용자에게 보여질 이름이에요</p>
-                    <p className="text-xs text-gray-400 font-mono">
-                      {formData.nickname.length}/20
-                    </p>
-                  </div>
-                </div>
-
-                {/* Age Range */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    🎂 연령대 *
-                  </label>
-                  <select
-                    value={formData.age_range}
-                    onChange={(e) => handleInputChange('age_range', e.target.value)}
-                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all bg-white text-gray-800 font-medium"
-                  >
-                    <option value="">연령대를 선택하세요</option>
-                    {ageRanges.map((range) => (
-                      <option key={range.value} value={range.value}>
-                        {range.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Introduction */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    💭 자기소개
-                  </label>
-                  <textarea
-                    value={formData.intro}
-                    onChange={(e) => handleInputChange('intro', e.target.value)}
-                    rows={4}
-                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-0 focus:border-emerald-500 transition-all resize-none text-gray-800 font-medium placeholder:text-gray-400"
-                    placeholder="자신을 소개해주세요! 어떤 모임을 좋아하는지, 취미가 무엇인지 알려주세요."
-                    maxLength={500}
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <p className="text-xs text-gray-500">다른 사용자가 참고할 수 있어요</p>
-                    <p className="text-xs text-gray-400 font-mono">
-                      {formData.intro.length}/500
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Enhanced Profile Stats */}
-        {!isEditing && (
-          <EnhancedProfile className="mb-6" />
-        )}
-
-        {/* Action Menu */}
-        <div className="space-y-3 mb-6">
-          {/* My Rooms */}
-          <Link href="/map" className="block">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/50 hover:shadow-xl transition-all transform hover:scale-105">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                    <span className="text-xl">🗺️</span>
-                  </div>
+                  {/* Nickname */}
                   <div>
-                    <div className="font-bold text-gray-900">지도에서 모임 찾기</div>
-                    <div className="text-sm text-gray-600">새로운 모임을 찾아보세요</div>
+                    <label className="mb-3 block text-sm font-bold text-gray-700">
+                      ✨ 닉네임 *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.nickname}
+                      onChange={e => handleInputChange('nickname', e.target.value)}
+                      className="w-full rounded-2xl border-2 border-gray-200 px-5 py-4 font-medium text-gray-800 transition-all placeholder:text-gray-400 focus:border-emerald-500 focus:ring-0"
+                      placeholder="멋진 닉네임을 입력하세요"
+                      maxLength={20}
+                    />
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-gray-500">다른 사용자에게 보여질 이름이에요</p>
+                      <p className="font-mono text-xs text-gray-400">
+                        {formData.nickname.length}/20
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </Link>
 
-          {/* Create Room */}
-          <Link href="/room/new" className="block">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/50 hover:shadow-xl transition-all transform hover:scale-105">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center mr-4">
-                    <span className="text-xl">➕</span>
-                  </div>
+                  {/* Age Range */}
                   <div>
-                    <div className="font-bold text-gray-900">새 모임 만들기</div>
-                    <div className="text-sm text-gray-600">모임을 주최해보세요</div>
+                    <label className="mb-3 block text-sm font-bold text-gray-700">
+                      🎂 연령대 *
+                    </label>
+                    <select
+                      value={formData.age_range}
+                      onChange={e => handleInputChange('age_range', e.target.value)}
+                      className="w-full rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 font-medium text-gray-800 transition-all focus:border-emerald-500 focus:ring-0"
+                    >
+                      <option value="">연령대를 선택하세요</option>
+                      {ageRanges.map(range => (
+                        <option key={range.value} value={range.value}>
+                          {range.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </Link>
 
-          {/* My Requests */}
-          <Link href="/requests" className="block">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/50 hover:shadow-xl transition-all transform hover:scale-105">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
-                    <span className="text-xl">📮</span>
-                  </div>
+                  {/* Introduction */}
                   <div>
-                    <div className="font-bold text-gray-900">요청함</div>
-                    <div className="text-sm text-gray-600">참가 요청과 받은 요청 확인</div>
+                    <label className="mb-3 block text-sm font-bold text-gray-700">
+                      💭 자기소개
+                    </label>
+                    <textarea
+                      value={formData.intro}
+                      onChange={e => handleInputChange('intro', e.target.value)}
+                      rows={4}
+                      className="w-full resize-none rounded-2xl border-2 border-gray-200 px-5 py-4 font-medium text-gray-800 transition-all placeholder:text-gray-400 focus:border-emerald-500 focus:ring-0"
+                      placeholder="자신을 소개해주세요! 어떤 모임을 좋아하는지, 취미가 무엇인지 알려주세요."
+                      maxLength={500}
+                    />
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-gray-500">다른 사용자가 참고할 수 있어요</p>
+                      <p className="font-mono text-xs text-gray-400">{formData.intro.length}/500</p>
+                    </div>
                   </div>
                 </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               </div>
             </div>
-          </Link>
+          )}
 
-          {/* Referral Program */}
-          <div
-            onClick={() => setShowReferralModal(true)}
-            className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-                  <span className="text-xl">🎁</span>
-                </div>
-                <div>
-                  <div className="font-bold text-white">친구 초대하기</div>
-                  <div className="text-sm text-white/80">초대하고 함께 혜택 받기</div>
-                </div>
-              </div>
-              <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </div>
+          {/* Enhanced Profile Stats */}
+          {!isEditing && <EnhancedProfile className="mb-6" />}
 
-          {/* Notification Settings */}
-          <Link href="/settings/notifications" className="block">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg border border-white/50 hover:shadow-xl transition-all transform hover:scale-105">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-                    <span className="text-xl">🔔</span>
-                  </div>
-                  <div>
-                    <div className="font-bold text-gray-900">알림 설정</div>
-                    <div className="text-sm text-gray-600">푸시 알림 및 소식 설정</div>
-                  </div>
-                </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </Link>
-
-          {/* Admin Panel (관리자만) */}
-          {user.role === 'admin' && (
-            <Link href="/admin" className="block">
-              <div className="bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+          {/* Action Menu */}
+          <div className="mb-6 space-y-3">
+            {/* My Rooms */}
+            <Link href="/map" className="block">
+              <div className="transform rounded-2xl border border-white/50 bg-white/80 p-5 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-xl">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-                      <span className="text-xl">👑</span>
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500">
+                      <span className="text-xl">🗺️</span>
                     </div>
                     <div>
-                      <div className="font-bold text-white">관리자 패널</div>
-                      <div className="text-sm text-white/80">시스템 관리 및 사용자 관리</div>
+                      <div className="font-bold text-gray-900">지도에서 모임 찾기</div>
+                      <div className="text-sm text-gray-600">새로운 모임을 찾아보세요</div>
                     </div>
                   </div>
-                  <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </div>
               </div>
             </Link>
-          )}
-        </div>
 
+            {/* Create Room */}
+            <Link href="/room/new" className="block">
+              <div className="transform rounded-2xl border border-white/50 bg-white/80 p-5 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-500">
+                      <span className="text-xl">➕</span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">새 모임 만들기</div>
+                      <div className="text-sm text-gray-600">모임을 주최해보세요</div>
+                    </div>
+                  </div>
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
 
-        {/* App Info */}
-        <div className="text-center mt-4 text-gray-400 text-sm">
-          <p className="font-medium mb-3">밋핀(MeetPin) v1.0</p>
-          <div className="flex justify-center space-x-6">
-            <Link href="/legal/terms" className="hover:text-emerald-500 transition-colors">
-              이용약관
+            {/* My Requests */}
+            <Link href="/requests" className="block">
+              <div className="transform rounded-2xl border border-white/50 bg-white/80 p-5 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-500">
+                      <span className="text-xl">📮</span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">요청함</div>
+                      <div className="text-sm text-gray-600">참가 요청과 받은 요청 확인</div>
+                    </div>
+                  </div>
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
             </Link>
-            <Link href="/legal/privacy" className="hover:text-emerald-500 transition-colors">
-              개인정보처리방침
+
+            {/* Referral Program */}
+            <div
+              onClick={() => setShowReferralModal(true)}
+              className="transform cursor-pointer rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 p-5 shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+                    <span className="text-xl">🎁</span>
+                  </div>
+                  <div>
+                    <div className="font-bold text-white">친구 초대하기</div>
+                    <div className="text-sm text-white/80">초대하고 함께 혜택 받기</div>
+                  </div>
+                </div>
+                <svg
+                  className="h-5 w-5 text-white/60"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Notification Settings */}
+            <Link href="/settings/notifications" className="block">
+              <div className="transform rounded-2xl border border-white/50 bg-white/80 p-5 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500">
+                      <span className="text-xl">🔔</span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">알림 설정</div>
+                      <div className="text-sm text-gray-600">푸시 알림 및 소식 설정</div>
+                    </div>
+                  </div>
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
             </Link>
+
+            {/* Admin Panel (관리자만) */}
+            {user.role === 'admin' && (
+              <Link href="/admin" className="block">
+                <div className="transform rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 p-5 shadow-lg transition-all hover:scale-105 hover:shadow-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+                        <span className="text-xl">👑</span>
+                      </div>
+                      <div>
+                        <div className="font-bold text-white">관리자 패널</div>
+                        <div className="text-sm text-white/80">시스템 관리 및 사용자 관리</div>
+                      </div>
+                    </div>
+                    <svg
+                      className="h-5 w-5 text-white/60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+            )}
           </div>
-          <p className="mt-3 text-xs">
-            © 2024 MeetPin. Made with ❤️
-          </p>
-        </div>
-      </div>
 
-      {/* Referral Modal */}
-      <ReferralModal
-        isOpen={showReferralModal}
-        onClose={() => setShowReferralModal(false)}
-        userData={{
-          nickname: user?.nickname,
-          referralCode: user?.referral_code
-        }}
-      />
+          {/* App Info */}
+          <div className="mt-4 text-center text-sm text-gray-400">
+            <p className="mb-3 font-medium">밋핀(MeetPin) v1.0</p>
+            <div className="flex justify-center space-x-6">
+              <Link href="/legal/terms" className="transition-colors hover:text-emerald-500">
+                이용약관
+              </Link>
+              <Link href="/legal/privacy" className="transition-colors hover:text-emerald-500">
+                개인정보처리방침
+              </Link>
+            </div>
+            <p className="mt-3 text-xs">© 2024 MeetPin. Made with ❤️</p>
+          </div>
+        </div>
+
+        {/* Referral Modal */}
+        <ReferralModal
+          isOpen={showReferralModal}
+          onClose={() => setShowReferralModal(false)}
+          userData={{
+            nickname: user?.nickname,
+            referralCode: user?.referral_code,
+          }}
+        />
       </div>
     </PageTransition>
   )

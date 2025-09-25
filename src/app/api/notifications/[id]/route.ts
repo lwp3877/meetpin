@@ -12,18 +12,18 @@ export async function DELETE(
   try {
     const user = await getAuthenticatedUser()
     const { id: notificationId } = await params
-    
+
     // 개발 모드에서는 성공 응답만 반환
     if (isDevelopmentMode) {
       return Response.json({
         ok: true,
-        message: '알림이 삭제되었습니다'
+        message: '알림이 삭제되었습니다',
       } as ApiResponse<void>)
     }
 
     // 실제 데이터베이스에서 알림 삭제
     const supabase = await createServerSupabaseClient()
-    
+
     const { error } = await supabase
       .from('notifications')
       .delete()
@@ -36,9 +36,8 @@ export async function DELETE(
 
     return Response.json({
       ok: true,
-      message: '알림이 삭제되었습니다'
+      message: '알림이 삭제되었습니다',
     } as ApiResponse<void>)
-
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
@@ -48,9 +47,6 @@ export async function DELETE(
     }
 
     console.error('Notification deletion error:', error)
-    return Response.json(
-      { ok: false, message: '알림 삭제에 실패했습니다' },
-      { status: 500 }
-    )
+    return Response.json({ ok: false, message: '알림 삭제에 실패했습니다' }, { status: 500 })
   }
 }

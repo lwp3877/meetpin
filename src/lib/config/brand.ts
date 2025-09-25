@@ -2,11 +2,11 @@
 /**
  * 밋핀 브랜드 시스템
  * 앱 전체에서 일관된 색상, 메시지, UI 요소를 제공합니다.
- * 
+ *
  * 사용 예시:
  * ```typescript
  * import { brandColors, brandMessages, getCategoryDisplay } from '@/lib/config/brand'
- * 
+ *
  * const primaryColor = brandColors.primary
  * const appName = brandMessages.appName
  * const drinkCategory = getCategoryDisplay('drink')
@@ -22,29 +22,29 @@ export const brandColors = {
   primary: '#10B981',
   primaryDeep: '#059669',
   primaryLight: '#34D399',
-  
+
   // Secondary colors
   boost: '#F59E0B',
   boostDeep: '#D97706',
   accent: '#F97316',
   accentDeep: '#EA580C',
-  
+
   // Text colors
   text: '#111827',
   textMuted: '#6B7280',
   textLight: '#9CA3AF',
-  
+
   // Background colors
   bg: '#FFFFFF',
   bgSoft: '#F3F4F6',
   bgMuted: '#E5E7EB',
-  
+
   // Status colors
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   info: '#3B82F6',
-  
+
   // Category colors
   categoryDrink: '#E11D48',
   categoryExercise: '#3B82F6',
@@ -56,14 +56,14 @@ export const brandMessages = {
   tagline: '핀 찍고, 지금 모여요',
   shortDescription: '지도에서 방을 만들어 근처 사람들과 만나보세요',
   longDescription: '술, 운동, 취미 활동까지 다양한 모임을 즐길 수 있습니다.',
-  
+
   // Navigation
   navHome: '홈',
   navRooms: '방 목록',
   navRequests: '요청함',
   navProfile: '프로필',
   navAdmin: '관리',
-  
+
   // Common actions
   actionCreate: '만들기',
   actionJoin: '참가 신청',
@@ -72,7 +72,7 @@ export const brandMessages = {
   actionReport: '신고',
   actionBlock: '차단',
   actionBoost: '부스트',
-  
+
   // Status messages
   loading: '로딩 중...',
   noData: '데이터가 없습니다',
@@ -82,7 +82,7 @@ export const brandMessages = {
 
 export const categoryLabels = {
   drink: '술',
-  exercise: '운동', 
+  exercise: '운동',
   other: '기타',
 } as const
 

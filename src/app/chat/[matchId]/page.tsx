@@ -9,11 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import ChatPanel from '@/components/chat/ChatPanel'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 
-export default function ChatPage({ 
-  params 
-}: { 
-  params: Promise<{ matchId: string }> 
-}) {
+export default function ChatPage({ params }: { params: Promise<{ matchId: string }> }) {
   const { matchId } = use(params)
   const router = useRouter()
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
@@ -35,7 +31,8 @@ export default function ChatPage({
         }
 
         // UUID 형식 검증
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        const uuidRegex =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
         if (!uuidRegex.test(matchId)) {
           throw new Error('잘못된 채팅 ID 형식입니다')
         }
@@ -44,10 +41,13 @@ export default function ChatPage({
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 10000)
 
-        const { data: { user }, error: userError } = await supabase.auth.getUser()
-        
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser()
+
         clearTimeout(timeoutId)
-        
+
         if (userError) {
           if (userError.message.includes('session_expired')) {
             throw new Error('로그인 세션이 만료되었습니다. 다시 로그인해주세요')
@@ -56,7 +56,7 @@ export default function ChatPage({
           }
           throw new Error('인증 정보를 확인할 수 없습니다')
         }
-        
+
         if (!user) {
           throw new Error('로그인이 필요합니다')
         }
@@ -80,7 +80,7 @@ export default function ChatPage({
         setCurrentUserId(user.id)
       } catch (err: any) {
         console.error('User fetch error:', err)
-        
+
         if (err.name === 'AbortError') {
           setError('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')
         } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
@@ -102,10 +102,10 @@ export default function ChatPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
-        <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-white/20 dark:border-slate-700/30 shadow-2xl max-w-md mx-auto">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Card className="mx-auto max-w-md border-white/20 bg-white/95 shadow-2xl backdrop-blur-lg dark:border-slate-700/30 dark:bg-slate-900/95">
           <CardContent className="pt-12 pb-12 text-center">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <div className="border-primary mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent"></div>
             <p className="text-gray-600 dark:text-gray-300">채팅을 준비하는 중...</p>
           </CardContent>
         </Card>
@@ -115,23 +115,25 @@ export default function ChatPage({
 
   if (error || !currentUserId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center p-4">
-        <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-white/20 dark:border-slate-700/30 shadow-2xl max-w-md mx-auto">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 p-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Card className="mx-auto max-w-md border-white/20 bg-white/95 shadow-2xl backdrop-blur-lg dark:border-slate-700/30 dark:bg-slate-900/95">
           <CardContent className="pt-12 pb-12 text-center">
-            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400" />
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertCircle className="h-8 w-8 text-red-500 dark:text-red-400" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">채팅 오류</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">{error || '인증 정보를 가져올 수 없습니다'}</p>
-            <div className="flex gap-3 justify-center">
-              <Button 
-                onClick={() => router.push('/auth')} 
-                className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-lg"
+            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">채팅 오류</h2>
+            <p className="mb-8 text-gray-600 dark:text-gray-300">
+              {error || '인증 정보를 가져올 수 없습니다'}
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={() => router.push('/auth')}
+                className="from-primary hover:from-primary/90 bg-gradient-to-r to-emerald-600 text-white shadow-lg hover:to-emerald-600/90"
               >
                 로그인
               </Button>
               <Button onClick={() => router.back()} variant="outline">
-                <ArrowLeft className="w-4 h-4 mr-1" />
+                <ArrowLeft className="mr-1 h-4 w-4" />
                 돌아가기
               </Button>
             </div>
@@ -142,7 +144,7 @@ export default function ChatPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <ChatPanel
         matchId={matchId}
         currentUserId={currentUserId}

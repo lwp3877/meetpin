@@ -86,19 +86,19 @@ export function showNotification(options: PushNotificationOptions): Notification
     })
 
     // 알림 클릭 이벤트 처리
-    notification.onclick = (event) => {
+    notification.onclick = event => {
       event.preventDefault()
-      
+
       // 브라우저 창 포커스
       if (window.parent) {
         window.parent.focus()
       } else {
         window.focus()
       }
-      
+
       // 알림 닫기
       notification.close()
-      
+
       // 커스텀 데이터 처리
       if (options.data?.url) {
         window.open(options.data.url, '_blank')
@@ -109,7 +109,7 @@ export function showNotification(options: PushNotificationOptions): Notification
     }
 
     // 알림 에러 처리
-    notification.onerror = (error) => {
+    notification.onerror = error => {
       console.error('Notification error:', error)
     }
 
@@ -136,7 +136,7 @@ export async function showServiceWorkerNotification(
 
   try {
     const registration = await navigator.serviceWorker.ready
-    
+
     await registration.showNotification(options.title, {
       body: options.body,
       icon: options.icon || '/icons/icon-192x192.png',
@@ -169,19 +169,19 @@ export const MeetPinNotifications = {
         senderName,
         message,
         roomTitle,
-        url: '/profile'
+        url: '/profile',
       },
       requireInteraction: true,
       actions: [
         {
           action: 'reply',
-          title: '답장하기'
+          title: '답장하기',
         },
         {
           action: 'view',
-          title: '확인하기'
-        }
-      ]
+          title: '확인하기',
+        },
+      ],
     })
   },
 
@@ -196,19 +196,19 @@ export const MeetPinNotifications = {
         type: 'request',
         requesterName,
         roomTitle,
-        url: '/requests'
+        url: '/requests',
       },
       requireInteraction: true,
       actions: [
         {
           action: 'accept',
-          title: '수락'
+          title: '수락',
         },
         {
           action: 'view',
-          title: '확인'
-        }
-      ]
+          title: '확인',
+        },
+      ],
     })
   },
 
@@ -223,15 +223,15 @@ export const MeetPinNotifications = {
         type: 'accepted',
         roomTitle,
         hostName,
-        url: '/map'
+        url: '/map',
       },
       requireInteraction: true,
       actions: [
         {
           action: 'view-room',
-          title: '모임 보기'
-        }
-      ]
+          title: '모임 보기',
+        },
+      ],
     })
   },
 
@@ -246,25 +246,29 @@ export const MeetPinNotifications = {
         type: 'meeting-start',
         roomTitle,
         minutesLeft,
-        url: '/map'
+        url: '/map',
       },
       requireInteraction: true,
       vibrate: [300, 100, 300, 100, 300],
       actions: [
         {
           action: 'view-room',
-          title: '모임 확인'
-        }
-      ]
+          title: '모임 확인',
+        },
+      ],
     })
   },
 
   // 시스템 알림
-  systemNotification: (title: string, body: string, type: 'info' | 'warning' | 'error' = 'info') => {
+  systemNotification: (
+    title: string,
+    body: string,
+    type: 'info' | 'warning' | 'error' = 'info'
+  ) => {
     const icons = {
       info: '💡',
       warning: '⚠️',
-      error: '❌'
+      error: '❌',
     }
 
     showServiceWorkerNotification({
@@ -274,11 +278,11 @@ export const MeetPinNotifications = {
       tag: `system-${type}`,
       data: {
         type: 'system',
-        level: type
+        level: type,
       },
-      requireInteraction: type === 'error'
+      requireInteraction: type === 'error',
     })
-  }
+  },
 }
 
 // 알림 설정 관리
@@ -287,22 +291,24 @@ export class NotificationSettings {
 
   static getSettings() {
     if (typeof window === 'undefined') return null
-    
+
     const settings = localStorage.getItem(this.SETTINGS_KEY)
-    return settings ? JSON.parse(settings) : {
-      enabled: true,
-      messages: true,
-      requests: true,
-      meetings: true,
-      system: true,
-      sound: true,
-      vibration: true
-    }
+    return settings
+      ? JSON.parse(settings)
+      : {
+          enabled: true,
+          messages: true,
+          requests: true,
+          meetings: true,
+          system: true,
+          sound: true,
+          vibration: true,
+        }
   }
 
   static updateSettings(settings: any) {
     if (typeof window === 'undefined') return
-    
+
     localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings))
   }
 

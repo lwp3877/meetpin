@@ -13,7 +13,7 @@ env:
 jobs:
   purge-expired-data:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,11 +35,11 @@ jobs:
       - name: Execute DSAR purge function
         run: |
           echo "Starting DSAR data purge..."
-          
+
           # Create temporary SQL script for purging
           cat > purge_script.sql << 'EOF'
           BEGIN;
-          
+
           -- Log purge operation start
           INSERT INTO admin_notifications (type, title, message, priority, metadata, created_at)
           VALUES (
@@ -50,7 +50,7 @@ jobs:
             '{"trigger": "github_actions", "timestamp": "' || NOW()::text || '"}'::jsonb,
             NOW()
           );
-          
+
           -- Count records before purge
           DO $$
           DECLARE
@@ -67,10 +67,10 @@ jobs:
             RAISE NOTICE 'Records to purge: profiles=%, rooms=%, messages=%, total=%', 
                          profile_count, room_count, message_count, total_count;
           END $$;
-          
+
           -- Execute the purge function
           SELECT purge_expired_soft_deleted_data();
-          
+
           -- Log purge operation completion
           INSERT INTO admin_notifications (type, title, message, priority, metadata, created_at)
           VALUES (
@@ -81,13 +81,13 @@ jobs:
             '{"trigger": "github_actions", "timestamp": "' || NOW()::text || '", "success": true}'::jsonb,
             NOW()
           );
-          
+
           COMMIT;
           EOF
-          
+
           # Execute the purge script using psql
           echo "Executing purge script..."
-          
+
           # Use curl to execute SQL via Supabase REST API
           curl -X POST "${SUPABASE_URL}/rest/v1/rpc/purge_expired_soft_deleted_data" \
             -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
@@ -96,7 +96,7 @@ jobs:
             -d '{}' \
             --fail-with-body \
             --verbose
-          
+
           echo "✓ DSAR purge completed successfully"
 
       - name: Cleanup
@@ -109,7 +109,7 @@ jobs:
         if: failure()
         run: |
           echo "❌ DSAR purge failed. Check logs above."
-          
+
           # Try to log failure (best effort)
           curl -X POST "${SUPABASE_URL}/rest/v1/admin_notifications" \
             -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \

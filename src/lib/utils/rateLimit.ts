@@ -15,7 +15,7 @@ import {
   rateLimit,
   defaultLimits,
   type RateLimitOptions,
-  type RateLimitType
+  type RateLimitType,
 } from '@/lib/rateLimit'
 
 // 레거시 export (하위 호환성)
@@ -32,7 +32,7 @@ export {
   rateLimit,
   defaultLimits,
   type RateLimitOptions,
-  type RateLimitType
+  type RateLimitType,
 }
 
 // 레거시 유틸리티 객체

@@ -8,18 +8,20 @@ import { Card, CardContent } from '@/components/ui/card'
 const EnhancedLanding = dynamic(() => import('@/components/premium/enhanced-landing'), {
   ssr: true,
   loading: () => (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-500/20 via-blue-500/10 to-purple-500/20 flex items-center justify-center">
-      <Card className="w-full max-w-md mx-4 backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl">
-        <CardContent className="p-8 text-center space-y-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center animate-pulse shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-500/20 via-blue-500/10 to-purple-500/20">
+      <Card className="mx-4 w-full max-w-md border-0 bg-white/90 shadow-2xl backdrop-blur-xl dark:bg-gray-900/90">
+        <CardContent className="space-y-4 p-8 text-center">
+          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-2xl">
             <span className="text-2xl">📍</span>
           </div>
-          <div className="text-lg text-gray-600 dark:text-gray-300 font-semibold">밋핀 로딩 중...</div>
+          <div className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+            밋핀 로딩 중...
+          </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">잠시만 기다려주세요</div>
         </CardContent>
       </Card>
     </div>
-  )
+  ),
 })
 
 export default function HomePage() {

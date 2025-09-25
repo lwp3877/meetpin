@@ -17,13 +17,13 @@ interface RealtimeChatModalProps {
   roomId: string
 }
 
-export function RealtimeChatModal({ 
-  isOpen, 
-  onClose, 
-  hostName, 
-  hostAvatar, 
-  hostId, 
-  roomId 
+export function RealtimeChatModal({
+  isOpen,
+  onClose,
+  hostName,
+  hostAvatar,
+  hostId,
+  roomId,
 }: RealtimeChatModalProps) {
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -42,11 +42,11 @@ export function RealtimeChatModal({
     sendMessage,
     markAsRead,
     sendTyping,
-    stopTyping
+    stopTyping,
   } = useRealtimeChat({
     roomId,
     otherUserId: hostId,
-    enabled: isOpen && !!user
+    enabled: isOpen && !!user,
   })
 
   // 메시지 영역 자동 스크롤
@@ -62,9 +62,7 @@ export function RealtimeChatModal({
   useEffect(() => {
     if (!isOpen || !user) return
 
-    const unreadMessages = messages.filter(msg => 
-      msg.receiver_uid === user.id && !msg.is_read
-    )
+    const unreadMessages = messages.filter(msg => msg.receiver_uid === user.id && !msg.is_read)
 
     unreadMessages.forEach(msg => {
       markAsRead(msg.id)
@@ -119,23 +117,26 @@ export function RealtimeChatModal({
     const date = new Date(timestamp)
     const now = new Date()
     const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-    
+
     if (diffDays === 0) {
-      return date.toLocaleTimeString('ko-KR', { 
-        hour: 'numeric', 
-        minute: '2-digit', 
-        hour12: true 
+      return date.toLocaleTimeString('ko-KR', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
       })
     } else if (diffDays === 1) {
-      return '어제 ' + date.toLocaleTimeString('ko-KR', { 
-        hour: 'numeric', 
-        minute: '2-digit', 
-        hour12: true 
-      })
+      return (
+        '어제 ' +
+        date.toLocaleTimeString('ko-KR', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        })
+      )
     } else {
-      return date.toLocaleDateString('ko-KR', { 
-        month: 'short', 
-        day: 'numeric' 
+      return date.toLocaleDateString('ko-KR', {
+        month: 'short',
+        day: 'numeric',
       })
     }
   }
@@ -146,91 +147,98 @@ export function RealtimeChatModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg h-[80vh] max-h-[600px] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="flex h-[80vh] max-h-[600px] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-100 p-4 flex items-center justify-between">
+        <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white/95 p-4 backdrop-blur-md">
           <div className="flex items-center space-x-3">
             <div className="relative">
               {hostAvatar ? (
-                <Image 
-                  src={hostAvatar} 
+                <Image
+                  src={hostAvatar}
                   alt={hostName}
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="h-10 w-10 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-gray-500" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
+                  <User className="h-5 w-5 text-gray-500" />
                 </div>
               )}
-              
+
               {/* 온라인 상태 표시 */}
               {isHostOnline && (
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                <div className="absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 border-white bg-green-500"></div>
               )}
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
+              <h2 className="flex items-center space-x-2 text-lg font-bold text-gray-900">
                 <span>{hostName}</span>
                 {isHostOnline && <span className="text-xs text-green-600">온라인</span>}
               </h2>
               <div className="flex items-center space-x-2">
                 {connectionStatus === 'connected' ? (
-                  <Wifi className="w-3 h-3 text-green-500" />
+                  <Wifi className="h-3 w-3 text-green-500" />
                 ) : (
-                  <WifiOff className="w-3 h-3 text-red-500" />
+                  <WifiOff className="h-3 w-3 text-red-500" />
                 )}
                 <p className="text-sm text-gray-500">
-                  {connectionStatus === 'connected' ? '실시간 연결됨' : 
-                   connectionStatus === 'connecting' ? '연결 중...' : '연결 끊김'}
+                  {connectionStatus === 'connected'
+                    ? '실시간 연결됨'
+                    : connectionStatus === 'connecting'
+                      ? '연결 중...'
+                      : '연결 끊김'}
                 </p>
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-gray-100"
           >
-            <X className="w-6 h-6 text-gray-700" />
+            <X className="h-6 w-6 text-gray-700" />
           </button>
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"></div>
               <span className="ml-2 text-gray-600">메시지를 불러오는 중...</span>
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-red-600">
+            <div className="py-8 text-center text-red-600">
               <p>메시지를 불러오지 못했습니다</p>
               <p className="text-sm text-gray-500">{error}</p>
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="py-8 text-center text-gray-500">
               <p>아직 메시지가 없습니다</p>
-              <p className="text-sm mt-1">{hostName}님과 대화를 시작해보세요!</p>
+              <p className="mt-1 text-sm">{hostName}님과 대화를 시작해보세요!</p>
             </div>
           ) : (
             <>
-              {messages.map((msg) => {
+              {messages.map(msg => {
                 const isMine = msg.sender_uid === user?.id
                 return (
                   <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] ${isMine ? 'order-2' : 'order-1'}`}>
-                      <div className={`p-3 rounded-2xl ${
-                        isMine 
-                          ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white' 
-                          : 'bg-gray-100 text-gray-900'
-                      }`}>
-                        <p className="whitespace-pre-wrap break-words">{msg.text}</p>
+                      <div
+                        className={`rounded-2xl p-3 ${
+                          isMine
+                            ? 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        <p className="break-words whitespace-pre-wrap">{msg.text}</p>
                       </div>
-                      <div className={`flex items-center mt-1 space-x-1 text-xs text-gray-500 ${
-                        isMine ? 'justify-end' : 'justify-start'
-                      }`}>
+                      <div
+                        className={`mt-1 flex items-center space-x-1 text-xs text-gray-500 ${
+                          isMine ? 'justify-end' : 'justify-start'
+                        }`}
+                      >
                         <span>{formatTime(msg.created_at)}</span>
                         {isMine && (
                           <span className={msg.is_read ? 'text-blue-500' : 'text-gray-400'}>
@@ -242,19 +250,28 @@ export function RealtimeChatModal({
                   </div>
                 )
               })}
-              
+
               {/* 타이핑 인디케이터 */}
               {typingUsers.length > 0 && (
                 <div className="flex justify-start">
                   <div className="max-w-[80%]">
-                    <div className="bg-gray-100 p-3 rounded-2xl">
+                    <div className="rounded-2xl bg-gray-100 p-3">
                       <div className="flex items-center space-x-1">
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          <div
+                            className="h-2 w-2 animate-bounce rounded-full bg-gray-500"
+                            style={{ animationDelay: '0ms' }}
+                          ></div>
+                          <div
+                            className="h-2 w-2 animate-bounce rounded-full bg-gray-500"
+                            style={{ animationDelay: '150ms' }}
+                          ></div>
+                          <div
+                            className="h-2 w-2 animate-bounce rounded-full bg-gray-500"
+                            style={{ animationDelay: '300ms' }}
+                          ></div>
                         </div>
-                        <span className="text-xs text-gray-500 ml-2">
+                        <span className="ml-2 text-xs text-gray-500">
                           {typingUsers.map(u => u.nickname).join(', ')}님이 입력 중...
                         </span>
                       </div>
@@ -268,7 +285,7 @@ export function RealtimeChatModal({
         </div>
 
         {/* Input Area */}
-        <div className="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-gray-100 p-4">
+        <div className="sticky bottom-0 border-t border-gray-100 bg-white/95 p-4 backdrop-blur-md">
           <div className="flex items-end space-x-3">
             <div className="flex-1">
               <textarea
@@ -277,21 +294,19 @@ export function RealtimeChatModal({
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
                 placeholder={`${hostName}님에게 메시지를 입력하세요...`}
-                className="w-full p-3 border border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors max-h-24"
+                className="max-h-24 w-full resize-none rounded-2xl border border-gray-200 p-3 transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                 rows={1}
                 maxLength={500}
                 disabled={connectionStatus !== 'connected'}
               />
-              <div className="text-xs text-gray-500 text-right mt-1">
-                {message.length}/500
-              </div>
+              <div className="mt-1 text-right text-xs text-gray-500">{message.length}/500</div>
             </div>
             <button
               onClick={handleSendMessage}
               disabled={!message.trim() || connectionStatus !== 'connected'}
-              className="p-3 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-2xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 p-3 text-white transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Send className="w-5 h-5" />
+              <Send className="h-5 w-5" />
             </button>
           </div>
         </div>

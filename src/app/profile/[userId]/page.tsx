@@ -34,7 +34,7 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     const foundUser = mockUsers.find(u => u.uid === userId)
-      
+
     if (foundUser) {
       setUserProfile({
         id: foundUser.uid,
@@ -45,16 +45,20 @@ export default function UserProfilePage() {
         role: foundUser.role,
       })
     }
-      
+
     setIsLoading(false)
   }, [userId])
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50">
         <div className="flex flex-col items-center justify-center">
-          <div className="w-8 h-8 border-emerald-500 border-4 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading"></div>
-          <p className="mt-3 text-sm text-gray-600 animate-pulse">프로필을 불러오는 중...</p>
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"
+            role="status"
+            aria-label="Loading"
+          ></div>
+          <p className="mt-3 animate-pulse text-sm text-gray-600">프로필을 불러오는 중...</p>
         </div>
       </div>
     )
@@ -62,11 +66,11 @@ export default function UserProfilePage() {
 
   if (!userProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-500/10 via-blue-500/5 to-purple-500/10 flex items-center justify-center">
-        <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50">
-          <div className="text-8xl mb-6">😅</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-3">사용자를 찾을 수 없어요</h1>
-          <p className="text-gray-600 mb-8 text-lg">존재하지 않거나 삭제된 사용자입니다.</p>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-500/10 via-blue-500/5 to-purple-500/10">
+        <div className="rounded-3xl border border-white/50 bg-white/80 p-8 text-center shadow-xl backdrop-blur-sm">
+          <div className="mb-6 text-8xl">😅</div>
+          <h1 className="mb-3 text-3xl font-bold text-gray-800">사용자를 찾을 수 없어요</h1>
+          <p className="mb-8 text-lg text-gray-600">존재하지 않거나 삭제된 사용자입니다.</p>
         </div>
       </div>
     )
@@ -75,28 +79,26 @@ export default function UserProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           {/* Profile Header */}
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden mb-8">
+          <div className="mb-8 overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl">
             <div className="p-8 text-center">
-              <div className="relative mx-auto w-32 h-32 mb-6">
-                <Image 
-                  src={userProfile.avatar_url} 
-                  alt={`${userProfile.nickname}의 프로필 사진`} 
+              <div className="relative mx-auto mb-6 h-32 w-32">
+                <Image
+                  src={userProfile.avatar_url}
+                  alt={`${userProfile.nickname}의 프로필 사진`}
                   width={128}
                   height={128}
-                  className="w-full h-full object-cover rounded-full border-4 border-emerald-500"
+                  className="h-full w-full rounded-full border-4 border-emerald-500 object-cover"
                 />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                {userProfile.nickname}
-              </h2>
+              <h2 className="mb-2 text-3xl font-bold text-gray-900">{userProfile.nickname}</h2>
               <div className="flex items-center justify-center gap-3">
-                <span className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium">
+                <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-800">
                   {getAgeRangeLabel(userProfile.age_range)}
                 </span>
                 {userProfile.role === 'admin' && (
-                  <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                  <span className="rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white">
                     👑 관리자
                   </span>
                 )}

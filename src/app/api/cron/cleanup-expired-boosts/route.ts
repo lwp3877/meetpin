@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
     const now = new Date().toISOString()
-    
+
     // 만료된 부스트 찾기 및 정리
     const { data: expiredBoosts, error: selectError } = await supabase
       .from('rooms')
@@ -27,15 +27,15 @@ export async function GET(request: NextRequest) {
     }
 
     if (!expiredBoosts || expiredBoosts.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'No expired boosts found',
         cleaned: 0,
-        timestamp: now
+        timestamp: now,
       })
     }
 
     // 만료된 부스트 NULL로 설정
-    const { error: updateError } = await ((supabase as any)
+    const { error: updateError } = (await (supabase as any)
       .from('rooms')
       .update({ boost_until: null, updated_at: now })
       .not('boost_until', 'is', null)
@@ -54,16 +54,18 @@ export async function GET(request: NextRequest) {
       rooms: expiredBoosts.map((room: any) => ({
         id: room.id,
         title: room.title,
-        expired_at: room.boost_until
+        expired_at: room.boost_until,
       })),
-      timestamp: now
+      timestamp: now,
     })
-
   } catch (error) {
     console.error('Cron job error:', error)
-    return NextResponse.json({ 
-      error: 'Internal server error',
-      timestamp: new Date().toISOString()
-    }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 }
+    )
   }
 }

@@ -107,7 +107,8 @@
       "Bash(if [ -z \"$VERCEL_TOKEN\" ])",
       "Bash(then echo \"NEED_TOKEN\")",
       "Bash(exit 2)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

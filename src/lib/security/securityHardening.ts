@@ -14,7 +14,7 @@ export class InputSanitizer {
    */
   static sanitizeHTML(input: string): string {
     if (!input || typeof input !== 'string') return ''
-    
+
     // 기본적인 HTML 태그 제거
     return input
       .replace(/</g, '&lt;')
@@ -30,7 +30,7 @@ export class InputSanitizer {
    */
   static validateSQLSafe(input: string): boolean {
     if (!input || typeof input !== 'string') return true
-    
+
     const dangerousPatterns = [
       /(\s|^)(select|insert|update|delete|drop|create|alter|exec|execute|union|script)\s/i,
       /['"]\s*;\s*--/i,
@@ -40,9 +40,9 @@ export class InputSanitizer {
       /\btruncate\s+table\b/i,
       /\bdelete\s+from\b/i,
       /\bupdate\s+.*\s+set\b/i,
-      /\binsert\s+into\b/i
+      /\binsert\s+into\b/i,
     ]
-    
+
     return !dangerousPatterns.some(pattern => pattern.test(input))
   }
 
@@ -51,15 +51,15 @@ export class InputSanitizer {
    */
   static validateFilePath(path: string): boolean {
     if (!path || typeof path !== 'string') return false
-    
+
     const dangerousPatterns = [
-      /\.\./,           // 상위 디렉토리 접근
-      /\//,             // 절대 경로
-      /\\/,             // Windows 경로
-      /\0/,             // NULL 바이트
-      /[<>:"|?*]/,      // 파일명에 부적절한 문자
+      /\.\./, // 상위 디렉토리 접근
+      /\//, // 절대 경로
+      /\\/, // Windows 경로
+      /\0/, // NULL 바이트
+      /[<>:"|?*]/, // 파일명에 부적절한 문자
     ]
-    
+
     return !dangerousPatterns.some(pattern => pattern.test(path))
   }
 
@@ -68,19 +68,20 @@ export class InputSanitizer {
    */
   static validateEmail(email: string): boolean {
     if (!email || typeof email !== 'string') return false
-    
+
     // RFC 5322 기반 이메일 검증 (단순화된 버전)
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-    
+    const emailRegex =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+
     if (!emailRegex.test(email)) return false
-    
+
     // 길이 제한
     if (email.length > 254) return false
-    
+
     // 로컬 부분 길이 제한
     const [localPart] = email.split('@')
     if (localPart.length > 64) return false
-    
+
     return true
   }
 
@@ -89,21 +90,21 @@ export class InputSanitizer {
    */
   static sanitizeURL(url: string): string | null {
     if (!url || typeof url !== 'string') return null
-    
+
     try {
       const parsed = new URL(url)
-      
+
       // 허용되는 프로토콜만 허용
       const allowedProtocols = ['http:', 'https:', 'mailto:', 'tel:']
       if (!allowedProtocols.includes(parsed.protocol)) {
         return null
       }
-      
+
       // JavaScript 스키마 차단
       if (parsed.protocol === 'javascript:') {
         return null
       }
-      
+
       return parsed.toString()
     } catch {
       return null
@@ -117,42 +118,67 @@ export class InputSanitizer {
     if (!nickname || typeof nickname !== 'string') {
       return { isValid: false, reason: '닉네임을 입력해주세요' }
     }
-    
+
     // 길이 제한
     if (nickname.length < 2 || nickname.length > 10) {
       return { isValid: false, reason: '닉네임은 2-10자 사이여야 합니다' }
     }
-    
+
     // 허용되는 문자만 사용 (한글, 영문, 숫자, 일부 특수문자)
     const allowedPattern = /^[가-힣a-zA-Z0-9._-]+$/
     if (!allowedPattern.test(nickname)) {
       return { isValid: false, reason: '한글, 영문, 숫자, ., _, -만 사용 가능합니다' }
     }
-    
+
     // 금지어 목록
     const forbiddenWords = [
-      '관리자', 'admin', 'Administrator', 'root', 'system',
-      '운영자', '매니저', 'manager', 'mod', 'moderator',
-      '밋핀', 'meetpin', 'MeetPin',
+      '관리자',
+      'admin',
+      'Administrator',
+      'root',
+      'system',
+      '운영자',
+      '매니저',
+      'manager',
+      'mod',
+      'moderator',
+      '밋핀',
+      'meetpin',
+      'MeetPin',
       // 욕설이나 부적절한 단어들
-      '바보', '멍청이', '병신', '시발', '개새끼', '씨발',
+      '바보',
+      '멍청이',
+      '병신',
+      '시발',
+      '개새끼',
+      '씨발',
       // 사기 관련
-      '사기', '돈', '송금', '계좌', '투자', '대출',
+      '사기',
+      '돈',
+      '송금',
+      '계좌',
+      '투자',
+      '대출',
       // 성적 내용
-      '섹스', '야동', '포르노', '성관계',
+      '섹스',
+      '야동',
+      '포르노',
+      '성관계',
       // 기타 부적절한 내용
-      '죽이', '살인', '폭력', '마약', '도박'
+      '죽이',
+      '살인',
+      '폭력',
+      '마약',
+      '도박',
     ]
-    
+
     const lowerNickname = nickname.toLowerCase()
-    const hasForbiddenWord = forbiddenWords.some(word => 
-      lowerNickname.includes(word.toLowerCase())
-    )
-    
+    const hasForbiddenWord = forbiddenWords.some(word => lowerNickname.includes(word.toLowerCase()))
+
     if (hasForbiddenWord) {
       return { isValid: false, reason: '부적절한 단어가 포함되어 있습니다' }
     }
-    
+
     return { isValid: true }
   }
 }
@@ -161,20 +187,25 @@ export class InputSanitizer {
  * Rate Limiting 보안
  */
 export class SecurityRateLimit {
-  private static attempts: Map<string, { count: number; resetTime: number; blocked?: boolean }> = new Map()
+  private static attempts: Map<string, { count: number; resetTime: number; blocked?: boolean }> =
+    new Map()
   private static suspiciousIPs: Set<string> = new Set()
 
   /**
    * 로그인 시도 제한
    */
-  static checkLoginAttempts(identifier: string): { allowed: boolean; remainingAttempts?: number; blockDuration?: number } {
+  static checkLoginAttempts(identifier: string): {
+    allowed: boolean
+    remainingAttempts?: number
+    blockDuration?: number
+  } {
     const now = Date.now()
     const maxAttempts = 5
     const blockDuration = 15 * 60 * 1000 // 15분
     const windowDuration = 5 * 60 * 1000 // 5분
 
     const record = this.attempts.get(identifier)
-    
+
     // 기록이 없거나 시간 윈도우가 지났으면 초기화
     if (!record || now > record.resetTime) {
       this.attempts.set(identifier, { count: 1, resetTime: now + windowDuration })
@@ -183,9 +214,9 @@ export class SecurityRateLimit {
 
     // 이미 차단된 경우
     if (record.blocked && now < record.resetTime) {
-      return { 
-        allowed: false, 
-        blockDuration: Math.ceil((record.resetTime - now) / 1000) 
+      return {
+        allowed: false,
+        blockDuration: Math.ceil((record.resetTime - now) / 1000),
       }
     }
 
@@ -197,34 +228,37 @@ export class SecurityRateLimit {
       record.blocked = true
       record.resetTime = now + blockDuration
       this.suspiciousIPs.add(identifier)
-      
-      return { 
-        allowed: false, 
-        blockDuration: blockDuration / 1000 
+
+      return {
+        allowed: false,
+        blockDuration: blockDuration / 1000,
       }
     }
 
-    return { 
-      allowed: true, 
-      remainingAttempts: maxAttempts - record.count 
+    return {
+      allowed: true,
+      remainingAttempts: maxAttempts - record.count,
     }
   }
 
   /**
    * API 요청 빈도 제한
    */
-  static checkAPIRateLimit(identifier: string, endpoint: string): { allowed: boolean; retryAfter?: number } {
+  static checkAPIRateLimit(
+    identifier: string,
+    endpoint: string
+  ): { allowed: boolean; retryAfter?: number } {
     const now = Date.now()
     const key = `${identifier}:${endpoint}`
-    
+
     // 엔드포인트별 제한 설정
     const limits = {
-      '/api/auth/login': { max: 5, window: 5 * 60 * 1000 },      // 5회/5분
-      '/api/auth/signup': { max: 3, window: 10 * 60 * 1000 },    // 3회/10분
-      '/api/rooms': { max: 100, window: 60 * 1000 },             // 100회/1분
-      '/api/messages': { max: 50, window: 60 * 1000 },           // 50회/1분
-      '/api/requests': { max: 10, window: 60 * 1000 },           // 10회/1분
-      default: { max: 30, window: 60 * 1000 }                    // 30회/1분
+      '/api/auth/login': { max: 5, window: 5 * 60 * 1000 }, // 5회/5분
+      '/api/auth/signup': { max: 3, window: 10 * 60 * 1000 }, // 3회/10분
+      '/api/rooms': { max: 100, window: 60 * 1000 }, // 100회/1분
+      '/api/messages': { max: 50, window: 60 * 1000 }, // 50회/1분
+      '/api/requests': { max: 10, window: 60 * 1000 }, // 10회/1분
+      default: { max: 30, window: 60 * 1000 }, // 30회/1분
     }
 
     const limit = limits[endpoint as keyof typeof limits] || limits.default
@@ -236,9 +270,9 @@ export class SecurityRateLimit {
     }
 
     if (record.count >= limit.max) {
-      return { 
-        allowed: false, 
-        retryAfter: Math.ceil((record.resetTime - now) / 1000) 
+      return {
+        allowed: false,
+        retryAfter: Math.ceil((record.resetTime - now) / 1000),
       }
     }
 
@@ -253,12 +287,12 @@ export class SecurityRateLimit {
     const patterns = {
       // 빠른 연속 요청
       rapidRequests: (id: string) => {
-        const recentRequests = Array.from(this.attempts.keys())
-          .filter(key => key.startsWith(id))
-          .length
+        const recentRequests = Array.from(this.attempts.keys()).filter(key =>
+          key.startsWith(id)
+        ).length
         return recentRequests > 20
       },
-      
+
       // 다양한 엔드포인트에 대한 무차별 요청
       endpointScanning: (id: string) => {
         const uniqueEndpoints = new Set(
@@ -267,16 +301,16 @@ export class SecurityRateLimit {
             .map(key => key.split(':')[1])
         )
         return uniqueEndpoints.size > 10
-      }
+      },
     }
 
     const isSuspicious = Object.values(patterns).some(check => check(identifier))
-    
+
     if (isSuspicious) {
       this.suspiciousIPs.add(identifier)
       console.warn(`🚨 Suspicious activity detected: ${activity} from ${identifier}`)
     }
-    
+
     return isSuspicious
   }
 
@@ -316,9 +350,9 @@ export class ContentSecurityPolicy {
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      "upgrade-insecure-requests"
+      'upgrade-insecure-requests',
     ]
-    
+
     return directives.join('; ')
   }
 
@@ -374,15 +408,15 @@ export class SessionSecurity {
     ctx!.textBaseline = 'top'
     ctx!.font = '14px Arial'
     ctx!.fillText('안전한 세션을 위한 핑거프린트', 2, 2)
-    
+
     const fingerprint = [
       navigator.userAgent,
       navigator.language,
       screen.width + 'x' + screen.height,
       new Date().getTimezoneOffset(),
-      canvas.toDataURL()
+      canvas.toDataURL(),
     ].join('|')
-    
+
     return btoa(fingerprint).slice(0, 32)
   }
 }
@@ -399,9 +433,9 @@ export class FileUploadSecurity {
    */
   static validateFileType(file: File): { isValid: boolean; reason?: string } {
     if (!this.allowedTypes.includes(file.type)) {
-      return { 
-        isValid: false, 
-        reason: `허용되지 않는 파일 형식입니다. 허용: ${this.allowedTypes.join(', ')}` 
+      return {
+        isValid: false,
+        reason: `허용되지 않는 파일 형식입니다. 허용: ${this.allowedTypes.join(', ')}`,
       }
     }
     return { isValid: true }
@@ -412,9 +446,9 @@ export class FileUploadSecurity {
    */
   static validateFileSize(file: File): { isValid: boolean; reason?: string } {
     if (file.size > this.maxFileSize) {
-      return { 
-        isValid: false, 
-        reason: `파일 크기가 너무 큽니다. 최대 ${this.maxFileSize / (1024 * 1024)}MB` 
+      return {
+        isValid: false,
+        reason: `파일 크기가 너무 큽니다. 최대 ${this.maxFileSize / (1024 * 1024)}MB`,
       }
     }
     return { isValid: true }
@@ -424,24 +458,24 @@ export class FileUploadSecurity {
    * 파일 내용 검증 (매직 넘버 확인)
    */
   static async validateFileContent(file: File): Promise<{ isValid: boolean; reason?: string }> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const reader = new FileReader()
-      
-      reader.onload = (e) => {
+
+      reader.onload = e => {
         const arrayBuffer = e.target?.result as ArrayBuffer
         const uint8Array = new Uint8Array(arrayBuffer)
-        
+
         // JPEG 매직 넘버 확인
         if (file.type === 'image/jpeg') {
-          if (uint8Array[0] !== 0xFF || uint8Array[1] !== 0xD8) {
+          if (uint8Array[0] !== 0xff || uint8Array[1] !== 0xd8) {
             resolve({ isValid: false, reason: 'JPEG 파일이 아닙니다' })
             return
           }
         }
-        
+
         // PNG 매직 넘버 확인
         if (file.type === 'image/png') {
-          const pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+          const pngSignature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
           for (let i = 0; i < pngSignature.length; i++) {
             if (uint8Array[i] !== pngSignature[i]) {
               resolve({ isValid: false, reason: 'PNG 파일이 아닙니다' })
@@ -449,14 +483,14 @@ export class FileUploadSecurity {
             }
           }
         }
-        
+
         resolve({ isValid: true })
       }
-      
+
       reader.onerror = () => {
         resolve({ isValid: false, reason: '파일을 읽을 수 없습니다' })
       }
-      
+
       // 처음 100바이트만 읽어서 매직 넘버 확인
       reader.readAsArrayBuffer(file.slice(0, 100))
     })
@@ -495,19 +529,24 @@ export function initializeSecurityMeasures(): () => void {
   if (process.env.NODE_ENV === 'production') {
     const devtools = {
       open: false,
-      orientation: null as string | null
+      orientation: null as string | null,
     }
 
     const threshold = 160
 
     setInterval(() => {
-      if (window.outerHeight - window.innerHeight > threshold || 
-          window.outerWidth - window.innerWidth > threshold) {
+      if (
+        window.outerHeight - window.innerHeight > threshold ||
+        window.outerWidth - window.innerWidth > threshold
+      ) {
         if (!devtools.open) {
           devtools.open = true
           console.clear()
           console.log('%c🚨 보안 경고', 'color: red; font-size: 50px; font-weight: bold;')
-          console.log('%c개발자 도구 사용이 감지되었습니다.\n악의적인 코드 실행을 방지하기 위해 콘솔을 사용하지 마세요.', 'color: red; font-size: 16px;')
+          console.log(
+            '%c개발자 도구 사용이 감지되었습니다.\n악의적인 코드 실행을 방지하기 위해 콘솔을 사용하지 마세요.',
+            'color: red; font-size: 16px;'
+          )
         }
       } else {
         devtools.open = false
@@ -516,36 +555,36 @@ export function initializeSecurityMeasures(): () => void {
   }
 
   // 우클릭 방지 (이미지 다운로드 방지)
-  document.addEventListener('contextmenu', (e) => {
+  document.addEventListener('contextmenu', e => {
     if (e.target instanceof HTMLImageElement) {
       e.preventDefault()
     }
   })
 
   // 드래그 방지 (이미지 드래그 방지)
-  document.addEventListener('dragstart', (e) => {
+  document.addEventListener('dragstart', e => {
     if (e.target instanceof HTMLImageElement) {
       e.preventDefault()
     }
   })
 
   // 키보드 단축키 차단 (F12, Ctrl+Shift+I 등)
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     // F12
     if (e.key === 'F12') {
       e.preventDefault()
     }
-    
+
     // Ctrl+Shift+I (개발자 도구)
     if (e.ctrlKey && e.shiftKey && e.key === 'I') {
       e.preventDefault()
     }
-    
+
     // Ctrl+Shift+C (요소 선택)
     if (e.ctrlKey && e.shiftKey && e.key === 'C') {
       e.preventDefault()
     }
-    
+
     // Ctrl+U (소스 보기)
     if (e.ctrlKey && e.key === 'u') {
       e.preventDefault()
@@ -553,11 +592,11 @@ export function initializeSecurityMeasures(): () => void {
   })
 
   // 전역 에러 핸들러
-  window.addEventListener('error', (e) => {
+  window.addEventListener('error', e => {
     console.error('Security: Unhandled error detected:', e.error)
   })
 
-  window.addEventListener('unhandledrejection', (e) => {
+  window.addEventListener('unhandledrejection', e => {
     console.error('Security: Unhandled promise rejection:', e.reason)
   })
 
@@ -567,7 +606,7 @@ export function initializeSecurityMeasures(): () => void {
   }
 
   console.log('✅ 보안 시스템 초기화 완료')
-  
+
   return cleanup
 }
 
@@ -577,5 +616,5 @@ export default {
   ContentSecurityPolicy,
   SessionSecurity,
   FileUploadSecurity,
-  initializeSecurityMeasures
+  initializeSecurityMeasures,
 }

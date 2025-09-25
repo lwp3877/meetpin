@@ -15,20 +15,22 @@ interface PremiumButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const PremiumButton = React.forwardRef<HTMLButtonElement, PremiumButtonProps>(
-  ({
-    className,
-    variant = 'primary',
-    size = 'md',
-    loading = false,
-    icon,
-    iconPosition = 'left',
-    fullWidth = false,
-    glow = false,
-    children,
-    disabled,
-    ...props
-  }, ref) => {
-    
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      loading = false,
+      icon,
+      iconPosition = 'left',
+      fullWidth = false,
+      glow = false,
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     const baseClasses = `
       relative
       inline-flex
@@ -134,7 +136,7 @@ const PremiumButton = React.forwardRef<HTMLButtonElement, PremiumButtonProps>(
 
     const LoadingSpinner = () => (
       <svg
-        className="animate-spin h-4 w-4"
+        className="h-4 w-4 animate-spin"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -158,35 +160,26 @@ const PremiumButton = React.forwardRef<HTMLButtonElement, PremiumButtonProps>(
     return (
       <button
         ref={ref}
-        className={cn(
-          baseClasses,
-          variants[variant],
-          sizes[size],
-          className
-        )}
+        className={cn(baseClasses, variants[variant], sizes[size], className)}
         disabled={disabled || loading}
         {...props}
       >
         {/* 로딩 상태 */}
         {loading && <LoadingSpinner />}
-        
+
         {/* 왼쪽 아이콘 */}
         {!loading && icon && iconPosition === 'left' && (
           <span className="flex-shrink-0">{icon}</span>
         )}
-        
+
         {/* 버튼 텍스트 */}
-        {children && (
-          <span className={loading ? 'opacity-0' : 'opacity-100'}>
-            {children}
-          </span>
-        )}
-        
+        {children && <span className={loading ? 'opacity-0' : 'opacity-100'}>{children}</span>}
+
         {/* 오른쪽 아이콘 */}
         {!loading && icon && iconPosition === 'right' && (
           <span className="flex-shrink-0">{icon}</span>
         )}
-        
+
         {/* Ripple 효과를 위한 오버레이 */}
         <span className="absolute inset-0 rounded-xl bg-white/10 opacity-0 transition-opacity duration-300 group-active:opacity-100" />
       </button>

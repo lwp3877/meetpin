@@ -1,6 +1,13 @@
 /* src/app/api/requests/my/route.ts */
 import { NextRequest } from 'next/server'
-import { createMethodRouter, parseQueryParams, parsePaginationParams, withRateLimit, apiUtils, getAuthenticatedUser } from '@/lib/api'
+import {
+  createMethodRouter,
+  parseQueryParams,
+  parsePaginationParams,
+  withRateLimit,
+  apiUtils,
+  getAuthenticatedUser,
+} from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 
 // GET /api/requests/my - 내가 보낸 요청과 받은 요청 조회
@@ -11,9 +18,7 @@ async function getMyRequests(request: NextRequest) {
   const { page, limit, offset } = parsePaginationParams(searchParams)
   const type = searchParams.get('type') || 'all' // 'sent', 'received', 'all'
 
-  let query = supabase
-    .from('requests')
-    .select(`
+  let query = supabase.from('requests').select(`
       *,
       rooms:room_id (
         id,
@@ -45,11 +50,8 @@ async function getMyRequests(request: NextRequest) {
     query = query.eq('requester_uid', user.id)
   } else if (type === 'received') {
     // 내가 받은 요청 (내가 호스트인 방의 요청들)
-    const { data: myRooms } = await supabase
-      .from('rooms')
-      .select('id')
-      .eq('host_uid', user.id)
-    
+    const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
+
     const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
     if (roomIds.length > 0) {
       query = query.in('room_id', roomIds)
@@ -69,13 +71,10 @@ async function getMyRequests(request: NextRequest) {
     }
   } else {
     // 전체 (내가 보낸 것 + 내가 받은 것)
-    const { data: myRooms } = await supabase
-      .from('rooms')
-      .select('id')
-      .eq('host_uid', user.id)
-    
+    const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
+
     const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
-    
+
     if (roomIds.length > 0) {
       query = query.or(`requester_uid.eq.${user.id},room_id.in.(${roomIds.join(',')})`)
     } else {
@@ -93,30 +92,22 @@ async function getMyRequests(request: NextRequest) {
   }
 
   // 총 개수 조회
-  let countQuery = supabase
-    .from('requests')
-    .select('id', { count: 'exact', head: true })
+  let countQuery = supabase.from('requests').select('id', { count: 'exact', head: true })
 
   if (type === 'sent') {
     countQuery = countQuery.eq('requester_uid', user.id)
   } else if (type === 'received') {
-    const { data: myRooms } = await supabase
-      .from('rooms')
-      .select('id')
-      .eq('host_uid', user.id)
-    
+    const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
+
     const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
     if (roomIds.length > 0) {
       countQuery = countQuery.in('room_id', roomIds)
     }
   } else {
-    const { data: myRooms } = await supabase
-      .from('rooms')
-      .select('id')
-      .eq('host_uid', user.id)
-    
+    const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
+
     const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
-    
+
     if (roomIds.length > 0) {
       countQuery = countQuery.or(`requester_uid.eq.${user.id},room_id.in.(${roomIds.join(',')})`)
     } else {

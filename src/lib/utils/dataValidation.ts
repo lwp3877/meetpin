@@ -31,13 +31,23 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Room',
-      environment: isDevelopmentMode() ? 'mock' : 'production'
+      environment: isDevelopmentMode() ? 'mock' : 'production',
     }
 
     // 필수 필드 검증
     const requiredFields = [
-      'id', 'title', 'category', 'lat', 'lng', 'place_text', 
-      'start_at', 'max_people', 'fee', 'visibility', 'created_at', 'host'
+      'id',
+      'title',
+      'category',
+      'lat',
+      'lng',
+      'place_text',
+      'start_at',
+      'max_people',
+      'fee',
+      'visibility',
+      'created_at',
+      'host',
     ]
 
     requiredFields.forEach(field => {
@@ -63,7 +73,10 @@ export class APIResponseValidator {
       result.isValid = false
     }
 
-    if (data.max_people && (typeof data.max_people !== 'number' || data.max_people < 1 || data.max_people > 100)) {
+    if (
+      data.max_people &&
+      (typeof data.max_people !== 'number' || data.max_people < 1 || data.max_people > 100)
+    ) {
       result.errors.push('max_people must be number between 1 and 100')
       result.isValid = false
     }
@@ -119,17 +132,15 @@ export class APIResponseValidator {
       if (data.id && data.id.startsWith('mock-')) {
         result.warnings.push('Mock data detected (ID prefix)')
       }
-      
+
       if (data.host && data.host.id === 'mock-admin-001') {
         result.warnings.push('Mock admin user detected')
       }
 
       // Mock 데이터의 실제성 검증
       if (data.lat && data.lng) {
-        const isSeoulArea = (
-          data.lat >= 37.4 && data.lat <= 37.7 &&
-          data.lng >= 126.7 && data.lng <= 127.2
-        )
+        const isSeoulArea =
+          data.lat >= 37.4 && data.lat <= 37.7 && data.lng >= 126.7 && data.lng <= 127.2
         if (!isSeoulArea) {
           result.warnings.push('Location outside Seoul area (unusual for mock data)')
         }
@@ -148,12 +159,12 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'User',
-      environment: isDevelopmentMode() ? 'mock' : 'production'
+      environment: isDevelopmentMode() ? 'mock' : 'production',
     }
 
     // 필수 필드 검증
     const requiredFields = ['id', 'email', 'role', 'created_at']
-    
+
     requiredFields.forEach(field => {
       if (!data.hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
@@ -184,7 +195,7 @@ export class APIResponseValidator {
       if (data.email && data.email.endsWith('@meetpin.com')) {
         result.warnings.push('Mock email domain detected')
       }
-      
+
       if (data.id && data.id.startsWith('mock-')) {
         result.warnings.push('Mock ID prefix detected')
       }
@@ -202,11 +213,11 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Match',
-      environment: isDevelopmentMode() ? 'mock' : 'production'
+      environment: isDevelopmentMode() ? 'mock' : 'production',
     }
 
     const requiredFields = ['id', 'room_id', 'user1_id', 'user2_id', 'status', 'created_at']
-    
+
     requiredFields.forEach(field => {
       if (!data.hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
@@ -236,11 +247,11 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Message',
-      environment: isDevelopmentMode() ? 'mock' : 'production'
+      environment: isDevelopmentMode() ? 'mock' : 'production',
     }
 
     const requiredFields = ['id', 'sender_id', 'match_id', 'content', 'created_at']
-    
+
     requiredFields.forEach(field => {
       if (!data.hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
@@ -274,7 +285,7 @@ export class MockDataQualityValidator {
       errors: [],
       warnings: [],
       schema: `MockRealism_${schema}`,
-      environment: 'mock'
+      environment: 'mock',
     }
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -336,7 +347,7 @@ export class MockDataQualityValidator {
       errors: [],
       warnings: [],
       schema: 'SchemaCompatibility',
-      environment: 'mock'
+      environment: 'mock',
     }
 
     if (!mockData || !realDataSample) {
@@ -368,9 +379,11 @@ export class MockDataQualityValidator {
       if (realKeys.has(key)) {
         const mockType = typeof mockData[key]
         const realType = typeof realDataSample[key]
-        
+
         if (mockType !== realType) {
-          result.errors.push(`Type mismatch for field '${key}': mock(${mockType}) vs real(${realType})`)
+          result.errors.push(
+            `Type mismatch for field '${key}': mock(${mockType}) vs real(${realType})`
+          )
           result.isValid = false
         }
       }
@@ -426,9 +439,9 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'RoomList',
-          environment: isDevelopmentMode() ? 'mock' : 'production'
+          environment: isDevelopmentMode() ? 'mock' : 'production',
         }
-        
+
         data.forEach((room, index) => {
           const roomResult = APIResponseValidator.validateRoomData(room)
           if (!roomResult.isValid) {
@@ -450,9 +463,9 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'MatchList',
-          environment: isDevelopmentMode() ? 'mock' : 'production'
+          environment: isDevelopmentMode() ? 'mock' : 'production',
         }
-        
+
         data.forEach((match, index) => {
           const matchResult = APIResponseValidator.validateMatchData(match)
           if (!matchResult.isValid) {
@@ -471,9 +484,9 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'MessageList',
-          environment: isDevelopmentMode() ? 'mock' : 'production'
+          environment: isDevelopmentMode() ? 'mock' : 'production',
         }
-        
+
         data.forEach((message, index) => {
           const messageResult = APIResponseValidator.validateMessageData(message)
           if (!messageResult.isValid) {
@@ -492,7 +505,7 @@ export class DataValidationMonitor {
         errors: data === null || data === undefined ? ['Data is null or undefined'] : [],
         warnings: [],
         schema: 'Generic',
-        environment: isDevelopmentMode() ? 'mock' : 'production'
+        environment: isDevelopmentMode() ? 'mock' : 'production',
       }
     }
 
@@ -528,7 +541,7 @@ export class DataValidationMonitor {
       totalValidations: 0,
       successfulValidations: 0,
       failedValidations: 0,
-      warningCount: 0
+      warningCount: 0,
     }
 
     this.validationResults.forEach((results, endpoint) => {
@@ -547,7 +560,7 @@ export class DataValidationMonitor {
 📊 데이터 검증 요약 (환경: ${isDevelopmentMode() ? 'Mock' : 'Production'})
    - 검증된 엔드포인트: ${summary.totalEndpoints}개
    - 총 검증 횟수: ${summary.totalValidations}회
-   - 성공: ${summary.successfulValidations}회 (${Math.round(summary.successfulValidations/summary.totalValidations*100)}%)
+   - 성공: ${summary.successfulValidations}회 (${Math.round((summary.successfulValidations / summary.totalValidations) * 100)}%)
    - 실패: ${summary.failedValidations}회
    - 경고: ${summary.warningCount}개
     `)
@@ -591,13 +604,13 @@ export function initializeDataValidation() {
     const originalFetch = window.fetch
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       const response = await originalFetch(input, init)
-      
+
       // API 응답 검증
       if (response.ok && typeof input === 'string' && input.includes('/api/')) {
         try {
           const clonedResponse = response.clone()
           const data = await clonedResponse.json()
-          
+
           if (data.ok && data.data) {
             DataValidationMonitor.validateAPIResponse(input, data.data)
           }
@@ -605,7 +618,7 @@ export function initializeDataValidation() {
           // JSON 파싱 실패는 무시 (이미지, 파일 등)
         }
       }
-      
+
       return response
     }
   }
@@ -619,5 +632,5 @@ export default {
   APIResponseValidator,
   MockDataQualityValidator,
   DataValidationMonitor,
-  initializeDataValidation
+  initializeDataValidation,
 }

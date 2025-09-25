@@ -20,17 +20,17 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
 export function rateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now()
   const record = rateLimitStore.get(key)
-  
+
   if (!record || now > record.resetTime) {
     // Reset or create new record
     rateLimitStore.set(key, { count: 1, resetTime: now + windowMs })
     return true
   }
-  
+
   if (record.count >= limit) {
     return false
   }
-  
+
   record.count++
   return true
 }
@@ -82,11 +82,14 @@ export function createSuccessResponse<T>(
   message?: string,
   status: number = 200
 ): NextResponse<ApiResponse<T>> {
-  return NextResponse.json({
-    ok: true,
-    data,
-    message,
-  }, { status })
+  return NextResponse.json(
+    {
+      ok: true,
+      data,
+      message,
+    },
+    { status }
+  )
 }
 
 /**
@@ -102,12 +105,15 @@ export function createErrorResponse(
   code?: string
 ): NextResponse<ApiResponse> {
   const message = error instanceof Error ? error.message : error
-  
-  return NextResponse.json({
-    ok: false,
-    code,
-    message,
-  }, { status })
+
+  return NextResponse.json(
+    {
+      ok: false,
+      code,
+      message,
+    },
+    { status }
+  )
 }
 
 // 클라이언트 IP 주소 추출
@@ -116,12 +122,8 @@ export function getClientIP(request: NextRequest): string {
   if (forwardedFor) {
     return forwardedFor.split(',')[0].trim()
   }
-  
-  return (
-    request.headers.get('x-real-ip') ||
-    request.headers.get('cf-connecting-ip') ||
-    'unknown'
-  )
+
+  return request.headers.get('x-real-ip') || request.headers.get('cf-connecting-ip') || 'unknown'
 }
 
 // 요청 본문 파싱 및 검증
@@ -134,9 +136,7 @@ export async function parseAndValidateBody<T>(
     return schema.parse(body)
   } catch (error: any) {
     if (error.name === 'ZodError' && error.errors && Array.isArray(error.errors)) {
-      const message = error.errors.map((e: any) => 
-        `${e.path.join('.')}: ${e.message}`
-      ).join(', ')
+      const message = error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
       throw new ApiError(`입력 데이터가 올바르지 않습니다: ${message}`, 400, 'VALIDATION_ERROR')
     }
     console.error('Parse error:', error)
@@ -145,9 +145,9 @@ export async function parseAndValidateBody<T>(
 }
 
 // URL 파라미터 파싱
-export async function parseUrlParams(
-  context: { params: Promise<{ [key: string]: string }> }
-): Promise<{ [key: string]: string }> {
+export async function parseUrlParams(context: {
+  params: Promise<{ [key: string]: string }>
+}): Promise<{ [key: string]: string }> {
   return await context.params
 }
 
@@ -166,7 +166,7 @@ export function parsePaginationParams(searchParams: URLSearchParams): {
   const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
   const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')))
   const offset = (page - 1) * limit
-  
+
   return { page, limit, offset }
 }
 
@@ -175,12 +175,16 @@ export function withRateLimit(type: RateLimitType = 'api') {
   return (handler: ApiHandler) => {
     return async (request: NextRequest, context: any) => {
       const ip = getClientIP(request)
-      
+
       // IP 기반 Rate Limit
       if (!checkIPRateLimit(ip, type)) {
-        throw new ApiError('요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.', 429, 'RATE_LIMIT_EXCEEDED')
+        throw new ApiError(
+          '요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.',
+          429,
+          'RATE_LIMIT_EXCEEDED'
+        )
       }
-      
+
       return await handler(request, context)
     }
   }
@@ -207,12 +211,16 @@ export function withUserRateLimit(type: RateLimitType) {
   return (handler: AuthenticatedApiHandler) => {
     return withAuth(async (request: NextRequest, context: any, user) => {
       const ip = getClientIP(request)
-      
+
       // 사용자 + IP 기반 Rate Limit (더 엄격)
       if (!checkUserIPRateLimit(user.id, ip, type)) {
-        throw new ApiError('요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.', 429, 'RATE_LIMIT_EXCEEDED')
+        throw new ApiError(
+          '요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.',
+          429,
+          'RATE_LIMIT_EXCEEDED'
+        )
       }
-      
+
       return await handler(request, context, user)
     })
   }
@@ -225,24 +233,24 @@ export function withErrorHandling(handler: ApiHandler) {
       return await handler(request, context)
     } catch (error: any) {
       console.error('API Error:', error)
-      
+
       if (error instanceof ApiError) {
         return createErrorResponse(error.message, error.status, error.code)
       }
-      
+
       // 네트워크 및 연결 에러 처리
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
         return createErrorResponse('네트워크 연결에 실패했습니다', 503, 'NETWORK_ERROR')
       }
-      
+
       if (error.name === 'AbortError') {
         return createErrorResponse('요청 시간이 초과되었습니다', 408, 'TIMEOUT_ERROR')
       }
-      
+
       if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
         return createErrorResponse('서비스에 연결할 수 없습니다', 503, 'CONNECTION_ERROR')
       }
-      
+
       // Supabase 에러 처리 (확장됨)
       if (error.code) {
         switch (error.code) {
@@ -255,7 +263,11 @@ export function withErrorHandling(handler: ApiHandler) {
           case '42501':
             return createErrorResponse('권한이 없습니다', 403, 'INSUFFICIENT_PRIVILEGE')
           case '08006':
-            return createErrorResponse('데이터베이스 연결에 실패했습니다', 503, 'DATABASE_CONNECTION_ERROR')
+            return createErrorResponse(
+              '데이터베이스 연결에 실패했습니다',
+              503,
+              'DATABASE_CONNECTION_ERROR'
+            )
           case '53300':
             return createErrorResponse('서버가 과부하 상태입니다', 503, 'SERVER_OVERLOAD')
           case '57014':
@@ -268,17 +280,17 @@ export function withErrorHandling(handler: ApiHandler) {
             console.error('Supabase Error:', error)
         }
       }
-      
+
       // JSON 파싱 에러 처리
       if (error instanceof SyntaxError && error.message.includes('JSON')) {
         return createErrorResponse('잘못된 요청 형식입니다', 400, 'INVALID_JSON')
       }
-      
+
       // 메모리 부족 에러
       if (error.code === 'ERR_MEMORY_ALLOCATION_FAILED' || error.message?.includes('memory')) {
         return createErrorResponse('서버 리소스가 부족합니다', 503, 'MEMORY_ERROR')
       }
-      
+
       return createErrorResponse('서버 내부 오류가 발생했습니다', 500, 'INTERNAL_ERROR')
     }
   }
@@ -302,10 +314,7 @@ export function createMethodRouter(handlers: {
 }
 
 // 타입 정의
-export type ApiHandler = (
-  request: NextRequest,
-  context: any
-) => Promise<NextResponse>
+export type ApiHandler = (request: NextRequest, context: any) => Promise<NextResponse>
 
 export type AuthenticatedApiHandler = (
   request: NextRequest,
@@ -317,44 +326,41 @@ export type AuthenticatedApiHandler = (
 export const apiUtils = {
   // 성공 응답
   success: createSuccessResponse,
-  
+
   // 에러 응답
   error: createErrorResponse,
-  
+
   // 생성 성공 응답
-  created: <T>(data?: T, message?: string) => 
-    createSuccessResponse(data, message, 201),
-  
+  created: <T>(data?: T, message?: string) => createSuccessResponse(data, message, 201),
+
   // 삭제 성공 응답
-  deleted: (message: string = '삭제되었습니다') => 
-    createSuccessResponse(undefined, message, 200),
-  
+  deleted: (message: string = '삭제되었습니다') => createSuccessResponse(undefined, message, 200),
+
   // 업데이트 성공 응답
-  updated: <T>(data?: T, message: string = '업데이트되었습니다') => 
+  updated: <T>(data?: T, message: string = '업데이트되었습니다') =>
     createSuccessResponse(data, message, 200),
-  
+
   // 찾을 수 없음 에러
-  notFound: (message: string = '리소스를 찾을 수 없습니다') => 
+  notFound: (message: string = '리소스를 찾을 수 없습니다') =>
     createErrorResponse(message, 404, 'NOT_FOUND'),
-  
+
   // 권한 없음 에러
-  forbidden: (message: string = '권한이 없습니다') => 
+  forbidden: (message: string = '권한이 없습니다') =>
     createErrorResponse(message, 403, 'FORBIDDEN'),
-  
+
   // 인증 필요 에러
-  unauthorized: (message: string = '인증이 필요합니다') => 
+  unauthorized: (message: string = '인증이 필요합니다') =>
     createErrorResponse(message, 401, 'UNAUTHORIZED'),
-  
+
   // 검증 실패 에러
-  validation: (message: string) => 
-    createErrorResponse(message, 400, 'VALIDATION_ERROR'),
-  
+  validation: (message: string) => createErrorResponse(message, 400, 'VALIDATION_ERROR'),
+
   // 중복 데이터 에러
-  conflict: (message: string = '중복된 데이터입니다') => 
+  conflict: (message: string = '중복된 데이터입니다') =>
     createErrorResponse(message, 409, 'CONFLICT'),
-  
+
   // Rate limit 초과 에러
-  rateLimit: (message: string = '요청 한도를 초과했습니다') => 
+  rateLimit: (message: string = '요청 한도를 초과했습니다') =>
     createErrorResponse(message, 429, 'RATE_LIMIT_EXCEEDED'),
 }
 

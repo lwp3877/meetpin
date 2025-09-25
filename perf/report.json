@@ -2,9 +2,7 @@
   "summary": "FAIL",
   "regressions": [],
   "improvements": [],
-  "budgetViolations": [
-    "초기 JS 크기 예산 초과: 307KB > 230KB"
-  ],
+  "budgetViolations": ["초기 JS 크기 예산 초과: 307KB > 230KB"],
   "details": {
     "bundle": {
       "baseline": {

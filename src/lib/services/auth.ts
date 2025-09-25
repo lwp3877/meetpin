@@ -18,15 +18,15 @@ function createMockSupabaseUser(mockUser: any): User {
     phone: undefined,
     last_sign_in_at: new Date().toISOString(),
     app_metadata: { provider: 'mock', providers: ['mock'] },
-    user_metadata: { 
+    user_metadata: {
       nickname: mockUser.nickname,
       age_range: mockUser.age_range,
-      role: mockUser.role 
+      role: mockUser.role,
     },
     identities: [],
     created_at: mockUser.created_at,
     updated_at: new Date().toISOString(),
-    is_anonymous: false
+    is_anonymous: false,
   } as User
 }
 
@@ -40,7 +40,7 @@ export async function getAuthenticatedUser(): Promise<User> {
       // 서버에서는 쿠키를 통해 Mock 사용자 정보 확인
       const cookieStore = await cookies()
       const mockUserCookie = cookieStore.get('meetpin_mock_user')
-      
+
       if (mockUserCookie?.value) {
         const mockUser = JSON.parse(decodeURIComponent(mockUserCookie.value))
         return createMockSupabaseUser(mockUser)
@@ -48,7 +48,7 @@ export async function getAuthenticatedUser(): Promise<User> {
     } catch (_error) {
       console.log('Mock user cookie not found, trying headers')
     }
-    
+
     // 헤더에서도 확인 (클라이언트에서 전송된 경우)
     try {
       // Request context가 있는 경우에만 시도
@@ -60,7 +60,7 @@ export async function getAuthenticatedUser(): Promise<User> {
           nickname: 'Mock사용자',
           role: 'admin',
           age_range: '20-29',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         }
         return createMockSupabaseUser(mockUser)
       }
@@ -71,18 +71,21 @@ export async function getAuthenticatedUser(): Promise<User> {
 
   // 실제 Supabase 인증 사용
   const supabase = await createServerSupabaseClient()
-  
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
+
   if (error) {
     console.error('Auth error:', error)
     throw new ApiError('인증 오류가 발생했습니다', 401, 'AUTH_ERROR')
   }
-  
+
   if (!user) {
     throw new ApiError('로그인이 필요합니다', 401, 'UNAUTHORIZED')
   }
-  
+
   return user
 }
 
@@ -98,7 +101,7 @@ export async function requireAuth(): Promise<User> {
  */
 export async function requireAdmin(): Promise<User> {
   const user = await getAuthenticatedUser()
-  
+
   // Mock 모드인 경우 사용자 메타데이터에서 역할 확인
   if (isDevelopmentMode && user.app_metadata?.provider === 'mock') {
     if (user.user_metadata?.role !== 'admin') {
@@ -106,24 +109,24 @@ export async function requireAdmin(): Promise<User> {
     }
     return user
   }
-  
+
   const supabase = await createServerSupabaseClient()
-  
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('role')
     .eq('uid', user.id)
     .single()
-  
+
   if (error) {
     console.error('Profile fetch error:', error)
     throw new ApiError('프로필 조회 중 오류가 발생했습니다', 500, 'PROFILE_ERROR')
   }
-  
+
   if (!profile || (profile as any).role !== 'admin') {
     throw new ApiError('관리자 권한이 필요합니다', 403, 'ADMIN_REQUIRED')
   }
-  
+
   return user
 }
 
@@ -133,7 +136,7 @@ export async function requireAdmin(): Promise<User> {
 export async function getUserProfile(uid?: string) {
   const user = await getAuthenticatedUser()
   const targetUid = uid || user.id
-  
+
   // Mock 모드인 경우 Mock 프로필 반환
   if (isDevelopmentMode && user.app_metadata?.provider === 'mock') {
     return {
@@ -146,22 +149,22 @@ export async function getUserProfile(uid?: string) {
       updated_at: user.updated_at,
       avatar_url: null,
       intro: null,
-      referral_code: null
+      referral_code: null,
     }
   }
-  
+
   const supabase = await createServerSupabaseClient()
-  
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('uid', targetUid)
     .single()
-  
+
   if (error) {
     throw new ApiError('프로필을 찾을 수 없습니다', 404, 'PROFILE_NOT_FOUND')
   }
-  
+
   return profile
 }
 
@@ -170,19 +173,19 @@ export async function getUserProfile(uid?: string) {
  */
 export async function checkOnboardingStatus(uid: string) {
   const supabase = await createServerSupabaseClient()
-  
+
   const { data: profile, error } = await supabase
     .from('profiles')
     .select('nickname, age_range')
     .eq('uid', uid)
     .single()
-  
+
   if (error) {
     return { isComplete: false, profile: null }
   }
-  
+
   const isComplete = !!((profile as any).nickname && (profile as any).age_range)
-  
+
   return { isComplete, profile }
 }
 
@@ -192,10 +195,11 @@ export async function checkOnboardingStatus(uid: string) {
 export async function getAdminUserProfile(uid: string) {
   // 관리자 권한 확인
   await requireAdmin()
-  
+
   const { data: profile, error } = await supabaseAdmin
     .from('profiles')
-    .select(`
+    .select(
+      `
       *,
       auth.users!inner(
         email,
@@ -203,14 +207,15 @@ export async function getAdminUserProfile(uid: string) {
         email_confirmed_at,
         last_sign_in_at
       )
-    `)
+    `
+    )
     .eq('uid', uid)
     .single()
-  
+
   if (error) {
     throw new ApiError('사용자를 찾을 수 없습니다', 404, 'USER_NOT_FOUND')
   }
-  
+
   return profile
 }
 
@@ -221,14 +226,14 @@ export async function isUserBlocked(targetUid: string): Promise<boolean> {
   try {
     const currentUser = await getAuthenticatedUser()
     const supabase = await createServerSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('blocked_users')
       .select('blocker_uid')
       .eq('blocker_uid', currentUser.id)
       .eq('blocked_uid', targetUid)
       .single()
-    
+
     return !!data && !error
   } catch {
     return false
@@ -242,14 +247,14 @@ export async function isBlockedByUser(blockerUid: string): Promise<boolean> {
   try {
     const currentUser = await getAuthenticatedUser()
     const supabase = await createServerSupabaseClient()
-    
+
     const { data, error } = await supabase
       .from('blocked_users')
       .select('blocked_uid')
       .eq('blocker_uid', blockerUid)
       .eq('blocked_uid', currentUser.id)
       .single()
-    
+
     return !!data && !error
   } catch {
     return false
@@ -266,13 +271,13 @@ export async function checkMutualBlocking(otherUid: string): Promise<{
 }> {
   const [blockedByMe, blockedByThem] = await Promise.all([
     isUserBlocked(otherUid),
-    isBlockedByUser(otherUid)
+    isBlockedByUser(otherUid),
   ])
-  
+
   return {
     blockedByMe,
     blockedByThem,
-    hasBlocking: blockedByMe || blockedByThem
+    hasBlocking: blockedByMe || blockedByThem,
   }
 }
 
@@ -282,21 +287,21 @@ export async function checkMutualBlocking(otherUid: string): Promise<{
 export async function requireRoomOwner(roomId: string): Promise<User> {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  
+
   const { data: room, error } = await supabase
     .from('rooms')
     .select('host_uid')
     .eq('id', roomId)
     .single()
-  
+
   if (error || !room) {
     throw new ApiError('방을 찾을 수 없습니다', 404, 'ROOM_NOT_FOUND')
   }
-  
+
   if ((room as any).host_uid !== user.id) {
     throw new ApiError('방 소유자만 수정할 수 있습니다', 403, 'NOT_ROOM_OWNER')
   }
-  
+
   return user
 }
 
@@ -306,21 +311,21 @@ export async function requireRoomOwner(roomId: string): Promise<User> {
 export async function requireMatchParticipant(matchId: string): Promise<User> {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  
+
   const { data: match, error } = await supabase
     .from('matches')
     .select('host_uid, guest_uid')
     .eq('id', matchId)
     .single()
-  
+
   if (error || !match) {
     throw new ApiError('매치를 찾을 수 없습니다', 404, 'MATCH_NOT_FOUND')
   }
-  
+
   if ((match as any).host_uid !== user.id && (match as any).guest_uid !== user.id) {
     throw new ApiError('매치 당사자만 접근할 수 있습니다', 403, 'NOT_MATCH_PARTICIPANT')
   }
-  
+
   return user
 }
 
@@ -330,7 +335,7 @@ export async function requireMatchParticipant(matchId: string): Promise<User> {
 export async function signOut() {
   const supabase = await createServerSupabaseClient()
   const { error } = await supabase.auth.signOut()
-  
+
   if (error) {
     throw new ApiError('로그아웃 중 오류가 발생했습니다', 500, 'SIGNOUT_ERROR')
   }
@@ -342,9 +347,9 @@ export async function signOut() {
 export async function deleteUserAdmin(uid: string) {
   // 관리자 권한 확인
   await requireAdmin()
-  
+
   const { error } = await supabaseAdmin.auth.admin.deleteUser(uid)
-  
+
   if (error) {
     throw new ApiError('사용자 삭제 중 오류가 발생했습니다', 500, 'USER_DELETE_ERROR')
   }
@@ -356,12 +361,9 @@ export async function deleteUserAdmin(uid: string) {
 export async function updateUserRole(uid: string, role: 'user' | 'admin') {
   // 관리자 권한 확인
   await requireAdmin()
-  
-  const { error } = await (supabaseAdmin as any)
-    .from('profiles')
-    .update({ role })
-    .eq('uid', uid)
-  
+
+  const { error } = await (supabaseAdmin as any).from('profiles').update({ role }).eq('uid', uid)
+
   if (error) {
     throw new ApiError('사용자 역할 변경 중 오류가 발생했습니다', 500, 'ROLE_UPDATE_ERROR')
   }
@@ -372,11 +374,11 @@ export async function updateUserRole(uid: string, role: 'user' | 'admin') {
  */
 export async function checkEmailVerification(uid: string): Promise<boolean> {
   const { data, error } = await supabaseAdmin.auth.admin.getUserById(uid)
-  
+
   if (error || !data.user) {
     return false
   }
-  
+
   return !!data.user.email_confirmed_at
 }
 
@@ -386,15 +388,13 @@ export async function checkEmailVerification(uid: string): Promise<boolean> {
 export async function getUserStats() {
   // 관리자 권한 확인
   await requireAdmin()
-  
-  const { data, error } = await supabaseAdmin
-    .from('admin_stats')
-    .select('*')
-  
+
+  const { data, error } = await supabaseAdmin.from('admin_stats').select('*')
+
   if (error) {
     throw new ApiError('사용자 통계 조회 중 오류가 발생했습니다', 500, 'STATS_ERROR')
   }
-  
+
   return data
 }
 

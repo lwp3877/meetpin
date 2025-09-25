@@ -60,8 +60,11 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
     } else {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-      
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser()
+
       if (authError || !authUser) {
         logAuthState('No authenticated user found', authError)
         return null
@@ -94,7 +97,7 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
         age_range: profileData.age_range,
         avatar_url: profileData.avatar_url,
         intro: profileData.intro,
-        created_at: profileData.created_at
+        created_at: profileData.created_at,
       }
     }
   } catch (error) {
@@ -104,38 +107,36 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
 }
 
 // 이메일 로그인
-export const signInWithEmail = async (
-  email: string, 
-  password: string
-): Promise<AuthResult> => {
+export const signInWithEmail = async (email: string, password: string): Promise<AuthResult> => {
   try {
     if (isDevelopmentMode()) {
       // Mock 모드: Mock 로그인 사용
       const { mockLogin } = await import('@/lib/config/mockData')
       const result = await mockLogin(email, password)
       localStorage.setItem('meetpin_user', JSON.stringify(result.user))
-      
+
       // 서버에서도 읽을 수 있도록 쿠키에도 저장
       if (typeof document !== 'undefined') {
         document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(result.user))}; path=/; max-age=86400`
       }
-      
+
       return { success: true }
     } else {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       })
 
       if (error) {
         logAuthState('Sign in failed', error)
-        return { 
-          success: false, 
-          error: error.message === 'Invalid login credentials' 
-            ? '이메일 또는 비밀번호가 잘못되었습니다' 
-            : '로그인에 실패했습니다. 다시 시도해주세요.'
+        return {
+          success: false,
+          error:
+            error.message === 'Invalid login credentials'
+              ? '이메일 또는 비밀번호가 잘못되었습니다'
+              : '로그인에 실패했습니다. 다시 시도해주세요.',
         }
       }
 
@@ -147,9 +148,9 @@ export const signInWithEmail = async (
     }
   } catch (error: any) {
     logAuthState('Unexpected error in signInWithEmail', error)
-    return { 
-      success: false, 
-      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.' 
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
     }
   }
 }
@@ -170,20 +171,20 @@ export const signUpWithEmail = async (
     } else {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
-      
+
       // 이메일 회원가입
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
-        password
+        password,
       })
 
       if (signUpError) {
         logAuthState('Sign up failed', signUpError)
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: signUpError.message.includes('already registered')
             ? '이미 등록된 이메일입니다'
-            : '회원가입에 실패했습니다. 다시 시도해주세요.'
+            : '회원가입에 실패했습니다. 다시 시도해주세요.',
         }
       }
 
@@ -194,7 +195,7 @@ export const signUpWithEmail = async (
       // 프로필 생성 (트리거가 자동으로 처리하지만 nickname, age_range 업데이트 필요)
       const profileUpdate: ProfileUpdate = {
         nickname,
-        age_range: ageRange
+        age_range: ageRange,
       }
       const { error: profileError } = await (supabase as any)
         .from('profiles')
@@ -210,9 +211,9 @@ export const signUpWithEmail = async (
     }
   } catch (error: any) {
     logAuthState('Unexpected error in signUpWithEmail', error)
-    return { 
-      success: false, 
-      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.' 
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
     }
   }
 }
@@ -233,7 +234,7 @@ export const signOut = async (): Promise<void> => {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
       const { error } = await supabase.auth.signOut()
-      
+
       if (error) {
         logAuthState('Sign out failed', error)
         // 에러가 있어도 로그아웃 처리 (클라이언트 사이드 정리)
@@ -246,9 +247,7 @@ export const signOut = async (): Promise<void> => {
 }
 
 // 프로필 업데이트
-export const updateUserProfile = async (
-  updates: Partial<AuthUser>
-): Promise<AuthResult> => {
+export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<AuthResult> => {
   try {
     if (isDevelopmentMode()) {
       // Mock 모드: localStorage에서 사용자 정보 업데이트
@@ -258,12 +257,12 @@ export const updateUserProfile = async (
           const user = JSON.parse(stored)
           const updatedUser = { ...user, ...updates }
           localStorage.setItem('meetpin_user', JSON.stringify(updatedUser))
-          
+
           // 쿠키도 업데이트
           if (typeof document !== 'undefined') {
             document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(updatedUser))}; path=/; max-age=86400`
           }
-          
+
           return { success: true }
         }
         return { success: false, error: '사용자를 찾을 수 없습니다' }
@@ -272,8 +271,11 @@ export const updateUserProfile = async (
     } else {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-      
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser()
+
       if (authError || !authUser) {
         return { success: false, error: '인증되지 않은 사용자입니다' }
       }
@@ -284,9 +286,9 @@ export const updateUserProfile = async (
         nickname: profileUpdates.nickname,
         age_range: profileUpdates.age_range,
         avatar_url: profileUpdates.avatar_url,
-        intro: profileUpdates.intro
+        intro: profileUpdates.intro,
       }
-      
+
       const { error } = await (supabase as any)
         .from('profiles')
         .update(updateData)
@@ -294,9 +296,9 @@ export const updateUserProfile = async (
 
       if (error) {
         logAuthState('Profile update failed', error)
-        return { 
-          success: false, 
-          error: '프로필 업데이트에 실패했습니다. 다시 시도해주세요.' 
+        return {
+          success: false,
+          error: '프로필 업데이트에 실패했습니다. 다시 시도해주세요.',
         }
       }
 
@@ -304,9 +306,9 @@ export const updateUserProfile = async (
     }
   } catch (error: any) {
     logAuthState('Unexpected error in updateUserProfile', error)
-    return { 
-      success: false, 
-      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.' 
+    return {
+      success: false,
+      error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
     }
   }
 }

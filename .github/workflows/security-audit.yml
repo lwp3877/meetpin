@@ -1,13 +1,13 @@
 # .github/workflows/security-audit.yml
 # 🔒 의존성 보안 감사 및 서플라이체인 보안
 
-name: "🔒 Security Audit & Supply Chain"
+name: '🔒 Security Audit & Supply Chain'
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   schedule:
     # 매일 오전 2시 (KST 11시)에 보안 감사 실행
     - cron: '0 2 * * *'
@@ -20,31 +20,31 @@ env:
 jobs:
   # 의존성 보안 감사
   dependency-audit:
-    name: "🔍 Dependency Security Audit"
+    name: '🔍 Dependency Security Audit'
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: "📥 Checkout Code"
+      - name: '📥 Checkout Code'
         uses: actions/checkout@v4
 
-      - name: "🛠️ Setup Node.js & PNPM"
+      - name: '🛠️ Setup Node.js & PNPM'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "📦 Install PNPM"
+      - name: '📦 Install PNPM'
         run: npm install -g pnpm@${{ env.PNPM_VERSION }}
 
-      - name: "🔍 PNPM Audit"
+      - name: '🔍 PNPM Audit'
         run: |
           echo "🔍 Running PNPM security audit..."
           pnpm audit --audit-level high
-          
+
           # 취약점 개수 확인
           VULNERABILITIES=$(pnpm audit --audit-level high --json | jq '.metadata.vulnerabilities.total // 0')
           echo "Found $VULNERABILITIES vulnerabilities"
-          
+
           if [ "$VULNERABILITIES" -gt 0 ]; then
             echo "⚠️ Security vulnerabilities found!"
             pnpm audit --audit-level high
@@ -53,12 +53,12 @@ jobs:
             echo "✅ No high-severity vulnerabilities found"
           fi
 
-      - name: "📝 Generate Audit Report"
+      - name: '📝 Generate Audit Report'
         if: always()
         run: |
           echo "📝 Generating audit report..."
           pnpm audit --json > audit-report.json
-          
+
           # 요약 생성
           echo "## 🔒 Security Audit Summary" > audit-summary.md
           echo "- **Scan Date**: $(date)" >> audit-summary.md
@@ -67,7 +67,7 @@ jobs:
           echo "- **High Severity**: $(jq '.metadata.vulnerabilities.high // 0' audit-report.json)" >> audit-summary.md
           echo "- **Critical Severity**: $(jq '.metadata.vulnerabilities.critical // 0' audit-report.json)" >> audit-summary.md
 
-      - name: "📤 Upload Audit Results"
+      - name: '📤 Upload Audit Results'
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -79,44 +79,44 @@ jobs:
 
   # 라이센스 검사
   license-check:
-    name: "📜 License Compliance Check"
+    name: '📜 License Compliance Check'
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: "📥 Checkout Code"
+      - name: '📥 Checkout Code'
         uses: actions/checkout@v4
 
-      - name: "🛠️ Setup Node.js & PNPM"
+      - name: '🛠️ Setup Node.js & PNPM'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "📦 Install PNPM"
+      - name: '📦 Install PNPM'
         run: npm install -g pnpm@${{ env.PNPM_VERSION }}
 
-      - name: "📦 Install Dependencies"
+      - name: '📦 Install Dependencies'
         run: pnpm install --frozen-lockfile
 
-      - name: "📦 Install License Checker"
+      - name: '📦 Install License Checker'
         run: npm install -g license-checker
 
-      - name: "📜 Check Licenses"
+      - name: '📜 Check Licenses'
         run: |
           echo "📜 Checking package licenses..."
-          
+
           # 허용된 라이센스 목록
           ALLOWED_LICENSES="MIT,ISC,BSD-2-Clause,BSD-3-Clause,Apache-2.0,CC0-1.0,Unlicense,WTFPL"
-          
+
           # 라이센스 체크
           license-checker --summary --onlyAllow "$ALLOWED_LICENSES" --excludePrivatePackages
-          
+
           # 상세 리포트 생성
           license-checker --json --out license-report.json
-          
+
           echo "✅ License compliance check completed"
 
-      - name: "📤 Upload License Report"
+      - name: '📤 Upload License Report'
         uses: actions/upload-artifact@v4
         with:
           name: license-report
@@ -125,7 +125,7 @@ jobs:
 
   # CodeQL 보안 분석
   codeql:
-    name: "🔍 CodeQL Security Analysis"
+    name: '🔍 CodeQL Security Analysis'
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -133,64 +133,64 @@ jobs:
       security-events: write
 
     steps:
-      - name: "📥 Checkout Code"
+      - name: '📥 Checkout Code'
         uses: actions/checkout@v4
 
-      - name: "🔍 Initialize CodeQL"
+      - name: '🔍 Initialize CodeQL'
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
           queries: security-extended,security-and-quality
 
-      - name: "🔍 Perform CodeQL Analysis"
+      - name: '🔍 Perform CodeQL Analysis'
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:javascript-typescript"
+          category: '/language:javascript-typescript'
 
   # SBOM (Software Bill of Materials) 생성
   sbom-generation:
-    name: "📋 SBOM Generation"
+    name: '📋 SBOM Generation'
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: "📥 Checkout Code"
+      - name: '📥 Checkout Code'
         uses: actions/checkout@v4
 
-      - name: "🛠️ Setup Node.js & PNPM"
+      - name: '🛠️ Setup Node.js & PNPM'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "📦 Install PNPM"
+      - name: '📦 Install PNPM'
         run: npm install -g pnpm@${{ env.PNPM_VERSION }}
 
-      - name: "📦 Install Dependencies"
+      - name: '📦 Install Dependencies'
         run: pnpm install --frozen-lockfile
 
-      - name: "📦 Install CycloneDX"
+      - name: '📦 Install CycloneDX'
         run: npm install -g @cyclonedx/cyclonedx-npm
 
-      - name: "📋 Generate SBOM"
+      - name: '📋 Generate SBOM'
         run: |
           echo "📋 Generating Software Bill of Materials..."
-          
+
           # CycloneDX SBOM 생성
           cyclonedx-npm --output-file sbom.json --spec-version 1.4
-          
+
           # SPDX 형식으로도 생성
           npm list --json --all > npm-dependencies.json
-          
+
           echo "✅ SBOM generated successfully"
 
-      - name: "🔐 Sign SBOM"
+      - name: '🔐 Sign SBOM'
         run: |
           echo "🔐 Signing SBOM with timestamp..."
-          
+
           # 간단한 해시 기반 서명 (실제로는 cosign 등 사용 권장)
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           HASH=$(sha256sum sbom.json | cut -d' ' -f1)
-          
+
           echo "{
             \"timestamp\": \"$TIMESTAMP\",
             \"sbom_hash\": \"$HASH\",
@@ -198,10 +198,10 @@ jobs:
             \"workflow\": \"${{ github.workflow }}\",
             \"run_id\": \"${{ github.run_id }}\"
           }" > sbom-signature.json
-          
+
           echo "✅ SBOM signed with metadata"
 
-      - name: "📤 Upload SBOM"
+      - name: '📤 Upload SBOM'
         uses: actions/upload-artifact@v4
         with:
           name: sbom-report
@@ -213,53 +213,53 @@ jobs:
 
   # Lockfile 검증
   lockfile-verification:
-    name: "🔒 Lockfile Verification"
+    name: '🔒 Lockfile Verification'
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: "📥 Checkout Code"
+      - name: '📥 Checkout Code'
         uses: actions/checkout@v4
 
-      - name: "🛠️ Setup Node.js & PNPM"
+      - name: '🛠️ Setup Node.js & PNPM'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: "📦 Install PNPM"
+      - name: '📦 Install PNPM'
         run: npm install -g pnpm@${{ env.PNPM_VERSION }}
 
-      - name: "🔒 Verify Lockfile Integrity"
+      - name: '🔒 Verify Lockfile Integrity'
         run: |
           echo "🔒 Verifying lockfile integrity..."
-          
+
           # Lockfile 무결성 검증
           if ! pnpm install --frozen-lockfile --ignore-scripts; then
             echo "❌ Lockfile verification failed!"
             echo "The pnpm-lock.yaml file may be out of sync with package.json"
             exit 1
           fi
-          
+
           echo "✅ Lockfile integrity verified"
 
-      - name: "📊 Generate Lockfile Report"
+      - name: '📊 Generate Lockfile Report'
         run: |
           echo "📊 Analyzing lockfile..."
-          
+
           # 직접 의존성 vs 간접 의존성 분석
           DIRECT_DEPS=$(jq '.dependencies // {} | length' package.json)
           TOTAL_DEPS=$(pnpm list --depth=Infinity --json | jq '.[0].dependencies // {} | length')
-          
+
           echo "## 📊 Dependency Analysis" > lockfile-report.md
           echo "- **Direct Dependencies**: $DIRECT_DEPS" >> lockfile-report.md
           echo "- **Total Dependencies**: $TOTAL_DEPS" >> lockfile-report.md
           echo "- **Dependency Ratio**: $(echo "scale=2; $TOTAL_DEPS / $DIRECT_DEPS" | bc)" >> lockfile-report.md
-          
+
           # 중복 패키지 확인
           echo "### 🔍 Duplicate Package Analysis" >> lockfile-report.md
           pnpm why react >> lockfile-report.md || echo "No react duplicates" >> lockfile-report.md
 
-      - name: "📤 Upload Lockfile Report"
+      - name: '📤 Upload Lockfile Report'
         uses: actions/upload-artifact@v4
         with:
           name: lockfile-report
@@ -268,27 +268,27 @@ jobs:
 
   # 결과 통합 및 알림
   security-summary:
-    name: "📊 Security Summary & Notification"
+    name: '📊 Security Summary & Notification'
     runs-on: ubuntu-latest
     needs: [dependency-audit, license-check, codeql, sbom-generation, lockfile-verification]
     if: always()
-    
+
     steps:
-      - name: "📥 Download All Reports"
+      - name: '📥 Download All Reports'
         uses: actions/download-artifact@v4
         with:
           path: security-reports/
 
-      - name: "📊 Generate Security Summary"
+      - name: '📊 Generate Security Summary'
         run: |
           echo "📊 Generating comprehensive security summary..."
-          
+
           echo "# 🔒 MeetPin Security Audit Report" > security-summary.md
           echo "**Generated**: $(date)" >> security-summary.md
           echo "**Workflow**: ${{ github.workflow }}" >> security-summary.md
           echo "**Commit**: ${{ github.sha }}" >> security-summary.md
           echo "" >> security-summary.md
-          
+
           echo "## 📋 Audit Results" >> security-summary.md
           echo "- **Dependency Audit**: ${{ needs.dependency-audit.result }}" >> security-summary.md
           echo "- **License Check**: ${{ needs.license-check.result }}" >> security-summary.md
@@ -296,7 +296,7 @@ jobs:
           echo "- **SBOM Generation**: ${{ needs.sbom-generation.result }}" >> security-summary.md
           echo "- **Lockfile Verification**: ${{ needs.lockfile-verification.result }}" >> security-summary.md
           echo "" >> security-summary.md
-          
+
           # 실패한 작업이 있는지 확인
           FAILED_JOBS=""
           [ "${{ needs.dependency-audit.result }}" != "success" ] && FAILED_JOBS="$FAILED_JOBS dependency-audit"
@@ -304,7 +304,7 @@ jobs:
           [ "${{ needs.codeql.result }}" != "success" ] && FAILED_JOBS="$FAILED_JOBS codeql"
           [ "${{ needs.sbom-generation.result }}" != "success" ] && FAILED_JOBS="$FAILED_JOBS sbom-generation"
           [ "${{ needs.lockfile-verification.result }}" != "success" ] && FAILED_JOBS="$FAILED_JOBS lockfile-verification"
-          
+
           if [ -n "$FAILED_JOBS" ]; then
             echo "## ⚠️ Failed Jobs" >> security-summary.md
             echo "The following security checks failed: $FAILED_JOBS" >> security-summary.md
@@ -315,14 +315,14 @@ jobs:
             echo "No security issues detected in this audit." >> security-summary.md
           fi
 
-      - name: "📤 Upload Security Summary"
+      - name: '📤 Upload Security Summary'
         uses: actions/upload-artifact@v4
         with:
           name: security-summary
           path: security-summary.md
           retention-days: 90
 
-      - name: "💬 Comment on PR"
+      - name: '💬 Comment on PR'
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:

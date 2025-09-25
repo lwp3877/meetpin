@@ -13,10 +13,10 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       try {
         const supabase = createBrowserSupabaseClient()
-        
+
         // Get the auth code from URL
         const { data, error } = await supabase.auth.getSession()
-        
+
         if (error) {
           console.error('Auth callback error:', error)
           toast.error('로그인 처리 중 오류가 발생했습니다')
@@ -40,11 +40,11 @@ export default function AuthCallback() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="bg-background flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
         <p className="text-gray-600">로그인 처리 중...</p>
-        <p className="text-sm text-gray-500 mt-2">잠시만 기다려 주세요</p>
+        <p className="mt-2 text-sm text-gray-500">잠시만 기다려 주세요</p>
       </div>
     </div>
   )

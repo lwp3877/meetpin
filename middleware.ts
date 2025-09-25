@@ -8,46 +8,52 @@ function simpleRateLimit(ip: string, limit: number, windowMs: number): boolean {
   const now = Date.now()
   const key = `middleware:${ip}`
   const record = requestCounts.get(key)
-  
+
   if (!record || now > record.resetTime) {
     requestCounts.set(key, { count: 1, resetTime: now + windowMs })
     return true
   }
-  
+
   if (record.count < limit) {
     record.count++
     return true
   }
-  
+
   return false
 }
 
 export async function middleware(request: NextRequest) {
   const startTime = Date.now()
-  const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+  const clientIP =
+    request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
   const userAgent = request.headers.get('user-agent') || 'unknown'
   const pathname = request.nextUrl.pathname
 
   // 기본적인 Rate limiting (전역)
-  if (!simpleRateLimit(clientIP, 100, 60000)) { // 1분에 100요청
+  if (!simpleRateLimit(clientIP, 100, 60000)) {
+    // 1분에 100요청
     console.warn(`[Security] Rate limit exceeded for IP: ${clientIP}, Path: ${pathname}`)
-    return new NextResponse('Too Many Requests', { 
+    return new NextResponse('Too Many Requests', {
       status: 429,
       headers: {
         'Retry-After': '60',
         'X-RateLimit-Limit': '100',
-        'X-RateLimit-Remaining': '0'
-      }
+        'X-RateLimit-Remaining': '0',
+      },
     })
   }
 
   // Suspicious request patterns 감지
-  if (pathname.includes('..') || 
-      pathname.includes('//') || 
-      pathname.toLowerCase().includes('script') ||
-      pathname.toLowerCase().includes('eval') ||
-      userAgent.toLowerCase().includes('bot') && !userAgent.toLowerCase().includes('googlebot')) {
-    console.warn(`[Security] Suspicious request detected - IP: ${clientIP}, Path: ${pathname}, UA: ${userAgent}`)
+  if (
+    pathname.includes('..') ||
+    pathname.includes('//') ||
+    pathname.toLowerCase().includes('script') ||
+    pathname.toLowerCase().includes('eval') ||
+    (userAgent.toLowerCase().includes('bot') && !userAgent.toLowerCase().includes('googlebot'))
+  ) {
+    console.warn(
+      `[Security] Suspicious request detected - IP: ${clientIP}, Path: ${pathname}, UA: ${userAgent}`
+    )
     return new NextResponse('Forbidden', { status: 403 })
   }
 
@@ -85,11 +91,20 @@ export async function middleware(request: NextRequest) {
   // API 라우트에 대한 추가 CORS 헤더 설정
   if (request.nextUrl.pathname.startsWith('/api/')) {
     // CORS 헤더 추가
-    supabaseResponse.headers.set('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://meetpin-weld.vercel.app')
-    supabaseResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH')
-    supabaseResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+    supabaseResponse.headers.set(
+      'Access-Control-Allow-Origin',
+      process.env.SITE_URL || 'https://meetpin-weld.vercel.app'
+    )
+    supabaseResponse.headers.set(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+    )
+    supabaseResponse.headers.set(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization, X-Requested-With'
+    )
     supabaseResponse.headers.set('Access-Control-Max-Age', '86400')
-    
+
     // API 호출 로깅 (민감한 정보 제외)
     if (process.env.NODE_ENV === 'production') {
       const duration = Date.now() - startTime

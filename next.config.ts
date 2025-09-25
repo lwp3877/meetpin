@@ -1,11 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   // 프로덕션 최적화
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
   compress: true,
-  
+
   // 이미지 최적화
   images: {
     remotePatterns: [
@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: [
-      'lucide-react', 
+      'lucide-react',
       '@tanstack/react-query',
       'date-fns',
       '@radix-ui/react-dialog',
@@ -62,11 +62,11 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
       'react-hook-form',
-      'zod'
+      'zod',
     ],
     webVitalsAttribution: ['CLS', 'LCP'],
   },
-  
+
   // 서버 외부 패키지
   serverExternalPackages: ['@supabase/supabase-js'],
 
@@ -121,8 +121,8 @@ const nextConfig: NextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
-              "upgrade-insecure-requests",
-              "report-uri /api/security/csp-report",
+              'upgrade-insecure-requests',
+              'report-uri /api/security/csp-report',
             ].join('; '),
           },
           // Content Security Policy (Enforced - 점진적으로 활성화)
@@ -140,7 +140,7 @@ const nextConfig: NextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
-              "upgrade-insecure-requests",
+              'upgrade-insecure-requests',
             ].join('; '),
           },
         ],
@@ -164,7 +164,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
 
   // 리다이렉트
@@ -185,7 +185,7 @@ const nextConfig: NextConfig = {
         destination: '/auth/signup',
         permanent: true,
       },
-    ];
+    ]
   },
 
   // 리라이트 (API 프록시)
@@ -195,28 +195,28 @@ const nextConfig: NextConfig = {
         source: '/api/stripe/:path*',
         destination: '/api/payments/stripe/:path*',
       },
-    ];
+    ]
   },
 
   // 웹팩 최적화
   webpack: (config, { dev, isServer }) => {
     // 프로덕션에서 콘솔 로그 제거
     if (!dev) {
-      config.optimization.minimize = true;
+      config.optimization.minimize = true
     }
 
     // Bundle Analyzer (조건부)
     if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
           openAnalyzer: false,
         })
-      );
+      )
     }
 
-    return config;
+    return config
   },
 
   // 환경별 설정
@@ -227,16 +227,16 @@ const nextConfig: NextConfig = {
 
   // 출력 설정 (Vercel에서는 자동으로 standalone 사용)
   output: process.env.VERCEL ? 'standalone' : undefined,
-  
+
   // TypeScript 최적화
   typescript: {
     ignoreBuildErrors: false,
   },
 
-  // ESLint 최적화  
+  // ESLint 최적화
   eslint: {
     ignoreDuringBuilds: false,
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

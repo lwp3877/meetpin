@@ -34,14 +34,9 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
   const router = useRouter()
 
   // 실시간 알림 훅 사용
-  const {
-    messages,
-    unreadCount,
-    loading,
-    markAsRead
-  } = useRealtimeNotifications({
+  const { messages, unreadCount, loading, markAsRead } = useRealtimeNotifications({
     enabled: !!user,
-    showToast: true // 새 메시지 토스트 알림 활성화
+    showToast: true, // 새 메시지 토스트 알림 활성화
   })
 
   const formatTimeAgo = (dateString: string) => {
@@ -67,11 +62,11 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
       {/* Notification Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-3 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 border border-gray-200/50 dark:border-slate-600/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+        className="relative rounded-xl border border-gray-200/50 bg-white/90 p-3 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-white hover:shadow-xl dark:border-slate-600/50 dark:bg-slate-800/90 dark:hover:bg-slate-700"
       >
-        <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+        <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300" />
         {unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+          <div className="absolute -top-1 -right-1 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
             {unreadCount > 99 ? '99+' : unreadCount}
           </div>
         )}
@@ -81,29 +76,29 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          <div
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Panel */}
-          <div className="absolute right-0 top-full mt-2 w-96 max-h-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-slate-600/50 z-50 overflow-hidden">
+          <div className="absolute top-full right-0 z-50 mt-2 max-h-96 w-96 overflow-hidden rounded-2xl border border-gray-200/50 bg-white shadow-2xl dark:border-slate-600/50 dark:bg-slate-800">
             {/* Header */}
-            <div className="p-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-slate-700">
               <div className="flex items-center space-x-2">
-                <MessageCircle className="w-5 h-5 text-primary" />
+                <MessageCircle className="text-primary h-5 w-5" />
                 <h3 className="font-bold text-gray-900 dark:text-white">호스트 메시지</h3>
                 {unreadCount > 0 && (
-                  <div className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-full">
+                  <div className="rounded-full bg-red-100 px-2 py-1 text-xs font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
                     {unreadCount}개 새 메시지
                   </div>
                 )}
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="rounded-lg p-1 transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="h-4 w-4 text-gray-500" />
               </button>
             </div>
 
@@ -111,42 +106,48 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
             <div className="max-h-80 overflow-y-auto">
               {loading ? (
                 <div className="p-4 text-center">
-                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-sm text-gray-500 dark:text-gray-400">메시지를 불러오는 중...</p>
+                  <div className="border-primary mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    메시지를 불러오는 중...
+                  </p>
                 </div>
               ) : messages.length === 0 ? (
                 <div className="p-6 text-center">
-                  <MessageCircle className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <MessageCircle className="mx-auto mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
                   <p className="text-gray-500 dark:text-gray-400">아직 받은 메시지가 없습니다</p>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {messages.map((message) => (
+                  {messages.map(message => (
                     <button
                       key={message.id}
                       onClick={() => handleMessageClick(message)}
-                      className={`w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${
-                        !message.is_read ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-l-blue-500' : ''
+                      className={`w-full p-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-slate-700/50 ${
+                        !message.is_read
+                          ? 'border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/20'
+                          : ''
                       }`}
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {message.sender?.nickname?.charAt(0).toUpperCase() || <User className="w-5 h-5" />}
+                        <div className="from-primary flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br to-emerald-600 text-sm font-bold text-white">
+                          {message.sender?.nickname?.charAt(0).toUpperCase() || (
+                            <User className="h-5 w-5" />
+                          )}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center justify-between">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
                               {message.sender?.nickname || '알 수 없는 사용자'}
                             </p>
                             <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                              <Clock className="w-3 h-3 mr-1" />
+                              <Clock className="mr-1 h-3 w-3" />
                               {formatTimeAgo(message.created_at)}
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                          <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
                             {message.room?.title || '모임'}에서
                           </p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                          <p className="line-clamp-2 text-sm text-gray-700 dark:text-gray-300">
                             {message.text}
                           </p>
                         </div>
@@ -159,14 +160,14 @@ export function HostMessageNotifications({ onMessageClick }: HostMessageNotifica
 
             {/* Footer */}
             {messages.length > 0 && (
-              <div className="p-3 border-t border-gray-100 dark:border-slate-700 text-center">
+              <div className="border-t border-gray-100 p-3 text-center dark:border-slate-700">
                 <button
                   onClick={() => {
                     setIsOpen(false)
                     router.push('/messages')
                     toast.success('전체 메시지 페이지로 이동합니다')
                   }}
-                  className="text-sm text-primary hover:text-primary/80 font-medium"
+                  className="text-primary hover:text-primary/80 text-sm font-medium"
                 >
                   모든 메시지 보기
                 </button>

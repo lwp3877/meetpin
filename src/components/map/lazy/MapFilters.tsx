@@ -5,29 +5,38 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import dynamic from 'next/dynamic'
 
 // 아이콘들도 필요할 때만 로딩
 const Filter = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Filter })), {
   ssr: false,
-  loading: () => <div className="w-3 h-3 bg-gray-200 rounded animate-pulse" />
+  loading: () => <div className="h-3 w-3 animate-pulse rounded bg-gray-200" />,
 })
 
 const Calendar = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Calendar })), {
   ssr: false,
-  loading: () => <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
 })
 
-const DollarSign = dynamic(() => import('lucide-react').then(mod => ({ default: mod.DollarSign })), {
-  ssr: false,
-  loading: () => <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
-})
+const DollarSign = dynamic(
+  () => import('lucide-react').then(mod => ({ default: mod.DollarSign })),
+  {
+    ssr: false,
+    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
+  }
+)
 
 const Users = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Users })), {
   ssr: false,
-  loading: () => <div className="w-4 h-4 bg-gray-200 rounded animate-pulse" />
+  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
 })
 
 interface MapFiltersProps {
@@ -49,17 +58,17 @@ export default function MapFilters({
   maxPeople,
   setMaxPeople,
   timeFilter,
-  setTimeFilter
+  setTimeFilter,
 }: MapFiltersProps) {
   return (
-    <Card className="mt-6 bg-gradient-to-br from-white/98 to-emerald-50/50 dark:from-gray-900/98 dark:to-emerald-950/50 backdrop-blur-xl border-2 border-emerald-200/30 dark:border-emerald-800/30 shadow-2xl shadow-emerald-500/10 rounded-2xl animate-in slide-in-from-top-2 duration-300">
+    <Card className="animate-in slide-in-from-top-2 mt-6 rounded-2xl border-2 border-emerald-200/30 bg-gradient-to-br from-white/98 to-emerald-50/50 shadow-2xl shadow-emerald-500/10 backdrop-blur-xl duration-300 dark:border-emerald-800/30 dark:from-gray-900/98 dark:to-emerald-950/50">
       <CardContent className="p-8">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid gap-8 md:grid-cols-4">
           {/* Category Filter */}
           <div className="space-y-4">
-            <label className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center">
-              <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mr-3">
-                <Filter className="w-3 h-3 text-white" />
+            <label className="flex items-center text-sm font-bold text-gray-800 dark:text-gray-200">
+              <div className="mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500">
+                <Filter className="h-3 w-3 text-white" />
               </div>
               카테고리
             </label>
@@ -68,26 +77,37 @@ export default function MapFilters({
                 { key: 'all', label: '전체', emoji: '🌐', color: 'from-gray-400 to-gray-500' },
                 { key: 'drink', label: '술', emoji: '🍻', color: 'from-amber-400 to-orange-500' },
                 { key: 'exercise', label: '운동', emoji: '💪', color: 'from-red-400 to-pink-500' },
-                { key: 'other', label: '기타', emoji: '✨', color: 'from-purple-400 to-indigo-500' },
+                {
+                  key: 'other',
+                  label: '기타',
+                  emoji: '✨',
+                  color: 'from-purple-400 to-indigo-500',
+                },
               ].map(category => (
                 <Button
                   key={category.key}
                   variant="ghost"
                   size="sm"
                   onClick={() => onCategoryChange(category.key)}
-                  className={`group p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                    selectedCategory === category.key 
-                      ? `bg-gradient-to-r ${category.color} text-white shadow-lg shadow-emerald-500/25` 
-                      : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-md'
+                  className={`group rounded-xl p-3 transition-all duration-300 hover:scale-105 ${
+                    selectedCategory === category.key
+                      ? `bg-gradient-to-r ${category.color} text-white shadow-lg shadow-emerald-500/25`
+                      : 'bg-white shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <div className="text-center space-y-1">
-                    <div className={`text-lg ${selectedCategory === category.key ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'}`}>
+                  <div className="space-y-1 text-center">
+                    <div
+                      className={`text-lg ${selectedCategory === category.key ? 'animate-bounce' : 'transition-transform group-hover:scale-110'}`}
+                    >
                       {category.emoji}
                     </div>
-                    <div className={`text-xs font-semibold ${
-                      selectedCategory === category.key ? 'text-white' : 'text-gray-700 dark:text-gray-300'
-                    }`}>
+                    <div
+                      className={`text-xs font-semibold ${
+                        selectedCategory === category.key
+                          ? 'text-white'
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
                       {category.label}
                     </div>
                   </div>
@@ -98,12 +118,12 @@ export default function MapFilters({
 
           {/* Time Filter */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
+            <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <Calendar className="mr-2 h-4 w-4" />
               시간
             </label>
             <Select value={timeFilter} onValueChange={setTimeFilter}>
-              <SelectTrigger className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
+              <SelectTrigger className="border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -117,9 +137,10 @@ export default function MapFilters({
 
           {/* Price Range */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-              <DollarSign className="w-4 h-4 mr-2" />
-              참가비 (최대 {priceRange[0] === 100000 ? '10만원+' : `${priceRange[0].toLocaleString()}원`})
+            <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <DollarSign className="mr-2 h-4 w-4" />
+              참가비 (최대{' '}
+              {priceRange[0] === 100000 ? '10만원+' : `${priceRange[0].toLocaleString()}원`})
             </label>
             <div className="space-y-3">
               <Slider
@@ -139,8 +160,8 @@ export default function MapFilters({
 
           {/* Max People */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-              <Users className="w-4 h-4 mr-2" />
+            <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <Users className="mr-2 h-4 w-4" />
               최대 인원 ({maxPeople[0]}명 이하)
             </label>
             <div className="space-y-3">

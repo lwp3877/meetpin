@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 // 날짜 포맷팅 함수들
 export function formatDate(date: string | Date, format: 'short' | 'long' = 'short'): string {
   const d = new Date(date)
-  
+
   if (format === 'short') {
     return new Intl.DateTimeFormat('ko-KR', {
       month: 'short',
@@ -17,7 +17,7 @@ export function formatDate(date: string | Date, format: 'short' | 'long' = 'shor
       minute: '2-digit',
     }).format(d)
   }
-  
+
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: 'long',
@@ -32,16 +32,16 @@ export function formatRelativeTime(date: string | Date): string {
   const d = new Date(date)
   const now = new Date()
   const diff = now.getTime() - d.getTime()
-  
+
   const minutes = Math.floor(diff / (1000 * 60))
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  
+
   if (minutes < 1) return '방금 전'
   if (minutes < 60) return `${minutes}분 전`
   if (hours < 24) return `${hours}시간 전`
   if (days < 7) return `${days}일 전`
-  
+
   return formatDate(d, 'short')
 }
 
@@ -101,7 +101,7 @@ export function generateRandomId(length: number = 8): string {
 export function getCategoryColor(category: 'drink' | 'exercise' | 'other'): string {
   const colors = {
     drink: '#E11D48',
-    exercise: '#3B82F6', 
+    exercise: '#3B82F6',
     other: '#8B5CF6',
   }
   return colors[category]
@@ -118,7 +118,7 @@ export function debounce<T extends (...args: any[]) => any>(
     if (timeoutId) {
       clearTimeout(timeoutId)
     }
-    
+
     timeoutId = setTimeout(() => {
       func(...args)
     }, delay)
@@ -134,14 +134,13 @@ export function throttle<T extends (...args: any[]) => any>(
 
   return (...args: Parameters<T>) => {
     const now = Date.now()
-    
+
     if (now - lastCall >= delay) {
       lastCall = now
       func(...args)
     }
   }
 }
-
 
 // 로컬스토리지 유틸리티
 export const storage = {
@@ -153,7 +152,7 @@ export const storage = {
       return null
     }
   },
-  
+
   set: <T>(key: string, value: T): void => {
     try {
       localStorage.setItem(key, JSON.stringify(value))
@@ -161,7 +160,7 @@ export const storage = {
       console.error('Failed to save to localStorage:', error)
     }
   },
-  
+
   remove: (key: string): void => {
     try {
       localStorage.removeItem(key)
@@ -178,11 +177,11 @@ export const browser = {
       navigator.userAgent
     )
   },
-  
+
   isIOS: (): boolean => {
     return /iPad|iPhone|iPod/.test(navigator.userAgent)
   },
-  
+
   isAndroid: (): boolean => {
     return /Android/.test(navigator.userAgent)
   },

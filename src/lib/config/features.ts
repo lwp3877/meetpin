@@ -12,14 +12,14 @@ interface FeatureFlags {
   ENABLE_EMOJI_PICKER: boolean
   ENABLE_VIDEO_CALL: boolean
   ENABLE_AVATAR_CROPPER: boolean
-  
+
   // Growth Features
   ENABLE_REFERRAL_CODE: boolean
   ENABLE_PUSH_NOTIFICATIONS: boolean
   ENABLE_SOCIAL_LOGIN: boolean
   ENABLE_RECOMMENDATION_SLIDER: boolean
   ENABLE_LOCATION_FILTER: boolean
-  
+
   // Premium Features
   ENABLE_PREMIUM_BADGES: boolean
   ENABLE_ANALYTICS_DASHBOARD: boolean
@@ -37,14 +37,14 @@ const getFeatureFlags = (): FeatureFlags => {
     ENABLE_EMOJI_PICKER: process.env.NEXT_PUBLIC_FEATURE_EMOJI_PICKER !== 'false', // default true
     ENABLE_VIDEO_CALL: process.env.NEXT_PUBLIC_FEATURE_VIDEO_CALL === 'true', // default false
     ENABLE_AVATAR_CROPPER: process.env.NEXT_PUBLIC_FEATURE_AVATAR_CROPPER === 'true', // default false
-    
-    // Growth Features  
+
+    // Growth Features
     ENABLE_REFERRAL_CODE: process.env.NEXT_PUBLIC_FEATURE_REFERRAL === 'true',
     ENABLE_PUSH_NOTIFICATIONS: process.env.NEXT_PUBLIC_FEATURE_PUSH === 'true',
     ENABLE_SOCIAL_LOGIN: process.env.NEXT_PUBLIC_FEATURE_SOCIAL_LOGIN !== 'false', // default true
     ENABLE_RECOMMENDATION_SLIDER: process.env.NEXT_PUBLIC_FEATURE_RECOMMENDATIONS !== 'false', // default true
     ENABLE_LOCATION_FILTER: process.env.NEXT_PUBLIC_FEATURE_LOCATION !== 'false', // default true
-    
+
     // Premium Features
     ENABLE_PREMIUM_BADGES: process.env.NEXT_PUBLIC_FEATURE_PREMIUM_BADGES !== 'false', // default true
     ENABLE_ANALYTICS_DASHBOARD: process.env.NEXT_PUBLIC_FEATURE_ANALYTICS === 'true',
@@ -79,7 +79,7 @@ export const getVariant = (testName: string, variants: string[]): string => {
   if (typeof window !== 'undefined') {
     const userId = localStorage.getItem('meetpin-user-id') || 'anonymous'
     const hash = Array.from(testName + userId).reduce((hash, char) => {
-      return ((hash << 5) - hash) + char.charCodeAt(0)
+      return (hash << 5) - hash + char.charCodeAt(0)
     }, 0)
     const index = Math.abs(hash) % variants.length
     return variants[index]

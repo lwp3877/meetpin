@@ -25,10 +25,12 @@ interface Message {
   }
 }
 
-
 // 메시지 폼 스키마
 const messageFormSchema = z.object({
-  text: z.string().min(1, '메시지를 입력해주세요').max(1000, '메시지는 1000자를 초과할 수 없습니다'),
+  text: z
+    .string()
+    .min(1, '메시지를 입력해주세요')
+    .max(1000, '메시지는 1000자를 초과할 수 없습니다'),
 })
 
 type MessageFormData = z.infer<typeof messageFormSchema>
@@ -51,7 +53,7 @@ export default function ChatPanel({
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const supabase = createBrowserSupabaseClient()
@@ -89,9 +91,10 @@ export default function ChatPanel({
 
       // 상대방 정보 조회
       if (result.data.match) {
-        const otherUserId = result.data.match.host_uid === currentUserId 
-          ? result.data.match.guest_uid 
-          : result.data.match.host_uid
+        const otherUserId =
+          result.data.match.host_uid === currentUserId
+            ? result.data.match.guest_uid
+            : result.data.match.host_uid
 
         const { data: profile } = await supabase
           .from('profiles')
@@ -181,7 +184,7 @@ export default function ChatPanel({
     if (diffMinutes < 60) return `${diffMinutes}분 전`
     if (diffHours < 24) return `${diffHours}시간 전`
     if (diffDays < 7) return `${diffDays}일 전`
-    
+
     return date.toLocaleDateString('ko-KR', {
       month: 'short',
       day: 'numeric',
@@ -212,14 +215,17 @@ export default function ChatPanel({
           table: 'messages',
           filter: `match_id=eq.${matchId}`,
         },
-        (payload) => {
+        payload => {
           const newMessage = payload.new as any
           if (newMessage.sender_uid !== currentUserId) {
             // 상대방의 새 메시지만 추가
-            setMessages(prev => [...prev, {
-              ...newMessage,
-              sender: otherUser || { id: newMessage.sender_uid, nickname: '상대방' }
-            }])
+            setMessages(prev => [
+              ...prev,
+              {
+                ...newMessage,
+                sender: otherUser || { id: newMessage.sender_uid, nickname: '상대방' },
+              },
+            ])
           }
         }
       )
@@ -232,10 +238,10 @@ export default function ChatPanel({
 
   if (isLoading) {
     return (
-      <div className={`flex flex-col h-full ${className}`}>
-        <div className="flex-1 flex items-center justify-center">
+      <div className={`flex h-full flex-col ${className}`}>
+        <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <div className="border-primary mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
             <p className="text-sm text-gray-600">메시지를 불러오는 중...</p>
           </div>
         </div>
@@ -245,17 +251,12 @@ export default function ChatPanel({
 
   if (error) {
     return (
-      <div className={`flex flex-col h-full ${className}`}>
-        <div className="flex-1 flex items-center justify-center">
+      <div className={`flex h-full flex-col ${className}`}>
+        <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
-            <div className="text-red-500 mb-2">❌</div>
+            <div className="mb-2 text-red-500">❌</div>
             <p className="text-sm text-red-600">{error}</p>
-            <Button
-              onClick={loadMessages}
-              variant="outline"
-              size="sm"
-              className="mt-2"
-            >
+            <Button onClick={loadMessages} variant="outline" size="sm" className="mt-2">
               다시 시도
             </Button>
           </div>
@@ -265,9 +266,9 @@ export default function ChatPanel({
   }
 
   return (
-    <div className={`flex flex-col h-full bg-white ${className}`}>
+    <div className={`flex h-full flex-col bg-white ${className}`}>
       {/* 헤더 */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between border-b border-gray-200 p-4">
         <div className="flex items-center">
           {otherUser?.avatar_url ? (
             <Image
@@ -275,17 +276,15 @@ export default function ChatPanel({
               alt={otherUser.nickname}
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full mr-3 object-cover"
+              className="mr-3 h-8 w-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 flex items-center justify-center">
+            <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
               <span className="text-sm text-gray-500">👤</span>
             </div>
           )}
           <div>
-            <h3 className="font-medium text-gray-900">
-              {otherUser?.nickname || '상대방'}
-            </h3>
+            <h3 className="font-medium text-gray-900">{otherUser?.nickname || '상대방'}</h3>
             <p className="text-xs text-gray-500">
               {messages.length > 0 ? `${messages.length}개 메시지` : '대화 시작'}
             </p>
@@ -299,16 +298,16 @@ export default function ChatPanel({
       </div>
 
       {/* 메시지 목록 */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="text-4xl mb-2">💬</div>
-            <p className="text-gray-500 text-sm">첫 메시지를 보내보세요!</p>
+          <div className="py-8 text-center">
+            <div className="mb-2 text-4xl">💬</div>
+            <p className="text-sm text-gray-500">첫 메시지를 보내보세요!</p>
           </div>
         ) : (
-          messages.map((message) => {
+          messages.map(message => {
             const isMyMessage = message.sender_uid === currentUserId
-            
+
             return (
               <div
                 key={message.id}
@@ -316,37 +315,33 @@ export default function ChatPanel({
               >
                 <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-2' : 'order-1'}`}>
                   {!isMyMessage && (
-                    <div className="flex items-center mb-1">
+                    <div className="mb-1 flex items-center">
                       {message.sender?.avatar_url ? (
                         <Image
                           src={message.sender.avatar_url}
                           alt={message.sender.nickname}
                           width={20}
                           height={20}
-                          className="w-5 h-5 rounded-full mr-2 object-cover"
+                          className="mr-2 h-5 w-5 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-5 h-5 rounded-full bg-gray-200 mr-2"></div>
+                        <div className="mr-2 h-5 w-5 rounded-full bg-gray-200"></div>
                       )}
-                      <span className="text-xs text-gray-500">
-                        {message.sender?.nickname}
-                      </span>
+                      <span className="text-xs text-gray-500">{message.sender?.nickname}</span>
                     </div>
                   )}
                   <div
-                    className={`px-3 py-2 rounded-lg ${
-                      isMyMessage
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-900'
+                    className={`rounded-lg px-3 py-2 ${
+                      isMyMessage ? 'bg-primary text-white' : 'bg-gray-100 text-gray-900'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                   </div>
-                  <div className={`text-xs text-gray-400 mt-1 ${isMyMessage ? 'text-right' : 'text-left'}`}>
+                  <div
+                    className={`mt-1 text-xs text-gray-400 ${isMyMessage ? 'text-right' : 'text-left'}`}
+                  >
                     {formatMessageTime(message.created_at)}
-                    {isMyMessage && message.read_at && (
-                      <span className="ml-1">읽음</span>
-                    )}
+                    {isMyMessage && message.read_at && <span className="ml-1">읽음</span>}
                   </div>
                 </div>
               </div>
@@ -357,7 +352,7 @@ export default function ChatPanel({
       </div>
 
       {/* 메시지 입력 */}
-      <div className="border-t border-white/20 dark:border-slate-700/30 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm p-4">
+      <div className="border-t border-white/20 bg-white/50 p-4 backdrop-blur-sm dark:border-slate-700/30 dark:bg-slate-800/50">
         <form onSubmit={handleSubmit(sendMessage)}>
           <div className="flex items-end gap-3">
             <div className="flex-1">
@@ -367,7 +362,7 @@ export default function ChatPanel({
                   ref={textareaRef}
                   placeholder="메시지를 입력하세요..."
                   rows={1}
-                  className="w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-2xl resize-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-lg transition-all duration-200"
+                  className="focus:ring-primary w-full resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 pr-12 shadow-lg transition-all duration-200 focus:border-transparent focus:ring-2 dark:border-slate-600 dark:bg-slate-800"
                   onInput={adjustTextareaHeight}
                   onKeyPress={handleKeyPress}
                   disabled={isSending}
@@ -383,18 +378,18 @@ export default function ChatPanel({
             <Button
               type="submit"
               disabled={!messageText?.trim() || isSending}
-              className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-lg p-3 rounded-2xl transition-all duration-200 hover:scale-105"
+              className="from-primary hover:from-primary/90 rounded-2xl bg-gradient-to-r to-emerald-600 p-3 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:to-emerald-600/90"
             >
               {isSending ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
-                <Send className="w-5 h-5" />
+                <Send className="h-5 w-5" />
               )}
             </Button>
           </div>
-          
+
           {/* 도움말 */}
-          <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>Shift+Enter로 줄바꿈</span>
             <span>전송은 Enter 키로 합니다</span>
           </div>

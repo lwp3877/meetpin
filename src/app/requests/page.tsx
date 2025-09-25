@@ -20,7 +20,7 @@ import {
   CheckCircle,
   XCircle,
   Heart,
-  Search
+  Search,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -166,9 +166,9 @@ export default function RequestsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
           <p className="text-gray-600">요청함을 불러오는 중...</p>
         </div>
       </div>
@@ -186,16 +186,11 @@ export default function RequestsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
+      <header className="sticky top-0 z-10 border-b border-white/20 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.back()}
-                className="mr-2"
-              >
+              <Button variant="ghost" size="sm" onClick={() => router.back()} className="mr-2">
                 ← 뒤로
               </Button>
               <h1 className="text-xl font-bold text-gray-900">요청함</h1>
@@ -211,10 +206,9 @@ export default function RequestsPage() {
         </div>
       </header>
 
-
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-4 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
             <p className="text-red-600">{error}</p>
             <Button onClick={loadData} variant="outline" size="sm" className="mt-2">
               다시 시도
@@ -222,15 +216,19 @@ export default function RequestsPage() {
           </div>
         )}
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'requests' | 'matches')} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={value => setActiveTab(value as 'requests' | 'matches')}
+          className="w-full"
+        >
+          <TabsList className="mb-6 grid w-full grid-cols-2">
             <TabsTrigger value="requests" className="relative">
               참가 요청 ({myRequests.length})
             </TabsTrigger>
             <TabsTrigger value="matches" className="relative">
               매치된 모임 ({myMatches.length})
               {myMatches.some(m => m.unread_count > 0) && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[16px] h-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-xs text-white">
                   {myMatches.reduce((sum, m) => sum + m.unread_count, 0)}
                 </span>
               )}
@@ -239,20 +237,20 @@ export default function RequestsPage() {
 
           <TabsContent value="requests" className="space-y-6">
             {/* Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 border border-gray-100">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="rounded-lg border border-gray-100 bg-white p-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-yellow-600">{pendingRequests.length}</div>
                   <div className="text-sm text-gray-600">대기 중</div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 border border-gray-100">
+              <div className="rounded-lg border border-gray-100 bg-white p-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{acceptedRequests.length}</div>
                   <div className="text-sm text-gray-600">승인됨</div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4 border border-gray-100">
+              <div className="rounded-lg border border-gray-100 bg-white p-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-600">{rejectedRequests.length}</div>
                   <div className="text-sm text-gray-600">거절됨</div>
@@ -262,12 +260,12 @@ export default function RequestsPage() {
 
             {/* Requests List */}
             {myRequests.length === 0 ? (
-              <div className="bg-white rounded-xl p-12 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <div className="rounded-xl bg-white p-12 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                   <span className="text-2xl">📤</span>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">보낸 요청이 없습니다</h3>
-                <p className="text-gray-600 mb-6">관심있는 모임에 참가 신청을 보내보세요!</p>
+                <h3 className="mb-2 text-lg font-medium text-gray-900">보낸 요청이 없습니다</h3>
+                <p className="mb-6 text-gray-600">관심있는 모임에 참가 신청을 보내보세요!</p>
                 <Button
                   onClick={() => router.push('/map')}
                   className="bg-primary hover:bg-primary/90"
@@ -277,73 +275,100 @@ export default function RequestsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {myRequests.map((request) => {
+                {myRequests.map(request => {
                   const categoryDisplay = getCategoryDisplay(request.room.category)
                   const isUpcoming = new Date(request.room.start_at) > new Date()
-                  
+
                   return (
-                    <Card key={request.id} className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-white/20 dark:border-slate-700/30 shadow-xl hover:shadow-2xl transition-all duration-200">
+                    <Card
+                      key={request.id}
+                      className="border-white/20 bg-white/95 shadow-xl backdrop-blur-lg transition-all duration-200 hover:shadow-2xl dark:border-slate-700/30 dark:bg-slate-900/95"
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
+                            <div className="mb-4 flex items-center gap-3">
                               <Badge
-                                className="text-white border-0"
+                                className="border-0 text-white"
                                 style={{ backgroundColor: categoryDisplay.color }}
                               >
                                 {categoryDisplay.emoji} {categoryDisplay.label}
                               </Badge>
-                              
-                              <Badge 
-                                variant={request.status === 'pending' ? 'secondary' : 
-                                        request.status === 'accepted' ? 'default' : 'destructive'}
-                                className={request.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200' :
-                                          request.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' :
-                                          'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'}
+
+                              <Badge
+                                variant={
+                                  request.status === 'pending'
+                                    ? 'secondary'
+                                    : request.status === 'accepted'
+                                      ? 'default'
+                                      : 'destructive'
+                                }
+                                className={
+                                  request.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                                    : request.status === 'accepted'
+                                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                                }
                               >
                                 {request.status === 'pending' ? (
-                                  <><ClockIcon className="w-3 h-3 mr-1" /> 대기 중</>
+                                  <>
+                                    <ClockIcon className="mr-1 h-3 w-3" /> 대기 중
+                                  </>
                                 ) : request.status === 'accepted' ? (
-                                  <><CheckCircle className="w-3 h-3 mr-1" /> 승인됨</>
+                                  <>
+                                    <CheckCircle className="mr-1 h-3 w-3" /> 승인됨
+                                  </>
                                 ) : (
-                                  <><XCircle className="w-3 h-3 mr-1" /> 거절됨</>
+                                  <>
+                                    <XCircle className="mr-1 h-3 w-3" /> 거절됨
+                                  </>
                                 )}
                               </Badge>
                             </div>
 
-                            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                            <CardTitle className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                               {request.room.title}
                             </CardTitle>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-600 md:grid-cols-2 dark:text-gray-300">
                               <div className="flex items-center space-x-2">
-                                <MapPin className="w-4 h-4" />
+                                <MapPin className="h-4 w-4" />
                                 <span>{request.room.place_text}</span>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <Clock className="w-4 h-4" />
-                                <span>{new Date(request.room.start_at).toLocaleDateString('ko-KR')} {new Date(request.room.start_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                <Clock className="h-4 w-4" />
+                                <span>
+                                  {new Date(request.room.start_at).toLocaleDateString('ko-KR')}{' '}
+                                  {new Date(request.room.start_at).toLocaleTimeString('ko-KR', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <User className="w-4 h-4" />
+                                <User className="h-4 w-4" />
                                 <span>호스트: {request.room.host.nickname}</span>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <Calendar className="w-4 h-4" />
-                                <span>신청일: {new Date(request.created_at).toLocaleDateString('ko-KR')}</span>
+                                <Calendar className="h-4 w-4" />
+                                <span>
+                                  신청일: {new Date(request.created_at).toLocaleDateString('ko-KR')}
+                                </span>
                               </div>
                             </div>
 
                             {request.message && (
-                              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-xl mb-4">
+                              <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/20">
                                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                                  <span className="font-medium">신청 메시지:</span> {request.message}
+                                  <span className="font-medium">신청 메시지:</span>{' '}
+                                  {request.message}
                                 </p>
                               </div>
                             )}
                           </div>
 
-                          <div className="flex flex-col gap-2 ml-6">
+                          <div className="ml-6 flex flex-col gap-2">
                             <Button
                               onClick={() => router.push(`/room/${request.room.id}`)}
                               size="sm"
@@ -352,24 +377,24 @@ export default function RequestsPage() {
                             >
                               모임 보기
                             </Button>
-                            
+
                             {request.status === 'accepted' && request.match_id && (
                               <Button
                                 onClick={() => openChat(request.match_id!)}
                                 size="sm"
-                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg min-w-[100px]"
+                                className="min-w-[100px] bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700"
                               >
-                                <MessageCircle className="w-4 h-4 mr-1" />
+                                <MessageCircle className="mr-1 h-4 w-4" />
                                 채팅하기
                               </Button>
                             )}
-                            
+
                             {request.status === 'pending' && isUpcoming && (
                               <Button
                                 onClick={() => cancelRequest(request.id)}
                                 size="sm"
                                 variant="outline"
-                                className="border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 min-w-[100px]"
+                                className="min-w-[100px] border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
                               >
                                 요청 취소
                               </Button>
@@ -386,115 +411,147 @@ export default function RequestsPage() {
 
           <TabsContent value="matches" className="space-y-6">
             {myMatches.length === 0 ? (
-              <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-white/20 dark:border-slate-700/30 shadow-2xl">
+              <Card className="border-white/20 bg-white/95 shadow-2xl backdrop-blur-lg dark:border-slate-700/30 dark:bg-slate-900/95">
                 <CardContent className="pt-12 pb-12 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-200 dark:from-pink-900/30 dark:to-rose-900/30 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
-                    <Heart className="w-8 h-8 text-pink-500 dark:text-pink-400" />
+                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-rose-200 shadow-lg dark:from-pink-900/30 dark:to-rose-900/30">
+                    <Heart className="h-8 w-8 text-pink-500 dark:text-pink-400" />
                   </div>
-                  <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white mb-3">매치된 모임이 없습니다</CardTitle>
-                  <p className="text-gray-600 dark:text-gray-300 mb-8">모임에 참가 신청을 보내고 승인받으면 여기에 표시됩니다!</p>
+                  <CardTitle className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
+                    매치된 모임이 없습니다
+                  </CardTitle>
+                  <p className="mb-8 text-gray-600 dark:text-gray-300">
+                    모임에 참가 신청을 보내고 승인받으면 여기에 표시됩니다!
+                  </p>
                   <Button
                     onClick={() => router.push('/map')}
-                    className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-lg"
+                    className="from-primary hover:from-primary/90 bg-gradient-to-r to-emerald-600 text-white shadow-lg hover:to-emerald-600/90"
                     size="lg"
                   >
-                    <Search className="w-4 h-4 mr-2" />
+                    <Search className="mr-2 h-4 w-4" />
                     모임 찾으러 가기
                   </Button>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-4">
-                {myMatches.map((match) => {
-                      const categoryDisplay = getCategoryDisplay(match.room.category)
-                      
-                      return (
-                        <Card key={match.id} className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-white/20 dark:border-slate-700/30 shadow-xl hover:shadow-2xl transition-all duration-200">
-                          <CardContent className="p-6">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-4">
-                                  <Badge
-                                    className="text-white border-0"
-                                    style={{ backgroundColor: categoryDisplay.color }}
-                                  >
-                                    {categoryDisplay.emoji} {categoryDisplay.label}
-                                  </Badge>
-                                  
-                                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-200 border-0">
-                                    <Heart className="w-3 h-3 mr-1" />
-                                    매치 성공
-                                  </Badge>
+                {myMatches.map(match => {
+                  const categoryDisplay = getCategoryDisplay(match.room.category)
 
-                                  {match.unread_count > 0 && (
-                                    <Badge variant="destructive" className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">
-                                      <MessageCircle className="w-3 h-3 mr-1" />
-                                      {match.unread_count}개 안읽음
-                                    </Badge>
-                                  )}
-                                </div>
+                  return (
+                    <Card
+                      key={match.id}
+                      className="border-white/20 bg-white/95 shadow-xl backdrop-blur-lg transition-all duration-200 hover:shadow-2xl dark:border-slate-700/30 dark:bg-slate-900/95"
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="mb-4 flex items-center gap-3">
+                              <Badge
+                                className="border-0 text-white"
+                                style={{ backgroundColor: categoryDisplay.color }}
+                              >
+                                {categoryDisplay.emoji} {categoryDisplay.label}
+                              </Badge>
 
-                                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                                  {match.room.title}
-                                </CardTitle>
+                              <Badge className="border-0 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-200">
+                                <Heart className="mr-1 h-3 w-3" />
+                                매치 성공
+                              </Badge>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                  <div className="flex items-center space-x-2">
-                                    <MapPin className="w-4 h-4" />
-                                    <span>{match.room.place_text}</span>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Clock className="w-4 h-4" />
-                                    <span>{new Date(match.room.start_at).toLocaleDateString('ko-KR')} {new Date(match.room.start_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Avatar className="w-5 h-5">
-                                      <AvatarImage src={match.other_user.avatar_url} alt={match.other_user.nickname} />
-                                      <AvatarFallback className="text-xs">{match.other_user.nickname.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <span>{match.other_user.nickname} ({match.other_user.age_range})</span>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Heart className="w-4 h-4" />
-                                    <span>매치일: {new Date(match.created_at).toLocaleDateString('ko-KR')}</span>
-                                  </div>
-                                </div>
+                              {match.unread_count > 0 && (
+                                <Badge
+                                  variant="destructive"
+                                  className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
+                                >
+                                  <MessageCircle className="mr-1 h-3 w-3" />
+                                  {match.unread_count}개 안읽음
+                                </Badge>
+                              )}
+                            </div>
 
-                                {match.last_message && (
-                                  <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700/30 rounded-xl">
-                                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                                      <span className="font-medium">최근 메시지:</span> {match.last_message.text}
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                      {new Date(match.last_message.created_at).toLocaleDateString('ko-KR')} {new Date(match.last_message.created_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                  </div>
-                                )}
+                            <CardTitle className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                              {match.room.title}
+                            </CardTitle>
+
+                            <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-600 md:grid-cols-2 dark:text-gray-300">
+                              <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4" />
+                                <span>{match.room.place_text}</span>
                               </div>
-
-                              <div className="flex flex-col gap-2 ml-6">
-                                <Button
-                                  onClick={() => openChat(match.id)}
-                                  size="sm"
-                                  className="bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-600/90 text-white shadow-lg min-w-[100px]"
-                                >
-                                  <MessageCircle className="w-4 h-4 mr-1" />
-                                  채팅하기
-                                </Button>
-                                
-                                <Button
-                                  onClick={() => router.push(`/room/${match.room.id}`)}
-                                  size="sm"
-                                  variant="outline"
-                                  className="min-w-[100px]"
-                                >
-                                  모임 보기
-                                </Button>
+                              <div className="flex items-center space-x-2">
+                                <Clock className="h-4 w-4" />
+                                <span>
+                                  {new Date(match.room.start_at).toLocaleDateString('ko-KR')}{' '}
+                                  {new Date(match.room.start_at).toLocaleTimeString('ko-KR', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Avatar className="h-5 w-5">
+                                  <AvatarImage
+                                    src={match.other_user.avatar_url}
+                                    alt={match.other_user.nickname}
+                                  />
+                                  <AvatarFallback className="text-xs">
+                                    {match.other_user.nickname.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span>
+                                  {match.other_user.nickname} ({match.other_user.age_range})
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Heart className="h-4 w-4" />
+                                <span>
+                                  매치일: {new Date(match.created_at).toLocaleDateString('ko-KR')}
+                                </span>
                               </div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      )
+
+                            {match.last_message && (
+                              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-slate-700/30 dark:bg-slate-800/50">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                  <span className="font-medium">최근 메시지:</span>{' '}
+                                  {match.last_message.text}
+                                </p>
+                                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                  {new Date(match.last_message.created_at).toLocaleDateString(
+                                    'ko-KR'
+                                  )}{' '}
+                                  {new Date(match.last_message.created_at).toLocaleTimeString(
+                                    'ko-KR',
+                                    { hour: '2-digit', minute: '2-digit' }
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="ml-6 flex flex-col gap-2">
+                            <Button
+                              onClick={() => openChat(match.id)}
+                              size="sm"
+                              className="from-primary hover:from-primary/90 min-w-[100px] bg-gradient-to-r to-emerald-600 text-white shadow-lg hover:to-emerald-600/90"
+                            >
+                              <MessageCircle className="mr-1 h-4 w-4" />
+                              채팅하기
+                            </Button>
+
+                            <Button
+                              onClick={() => router.push(`/room/${match.room.id}`)}
+                              size="sm"
+                              variant="outline"
+                              className="min-w-[100px]"
+                            >
+                              모임 보기
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
                 })}
               </div>
             )}

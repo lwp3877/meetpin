@@ -20,7 +20,12 @@ export interface AuthContextType {
   user: AppUser | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  signUp: (email: string, password: string, nickname: string, ageRange: string) => Promise<{ success: boolean; error?: string }>
+  signUp: (
+    email: string,
+    password: string,
+    nickname: string,
+    ageRange: string
+  ) => Promise<{ success: boolean; error?: string }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<AppUser>) => Promise<{ success: boolean; error?: string }>
   refreshUser: () => Promise<void>
@@ -55,12 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   // 이메일 회원가입 (authService로 위임)
-  const signUp = async (
-    email: string,
-    password: string,
-    nickname: string,
-    ageRange: string
-  ) => {
+  const signUp = async (email: string, password: string, nickname: string, ageRange: string) => {
     return await authService.signUpWithEmail(email, password, nickname, ageRange)
   }
 
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 초기 로드 및 인증 상태 변경 감지
   useEffect(() => {
     let mounted = true
-    
+
     const initializeAuth = async () => {
       if (mounted) {
         setLoading(true)
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(currentUser)
         }
       }
-      
+
       window.addEventListener('storage', handleStorageChange)
       return () => {
         mounted = false
@@ -118,9 +118,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       // Supabase 인증 상태 변경 감지
       const supabase = createBrowserSupabaseClient()
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!mounted) return
-        
+
         if (event === 'SIGNED_OUT') {
           setUser(null)
         } else if (session?.user) {
@@ -151,11 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser,
   }
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 }
 
 // useAuth 훅
@@ -174,9 +172,9 @@ export function withAuth<P extends object>(Component: React.ComponentType<P>) {
 
     if (loading) {
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-background flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
             <p className="text-gray-600">로딩 중...</p>
           </div>
         </div>
@@ -199,9 +197,9 @@ export function withAdmin<P extends object>(Component: React.ComponentType<P>) {
 
     if (loading) {
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-background flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
             <p className="text-gray-600">로딩 중...</p>
           </div>
         </div>
@@ -215,13 +213,13 @@ export function withAdmin<P extends object>(Component: React.ComponentType<P>) {
 
     if (user.role !== 'admin') {
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-background flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">접근 권한 없음</h1>
-            <p className="text-gray-600 mb-4">관리자 권한이 필요합니다.</p>
-            <button 
+            <h1 className="mb-4 text-2xl font-bold text-gray-900">접근 권한 없음</h1>
+            <p className="mb-4 text-gray-600">관리자 권한이 필요합니다.</p>
+            <button
               onClick={redirectToHome}
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-deep transition-colors"
+              className="bg-primary hover:bg-primary-deep rounded-lg px-4 py-2 text-white transition-colors"
             >
               홈으로 돌아가기
             </button>
@@ -237,7 +235,7 @@ export function withAdmin<P extends object>(Component: React.ComponentType<P>) {
 // 유틸리티 훅들
 export function useRequireAuth() {
   const { user, loading } = useAuth()
-  
+
   useEffect(() => {
     if (!loading && !user) {
       redirectToLogin()
@@ -249,7 +247,7 @@ export function useRequireAuth() {
 
 export function useRequireAdmin() {
   const { user, loading } = useAuth()
-  
+
   useEffect(() => {
     if (!loading && !user) {
       redirectToLogin()
