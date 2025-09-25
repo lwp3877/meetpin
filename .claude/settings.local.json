@@ -110,7 +110,9 @@
       "Bash(git pull:*)",
       "Bash(git merge:*)",
       "Bash(git stash:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "mcp__filesystem__edit_file",
+      "mcp__filesystem__write_file"
     ],
     "deny": [],
     "ask": []

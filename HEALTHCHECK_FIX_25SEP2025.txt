@@ -1,0 +1,11 @@
+Healthcheck endpoints fix deployment
+Date: 2025-09-25
+Issue: Route collision between /status page and /api/status API route
+Solution: Moved status page to /system-status and enhanced Vercel functions configuration
+
+Fixed endpoints:
+- /api/status
+- /api/healthz  
+- /api/ready
+
+This file forces Vercel to recognize all changes and invalidate cached routes.

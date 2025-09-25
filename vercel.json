@@ -9,6 +9,18 @@
     "src/app/api/**/*.ts": {
       "runtime": "nodejs20.x",
       "maxDuration": 30
+    },
+    "src/app/api/status/route.ts": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
+    },
+    "src/app/api/healthz/route.ts": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
+    },
+    "src/app/api/ready/route.ts": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
     }
   },
   "headers": [
@@ -54,7 +66,7 @@
         },
         {
           "key": "X-Force-Deployment",
-          "value": "v2.0.0-cache-bust-900d990"
+          "value": "v2.1.0-healthcheck-fix-25sep2025"
         },
         {
           "key": "Cache-Control",
