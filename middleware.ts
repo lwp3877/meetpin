@@ -29,6 +29,36 @@ export async function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || 'unknown'
   const pathname = request.nextUrl.pathname
 
+  // 🔒 SAFE_MODE: Block write operations (emergency read-only mode)
+  if (process.env.SAFE_MODE === 'true') {
+    const isWriteOperation = request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS'
+    const isWriteAPI = pathname.startsWith('/api/') &&
+      !pathname.includes('/health') &&
+      !pathname.includes('/status') &&
+      !pathname.includes('/ready') &&
+      !pathname.includes('/livez') &&
+      !pathname.includes('/readyz') &&
+      !pathname.includes('/monitoring')
+
+    if (isWriteOperation && isWriteAPI) {
+      console.warn(`[SAFE_MODE] Blocked write operation: ${request.method} ${pathname} from ${clientIP}`)
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Service Temporarily Read-Only',
+          message: 'Read-only window',
+          code: 'SAFE_MODE_ENABLED'
+        }),
+        {
+          status: 503,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': '900' // 15 minutes
+          }
+        }
+      )
+    }
+  }
+
   // 기본적인 Rate limiting (전역)
   if (!simpleRateLimit(clientIP, 100, 60000)) {
     // 1분에 100요청
