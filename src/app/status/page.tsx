@@ -83,7 +83,7 @@ export default function StatusPage() {
 
       setLoading(false)
       setError(null)
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch status data')
       setLoading(false)
     }

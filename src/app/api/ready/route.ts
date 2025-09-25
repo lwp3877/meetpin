@@ -18,12 +18,12 @@ export async function GET() {
     const supabase = await createServerSupabaseClient()
 
     // Try to access core tables to verify migrations
-    const { data: profilesData, error: profilesError } = await Promise.race([
+    const { data: _profilesData, error: profilesError } = await Promise.race([
       supabase.from('profiles').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
     ]) as any
 
-    const { data: roomsData, error: roomsError } = await Promise.race([
+    const { data: _roomsData, error: roomsError } = await Promise.race([
       supabase.from('rooms').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
     ]) as any
@@ -36,7 +36,7 @@ export async function GET() {
     } else {
       checks.migrationsApplied.status = 'applied'
     }
-  } catch (error) {
+  } catch (_error) {
     checks.migrationsApplied.status = 'timeout'
     checks.migrationsApplied.responseTime = timeout
     overallStatus = 503
@@ -51,7 +51,7 @@ export async function GET() {
     if (hasRateLimit) {
       // Try to import rate limit (dynamic to avoid build issues)
       try {
-        const { rateLimit } = await import('@/lib/rateLimit')
+        const { rateLimit: _rateLimit } = await import('@/lib/rateLimit')
         checks.rateLimitPing.status = 'configured'
       } catch {
         checks.rateLimitPing.status = 'import_failed'
@@ -62,7 +62,7 @@ export async function GET() {
     }
 
     checks.rateLimitPing.responseTime = Date.now() - rlStart
-  } catch (error) {
+  } catch (_error) {
     checks.rateLimitPing.status = 'error'
     overallStatus = 503
   }
@@ -82,7 +82,7 @@ export async function GET() {
     }
 
     checks.webhookReachable.responseTime = Date.now() - whStart
-  } catch (error) {
+  } catch (_error) {
     checks.webhookReachable.status = 'error'
     overallStatus = 503
   }

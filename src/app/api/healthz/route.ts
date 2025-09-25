@@ -18,7 +18,7 @@ export async function GET() {
     const dbStart = Date.now()
     const supabase = await createServerSupabaseClient()
 
-    const { data, error } = await Promise.race([
+    const { data: _data, error } = await Promise.race([
       supabase.from('profiles').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
     ]) as any
@@ -31,7 +31,7 @@ export async function GET() {
     } else {
       checks.db.status = 'healthy'
     }
-  } catch (error) {
+  } catch (_error) {
     checks.db.status = 'timeout'
     checks.db.responseTime = timeout
     overallStatus = 503
