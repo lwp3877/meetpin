@@ -131,7 +131,7 @@ export class StructuredLogger {
 // Request 기반 로거 생성
 export async function createRequestLogger(request: NextRequest): Promise<StructuredLogger> {
   const requestId = generateRequestId()
-  const startTime = Date.now()
+  const _startTime = Date.now()
 
   // 기본 컨텍스트 구성
   const context: LogContext = {

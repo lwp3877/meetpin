@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
       }),
       lastUpdated: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (_error) {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

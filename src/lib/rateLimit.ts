@@ -395,7 +395,7 @@ export async function checkTypedRateLimit(identifier: string, type: string): Pro
 /**
  * 레거시 지원: IP 기반 레이트리밋
  */
-export async function checkIPRateLimit(ip: string, type: string = 'api'): Promise<boolean> {
+export async function checkIPRateLimit(ip: string, _type: string = 'api'): Promise<boolean> {
   const result = await rateLimitGlobal(ip)
   return result.success
 }
@@ -423,7 +423,7 @@ export async function checkUserIPRateLimit(
 /**
  * 레거시 지원: 레이트리밋 정보 조회
  */
-export async function getRateLimitInfo(identifier: string): Promise<any> {
+export async function getRateLimitInfo(_identifier: string): Promise<any> {
   // 기존 호환성을 위해 null 반환
   return null
 }
@@ -464,7 +464,7 @@ export interface RateLimitOptions {
 }
 
 // 기본 export
-export default {
+const defaultExport = {
   rateLimit,
   rateLimitGlobal,
   rateLimitUser,
@@ -481,3 +481,4 @@ export default {
   getRateLimitInfo,
   presets: RATE_LIMIT_PRESETS,
 }
+export default defaultExport

@@ -510,10 +510,10 @@ export class DataValidationMonitor {
     }
 
     // 결과 저장
-    if (!this.validationResults.has(endpoint)) {
+    if (!this.validationResults.has(_endpoint)) {
       this.validationResults.set(endpoint, [])
     }
-    this.validationResults.get(endpoint)!.push(result)
+    this.validationResults.get(_endpoint)!.push(result)
 
     // 에러가 있으면 콘솔에 즉시 출력
     if (!result.isValid) {
@@ -544,7 +544,7 @@ export class DataValidationMonitor {
       warningCount: 0,
     }
 
-    this.validationResults.forEach((results, endpoint) => {
+    this.validationResults.forEach((results, _endpoint) => {
       results.forEach(result => {
         summary.totalValidations++
         if (result.isValid) {
@@ -614,7 +614,7 @@ export function initializeDataValidation() {
           if (data.ok && data.data) {
             DataValidationMonitor.validateAPIResponse(input, data.data)
           }
-        } catch (error) {
+        } catch (_error) {
           // JSON 파싱 실패는 무시 (이미지, 파일 등)
         }
       }
@@ -628,9 +628,10 @@ export function initializeDataValidation() {
   return stopMonitoring
 }
 
-export default {
+const defaultExport = {
   APIResponseValidator,
   MockDataQualityValidator,
   DataValidationMonitor,
   initializeDataValidation,
 }
+export default defaultExport

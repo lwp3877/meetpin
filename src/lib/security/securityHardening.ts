@@ -610,7 +610,7 @@ export function initializeSecurityMeasures(): () => void {
   return cleanup
 }
 
-export default {
+const defaultExport = {
   InputSanitizer,
   SecurityRateLimit,
   ContentSecurityPolicy,
@@ -618,3 +618,4 @@ export default {
   FileUploadSecurity,
   initializeSecurityMeasures,
 }
+export default defaultExport

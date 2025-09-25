@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthenticatedUser, ApiError, ApiResponse } from '@/lib/api'
+import { getAuthenticatedUser, ApiError } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import JSZip from 'jszip'
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(_req: NextRequest): Promise<NextResponse> {
   try {
     // 사용자 인증 확인
     const user = await getAuthenticatedUser()

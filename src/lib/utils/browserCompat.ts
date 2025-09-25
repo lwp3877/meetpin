@@ -209,7 +209,11 @@ export class PerformanceOptimizer {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const element = entry.target
-            callback ? callback(element) : this.loadLazyImage(element)
+            if (callback) {
+              callback(element)
+            } else {
+              PerformanceOptimizer.loadLazyImage(element)
+            }
             observer.unobserve(element)
           }
         })
@@ -510,7 +514,7 @@ export class CompatibilityPatches {
         },
       })
       window.addEventListener('test', null as any, opts)
-    } catch (e) {}
+    } catch (_e) {}
 
     // 패치가 필요한 경우 글로벌 설정
     if (!supportsPassive) {
@@ -579,7 +583,7 @@ export async function initializeBrowserCompatibility() {
   }
 }
 
-export default {
+const defaultExport = {
   BrowserDetector,
   FeatureSupport,
   PerformanceOptimizer,
@@ -587,3 +591,4 @@ export default {
   CompatibilityPatches,
   initializeBrowserCompatibility,
 }
+export default defaultExport

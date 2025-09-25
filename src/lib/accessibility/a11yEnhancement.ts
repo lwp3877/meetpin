@@ -353,7 +353,7 @@ export class VisualAccessibility {
     background: string
   ): { ratio: number; wcagLevel: 'AAA' | 'AA' | 'fail' } {
     // 간단한 대비 계산 (실제로는 더 복잡한 계산이 필요)
-    const getLuminance = (color: string): number => {
+    const getLuminance = (_color: string): number => {
       // 이 부분은 실제 구현에서는 더 정확한 luminance 계산이 필요
       return 0.5 // 임시값
     }
@@ -768,7 +768,7 @@ export function initializeAccessibility(): () => void {
   }
 }
 
-export default {
+const a11yEnhancements = {
   KeyboardNavigation,
   VisualAccessibility,
   ScreenReaderSupport,
@@ -776,3 +776,5 @@ export default {
   AccessibilityTesting,
   initializeAccessibility,
 }
+
+export default a11yEnhancements

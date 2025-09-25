@@ -32,7 +32,7 @@ interface SystemMetrics {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // 관리자 권한 필요
     await requireAdmin()

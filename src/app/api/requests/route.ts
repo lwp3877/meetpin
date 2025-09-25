@@ -13,7 +13,7 @@
  * - 방 시작 1시간 전까지만 요청 가능
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { requestSchema } from '@/lib/utils/zodSchemas'
 import { isDevelopmentMode } from '@/lib/config/mockData'

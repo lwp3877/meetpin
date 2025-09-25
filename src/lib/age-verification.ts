@@ -228,7 +228,7 @@ export const PRIVACY_COMPLIANCE_MESSAGES = {
   VERIFICATION_RIGHTS: '연령 인증을 거부할 권리가 있으나, 이 경우 서비스 이용이 제한됩니다.',
 }
 
-export default {
+const defaultExport = {
   verifyAge,
   getUserAgeVerificationStatus,
   requireAdultUser,
@@ -239,3 +239,4 @@ export default {
   PRIVACY_COMPLIANCE_MESSAGES,
   ADULT_ONLY_FEATURES,
 }
+export default defaultExport
