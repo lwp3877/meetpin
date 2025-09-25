@@ -50,7 +50,9 @@
     "perf:guard": "pnpm perf:baseline && pnpm perf:compare",
     "perf:slow4g": "playwright test tests/perf/slow4g.spec.ts",
     "sentry:upload": "node scripts/sentry-upload.js",
-    "smoke": "playwright test e2e/smoke.spec.ts"
+    "smoke": "playwright test e2e/smoke.spec.ts",
+    "analyze": "cross-env ANALYZE=true pnpm build",
+    "bundle:guard": "node scripts/bundle-guard.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

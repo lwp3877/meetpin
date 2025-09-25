@@ -39,6 +39,23 @@ jobs:
       - name: 🏗️ Build Check
         run: pnpm build
 
+      - name: 📦 Bundle size guard
+        run: pnpm bundle:guard
+
+      - name: 📊 Upload bundle analysis
+        run: pnpm analyze
+        continue-on-error: true
+
+      - name: 📈 Upload bundle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            .next/analyze/
+            .next/static/
+            bundle-analyzer-report.html
+          retention-days: 30
+
       - name: 📤 Upload sourcemaps to Sentry
         run: pnpm sentry:upload
         env:
