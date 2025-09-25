@@ -1,6 +1,6 @@
 {
   "name": "meetpin",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "지도에서 방을 만들어 근처 사람들과 만나고, 새로운 인연을 만들어보세요",
   "keywords": [
     "nextjs",
