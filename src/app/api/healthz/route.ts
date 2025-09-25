@@ -21,7 +21,7 @@ export async function GET() {
     const { data, error } = await Promise.race([
       supabase.from('profiles').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-    ])
+    ]) as any
 
     checks.db.responseTime = Date.now() - dbStart
 

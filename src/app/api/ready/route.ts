@@ -21,12 +21,12 @@ export async function GET() {
     const { data: profilesData, error: profilesError } = await Promise.race([
       supabase.from('profiles').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-    ])
+    ]) as any
 
     const { data: roomsData, error: roomsError } = await Promise.race([
       supabase.from('rooms').select('id').limit(1),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-    ])
+    ]) as any
 
     checks.migrationsApplied.responseTime = Date.now() - migStart
 
