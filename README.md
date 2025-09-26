@@ -1,6 +1,8 @@
 # 밋핀 (MeetPin) - 지도 기반 소셜 만남 플랫폼
 
 [![Quality Guard](https://github.com/meetpin/meetpin/workflows/🔧%20Quality%20Guard/badge.svg)](https://github.com/meetpin/meetpin/actions/workflows/quality.yml)
+[![E2E Tests](https://img.shields.io/github/actions/workflow/status/lwp3877/meetpin/e2e-prod.yml?label=E2E%20Prod&logo=playwright)](https://github.com/lwp3877/meetpin/actions/workflows/e2e-prod.yml)
+[![Coverage](https://img.shields.io/badge/E2E-100%25%20on%20v1.4.17-brightgreen.svg)](https://github.com/lwp3877/meetpin)
 [![TypeScript](https://img.shields.io/badge/TypeScript-0_errors-green.svg)](https://github.com/meetpin/meetpin)
 [![ESLint](https://img.shields.io/badge/ESLint-0_warnings-green.svg)](https://github.com/meetpin/meetpin)
 [![Architecture](https://img.shields.io/badge/Architecture-Valid-brightgreen.svg)](https://github.com/meetpin/meetpin)
@@ -24,6 +26,19 @@
 - **⭐ 모임 부스트**: 모임을 상단에 노출시켜 더 많은 참가자를 모을 수 있어요
 - **🛡️ 안전한 환경**: 신고/차단 시스템으로 안전한 만남을 보장해요
 - **📱 모바일 최적화**: 모바일 우선 반응형 디자인
+
+## 📊 QA 리포트
+
+### E2E 테스트 현황
+- **통과율**: 100% (12/12 tests) ✅
+- **브라우저**: Chromium, Firefox
+- **자동 실행**: 매일 03:00 (KST)
+- **최근 리포트**: [GitHub Actions Artifacts](https://github.com/lwp3877/meetpin/actions/workflows/e2e-prod.yml)
+
+### 관련 파일
+- **DOM 스냅샷**: [`docs/cleanup/DOM_SNAPSHOT.json`](docs/cleanup/DOM_SNAPSHOT.json)
+- **스마트 셀렉터**: [`tests/utils/smartLocator.ts`](tests/utils/smartLocator.ts)
+- **테스트 시나리오**: [`tests/e2e/`](tests/e2e/)
 
 ## 🛠️ 기술 스택
 
