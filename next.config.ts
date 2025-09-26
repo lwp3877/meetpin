@@ -189,12 +189,9 @@ const nextConfig: NextConfig = {
     ]
   },
 
-  // 리라이트 (OPS 우회 + API 프록시)
+  // 리라이트 (API 프록시만)
   async rewrites() {
     return [
-      { source: '/status',      destination: '/ops/status' },
-      { source: '/api/healthz', destination: '/api/_ops/healthz' },
-      { source: '/api/ready',   destination: '/api/_ops/ready' },
       {
         source: '/api/stripe/:path*',
         destination: '/api/payments/stripe/:path*',
