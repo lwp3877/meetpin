@@ -309,6 +309,7 @@ export default function MapWithCluster({
     <div className="relative h-full w-full">
       <div
         ref={mapContainerRef}
+        data-testid="map-container"
         className={`${className} bg-gray-200`}
         style={{
           width: '100%',

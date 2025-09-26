@@ -48,6 +48,17 @@ jobs:
       - name: 🧹 ESLint Check
         run: pnpm lint
 
+      - name: 🚫 App Router Only Guard
+        run: |
+          if [ -d "pages" ] || [ -d "src/pages" ]; then
+            echo "❌ Pages Router detected! This project uses App Router only."
+            echo "Found folders:"
+            ls -la pages/ src/pages/ 2>/dev/null || true
+            exit 1
+          else
+            echo "✅ App Router only - no Pages Router detected"
+          fi
+
       - name: 🔒 Security audit
         run: pnpm audit:security
 

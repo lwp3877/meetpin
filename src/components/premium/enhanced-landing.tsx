@@ -198,6 +198,7 @@ export default function EnhancedLanding() {
                   size="xl"
                   glow
                   className="group min-w-[200px]"
+                  data-testid="home-cta"
                   onClick={() => router.push('/map')}
                 >
                   <span className="mr-2">🗺️</span>
@@ -451,6 +452,7 @@ export default function EnhancedLanding() {
               variant="glass"
               size="xl"
               className="min-w-[250px]"
+              data-testid="home-cta"
               onClick={() => router.push('/map')}
             >
               <span className="mr-2">🚀</span>

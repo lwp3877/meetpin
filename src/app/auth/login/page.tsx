@@ -305,6 +305,7 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     id="email"
+                    data-testid="login-email"
                     type="email"
                     value={email}
                     onChange={e => handleEmailChange(e.target.value)}
@@ -397,6 +398,7 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     id="password"
+                    data-testid="login-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => handlePasswordChange(e.target.value)}
@@ -502,6 +504,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
+                data-testid="login-submit"
                 className="bg-primary hover:bg-primary/90 focus:ring-primary w-full touch-manipulation rounded-lg py-3 text-base font-medium transition-all duration-200 focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400 sm:py-4 sm:text-lg"
                 disabled={isLoading}
                 aria-describedby="submit-help keyboard-shortcuts"
