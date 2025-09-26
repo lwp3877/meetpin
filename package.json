@@ -35,6 +35,7 @@
     "approve-builds": "echo 'Build approved for pnpm run commands'",
     "playwright:install": "playwright install",
     "preview": "next build && next start",
+    "dev:check": "next build && next start -p 3000 & wait-on http://localhost:3000 && node scripts/check-routes.mjs",
     "qa:local": "playwright test --config=playwright.config.ts",
     "qa:production": "TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/production-quick-test.spec.ts",
     "qa:detailed": "TEST_URL=https://meetpin-weld.vercel.app playwright test e2e/detailed-production-test.spec.ts",

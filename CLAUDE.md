@@ -12,10 +12,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui, React 19
 - **Backend**: Supabase (PostgreSQL, Auth, Realtime, Storage)
+- **Caching**: Redis (ioredis) with Upstash for distributed caching
 - **External APIs**: Kakao Maps SDK, Stripe payments
 - **Database**: PostgreSQL with Row Level Security (RLS)
 - **State Management**: React Query (@tanstack/react-query)
 - **Form Handling**: React Hook Form with Zod validation
+- **Observability**: Structured logging with PII scrubbing and request tracing
 
 ### Key Architectural Patterns
 
@@ -47,6 +49,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Strict TypeScript configuration with enhanced type safety
    - Global type definitions in `src/types/global.d.ts`
 
+6. **Advanced Caching Architecture** (`src/lib/cache/redis.ts`):
+   - Redis/Upstash distributed caching with fallback to direct DB access
+   - Structured cache keys: `CacheKeys.rooms()`, `CacheKeys.roomDetail(id)`
+   - TTL-based invalidation with performance-optimized cache strategies
+   - Development mode gracefully handles missing Redis connections
+
+7. **Observability & Logging** (`src/lib/observability/logger.ts`):
+   - Structured logging with request tracing and PII scrubbing
+   - Performance timing with `PerformanceTimer` class
+   - Environment-aware logging (JSON for production, colored console for development)
+   - Request correlation with generated request IDs
+
+8. **API Status & Health Monitoring**:
+   - Multiple health endpoints: `/api/health`, `/api/ready`, `/api/healthz`, `/api/livez`
+   - Cache statistics endpoint: `/api/cache/stats`
+   - Security CSP reporting: `/api/security/csp-report`
+   - Web vitals telemetry: `/api/telemetry/web-vitals`
+
+9. **GDPR/DSAR Compliance**:
+   - Data Subject Access Rights automation: `/api/dsar/export`, `/api/dsar/delete-request`
+   - Privacy rights request handling: `/api/privacy-rights/request`
+   - Automated data cleanup with cron jobs: `/api/cron/*`
+   - Age verification system: `/api/age-verification`
+
 ## Current Project Status (최신 상태)
 
 ### ✅ Completed Advanced Features
@@ -55,6 +81,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **프로필/방 이미지 업로드 기능**: Supabase Storage 기반 이미지 처리 및 최적화
 - **Push 알림 시스템**: Browser Notification API 완전 구현
 - **Stripe 결제 시스템**: 부스트 기능을 위한 완전한 결제 처리
+- **Redis 캐싱 시스템**: 성능 최적화를 위한 분산 캐시 (개발환경에서는 선택적)
+- **구조화 로깅**: PII 스크러빙과 요청 추적을 포함한 관찰가능성 시스템
+- **GDPR/DSAR 준수**: 데이터 내보내기 및 삭제 요청 처리 자동화
+- **AI 콘텐츠 생성**: 자동 모임 봇 생성 및 스케줄링 시스템
+- **고급 보안**: CSP 헤더, 보안 강화, 취약점 자동 감사
 - **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
 - **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
 - **단위 테스트**: 60/60 테스트 통과 (RLS 보안 테스트 포함)
@@ -117,6 +148,11 @@ pnpm approve-builds # Approve package build requirements
 # Package Management
 pnpm store prune  # Clean package cache
 npx kill-port 3000 # Kill process on port 3000 if needed (or 3001 for alt port)
+
+# Security & Compliance
+pnpm audit:security # Security vulnerability audit
+pnpm arch:check     # Architecture boundary validation
+pnpm smoke          # Quick smoke test for essential features
 ```
 
 ## Database Schema & Migration
@@ -135,8 +171,11 @@ Execute database scripts in Supabase SQL Editor in this order:
 - `matches` - Accepted requests enabling 1:1 chat
 - `messages` - Chat messages between matched users (realtime enabled)
 - `host_messages` - Direct messages to room hosts with notification system
+- `notifications` - User notifications system with read status
 - `reports` - User reporting system
 - `blocked_users` - User blocking relationships
+- `age_verification` - Age verification tracking for compliance
+- `feedback` - User feedback collection system
 
 ## API Design Patterns
 
@@ -230,6 +269,18 @@ SITE_URL=
 NEXT_PUBLIC_ENABLE_STRIPE_CHECKOUT=true
 NEXT_PUBLIC_ENABLE_REALTIME_NOTIFICATIONS=true
 NEXT_PUBLIC_ENABLE_FILE_UPLOAD=true
+
+# Redis/Upstash (선택적 - 캐싱 성능 향상)
+REDIS_URL=your_redis_url
+UPSTASH_REDIS_REST_URL=your_upstash_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_token
+
+# Observability (선택적)
+SENTRY_DSN=your_sentry_dsn
+TELEMETRY_SAMPLING_RATE=0.1
+
+# Development Mode Control
+NEXT_PUBLIC_USE_MOCK_DATA=true  # true for mock mode, false for production
 
 # Testing Environment (RLS Security Tests)
 # Required only for advanced security testing
@@ -353,7 +404,7 @@ Centralized in `src/lib/brand.ts`:
 
 - **Platform**: Vercel (meetpin-weld.vercel.app)
 - **Git Integration**: Automatic deployment from GitHub main branch
-- **Build Status**: Latest version 1.3.3-route-conflict-fix with comprehensive cache invalidation
+- **Build Status**: Latest version 1.4.16 with App Router optimization and Pages Router removal
 - **Environment**: Production environment variables configured in Vercel dashboard
 
 ### Deployment Architecture
