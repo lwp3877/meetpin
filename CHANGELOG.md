@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.12] - 2025-09-26
+
+### Fixed
+- 🔧 **normalize routes to src/pages + prebuilt deploy**: 표준 경로 정규화
+- ⚡ **src/pages 단일 구조**: status, healthz, ready 엔드포인트 최소 구현
+- 🛡️ **config cleanup**: next.config headers 상태 규칙 제거, middleware 없음
+- 📦 **Vercel prebuilt deployment**: 로컬 빌드 → 프리빌트 배포 방식
+
+### Technical Details
+- src/pages/status.tsx: 최소 Status OK 응답
+- src/pages/api/{status,healthz,ready}.ts: cache-control no-store + JSON 응답
+- next.config.ts: 상태 엔드포인트 특별 규칙 제거
+- Vercel build → prebuilt deploy 파이프라인 적용
+
 ## [1.4.11] - 2025-09-26
 
 ### Fixed

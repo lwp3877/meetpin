@@ -71,26 +71,9 @@ const nextConfig: NextConfig = {
   // 서버 외부 패키지
   serverExternalPackages: ['@supabase/supabase-js'],
 
-  // 보안 헤더 + 캐시 완전 차단
+  // 보안 헤더 (상태 엔드포인트 규칙 제거)
   async headers() {
     return [
-      // 캐시 완전 차단 - 상태 엔드포인트
-      {
-        source: "/status",
-        headers: [
-          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, stale-while-revalidate=0" },
-          { key: "Pragma", value: "no-cache" },
-          { key: "Expires", value: "0" }
-        ],
-      },
-      {
-        source: "/api/:path(status|healthz|ready)",
-        headers: [
-          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, stale-while-revalidate=0" },
-          { key: "Pragma", value: "no-cache" },
-          { key: "Expires", value: "0" }
-        ],
-      },
       {
         source: '/(.*)',
         headers: [
