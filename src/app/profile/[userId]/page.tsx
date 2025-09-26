@@ -16,7 +16,10 @@ interface UserProfile {
 }
 
 export default function UserProfilePage() {
-  const { userId } = useParams()
+  const params = useParams<{ userId: string }>()
+  const userId = params?.userId
+    ? Array.isArray(params.userId) ? params.userId[0] : params.userId
+    : ''
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
