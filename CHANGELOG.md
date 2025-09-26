@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.16] - 2025-09-26
+
+### Fixed
+- 🚀 **ops endpoints: App Router only**: /status, /api/healthz, /api/ready 완전 App Router 전환
+- ⚡ **Pages Router 완전 제거**: pages/ 디렉토리 삭제로 라우팅 충돌 해결
+- 🔄 **Rewrite 규칙 정리**: /status, /api/healthz, /api/ready 관련 rewrite 제거
+- 🛡️ **Vercel 플랫폼 호환**: App Router만으로 확실한 배포 보장
+
+### Technical Details
+- src/app/status/page.tsx: force-dynamic + revalidate=0 + 30초 자동 새로고침
+- src/app/api/healthz/route.ts: nodejs runtime + cache-control no-store + JSON 응답
+- src/app/api/ready/route.ts: 준비도 검사 + 503 상태코드 지원
+- Pages Router 완전 삭제로 라우팅 충돌 제거
+
 ## [1.4.14] - 2025-09-26
 
 ### Fixed
