@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.14] - 2025-09-26
+
+### Fixed
+- 🚀 **ops v-path fallback**: /ops/* & /api/_ops/* + rewrites for cache bypass
+- ⚡ **Root Pages Router**: pages/ops/status.tsx, pages/api/_ops/{healthz,ready}.ts
+- 🔄 **Rewrite rules**: /status → /ops/status, /api/healthz → /api/_ops/healthz, /api/ready → /api/_ops/ready
+- 🛡️ **Middleware removed**: No conflicts with routing
+
+### Technical Details
+- New versioned paths to bypass 404 cache: /ops/status, /api/_ops/healthz, /api/_ops/ready
+- Root /pages directory (not src/pages) for Vercel platform compatibility
+- next.config.ts rewrites for legacy path support
+- Minimal implementations with timestamp + cache-control no-store
+
 ## [1.4.12] - 2025-09-26
 
 ### Fixed
