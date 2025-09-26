@@ -243,8 +243,8 @@ const nextConfig: NextConfig = {
     BUILD_VERSION: process.env.npm_package_version || '1.0.0',
   },
 
-  // 출력 설정 - 서버 실행 모드 강제 (API 라우트 지원)
-  // output: process.env.VERCEL ? 'standalone' : undefined,  // 주석 처리 - API 404 방지
+  // 🔥 정적 내보내기 완전 금지 - API 라우트 보장
+  // output: 'export',  // 완전 삭제 - 서버 모드 강제
 
   // TypeScript 최적화
   typescript: {
