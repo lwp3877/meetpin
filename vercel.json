@@ -1,112 +1,16 @@
 {
-  "version": 2,
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": "nextjs",
-  "regions": ["icn1", "hnd1", "sin1"],
   "functions": {
-    "src/app/api/**/*.ts": {
+    "pages/ops/status.tsx": {
       "runtime": "nodejs20.x",
       "maxDuration": 30
     },
-    "pages/api/*.ts": {
+    "pages/api/_ops/healthz.ts": {
+      "runtime": "nodejs20.x", 
+      "maxDuration": 30
+    },
+    "pages/api/_ops/ready.ts": {
       "runtime": "nodejs20.x",
-      "maxDuration": 10
+      "maxDuration": 30
     }
-  },
-  "routes": [
-    {
-      "src": "^/api/(healthz|ready|status)$",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "^/status$",
-      "dest": "/status"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://meetpin-weld.vercel.app"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization, X-Requested-With"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(self)"
-        },
-        {
-          "key": "X-Force-Deployment",
-          "value": "v2.1.0-healthcheck-fix-25sep2025"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/home",
-      "destination": "/map",
-      "permanent": true
-    },
-    {
-      "source": "/index",
-      "destination": "/",
-      "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
-    },
-    {
-      "source": "/robots.txt",
-      "destination": "/api/robots"
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron/cleanup-expired-boosts",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/cleanup-old-notifications",
-      "schedule": "0 2 * * *"
-    }
-  ]
+  }
 }
