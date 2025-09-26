@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.11] - 2025-09-26
+
+### Fixed
+- 🔥 **Vercel platform routing fix**: Pages Router 우선 적용으로 API 404 해결
+- ⚡ **Router conflict resolution**: App Router 중복 제거, Pages Router 단일화
+- 🛡️ **vercel.json routes**: 명시적 라우팅 규칙 + 함수 런타임 설정
+- 📦 **Clean Pages Router**: /api/healthz, /api/ready, /api/status, /status 완전 Pages Router 전환
+
+### Technical Details
+- Pages Router: pages/api/*.ts 단일 구조로 완전 통합
+- vercel.json: explicit routes 규칙 + nodejs20.x 함수 런타임
+- Router conflict 해결: src/app 중복 경로 완전 제거
+- Local dev 200 OK 확인: Pages Router 엔드포인트 정상 동작
+
 ## [1.4.10] - 2025-01-28
 
 ### Fixed

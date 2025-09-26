@@ -53,7 +53,7 @@ export default function StatusPage({ initialData }: StatusProps) {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   // 캐시 완전 차단
-  const res = {
+  const _res = {
     'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0, stale-while-revalidate=0',
     'Pragma': 'no-cache',
     'Expires': '0'
