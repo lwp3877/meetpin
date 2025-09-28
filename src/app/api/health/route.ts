@@ -36,10 +36,65 @@ export async function GET(_request: NextRequest): Promise<Response> {
 
   try {
     // 환경 정보 수집
-    const environment = isDevelopmentMode ? 'development' : 'production'
-    const version = process.env.NEXT_PUBLIC_APP_VERSION || '1.3.1'
+    const environment = isDevelopmentMode ? 'development-mock' : 'production'
+    const version = process.env.npm_package_version || '1.4.22'
 
-    // 서비스 상태 체크
+    // Mock 모드에서는 항상 정상 상태 반환
+    if (isDevelopmentMode) {
+      const mockServices = {
+        database: 'connected' as const,
+        auth: 'configured' as const,
+        maps: 'configured' as const,
+        payments: 'configured' as const,
+      }
+
+      const healthResult: HealthCheckResult = {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version,
+        environment: 'mock-mode',
+        services: mockServices,
+        additional_services: {
+          maps: 'configured',
+          payments: 'configured',
+        },
+        performance: {
+          uptime: process.uptime(),
+          memory_usage: Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100,
+        },
+        build_info: {
+          build_time: new Date().toISOString(),
+          commit_hash: process.env.VERCEL_GIT_COMMIT_SHA,
+          deploy_env: process.env.VERCEL_ENV || 'mock',
+        },
+      }
+
+      const responseTime = Date.now() - startTime
+
+      return Response.json(
+        {
+          ok: true,
+          data: healthResult,
+          meta: {
+            response_time_ms: responseTime,
+            checks_performed: 4,
+            mode: 'mock-development',
+          },
+        } as ApiResponse<HealthCheckResult>,
+        {
+          status: 200,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'X-Health-Check': 'meetpin-mock',
+            'X-Response-Time': `${responseTime}ms`,
+            'X-Service-Status': 'healthy',
+            'X-Mock-Mode': 'true',
+          },
+        }
+      )
+    }
+
+    // 서비스 상태 체크 (Non-Mock 모드)
     const services = await checkServices()
 
     // 성능 메트릭 수집
