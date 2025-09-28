@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
@@ -6,6 +6,10 @@ interface SmartLocatorOptions {
   fallback?: RegExp;
   timeout?: number;
 }
+
+type LocatorPatterns = {
+  [key: string]: (() => Locator)[];
+};
 
 export async function by(page: Page, key: string, opts: SmartLocatorOptions = {}) {
   const timeout = opts.timeout || 10000;
@@ -23,7 +27,7 @@ export async function by(page: Page, key: string, opts: SmartLocatorOptions = {}
   }
   
   // Step 2: Try semantic role-based matching
-  const patterns = {
+  const patterns: LocatorPatterns = {
     'login-email': [
       () => page.getByRole('textbox', { name: /email|이메일/i }),
       () => page.getByPlaceholder(/email|이메일|your@email/i),
@@ -38,13 +42,13 @@ export async function by(page: Page, key: string, opts: SmartLocatorOptions = {}
     ],
     'login-submit': [
       () => page.getByRole('button', { name: /로그인|login|sign in/i }),
-      () => page.getByText(/로그인|login/i).filter('button'),
+      () => page.locator('button').filter({ hasText: /로그인|login/i }),
       () => page.locator('button[type="submit"]')
     ],
     'home-cta': [
-      () => page.getByText('🗺️지도에서 시작하기').filter('button'),
-      () => page.getByText('🚀밋핀 시작하기').filter('button'),
-      () => page.getByText('밋핀 시작하기').filter('button'),
+      () => page.locator('button').filter({ hasText: '🗺️지도에서 시작하기' }),
+      () => page.locator('button').filter({ hasText: '🚀밋핀 시작하기' }),
+      () => page.locator('button').filter({ hasText: '밋핀 시작하기' }),
       () => page.getByRole('button', { name: /🗺️.*지도.*시작|🚀.*밋핀.*시작/i }),
       () => page.getByRole('button', { name: /시작|start|지도|map/i }),
       () => page.locator('a[href*="/map"], button[onclick*="map"]')

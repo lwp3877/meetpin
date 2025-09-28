@@ -81,8 +81,8 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5, // 접근성을 위해 확대 허용
+  userScalable: true, // 접근성을 위해 사용자 스케일링 허용
 }
 
 export default function RootLayout({

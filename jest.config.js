@@ -16,7 +16,7 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/e2e/',
-    '<rootDir>/tests/rls/', // Exclude RLS security tests that require Supabase
+    '<rootDir>/tests/', // Exclude all Playwright tests from Jest
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   testMatch: ['**/__tests__/**/*.(ts|tsx|js)', '**/*.(test|spec).(ts|tsx|js)'],

@@ -114,7 +114,10 @@
       "mcp__filesystem__edit_file",
       "mcp__filesystem__write_file",
       "Bash(rg:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(export PROD_URL=https://meetpin-weld.vercel.app)",
+      "Bash(export TZ=Asia/Seoul)",
+      "Bash(if exist .eslintignore del .eslintignore)"
     ],
     "deny": [],
     "ask": []

@@ -154,7 +154,7 @@ describe('Stripe Webhook Processing', () => {
       const userId = session.metadata?.user_id
 
       // Basic UUID format check (simplified)
-      const uuidRegex = /^[0-9a-f-]+$/i
+      const _uuidRegex = /^[0-9a-f-]+$/i
       expect(userId).toBeDefined()
       expect(typeof userId).toBe('string')
       expect(userId!.length).toBeGreaterThan(0)

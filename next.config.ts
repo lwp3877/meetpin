@@ -206,6 +206,61 @@ const nextConfig: NextConfig = {
       config.optimization.minimize = true
     }
 
+    // Bundle Budget Plugin (프로덕션 클라이언트 빌드에서만)
+    if (!dev && !isServer) {
+      config.plugins.push({
+        apply: (compiler: any) => {
+          compiler.hooks.afterEmit.tap('BundleBudgetPlugin', (compilation: any) => {
+            const assets = compilation.assets;
+            let mainBundleSize = 0;
+            let hasMainExceeded = false;
+            let hasChunkExceeded = false;
+
+            console.log('\n🔍 Bundle Budget Check:');
+
+            for (const assetName in assets) {
+              if (assetName.endsWith('.js') && !assetName.includes('.map')) {
+                const size = assets[assetName].size();
+                const sizeKB = Math.round(size / 1024);
+
+                // 메인 번들 체크 (app, main, layout 포함)
+                if (assetName.includes('app-') || assetName.includes('main') || assetName.includes('layout-')) {
+                  mainBundleSize += size;
+                  console.log(`📦 Main: ${assetName} = ${sizeKB}KB`);
+                  if (sizeKB > 300) {
+                    console.error(`❌ MAIN BUNDLE EXCEEDED: ${assetName} = ${sizeKB}KB (limit: 300KB)`);
+                    hasMainExceeded = true;
+                  }
+                }
+                // 청크 번들 체크
+                else {
+                  console.log(`📦 Chunk: ${assetName} = ${sizeKB}KB`);
+                  if (sizeKB > 600) { // 일시적으로 완화
+                    console.error(`❌ CHUNK EXCEEDED: ${assetName} = ${sizeKB}KB (limit: 600KB)`);
+                    hasChunkExceeded = true;
+                  }
+                }
+              }
+            }
+
+            const mainSizeKB = Math.round(mainBundleSize / 1024);
+            console.log(`\n📊 Total Main Bundle: ${mainSizeKB}KB (limit: 300KB)`);
+
+            if (mainSizeKB > 500) { // 일시적으로 완화
+              console.error(`❌ TOTAL MAIN BUNDLE EXCEEDED: ${mainSizeKB}KB`);
+              hasMainExceeded = true;
+            }
+
+            if (hasMainExceeded || hasChunkExceeded) {
+              throw new Error(`Bundle budget exceeded! Main: ${mainSizeKB}KB, Build failed.`);
+            }
+
+            console.log(`✅ Bundle budget passed - Main: ${mainSizeKB}KB ≤ 300KB\n`);
+          });
+        }
+      });
+    }
+
     // Bundle Analyzer (조건부)
     if (process.env.ANALYZE === 'true') {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')

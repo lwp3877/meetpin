@@ -153,6 +153,8 @@ npx kill-port 3000 # Kill process on port 3000 if needed (or 3001 for alt port)
 pnpm audit:security # Security vulnerability audit
 pnpm arch:check     # Architecture boundary validation
 pnpm smoke          # Quick smoke test for essential features
+pnpm a11y           # Run accessibility tests (WCAG 2.1 AA)
+pnpm a11y:report    # Generate accessibility report with HTML output
 ```
 
 ## Database Schema & Migration
@@ -312,7 +314,7 @@ Centralized in `src/lib/brand.ts`:
   - Cross-user data access prevention
   - Admin privilege escalation protection
   - Performance testing with large datasets
-- **Playwright** for E2E tests with UI support and accessibility testing
+- **Playwright** for E2E tests with UI support and comprehensive accessibility testing (WCAG 2.1 AA compliance)
 - **Multi-environment Testing**: Local, production, mobile, and performance test suites
 - **Critical User Flows**: signup → room creation → matching → chat
 - **Lighthouse Integration**: Performance, accessibility, and SEO auditing
@@ -389,14 +391,15 @@ Centralized in `src/lib/brand.ts`:
 
 ### Project Quality Standards
 
-- **TypeScript**: Strict mode with enhanced type safety
-- **Code Quality**: Comprehensive ESLint + Prettier configuration
-- **Testing Suite**: Jest unit tests + Playwright E2E testing
+- **TypeScript**: Strict mode with enhanced type safety (⚠️ 6 errors in tests/utils/smartLocator.ts need fixing)
+- **Code Quality**: Comprehensive ESLint + Prettier configuration (⚠️ Next.js lint deprecated in v16)
+- **Testing Suite**: Jest unit tests + Playwright E2E testing + WCAG 2.1 AA accessibility compliance
 - **Build Verification**: `pnpm repo:doctor` for complete quality checks
 - **Performance**: Bundle optimization and lazy loading
 - **Internationalization**: Korean-first UI with proper text handling
 - **Mobile-first**: Responsive design with touch-optimized interactions
 - **Security**: Multi-layer protection (RLS, validation, rate limiting, blocking)
+- **Accessibility**: WCAG 2.1 AA compliance with automated testing and color contrast verification
 
 ## Production Deployment
 
@@ -404,7 +407,7 @@ Centralized in `src/lib/brand.ts`:
 
 - **Platform**: Vercel (meetpin-weld.vercel.app)
 - **Git Integration**: Automatic deployment from GitHub main branch
-- **Build Status**: Latest version 1.4.16 with App Router optimization and Pages Router removal
+- **Build Status**: Latest version 1.4.17 with accessibility testing and performance improvements
 - **Environment**: Production environment variables configured in Vercel dashboard
 
 ### Deployment Architecture
@@ -449,11 +452,14 @@ Common production deployment issues and solutions:
    - Solution: Verify environment variables and consider Mock mode fallback
 3. **Build Failures**: TypeScript or linting errors preventing deployment
    - Solution: Run `pnpm repo:doctor` locally before pushing
+   - ⚠️ **Current Issue**: 6 TypeScript errors in `tests/utils/smartLocator.ts` preventing clean builds
 4. **Git Synchronization**: Local changes not reflecting in deployment
    - Solution: Ensure all changes are committed and pushed to GitHub main branch
 5. **RLS Test Failures**: Security tests failing due to missing Supabase environment variables
    - Solution: Either provide Supabase credentials for testing or skip RLS tests in development
    - Note: RLS tests in `tests/rls/` require live Supabase connection and will fail in CI/CD without proper setup
+6. **Next.js Lint Deprecation**: `next lint` command deprecated and will be removed in Next.js 16
+   - Solution: Consider migrating to ESLint CLI: `npx @next/codemod@canary next-lint-to-eslint-cli .`
 
 ### Test Environment Configuration
 
