@@ -1,0 +1,10 @@
+{
+  "env": {
+    "NEXT_PUBLIC_USE_MOCK_DATA": "true"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_USE_MOCK_DATA": "true"
+    }
+  }
+}

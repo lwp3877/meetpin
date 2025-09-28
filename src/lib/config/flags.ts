@@ -106,9 +106,9 @@ export const isDevelopment = process.env.NODE_ENV === 'development'
 export const isProduction = process.env.NODE_ENV === 'production'
 export const isTest = process.env.NODE_ENV === 'test'
 
-// 개발자 모드 (Mock 데이터 사용) - NEXT_PUBLIC_USE_MOCK_DATA 기준으로 결정
-// 프로덕션 준비: 환경변수가 명시적으로 'false'가 아닌 한 Mock 데이터 사용 (안전한 기본값)
-export const isDevelopmentMode = process.env.NEXT_PUBLIC_USE_MOCK_DATA !== 'false'
+// 개발자 모드 (Mock 데이터 사용) - 프로덕션 환경에서도 Mock 모드 활성화
+// 프로덕션 데모: 환경변수 설정 없이도 앱이 동작하도록 보장
+export const isDevelopmentMode = process.env.NEXT_PUBLIC_USE_MOCK_DATA !== 'false' || process.env.NODE_ENV === 'production'
 
 // 디버그 모드
 export const isDebugMode = isDevelopment && process.env.DEBUG?.includes('meetpin')
