@@ -103,6 +103,15 @@ export async function GET(_request: NextRequest): Promise<Response> {
     )
   } catch (error) {
     console.error('Health check failed:', error)
+    console.error('Environment debug info:', {
+      NODE_ENV: process.env.NODE_ENV,
+      NEXT_PUBLIC_USE_MOCK_DATA: process.env.NEXT_PUBLIC_USE_MOCK_DATA,
+      isDevelopmentMode,
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasSupabaseAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      hasSupabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasKakaoKey: !!process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY,
+    })
 
     return Response.json(
       {
@@ -112,6 +121,13 @@ export async function GET(_request: NextRequest): Promise<Response> {
           status: 'unhealthy',
           timestamp: new Date().toISOString(),
           error: error instanceof Error ? error.message : 'Unknown error',
+          debug_info: {
+            isDevelopmentMode,
+            NODE_ENV: process.env.NODE_ENV,
+            NEXT_PUBLIC_USE_MOCK_DATA: process.env.NEXT_PUBLIC_USE_MOCK_DATA,
+            hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+            hasKakaoKey: !!process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY,
+          },
         },
       } as ApiResponse<any>,
       {
