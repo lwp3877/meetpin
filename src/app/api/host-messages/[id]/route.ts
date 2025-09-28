@@ -5,7 +5,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
-import { isDevelopmentMode } from '@/lib/config/mockData'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
 // 특정 호스트 메시지 조회
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

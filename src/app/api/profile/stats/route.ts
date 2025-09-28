@@ -2,7 +2,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
-import { isDevelopmentMode } from '@/lib/config/mockData'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
 interface UserStats {
   hostedRooms: number

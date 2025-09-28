@@ -11,7 +11,7 @@ import {
   mockPaymentProcess,
 } from '@/lib/services/stripe'
 import { useAuth } from '@/lib/useAuth'
-import { isDevelopmentMode } from '@/lib/config/mockData'
+import { isDevelopmentMode } from '@/lib/config/flags'
 import toast from 'react-hot-toast'
 
 interface BoostModalProps {

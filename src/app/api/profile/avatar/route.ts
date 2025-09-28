@@ -5,7 +5,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
-import { isDevelopmentMode } from '@/lib/config/mockData'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
 // 프로필 아바타 업데이트
 export async function PATCH(req: NextRequest) {

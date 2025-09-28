@@ -1347,5 +1347,5 @@ export const mockSignUp = async (
   }
 }
 
-// Mock 모드는 개발환경에서만 사용 - 프로덕션 완전 비활성화
-export const isDevelopmentMode = true
+// Mock 모드는 flags.ts에서 관리됩니다 - 중복 제거
+// export const isDevelopmentMode = true  // 제거됨
