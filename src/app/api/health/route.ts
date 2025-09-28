@@ -6,13 +6,17 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
 interface HealthCheckResult {
-  status: 'healthy' | 'unhealthy'
+  status: 'healthy' | 'degraded' | 'unhealthy'
   timestamp: string
   version: string
   environment: string
   services: {
     database: 'connected' | 'disconnected' | 'error'
     auth: 'configured' | 'missing_keys' | 'error'
+    maps: 'configured' | 'missing_key' | 'error'
+    payments: 'configured' | 'missing_keys' | 'disabled' | 'error'
+  }
+  additional_services?: {
     maps: 'configured' | 'missing_key' | 'error'
     payments: 'configured' | 'missing_keys' | 'disabled' | 'error'
   }
@@ -51,12 +55,19 @@ export async function GET(_request: NextRequest): Promise<Response> {
       deploy_env: process.env.VERCEL_ENV || 'local',
     }
 
-    // 전체 상태 판단
-    const overallStatus = Object.values(services).every(
-      status => status === 'connected' || status === 'configured' || status === 'disabled'
-    )
-      ? 'healthy'
-      : 'unhealthy'
+    // 전체 상태 판단 (핵심 서비스만 체크, 부가 기능은 제외)
+    const coreServicesHealthy = isDevelopmentMode
+      ? true // 개발 모드에서는 항상 정상
+      : services.database === 'connected' &&
+        (services.auth === 'configured' || services.auth === 'missing_keys')
+
+    // 부가 서비스 상태 (maps, payments는 경고만 표시)
+    const additionalServices = {
+      maps: services.maps,
+      payments: services.payments
+    }
+
+    const overallStatus = coreServicesHealthy ? 'healthy' : 'unhealthy'
 
     const healthResult: HealthCheckResult = {
       status: overallStatus,
@@ -64,6 +75,7 @@ export async function GET(_request: NextRequest): Promise<Response> {
       version,
       environment,
       services,
+      additional_services: additionalServices,
       performance,
       build_info,
     }
@@ -80,11 +92,12 @@ export async function GET(_request: NextRequest): Promise<Response> {
         },
       } as ApiResponse<HealthCheckResult>,
       {
-        status: overallStatus === 'healthy' ? 200 : 503,
+        status: overallStatus === 'unhealthy' ? 503 : 200, // healthy나 degraded는 200, unhealthy만 503
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'X-Health-Check': 'meetpin-v1',
           'X-Response-Time': `${responseTime}ms`,
+          'X-Service-Status': overallStatus,
         },
       }
     )

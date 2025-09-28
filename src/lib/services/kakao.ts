@@ -33,11 +33,21 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     return loadPromise
   }
 
-  // API 키 확인 (프로덕션에서 하드코딩된 키 사용)
-  const key =
-    apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || '11764377687ae8ad3d8decc7ac0078d5'
+  // API 키 확인 (프로덕션 환경 고려)
+  const key = apiKey || process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY
+
+  // 프로덕션에서 API 키가 없으면 더 자세한 오류 정보 제공
   if (!key) {
-    return Promise.reject(new Error('Kakao Maps API 키가 설정되지 않았습니다'))
+    console.error('❌ Kakao Maps API 키가 설정되지 않았습니다.')
+    console.error('🔧 환경변수 확인 필요: NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY')
+    console.error('🌐 현재 도메인:', typeof window !== 'undefined' ? window.location.hostname : 'Unknown')
+
+    // 개발 환경에서는 Mock 모드 권장, 프로덕션에서는 즉시 실패
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('⚠️ 개발 환경: Mock 모드를 권장합니다.')
+    }
+
+    return Promise.reject(new Error(`Kakao Maps API 키가 설정되지 않았습니다. 환경변수 NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY를 확인하세요. (도메인: ${typeof window !== 'undefined' ? window.location.hostname : 'Unknown'})`))
   }
 
   // 로딩 시작
