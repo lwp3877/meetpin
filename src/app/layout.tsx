@@ -11,7 +11,14 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'http://localhost:3001' // 개발 기본
+}
+
 export const metadata: Metadata = {
+  metadataBase: new URL(getBaseUrl()),
   title: `${brandMessages.appName} - ${brandMessages.tagline}`,
   description:
     '🗺️ 지도에서 방을 만들어 근처 사람들과 실시간 만남! 술친구, 운동메이트, 취미친구를 쉽게 찾고 1:1 채팅으로 바로 연결하세요. 신규 가입 시 프리미엄 부스트 3일 무료 증정!',
