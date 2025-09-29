@@ -95,10 +95,9 @@ export async function POST(request: NextRequest) {
     const currentCount = global.cspStats.get(statsKey) || 0
     global.cspStats.set(statsKey, currentCount + 1)
 
-    return new NextResponse('CSP Report Received', {
+    return new NextResponse(null, {
       status: 204,
       headers: {
-        'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache',
       },
     })

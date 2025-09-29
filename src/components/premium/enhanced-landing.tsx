@@ -49,7 +49,7 @@ const FEATURED_ROOMS = [
     description: '서울에서 가장 높은 곳에서 즐기는 프리미엄 와인 테이스팅과 야경 감상',
     hostAge: '30대 초반',
     joinCount: 47,
-    image: 'https://images.unsplash.com/photo-1568732277412-6de2a5b4bcf8?w=800&h=600&fit=crop&crop=center',
+    image: '/icons/meetpin.svg',
   },
   {
     id: '2',

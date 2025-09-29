@@ -71,13 +71,33 @@ const nextConfig: NextConfig = {
   // 서버 외부 패키지
   serverExternalPackages: ['@supabase/supabase-js'],
 
-  // 보안 헤더 강화 - 강제 CSP + 메타 충돌 방지
+  // 보안 헤더 강화 - 개발/프로덕션 구분
   async headers() {
-    // CSP 정책 생성 - next/font 자체 호스팅으로 단순화
+    const isDev = process.env.NODE_ENV === 'development'
+
+    // 개발 모드에서는 CSP 완화
+    if (isDev) {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'X-Frame-Options',
+              value: 'SAMEORIGIN',
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff',
+            },
+          ],
+        },
+      ]
+    }
+
+    // 프로덕션 모드 - 강화된 보안 헤더
     const fontDomains = [
       'https://fonts.gstatic.com',
       'https://fonts.googleapis.com'
-      // cdn.jsdelivr.net 제거 - next/font 사용으로 CSP 단순화
     ].join(' ')
 
     const enforcedCSP = [
@@ -91,8 +111,8 @@ const nextConfig: NextConfig = {
       "frame-src 'self' https://js.stripe.com",
       "object-src 'none'",
       "form-action 'self'",
-      "frame-ancestors 'none'", // 헤더에서만 유효
-      'upgrade-insecure-requests', // 강제 CSP에만 포함
+      "frame-ancestors 'none'",
+      'upgrade-insecure-requests',
     ].join('; ')
 
     // Report-Only: 최소 정책으로 관측용
