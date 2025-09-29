@@ -1,50 +1,7 @@
 @import 'tailwindcss';
 
-/* Font optimization with display: swap */
-@font-face {
-  font-family: 'Pretendard';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Light.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-Light.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Regular.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-Regular.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Medium.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-Medium.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-SemiBold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-SemiBold.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff2/Pretendard-Bold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/woff/Pretendard-Bold.woff') format('woff');
-}
+/* next/font 자체 호스팅으로 CSP 단순화 - 외부 CDN 제거 */
+/* Pretendard CDN 로드 제거 - Inter 폰트로 대체 */
 
 :root {
   --background: #ffffff;
@@ -118,6 +75,52 @@ html {
 
 .skip-link:focus {
   top: 0;
+}
+
+/* WCAG 2.1 AA - 터치 타깃 최소 크기 (44x44px) */
+.touch-target-enhanced {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 인터랙티브 요소 기본 터치 타깃 */
+button,
+a[role="button"],
+input[type="button"],
+input[type="submit"],
+[role="tab"],
+[role="menuitem"] {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* 작은 아이콘 버튼을 위한 패딩 보정 */
+.btn-icon-sm {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+}
+
+/* 포커스 가시성 강화 */
+*:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 스크린 리더 전용 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* 고대비 모드 지원 */

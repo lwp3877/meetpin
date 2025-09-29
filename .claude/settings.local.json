@@ -118,7 +118,8 @@
       "Bash(export PROD_URL=https://meetpin-weld.vercel.app)",
       "Bash(export TZ=Asia/Seoul)",
       "Bash(if exist .eslintignore del .eslintignore)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(set \"TEST_URL=https://meetpin-weld.vercel.app\")"
     ],
     "deny": [],
     "ask": []

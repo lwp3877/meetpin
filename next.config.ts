@@ -71,8 +71,36 @@ const nextConfig: NextConfig = {
   // 서버 외부 패키지
   serverExternalPackages: ['@supabase/supabase-js'],
 
-  // 보안 헤더 (상태 엔드포인트 규칙 제거)
+  // 보안 헤더 강화 - 강제 CSP + 메타 충돌 방지
   async headers() {
+    // CSP 정책 생성 - next/font 자체 호스팅으로 단순화
+    const fontDomains = [
+      'https://fonts.gstatic.com',
+      'https://fonts.googleapis.com'
+      // cdn.jsdelivr.net 제거 - next/font 사용으로 CSP 단순화
+    ].join(' ')
+
+    const enforcedCSP = [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `font-src 'self' data: ${fontDomains}`,
+      "img-src 'self' data: blob: https: http:",
+      "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
+      "frame-src 'self' https://js.stripe.com",
+      "object-src 'none'",
+      "form-action 'self'",
+      "frame-ancestors 'none'", // 헤더에서만 유효
+      'upgrade-insecure-requests', // 강제 CSP에만 포함
+    ].join('; ')
+
+    // Report-Only: 최소 정책으로 관측용
+    const reportOnlyCSP = [
+      "default-src 'self'",
+      "report-uri /api/security/csp-report",
+    ].join('; ')
+
     return [
       {
         source: '/(.*)',
@@ -82,7 +110,7 @@ const nextConfig: NextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains; preload',
           },
-          // X-Frame-Options
+          // X-Frame-Options (하위 호환)
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -91,11 +119,6 @@ const nextConfig: NextConfig = {
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
-          },
-          // X-XSS-Protection
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
           },
           // Referrer Policy
           {
@@ -107,42 +130,24 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(self), payment=(self)',
           },
-          // Content Security Policy (Report-Only for testing)
+          // Cross-Origin Policies
           {
-            key: 'Content-Security-Policy-Report-Only',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com",
-              "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
-              "img-src 'self' data: blob: https: http:",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "frame-src 'self' https://js.stripe.com",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              'upgrade-insecure-requests',
-              'report-uri /api/security/csp-report',
-            ].join('; '),
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
           },
-          // Content Security Policy (Enforced - 점진적으로 활성화)
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          // Content Security Policy (강제 정책)
           {
             key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com",
-              "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
-              "img-src 'self' data: blob: https: http:",
-              "font-src 'self' data: https://fonts.gstatic.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "frame-src 'self' https://js.stripe.com",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "frame-ancestors 'none'",
-              'upgrade-insecure-requests',
-            ].join('; '),
+            value: enforcedCSP,
+          },
+          // Content Security Policy (Report-Only 최소화)
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: reportOnlyCSP,
           },
         ],
       },

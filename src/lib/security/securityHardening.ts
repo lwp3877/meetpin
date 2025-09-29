@@ -357,18 +357,14 @@ export class ContentSecurityPolicy {
   }
 
   /**
-   * 메타 태그로 CSP 설정
+   * 메타 태그 CSP 비활성화 - 헤더에서만 설정
+   * frame-ancestors는 메타 태그에서 무시됨
    */
   static setupMetaCSP(): void {
-    if (typeof document === 'undefined') return
-
-    const existingMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]')
-    if (existingMeta) return
-
-    const meta = document.createElement('meta')
-    meta.httpEquiv = 'Content-Security-Policy'
-    meta.content = this.generateCSPHeader()
-    document.head.appendChild(meta)
+    // CSP는 next.config.ts 헤더에서만 설정
+    // 메타 태그 사용 시 frame-ancestors 무시 문제 및 충돌 발생
+    console.log('🔒 CSP: HTTP 헤더에서만 설정 - 메타 태그 비활성화')
+    return
   }
 }
 

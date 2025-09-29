@@ -93,11 +93,11 @@ export const premiumShadows = {
 }
 
 export const premiumTypography = {
-  // Font stacks
+  // Font stacks - next/font 자체 호스팅으로 CSP 단순화
   fontFamily: {
     display: [
-      'Pretendard Variable',
-      'Pretendard',
+      'var(--font-inter)',
+      'Inter',
       '-apple-system',
       'BlinkMacSystemFont',
       'system-ui',
@@ -113,8 +113,8 @@ export const premiumTypography = {
       'sans-serif',
     ],
     body: [
-      'Pretendard Variable',
-      'Pretendard',
+      'var(--font-inter)',
+      'Inter',
       '-apple-system',
       'BlinkMacSystemFont',
       'system-ui',

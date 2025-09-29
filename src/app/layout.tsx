@@ -1,7 +1,15 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { brandMessages } from '@/lib/config/brand'
 import Providers from '@/components/common/Providers'
+
+// next/font 자체 호스팅으로 CSP 단순화
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
   title: `${brandMessages.appName} - ${brandMessages.tagline}`,
@@ -83,6 +91,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5, // 접근성을 위해 확대 허용
   userScalable: true, // 접근성을 위해 사용자 스케일링 허용
+  // WCAG 2.1 AA 준수: 확대/축소 기능 보장
 }
 
 export default function RootLayout({
@@ -106,8 +115,7 @@ export default function RootLayout({
 
         {/* Preconnect for performance */}
         <link rel="preconnect" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Google Fonts preconnect 제거 - next/font 자체 호스팅 사용 */}
 
         {/* JSON-LD Structured Data */}
         <script
@@ -146,7 +154,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-background min-h-screen touch-manipulation font-sans antialiased">
+      <body className={`${inter.variable} bg-background min-h-screen touch-manipulation font-sans antialiased`}>
         <Providers>
           <div id="root" className="mobile-full-height relative flex min-h-screen flex-col">
             <main className="flex-1">{children}</main>
@@ -161,14 +169,15 @@ export default function RootLayout({
             __html: `
               // 터치 최적화 즉시 실행
               (function() {
-                // 뷰포트 메타 태그 설정
+                // 뷰포트 메타 태그 접근성 준수 설정
                 var viewport = document.querySelector('meta[name=viewport]');
                 if (!viewport) {
                   viewport = document.createElement('meta');
                   viewport.name = 'viewport';
                   document.head.appendChild(viewport);
                 }
-                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+                // WCAG 2.1 AA 준수: 확대/축소 기능 보장 (user-scalable=yes, maximum-scale=5)
+                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover';
 
                 // iOS Safari 100vh 문제 해결
                 function setVhUnit() {
