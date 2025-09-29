@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 2 # 이전 커밋과 비교를 위해
 
       - name: pnpm 설정
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
 
