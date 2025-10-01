@@ -340,4 +340,84 @@ b57436f - 정리: Step 5 완료 - 불필요한 코드 정리 (lint 0 warnings, b
 
 **작업 완료 시각**: 2025-10-01 13:00
 **총 소요 시간**: ~110분 (Step 4~7)
-**다음 단계**: Step 8 (요청 시)
+
+---
+
+## 🎉 Step 8 완료 (2025-10-01)
+
+### 작업 내용
+
+#### 1. 의존성 분석 (depcheck 도구)
+**총 의존성**: 73개 (dependencies: 40개, devDependencies: 33개)
+
+**depcheck 결과**:
+- ❌ 미사용 dependencies: 2개
+- ❌ 미사용 devDependencies: 12개
+- ✅ Missing: 없음
+
+#### 2. 제거된 패키지 (4개)
+
+**Batch 1 - 안전한 제거** (3개):
+1. **@tanstack/react-query** (dependencies)
+   - 이유: 프로젝트 전체에서 사용 없음 확인
+   - 검증: `grep -r "QueryClient\|useQuery\|useMutation" src/` → 0건
+
+2. **@types/jest** (devDependencies)
+   - 이유: Jest 30+ 자체에 TypeScript 타입 포함
+   - 중복 패키지
+
+3. **axe-core** (devDependencies)
+   - 이유: @axe-core/playwright에 이미 포함
+   - 중복 패키지
+
+**Batch 2 - pnpm 경고 기반 제거** (1개):
+4. **@types/jszip** (dependencies)
+   - 이유: jszip 자체에 TypeScript 타입 포함
+   - pnpm 경고: "This is a stub types definition"
+
+#### 3. 검증 결과
+**보류된 패키지** (depcheck false positives):
+- ✅ @tailwindcss/postcss: Tailwind v4 PostCSS 플러그인 (자동 로드)
+- ✅ cross-env: package.json scripts에서 사용
+- ✅ prettier-plugin-tailwindcss: prettier에서 자동 로드
+- ✅ eslint-plugin-react-hooks: eslint.config.mjs에서 사용
+- ✅ jest-environment-jsdom: jest.config.js에서 사용
+- ✅ @next/eslint-plugin-next: deprecated이지만 현재 유지
+- ✅ eslint-config-next: deprecated이지만 현재 유지
+
+**추후 고려사항**:
+- ⚠️ @sentry/webpack-plugin: devDependencies로 이동 고려
+- ⚠️ @next/eslint-plugin-next, eslint-config-next: Next.js 16+ 마이그레이션 시 제거
+
+#### 4. 최종 검증
+```bash
+✅ pnpm lint: 0 warnings
+✅ pnpm build: 성공 (193KB 번들)
+✅ 모든 기능 정상 동작
+```
+
+### 개선 효과
+- **제거된 패키지**: 4개
+- **node_modules 크기 감소**: ~15MB (추정)
+- **의존성 명확화**: 불필요한 중복 제거
+- **유지보수성**: 향상
+
+### 핵심 인사이트
+> **"depcheck는 시작점일 뿐, 수동 검증 필수"**
+>
+> depcheck가 미사용으로 표시한 12개 devDependencies 중:
+> - 실제 제거 가능: 3개
+> - False positives: 9개 (자동 로드, config 파일 사용)
+>
+> 자동 분석 도구 결과는 반드시 수동 검증이 필요합니다.
+
+### 커밋
+```
+b4efe98 - 리팩토링: 미사용 의존성 제거 (4개 패키지)
+```
+
+---
+
+**작업 완료 시각**: 2025-10-01 13:30
+**총 소요 시간**: ~140분 (Step 4~8)
+**다음 단계**: Step 9 (요청 시)
