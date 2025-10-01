@@ -1,12 +1,10 @@
 'use client'
 
-import React, { useState, useEffect, useTransition } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
 import { useRouter } from 'next/navigation'
 import { isDevelopmentMode } from '@/lib/config/flags'
-import PremiumButton from '@/components/ui/premium-button'
-import { Badge } from '@/components/ui/badge'
 import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
 import LegalFooter from '@/components/layout/LegalFooter'
 import {
@@ -18,7 +16,6 @@ import {
   ChevronRight,
   Sparkles,
   Zap,
-  Heart,
   TrendingUp,
   ArrowRight,
   Play,
@@ -134,7 +131,6 @@ export default function EnhancedLanding() {
   const [isVisible, setIsVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [mounted, setMounted] = useState(false)
-  const [isPending, startTransition] = useTransition()
 
   // 강력한 디버깅 로그
   console.log('🔍 [EnhancedLanding] 컴포넌트 렌더링됨 - v2')
@@ -164,14 +160,6 @@ export default function EnhancedLanding() {
         }
       }
 
-      // 모든 네비게이션 이벤트를 가로채고 차단
-      const preventNavigation = (e: any) => {
-        console.log('🚨 [Landing] 네비게이션 시도 차단됨:', e)
-        e.preventDefault()
-        e.stopPropagation()
-        return false
-      }
-
       // 모든 링크 클릭 방지
       document.addEventListener('click', (e) => {
         const target = e.target as HTMLElement
@@ -197,7 +185,7 @@ export default function EnhancedLanding() {
       }
 
       // window.location 변경 시도 감지
-      let currentPath = window.location.pathname
+      const currentPath = window.location.pathname
       const checkLocation = () => {
         if (window.location.pathname !== currentPath) {
           console.log('🚨 [Landing] 위치 변경 감지됨, 복원:', currentPath, '->', window.location.pathname)
@@ -214,11 +202,6 @@ export default function EnhancedLanding() {
       }
     }
   }, [])
-
-  // 자동 리다이렉트 useEffect 완전 제거 - 메인 페이지에 머물게 함
-  // useEffect(() => {
-  //   // 모든 자동 리다이렉트 로직 제거됨
-  // }, [mounted, user])
 
   useEffect(() => {
     setIsVisible(true)
@@ -516,12 +499,12 @@ export default function EnhancedLanding() {
 
               {/* Slide Indicators */}
               <div className="flex justify-center gap-3 mt-8">
-                {FEATURED_ROOMS.map((_, index) => (
+                {FEATURED_ROOMS.map((_, _index) => (
                   <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
+                    key={_index}
+                    onClick={() => setCurrentSlide(_index)}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      index === currentSlide
+                      _index === currentSlide
                         ? 'bg-gradient-to-r from-purple-500 to-pink-500 scale-125'
                         : 'bg-white/30 hover:bg-white/50'
                     }`}

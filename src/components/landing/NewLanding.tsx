@@ -12,7 +12,6 @@ import {
   Music,
   Heart,
   Shield,
-  Zap,
   Star,
   ArrowRight,
   CheckCircle,

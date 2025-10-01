@@ -3,27 +3,19 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import Image from 'next/image'
 import {
   MapPin,
   Users,
-  Calendar,
   Clock,
   Coffee,
   Dumbbell,
   Music,
-  Heart,
   Shield,
-  Zap,
   Star,
   ArrowRight,
   CheckCircle,
-  Sparkles,
   TrendingUp,
-  MessageCircle,
   ChevronRight,
-  Award,
-  Target,
 } from 'lucide-react'
 
 // 실제 서울 지역 기반 리얼 모임 데이터
@@ -118,12 +110,6 @@ const LIVE_ROOMS = [
     fee: 10000,
     image: '/api/placeholder/400/300'
   },
-]
-
-const CATEGORY_STATS = [
-  { icon: Coffee, label: '술모임', count: '240+', color: 'from-amber-500 to-orange-600' },
-  { icon: Dumbbell, label: '운동', count: '180+', color: 'from-blue-500 to-cyan-600' },
-  { icon: Music, label: '취미', count: '320+', color: 'from-purple-500 to-pink-600' },
 ]
 
 const TRUST_FEATURES = [
@@ -589,13 +575,3 @@ export default function ProLanding() {
     </div>
   )
 }
-
-// CSS for grid pattern (add to globals.css)
-const styles = `
-.bg-grid-pattern {
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-`

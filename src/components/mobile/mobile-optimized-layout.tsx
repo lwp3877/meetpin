@@ -6,7 +6,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { firstGrapheme } from '@/lib/utils/textSafe'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import PremiumButton from '@/components/ui/premium-button'
