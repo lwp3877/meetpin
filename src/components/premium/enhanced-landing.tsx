@@ -8,7 +8,6 @@ import { isDevelopmentMode } from '@/lib/config/flags'
 import PremiumButton from '@/components/ui/premium-button'
 import { RoomCard } from '@/components/ui/premium-card'
 import { Badge } from '@/components/ui/badge'
-import SignupIncentive from '@/components/onboarding/signup-incentive'
 import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
 import LegalFooter from '@/components/layout/LegalFooter'
 import {
