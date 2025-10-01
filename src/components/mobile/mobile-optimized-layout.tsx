@@ -6,6 +6,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { firstGrapheme } from '@/lib/utils/textSafe'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import PremiumButton from '@/components/ui/premium-button'
@@ -213,7 +214,7 @@ export function MobileOptimizedLayout({
                   className="flex items-center space-x-3 rounded-xl bg-gray-50 p-3"
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 font-bold text-white">
-                    {room.title.charAt(0)}
+                    {room.category === 'drink' ? '🍻' : room.category === 'exercise' ? '💪' : '☕'}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-semibold text-gray-800">{room.title}</div>

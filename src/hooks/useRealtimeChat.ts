@@ -107,7 +107,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
           sender_profile: {
             nickname: '모임 호스트',
             avatar_url:
-              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              'https://api.dicebear.com/8.x/adventurer/svg?seed=host&backgroundColor=b6e3f4,c0aede,d1d4f9',
           },
         },
         {
@@ -121,7 +121,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
           receiver_profile: {
             nickname: '모임 호스트',
             avatar_url:
-              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              'https://api.dicebear.com/8.x/adventurer/svg?seed=host&backgroundColor=b6e3f4,c0aede,d1d4f9',
           },
         },
       ]
@@ -213,7 +213,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
             sender_profile: {
               nickname: '모임 호스트',
               avatar_url:
-                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                'https://api.dicebear.com/8.x/adventurer/svg?seed=host&backgroundColor=b6e3f4,c0aede,d1d4f9',
             },
           }
           setMessages(prev => [...prev, autoReply])

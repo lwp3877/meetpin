@@ -24,13 +24,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      // CDN 이미지
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
+      // CDN 이미지 (일시적으로 비활성화 - 404 에러 때문에)
+      // {
+      //   protocol: 'https',
+      //   hostname: 'images.unsplash.com',
+      //   port: '',
+      //   pathname: '/**',
+      // },
       // 소셜 로그인 아바타
       {
         protocol: 'https',

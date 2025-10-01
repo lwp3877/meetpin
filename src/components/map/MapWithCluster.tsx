@@ -363,7 +363,7 @@ export default function MapWithCluster({
 
       {/* 현재 위치 버튼 */}
       <button
-        className="absolute right-4 bottom-4 rounded-lg bg-white p-3 shadow-lg transition-colors hover:bg-gray-50"
+        className="absolute right-4 bottom-4 rounded-lg bg-white p-3 shadow-lg transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
         onClick={() => {
           if (!navigator.geolocation || !mapRef.current || !window.kakao) return
 
@@ -383,12 +383,17 @@ export default function MapWithCluster({
           )
         }}
         title="현재 위치로 이동"
+        aria-label="현재 위치로 지도 이동"
+        aria-describedby="location-btn-desc"
+        type="button"
       >
         <svg
           className="h-5 w-5 text-gray-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
+          role="img"
         >
           <path
             strokeLinecap="round"
@@ -403,6 +408,10 @@ export default function MapWithCluster({
             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
           />
         </svg>
+        {/* Hidden description for screen readers */}
+        <span id="location-btn-desc" className="sr-only">
+          GPS를 사용하여 현재 위치를 찾고 지도의 중앙으로 이동합니다
+        </span>
       </button>
     </div>
   )

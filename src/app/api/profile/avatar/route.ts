@@ -38,7 +38,7 @@ export async function PATCH(req: NextRequest) {
 
       // 허용된 도메인 whitelist
       const allowedDomains = [
-        'images.unsplash.com',
+        // 'images.unsplash.com', // 일시적으로 비활성화 - 400 에러
         'api.dicebear.com',
         'avatars.githubusercontent.com',
         'lh3.googleusercontent.com',

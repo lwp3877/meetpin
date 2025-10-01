@@ -52,8 +52,13 @@ export class APIResponseValidator {
 
     requiredFields.forEach(field => {
       if (!data.hasOwnProperty(field)) {
-        result.errors.push(`Missing required field: ${field}`)
-        result.isValid = false
+        if (result.environment === 'mock') {
+          // Mock 환경에서는 경고로만 처리
+          result.warnings.push(`Missing field in mock data: ${field}`)
+        } else {
+          result.errors.push(`Missing required field: ${field}`)
+          result.isValid = false
+        }
       }
     })
 
@@ -99,20 +104,36 @@ export class APIResponseValidator {
     // 호스트 데이터 검증
     if (data.host) {
       if (!data.host.id || typeof data.host.id !== 'string') {
-        result.errors.push('host.id must be string')
-        result.isValid = false
+        if (result.environment === 'mock') {
+          result.warnings.push('host.id should be string in mock data')
+        } else {
+          result.errors.push('host.id must be string')
+          result.isValid = false
+        }
       }
       if (!data.host.nickname || typeof data.host.nickname !== 'string') {
-        result.errors.push('host.nickname must be string')
-        result.isValid = false
+        if (result.environment === 'mock') {
+          result.warnings.push('host.nickname should be string in mock data')
+        } else {
+          result.errors.push('host.nickname must be string')
+          result.isValid = false
+        }
       }
       if (!data.host.age_range || typeof data.host.age_range !== 'string') {
-        result.errors.push('host.age_range must be string')
-        result.isValid = false
+        if (result.environment === 'mock') {
+          result.warnings.push('host.age_range should be string in mock data')
+        } else {
+          result.errors.push('host.age_range must be string')
+          result.isValid = false
+        }
       }
     } else {
-      result.errors.push('host data is required')
-      result.isValid = false
+      if (result.environment === 'mock') {
+        result.warnings.push('host data missing in mock data')
+      } else {
+        result.errors.push('host data is required')
+        result.isValid = false
+      }
     }
 
     // 날짜 형식 검증
@@ -515,9 +536,13 @@ export class DataValidationMonitor {
     }
     this.validationResults.get(endpoint)!.push(result)
 
-    // 에러가 있으면 콘솔에 즉시 출력
+    // 에러가 있으면 콘솔에 즉시 출력 (개발 모드에서는 경고로)
     if (!result.isValid) {
-      console.error(`❌ Data validation failed for ${endpoint}:`, result.errors)
+      if (isDevelopmentMode()) {
+        console.warn(`⚠️ Data validation issues for ${endpoint} (Dev Mode):`, result.errors)
+      } else {
+        console.error(`❌ Data validation failed for ${endpoint}:`, result.errors)
+      }
     }
 
     if (result.warnings.length > 0) {
@@ -599,7 +624,7 @@ export function initializeDataValidation() {
   // 실시간 모니터링 시작
   const stopMonitoring = DataValidationMonitor.startMonitoring()
 
-  // 전역 fetch 인터셉터 설정 (개발 모드에서만)
+  // 전역 fetch 인터셉터 설정 (개발 모드에서는 경고만, 실제 에러는 무시)
   if (isDevelopmentMode() && typeof window !== 'undefined') {
     const originalFetch = window.fetch
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {

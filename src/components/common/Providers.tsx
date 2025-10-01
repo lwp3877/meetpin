@@ -10,7 +10,7 @@ import { BotSchedulerInitializer } from '@/components/common/BotSchedulerInitial
 import { GlobalErrorBoundary } from '@/components/error/GlobalErrorBoundary'
 import { Toaster } from 'sonner'
 import { logFeatureFlags } from '@/lib/config/features'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { initializeBrowserCompatibility } from '@/lib/utils/browserCompat'
 import { initializeDataValidation } from '@/lib/utils/dataValidation'
 import { initializeSecurityMeasures } from '@/lib/security/securityHardening'
@@ -21,7 +21,16 @@ interface ProvidersProps {
 }
 
 export default function Providers({ children }: ProvidersProps) {
+  const [isHydrated, setIsHydrated] = useState(false)
+
   useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    // 하이드레이션 완료 후에만 DOM 변형 시스템 초기화
+    if (!isHydrated) return
+
     // 개발 모드에서 피처 플래그 로그 출력
     logFeatureFlags()
 
@@ -30,22 +39,24 @@ export default function Providers({ children }: ProvidersProps) {
 
     const cleanupFunctions: (() => void)[] = []
 
-    // 브라우저 호환성 및 성능 최적화
+    // 브라우저 호환성 및 성능 최적화 (DOM 변형 없음)
     initializeBrowserCompatibility().then(cleanup => {
       if (cleanup) cleanupFunctions.push(cleanup)
     })
 
-    // 데이터 검증 시스템
+    // 데이터 검증 시스템 (DOM 변형 없음)
     const dataValidationCleanup = initializeDataValidation()
     cleanupFunctions.push(dataValidationCleanup)
 
-    // 보안 강화 시스템
+    // 보안 강화 시스템 (DOM 변형 없음)
     const securityCleanup = initializeSecurityMeasures()
     cleanupFunctions.push(securityCleanup)
 
-    // 접근성 개선 시스템
-    const accessibilityCleanup = initializeAccessibility()
-    cleanupFunctions.push(accessibilityCleanup)
+    // 접근성 개선 시스템 (하이드레이션 후 안전하게 실행)
+    setTimeout(() => {
+      const accessibilityCleanup = initializeAccessibility()
+      cleanupFunctions.push(accessibilityCleanup)
+    }, 100) // 하이드레이션 후 100ms 대기
 
     console.log('✅ 실제 사용자 테스트 준비 완료: 모든 시스템이 활성화되었습니다')
     console.log(`
@@ -80,7 +91,7 @@ export default function Providers({ children }: ProvidersProps) {
       cleanupFunctions.forEach(cleanup => cleanup())
       console.log('🧹 시스템 정리 완료')
     }
-  }, [])
+  }, [isHydrated])
 
   return (
     <GlobalErrorBoundary>

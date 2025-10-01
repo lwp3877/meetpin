@@ -77,8 +77,34 @@ async function getRooms(request: NextRequest) {
     const total = filteredRooms.length
     const paginatedRooms = filteredRooms.slice(offset, offset + limit)
 
+    // 데이터 정규화: mockRooms 구조를 API 응답 형태로 변환
+    const normalizedRooms = paginatedRooms.map(room => ({
+      id: String(room.id || crypto.randomUUID()),
+      title: String(room.title || "제목 미정"),
+      category: String(room.category || "other"),
+      lat: Number(room.lat || 0),
+      lng: Number(room.lng || 0),
+      place_text: String(room.place_text || ""),
+      start_at: String(room.start_at || new Date().toISOString()),
+      max_people: Number(room.max_people || 1),
+      fee: Number(room.fee || 0),
+      visibility: String(room.visibility || "public"),
+      created_at: String(room.created_at || new Date().toISOString()),
+      host: room.profiles ? {
+        id: String(room.profiles.uid || "host_unknown"),
+        nickname: String(room.profiles.nickname || "Unknown"),
+        avatar_url: room.profiles.avatar_url,
+        age_range: room.profiles.age_range
+      } : { id: "host_unknown", nickname: "Unknown" },
+      boost_until: room.boost_until,
+      // 추가 필드들 보완
+      description: room.description || "",
+      host_uid: room.host_uid || room.profiles?.uid || "host_unknown",
+      updated_at: room.updated_at || room.created_at || new Date().toISOString()
+    }))
+
     return apiUtils.success({
-      rooms: paginatedRooms,
+      rooms: normalizedRooms, // API 응답은 'rooms' 키 사용
       pagination: {
         page,
         limit,
@@ -163,7 +189,7 @@ async function getRooms(request: NextRequest) {
     }
 
     return {
-      rooms,
+      rooms: rooms || [],
       pagination: {
         page,
         limit,

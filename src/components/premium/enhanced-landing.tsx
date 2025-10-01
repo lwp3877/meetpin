@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useTransition } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
 import { useRouter } from 'next/navigation'
+import { isDevelopmentMode } from '@/lib/config/flags'
 import PremiumButton from '@/components/ui/premium-button'
 import { RoomCard } from '@/components/ui/premium-card'
 import { Badge } from '@/components/ui/badge'
@@ -68,7 +69,7 @@ const FEATURED_ROOMS = [
     description: '프로 골퍼와 함께하는 프라이빗 골프 레슨 & 네트워킹',
     hostAge: '30대 후반',
     joinCount: 32,
-    image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&crop=center',
+    image: '/icons/meetpin.svg',
   },
   {
     id: '3',
@@ -87,7 +88,7 @@ const FEATURED_ROOMS = [
     description: '갤러리아 VIP 라운지에서 진행되는 큐레이터와 함께하는 프라이빗 아트 투어',
     hostAge: '30대 초반',
     joinCount: 28,
-    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop&crop=center',
+    image: '/icons/meetpin.svg',
   },
 ]
 
@@ -135,6 +136,92 @@ export default function EnhancedLanding() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [mounted, setMounted] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  // 강력한 디버깅 로그
+  console.log('🔍 [EnhancedLanding] 컴포넌트 렌더링됨 - v2')
+  console.log('🔍 [EnhancedLanding] user:', user)
+  console.log('🔍 [EnhancedLanding] mounted:', mounted)
+  console.log('🔍 [EnhancedLanding] NODE_ENV:', process.env.NODE_ENV)
+  console.log('🔍 [EnhancedLanding] window.location.pathname:', typeof window !== 'undefined' ? window.location.pathname : 'SSR')
+  console.log('🔍 [EnhancedLanding] localStorage meetpin_user:', typeof window !== 'undefined' ? localStorage.getItem('meetpin_user') : 'SSR')
+
+  useEffect(() => {
+    setMounted(true)
+
+    // 🚨 강력한 리다이렉트 방지 - 어떤 상황에서도 메인 페이지에서 벗어나지 않도록 함
+    if (typeof window !== 'undefined') {
+      console.log('🚨 [Landing] 강력한 리다이렉트 방지 활성화')
+
+      // 개발 모드에서 mock 사용자 데이터가 있지만 랜딩 페이지를 보려는 경우 제거
+      if (isDevelopmentMode) {
+        const mockUser = localStorage.getItem('meetpin_user')
+        if (mockUser) {
+          console.log('[Landing] Mock user found, clearing for fresh experience')
+          localStorage.removeItem('meetpin_user')
+          // 쿠키도 제거
+          if (typeof document !== 'undefined') {
+            document.cookie = 'meetpin_mock_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+          }
+        }
+      }
+
+      // 모든 네비게이션 이벤트를 가로채고 차단
+      const preventNavigation = (e: any) => {
+        console.log('🚨 [Landing] 네비게이션 시도 차단됨:', e)
+        e.preventDefault()
+        e.stopPropagation()
+        return false
+      }
+
+      // 모든 링크 클릭 방지
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement
+        if (target.tagName === 'A' && target.getAttribute('href') !== '#') {
+          console.log('🚨 [Landing] 링크 클릭 차단됨:', target.getAttribute('href'))
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      })
+
+      // History API 조작 방지
+      const originalPushState = window.history.pushState
+      const originalReplaceState = window.history.replaceState
+
+      window.history.pushState = function(...args) {
+        console.log('🚨 [Landing] history.pushState 차단됨:', args)
+        return
+      }
+
+      window.history.replaceState = function(...args) {
+        console.log('🚨 [Landing] history.replaceState 차단됨:', args)
+        return
+      }
+
+      // window.location 변경 시도 감지
+      let currentPath = window.location.pathname
+      const checkLocation = () => {
+        if (window.location.pathname !== currentPath) {
+          console.log('🚨 [Landing] 위치 변경 감지됨, 복원:', currentPath, '->', window.location.pathname)
+          window.history.replaceState(null, '', currentPath)
+        }
+      }
+
+      const locationWatcher = setInterval(checkLocation, 100)
+
+      return () => {
+        clearInterval(locationWatcher)
+        window.history.pushState = originalPushState
+        window.history.replaceState = originalReplaceState
+      }
+    }
+  }, [])
+
+  // 자동 리다이렉트 useEffect 완전 제거 - 메인 페이지에 머물게 함
+  // useEffect(() => {
+  //   // 모든 자동 리다이렉트 로직 제거됨
+  // }, [mounted, user])
 
   useEffect(() => {
     setIsVisible(true)
@@ -169,8 +256,8 @@ export default function EnhancedLanding() {
   }
 
   if (user) {
-    router.push('/map')
-    return null
+    // 하이드레이션 안정용: 고정된 skeleton만 노출
+    return <div aria-busy="true" className="p-6 text-sm text-neutral-500">이동 중…</div>
   }
 
   return (
@@ -249,7 +336,10 @@ export default function EnhancedLanding() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
                 <button
-                  onClick={() => router.push('/map')}
+                  onClick={() => {
+                    console.log('[DEBUG] 버튼 클릭됨 - 리다이렉트 방지됨')
+                    alert('버튼이 클릭되었습니다. 리다이렉트가 비활성화되어 있습니다.')
+                  }}
                   className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -494,7 +584,10 @@ export default function EnhancedLanding() {
             </p>
 
             <button
-              onClick={() => router.push('/map')}
+              onClick={() => {
+                console.log('[DEBUG] 하단 버튼 클릭됨 - 리다이렉트 방지됨')
+                alert('하단 버튼이 클릭되었습니다. 리다이렉트가 비활성화되어 있습니다.')
+              }}
               className="group relative px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

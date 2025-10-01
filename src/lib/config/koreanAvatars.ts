@@ -1,33 +1,33 @@
-// 한국인 프로필 이미지 URL 모음
+// 한국인 프로필 이미지 URL 모음 (Dicebear 아바타 사용)
 export const koreanAvatars = {
   // 한국인 남성 프로필들
   male: [
-    'https://images.unsplash.com/photo-1568822617270-2c1579f8dfe2?w=150&h=150&fit=crop&crop=face', // 젊은 한국 남성
-    'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face', // 한국 남성 프로필
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face', // 미소짓는 남성
-    'https://images.unsplash.com/photo-1600486913747-55e5470d6f40?w=150&h=150&fit=crop&crop=face', // 안경 쓴 남성
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face', // 캐주얼한 남성
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face', // 정장 남성
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face', // 웃는 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m1&backgroundColor=b6e3f4,c0aede,d1d4f9', // 젊은 한국 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m2&backgroundColor=ffd5dc,ffdfba,c7ceea', // 한국 남성 프로필
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m3&backgroundColor=b6e3f4,c0aede,d1d4f9', // 미소짓는 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m4&backgroundColor=ffd5dc,ffdfba,c7ceea', // 안경 쓴 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m5&backgroundColor=b6e3f4,c0aede,d1d4f9', // 캐주얼한 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m6&backgroundColor=ffd5dc,ffdfba,c7ceea', // 정장 남성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=m7&backgroundColor=b6e3f4,c0aede,d1d4f9', // 웃는 남성
   ],
 
   // 한국인 여성 프로필들
   female: [
-    'https://images.unsplash.com/photo-1601233749202-95d04d5b3c00?w=150&h=150&fit=crop&crop=face', // 한국 여성 프로필
-    'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=150&h=150&fit=crop&crop=face', // 긴 머리 여성
-    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face', // 미소짓는 여성
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face', // 단발 여성
-    'https://images.unsplash.com/photo-1494790108755-2616b9ee3cde?w=150&h=150&fit=crop&crop=face', // 자연스러운 여성
-    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face', // 프로페셔널 여성
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face', // 웃는 여성
-    'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face', // 캐주얼한 여성
-    'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=150&h=150&fit=crop&crop=face', // 친근한 여성
-    'https://images.unsplash.com/photo-1557555187-23d685287bc3?w=150&h=150&fit=crop&crop=face', // 세련된 여성
-    'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&h=150&fit=crop&crop=face', // 활발한 여성
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop&crop=face', // 밝은 여성
-    'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=face', // 지적인 여성
-    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face', // 우아한 여성
-    'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=150&fit=crop&crop=face', // 모던한 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f1&backgroundColor=ffd5dc,ffdfba,c7ceea', // 한국 여성 프로필
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f2&backgroundColor=b6e3f4,c0aede,d1d4f9', // 긴 머리 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f3&backgroundColor=ffd5dc,ffdfba,c7ceea', // 미소짓는 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f4&backgroundColor=b6e3f4,c0aede,d1d4f9', // 단발 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f5&backgroundColor=ffd5dc,ffdfba,c7ceea', // 자연스러운 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f6&backgroundColor=b6e3f4,c0aede,d1d4f9', // 프로페셔널 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f7&backgroundColor=ffd5dc,ffdfba,c7ceea', // 웃는 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f8&backgroundColor=b6e3f4,c0aede,d1d4f9', // 캐주얼한 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f9&backgroundColor=ffd5dc,ffdfba,c7ceea', // 친근한 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f10&backgroundColor=b6e3f4,c0aede,d1d4f9', // 세련된 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f11&backgroundColor=ffd5dc,ffdfba,c7ceea', // 활발한 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f12&backgroundColor=b6e3f4,c0aede,d1d4f9', // 밝은 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f13&backgroundColor=ffd5dc,ffdfba,c7ceea', // 지적인 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f14&backgroundColor=b6e3f4,c0aede,d1d4f9', // 우아한 여성
+    'https://api.dicebear.com/8.x/adventurer/svg?seed=f15&backgroundColor=ffd5dc,ffdfba,c7ceea', // 모던한 여성
   ],
 }
 

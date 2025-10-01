@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { firstGraphemeUpper } from '@/lib/utils/textSafe'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
@@ -148,7 +149,7 @@ export function ProfileModal({ isOpen, onClose, userId }: ProfileModalProps) {
                       ) : (
                         <span className="text-4xl font-bold text-white">
                           {userProfile.nickname
-                            ? userProfile.nickname.charAt(0).toUpperCase()
+                            ? firstGraphemeUpper(userProfile.nickname)
                             : '?'}
                         </span>
                       )}

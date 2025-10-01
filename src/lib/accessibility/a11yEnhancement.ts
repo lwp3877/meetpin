@@ -413,40 +413,111 @@ export class ScreenReaderSupport {
   }
 
   /**
-   * ARIA 속성 자동 추가
+   * ARIA 속성 자동 추가 (향상된 버전)
    */
   static enhanceARIA() {
-    // 버튼에 적절한 역할 추가
+    // 버튼에 적절한 접근성 이름 확인 및 개선
     document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])').forEach(btn => {
       if (!btn.textContent?.trim()) {
         console.warn('Button without accessible name detected:', btn)
-      }
-    })
 
-    // 입력 필드에 라벨 연결 확인
-    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach(input => {
-      const id = input.getAttribute('id')
-      if (id) {
-        const label = document.querySelector(`label[for="${id}"]`)
-        if (!label) {
-          console.warn('Input without associated label detected:', input)
+        // 아이콘 기반 버튼 자동 레이블링
+        const icon = btn.querySelector('svg, [class*="icon"], [class*="Icon"]')
+        if (icon) {
+          // 안전한 클래스명 문자열 정규화
+          let iconClass = ""
+          const cls = (icon as HTMLElement).className as unknown
+
+          if (typeof cls === "string") {
+            iconClass = cls
+          } else if (typeof (cls as any)?.baseVal === "string") {
+            // SVGAnimatedString
+            iconClass = (cls as any).baseVal
+          } else if ((icon as HTMLElement).classList) {
+            iconClass = Array.from((icon as HTMLElement).classList).join(" ")
+          }
+
+          iconClass = iconClass.toLowerCase()
+
+          if (iconClass.includes('close') || iconClass.includes('x')) {
+            btn.setAttribute('aria-label', '닫기')
+          } else if (iconClass.includes('menu') || iconClass.includes('hamburger')) {
+            btn.setAttribute('aria-label', '메뉴')
+          } else if (iconClass.includes('search')) {
+            btn.setAttribute('aria-label', '검색')
+          } else if (iconClass.includes('plus') || iconClass.includes('add')) {
+            btn.setAttribute('aria-label', '추가')
+          } else if (iconClass.includes('edit') || iconClass.includes('pencil')) {
+            btn.setAttribute('aria-label', '편집')
+          } else if (iconClass.includes('delete') || iconClass.includes('trash') || iconClass.includes('remove')) {
+            btn.setAttribute('aria-label', '삭제')
+          } else {
+            btn.setAttribute('aria-label', '버튼')
+          }
         }
       }
     })
 
-    // 이미지에 alt 텍스트 확인
-    document.querySelectorAll('img:not([alt])').forEach(img => {
-      console.warn('Image without alt text detected:', img)
+    // 입력 필드에 라벨 연결 확인 (더 관대하게)
+    document.querySelectorAll('input:not([aria-label]):not([aria-labelledby])').forEach(input => {
+      const id = input.getAttribute('id')
+      const placeholder = input.getAttribute('placeholder')
+
+      if (id) {
+        const label = document.querySelector(`label[for="${id}"]`)
+        if (!label && !placeholder) {
+          console.warn('Input without associated label or placeholder detected:', input)
+        }
+      } else if (!placeholder) {
+        console.warn('Input without label, id, or placeholder detected:', input)
+      }
     })
 
-    // 링크에 목적 설명 확인
-    document.querySelectorAll('a:not([aria-label]):not([aria-labelledby])').forEach(link => {
-      if (
-        !link.textContent?.trim() ||
-        link.textContent.trim() === '더보기' ||
-        link.textContent.trim() === '자세히'
-      ) {
-        console.warn('Link with unclear purpose detected:', link)
+    // 이미지에 alt 텍스트 확인 (장식용 이미지 제외)
+    document.querySelectorAll('img:not([alt])').forEach(img => {
+      // 장식용 이미지가 아닌 경우에만 경고
+      if (!img.closest('[role="presentation"]') && !img.classList.contains('decorative')) {
+        console.warn('Image without alt text detected:', img.src)
+        // 장식용으로 추정되는 이미지에는 빈 alt 추가
+        if (img.classList.contains('bg-') || img.classList.contains('decoration') || img.closest('.bg-')) {
+          img.setAttribute('alt', '')
+        }
+      }
+    })
+
+    // 링크에 목적 설명 확인 (더 관대하게)
+    document.querySelectorAll('a[href]:not([aria-label]):not([aria-labelledby])').forEach(link => {
+      const text = link.textContent?.trim()
+      if (!text || ['더보기', '자세히', '보기', '클릭', '링크'].includes(text)) {
+        console.warn('Link with unclear purpose detected:', text || link.href)
+
+        // 컨텍스트에서 유추할 수 있는 정보로 자동 레이블링
+        const container = link.closest('[data-title], [data-name], h1, h2, h3, h4, h5, h6')
+        if (container) {
+          const contextText = container.getAttribute('data-title') ||
+                             container.getAttribute('data-name') ||
+                             container.textContent?.trim()
+          if (contextText && contextText !== text) {
+            link.setAttribute('aria-label', `${contextText} ${text || '보기'}`)
+          }
+        }
+      }
+    })
+
+    // 헤딩 요소에 적절한 역할 확인
+    document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+      if (!heading.textContent?.trim()) {
+        console.warn('Empty heading detected:', heading.tagName)
+      }
+    })
+
+    // 대화형 요소의 포커스 가능성 확인
+    document.querySelectorAll('[onclick], [onkeydown]').forEach(element => {
+      if (!element.hasAttribute('tabindex') && element.tagName !== 'BUTTON' && element.tagName !== 'A') {
+        console.warn('Interactive element without keyboard accessibility:', element)
+        // 키보드 접근성 자동 추가
+        element.setAttribute('tabindex', '0')
+        element.setAttribute('role', 'button')
       }
     })
   }
@@ -490,31 +561,90 @@ export class ScreenReaderSupport {
  */
 export class UsabilityEnhancement {
   /**
-   * 터치 대상 크기 확인
+   * 터치 대상 크기 확인 (향상된 버전)
    */
   static validateTouchTargets() {
     const minSize = 44 // 44px 최소 권장 크기
+    const minSizeTablet = 48 // 태블릿용 48px
 
-    document.querySelectorAll('button, a, input, select, textarea').forEach(element => {
+    // 기존 스타일이 있는지 확인
+    if (document.getElementById('touch-target-styles')) return
+
+    const currentSize = window.innerWidth > 768 ? minSizeTablet : minSize
+
+    document.querySelectorAll('button, a[href], input, select, textarea, [role="button"]').forEach(element => {
       const rect = element.getBoundingClientRect()
 
-      if (rect.width < minSize || rect.height < minSize) {
-        console.warn(`Touch target too small (${rect.width}x${rect.height}):`, element)
+      // 화면에 보이지 않는 요소는 스킵
+      if (rect.width === 0 && rect.height === 0) return
 
-        // 자동으로 최소 크기 보장 클래스 추가
-        element.classList.add('touch-target-enhanced')
+      if (rect.width < currentSize || rect.height < currentSize) {
+        // 이미 충분한 패딩이 있는지 확인
+        const computedStyle = window.getComputedStyle(element)
+        const totalWidth = rect.width + parseInt(computedStyle.paddingLeft) + parseInt(computedStyle.paddingRight)
+        const totalHeight = rect.height + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom)
+
+        if (totalWidth < currentSize || totalHeight < currentSize) {
+          console.warn(`Touch target too small (${Math.round(rect.width)}x${Math.round(rect.height)}):`, element.textContent?.substring(0, 30) || element.tagName)
+
+          // 자동으로 최소 크기 보장 클래스 추가 (조건부)
+          if (!element.closest('.ignore-touch-target') && !element.classList.contains('text-xs')) {
+            element.classList.add('touch-target-enhanced')
+          }
+        }
+      }
+
+      // 버튼과 링크에 접근성 레이블 확인
+      if ((element.tagName === 'BUTTON' || element.tagName === 'A') &&
+          !element.getAttribute('aria-label') &&
+          !element.getAttribute('aria-labelledby') &&
+          !element.textContent?.trim()) {
+
+        console.warn('Interactive element without accessible name:', element)
+
+        // 아이콘 버튼인 경우 자동으로 aria-label 추가
+        const icon = element.querySelector('svg, [class*="icon"]')
+        if (icon) {
+          element.setAttribute('aria-label', '버튼')
+        }
       }
     })
 
-    // 최소 크기 보장 스타일 추가
+    // 최소 크기 보장 스타일 추가 (한 번만)
     const style = document.createElement('style')
+    style.id = 'touch-target-styles'
     style.textContent = `
       .touch-target-enhanced {
-        min-width: 44px;
-        min-height: 44px;
+        min-width: ${currentSize}px;
+        min-height: ${currentSize}px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+      }
+
+      /* 작은 아이콘 버튼에 대한 터치 영역 확장 */
+      .touch-target-enhanced::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: ${currentSize}px;
+        min-height: ${currentSize}px;
+        z-index: -1;
+      }
+
+      /* 태블릿과 데스크톱에서 더 큰 터치 타겟 */
+      @media (min-width: 768px) {
+        .touch-target-enhanced {
+          min-width: 48px;
+          min-height: 48px;
+        }
+        .touch-target-enhanced::before {
+          min-width: 48px;
+          min-height: 48px;
+        }
       }
     `
     document.head.appendChild(style)
@@ -713,57 +843,100 @@ ${score.details.warningsList.map((warning: string) => `- ${warning}`).join('\n')
 }
 
 /**
- * 전역 접근성 개선 시스템 초기화
+ * 하이드레이션 체크 헬퍼
+ */
+function waitForHydration(): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve()
+      return
+    }
+
+    // 이미 하이드레이션이 완료되었거나 DOM이 준비되었으면 즉시 실행
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(resolve, 50) // 짧은 지연으로 React 하이드레이션 완료 보장
+    } else {
+      // DOM 로드 완료 대기
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(resolve, 50)
+      }, { once: true })
+    }
+  })
+}
+
+/**
+ * 전역 접근성 개선 시스템 초기화 (하이드레이션 안전)
  */
 export function initializeAccessibility(): () => void {
   console.log('♿ 접근성 개선 시스템 초기화 시작...')
 
-  // 기본 접근성 설정
-  KeyboardNavigation.addSkipLinks()
-  const cleanupShortcuts = KeyboardNavigation.setupShortcuts()
+  const cleanupFunctions: (() => void)[] = []
 
-  // 시각적 접근성
-  const cleanupHighContrast = VisualAccessibility.setupHighContrastMode()
-  const cleanupReducedMotion = VisualAccessibility.setupReducedMotion()
-  VisualAccessibility.enhanceFocusIndicators()
+  // 하이드레이션 완료 후 안전하게 DOM 변형 수행
+  waitForHydration().then(() => {
+    try {
+      // 기본 접근성 설정 (DOM 변형 최소화)
+      KeyboardNavigation.addSkipLinks()
+      const cleanupShortcuts = KeyboardNavigation.setupShortcuts()
+      cleanupFunctions.push(cleanupShortcuts)
 
-  // 스크린 리더 지원
-  ScreenReaderSupport.setupLiveRegions()
-  ScreenReaderSupport.enhanceARIA()
-  ScreenReaderSupport.validateHeadingStructure()
+      // 시각적 접근성 (Media Query 기반, DOM 변형 안전)
+      const cleanupHighContrast = VisualAccessibility.setupHighContrastMode()
+      const cleanupReducedMotion = VisualAccessibility.setupReducedMotion()
+      VisualAccessibility.enhanceFocusIndicators()
+      cleanupFunctions.push(cleanupHighContrast, cleanupReducedMotion)
 
-  // 사용성 개선
-  UsabilityEnhancement.validateTouchTargets()
-  UsabilityEnhancement.enhanceFormAccessibility()
-  UsabilityEnhancement.enhanceLoadingStates()
+      // 스크린 리더 지원 (라이브 리전 추가)
+      ScreenReaderSupport.setupLiveRegions()
 
-  // 자동 접근성 검사 (개발 모드에서만)
-  if (process.env.NODE_ENV === 'development') {
-    setTimeout(() => {
-      const report = AccessibilityTesting.generateReport()
-      console.log('♿ 접근성 검사 결과:\n', report)
-    }, 2000)
-  }
+      // DOM 검증은 논 블로킹으로 실행
+      setTimeout(() => {
+        ScreenReaderSupport.enhanceARIA()
+        ScreenReaderSupport.validateHeadingStructure()
 
-  // 메인 콘텐츠 영역 식별
-  const main = document.querySelector('main')
-  if (main && !main.id) {
-    main.id = 'main'
-  }
+        // 사용성 개선 (DOM 변형 포함이므로 지연 실행)
+        UsabilityEnhancement.validateTouchTargets()
+        UsabilityEnhancement.enhanceFormAccessibility()
+        UsabilityEnhancement.enhanceLoadingStates()
+      }, 200)
 
-  // 내비게이션 영역 식별
-  const nav = document.querySelector('nav')
-  if (nav && !nav.id) {
-    nav.id = 'navigation'
-  }
+      // 자동 접근성 검사 (개발 모드에서만, 추가 지연)
+      if (process.env.NODE_ENV === 'development') {
+        setTimeout(() => {
+          const report = AccessibilityTesting.generateReport()
+          console.log('♿ 접근성 검사 결과:\n', report)
+        }, 3000) // 모든 컴포넌트 마운트 후 검사
+      }
 
-  console.log('✅ 접근성 개선 시스템 초기화 완료')
+      // 메인 콘텐츠 영역 식별 (안전한 ID 추가)
+      const main = document.querySelector('main')
+      if (main && !main.id) {
+        main.id = 'main'
+      }
+
+      // 내비게이션 영역 식별 (안전한 ID 추가)
+      const nav = document.querySelector('nav')
+      if (nav && !nav.id) {
+        nav.id = 'navigation'
+      }
+
+      console.log('✅ 접근성 개선 시스템 초기화 완료')
+    } catch (error) {
+      console.warn('♿ 접근성 개선 시스템 초기화 중 오류:', error)
+    }
+  }).catch(error => {
+    console.warn('♿ 접근성 시스템 하이드레이션 대기 중 오류:', error)
+  })
 
   // cleanup 함수 반환
   return () => {
-    cleanupShortcuts()
-    cleanupHighContrast()
-    cleanupReducedMotion()
+    cleanupFunctions.forEach(cleanup => {
+      try {
+        cleanup()
+      } catch (error) {
+        console.warn('접근성 시스템 정리 중 오류:', error)
+      }
+    })
     console.log('♿ 접근성 개선 시스템 정리 완료')
   }
 }

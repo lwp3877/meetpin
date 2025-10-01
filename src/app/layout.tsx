@@ -161,7 +161,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} bg-background min-h-screen touch-manipulation font-sans antialiased`}>
+      <body className={`${inter.variable} bg-background min-h-screen touch-manipulation font-sans antialiased`} style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
         <Providers>
           <div id="root" className="mobile-full-height relative flex min-h-screen flex-col">
             <main className="flex-1">{children}</main>
@@ -176,16 +176,6 @@ export default function RootLayout({
             __html: `
               // 터치 최적화 즉시 실행
               (function() {
-                // 뷰포트 메타 태그 접근성 준수 설정
-                var viewport = document.querySelector('meta[name=viewport]');
-                if (!viewport) {
-                  viewport = document.createElement('meta');
-                  viewport.name = 'viewport';
-                  document.head.appendChild(viewport);
-                }
-                // WCAG 2.1 AA 준수: 확대/축소 기능 보장 (user-scalable=yes, maximum-scale=5)
-                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover';
-
                 // iOS Safari 100vh 문제 해결
                 function setVhUnit() {
                   var vh = window.innerHeight * 0.01;
@@ -197,12 +187,8 @@ export default function RootLayout({
 
                 // 터치 지연 제거
                 document.documentElement.style.touchAction = 'manipulation';
-                
-                // 텍스트 선택 방지 (필요한 곳에서만)
-                document.body.style.webkitUserSelect = 'none';
-                document.body.style.userSelect = 'none';
-                
-                // 입력 필드에서는 텍스트 선택 허용
+
+                // 입력 필드에서는 텍스트 선택 허용 (전역 스타일로 추가)
                 var style = document.createElement('style');
                 style.textContent = 'input, textarea, [contenteditable] { -webkit-user-select: text !important; user-select: text !important; }';
                 document.head.appendChild(style);

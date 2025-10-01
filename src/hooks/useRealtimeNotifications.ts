@@ -63,7 +63,7 @@ export function useRealtimeNotifications({
           sender: {
             nickname: '김철수',
             avatar_url:
-              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+              'https://api.dicebear.com/8.x/adventurer/svg?seed=kim&backgroundColor=b6e3f4,c0aede,d1d4f9',
           },
           room: {
             title: '한강 치킨 모임',
@@ -79,7 +79,7 @@ export function useRealtimeNotifications({
           sender: {
             nickname: '이영희',
             avatar_url:
-              'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=150&h=150&fit=crop&crop=face',
+              'https://api.dicebear.com/8.x/adventurer/svg?seed=lee&backgroundColor=ffd5dc,ffdfba,c7ceea',
           },
           room: {
             title: '강남 맛집 탐방',

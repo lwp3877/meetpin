@@ -118,7 +118,8 @@ function getBotAvatarUrl(botProfile: any): string {
   }, 0)
 
   const avatarId = avatarIds[Math.abs(hash) % avatarIds.length]
-  return `https://images.unsplash.com/${avatarId}?w=150&h=150&fit=crop&crop=face`
+  // Unsplash 대신 Dicebear 아바타 사용
+  return `https://api.dicebear.com/8.x/adventurer/svg?seed=${avatarId}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfba,c7ceea`
 }
 
 /**
