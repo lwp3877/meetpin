@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser, ApiResponse, ApiError } from '@/lib/api'
-import rateLimit from '@/lib/utils/rateLimit'
+import { checkRateLimit } from '@/lib/rateLimit'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { z } from 'zod'
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
     const rateLimitKey = `emergency-report:${clientIP}`
 
-    if (!rateLimit.check(rateLimitKey, { requests: 5, windowMs: 15 * 60 * 1000 })) {
+    if (!(await checkRateLimit(rateLimitKey, { requests: 5, windowMs: 15 * 60 * 1000 }))) {
       // 15분에 5번
       throw new ApiError('너무 많은 신고가 접수되었습니다. 잠시 후 다시 시도해주세요.', 429)
     }

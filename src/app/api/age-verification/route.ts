@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser, ApiResponse, ApiError } from '@/lib/api'
 import { verifyAge, AgeVerificationData } from '@/lib/age-verification'
-import rateLimit from '@/lib/utils/rateLimit'
+import { checkRateLimit } from '@/lib/rateLimit'
 import { z } from 'zod'
 
 const ageVerificationSchema = z.object({
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
     const rateLimitKey = `age-verification:${clientIP}`
 
-    if (!rateLimit.check(rateLimitKey, { requests: 3, windowMs: 15 * 60 * 1000 })) {
+    if (!(await checkRateLimit(rateLimitKey, { requests: 3, windowMs: 15 * 60 * 1000 }))) {
       // 15분에 3번
       throw new ApiError('너무 많은 인증 시도가 있었습니다. 잠시 후 다시 시도해주세요.', 429)
     }

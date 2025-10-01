@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser, ApiResponse, ApiError } from '@/lib/api'
-import rateLimit from '@/lib/utils/rateLimit'
+import { checkRateLimit } from '@/lib/rateLimit'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { z } from 'zod'
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
     const rateLimitKey = `privacy-rights:${clientIP}`
 
-    if (!rateLimit.check(rateLimitKey, { requests: 3, windowMs: 60 * 60 * 1000 })) {
+    if (!(await checkRateLimit(rateLimitKey, { requests: 3, windowMs: 60 * 60 * 1000 }))) {
       // 1시간에 3번
       throw new ApiError('개인정보 권리 요청이 너무 많습니다. 1시간 후 다시 시도해주세요.', 429)
     }
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // 사용자별 rate limiting 추가
     const userRateLimitKey = `privacy-rights-user:${user.id}`
-    if (!rateLimit.check(userRateLimitKey, { requests: 5, windowMs: 24 * 60 * 60 * 1000 })) {
+    if (!(await checkRateLimit(userRateLimitKey, { requests: 5, windowMs: 24 * 60 * 60 * 1000 }))) {
       // 24시간에 5번
       throw new ApiError('일일 개인정보 권리 요청 한도를 초과했습니다.', 429)
     }

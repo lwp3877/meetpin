@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
-import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/utils/rateLimit'
+import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
 
 /**
  * 간단한 인메모리 레이트 리미팅 스토어
