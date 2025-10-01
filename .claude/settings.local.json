@@ -3,7 +3,11 @@
     "allow": [
       "Bash(git add:*)",
       "Bash(git tag:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(pnpm build:*)",
+      "Bash(tee:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

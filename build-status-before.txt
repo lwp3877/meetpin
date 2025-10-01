@@ -1,0 +1,270 @@
+
+> meetpin@1.5.0 build C:\Users\이원표\Desktop\meetpin
+> next build
+
+   ▲ Next.js 15.5.2
+   - Environments: .env.local, .env.production
+   - Experiments (use with caution):
+     · webVitalsAttribution
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+
+[2m[495.75ms][22m [@tailwindcss/postcss] src\app\globals.css
+[2m[  0.04ms][22m  [2m ↳ [22mQuick bail check
+[2m[ 50.71ms][22m  [2m ↳ [22mSetup compiler
+[2m[  0.60ms][22m    [2m ↳ [22mPostCSS AST -> Tailwind CSS AST
+[2m[ 50.09ms][22m    [2m ↳ [22mCreate compiler
+[2m[  0.25ms][22m  [2m ↳ [22mRegister full rebuild paths
+[2m[  1.33ms][22m  [2m ↳ [22mSetup scanner
+[2m[118.50ms][22m  [2m ↳ [22mScan for candidates
+[2m[148.03ms][22m  [2m ↳ [22mRegister dependency messages
+[2m[ 69.44ms][22m  [2m ↳ [22mBuild utilities
+[2m[ 92.01ms][22m  [2m ↳ [22mOptimization
+[2m[  2.11ms][22m    [2m ↳ [22mAST -> CSS
+[2m[ 57.84ms][22m    [2m ↳ [22mLightning CSS
+[2m[ 31.99ms][22m    [2m ↳ [22mCSS -> PostCSS AST
+[2m[ 14.97ms][22m  [2m ↳ [22mUpdate PostCSS AST
+
+
+🔍 Bundle Budget Check:
+📦 Chunk: static/chunks/polyfills-42372ed130431b0a.js = 110KB
+📦 Chunk: server/middleware-react-loadable-manifest.js = 3KB
+📦 Chunk: static/_EpuvLPZS5a0lvPOZwEPV/_ssgManifest.js = 0KB
+📦 Chunk: server/middleware-build-manifest.js = 1KB
+📦 Chunk: static/_EpuvLPZS5a0lvPOZwEPV/_buildManifest.js = 3KB
+📦 Chunk: server/next-font-manifest.js = 0KB
+📦 Main: static/chunks/main-61225f28e59fea25.js = 128KB
+📦 Main: static/chunks/main-app-d8f3a9f0284b3142.js = 1KB
+📦 Chunk: static/chunks/app/_not-found/page-9a9463ab7955e588.js = 0KB
+📦 Main: static/chunks/pages/_app-67b05e9204a570d7.js = 1KB
+📦 Chunk: static/chunks/pages/_error-38788cd0bca45c84.js = 6KB
+📦 Chunk: static/chunks/app/not-found-1331df180f7be99f.js = 12KB
+📦 Main: static/chunks/app/layout-88d621e6999f6868.js = 64KB
+📦 Chunk: static/chunks/app/api/age-verification/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/auth/demo-login/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/cron/cleanup-expired-boosts/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/cron/cleanup-old-notifications/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/cache/stats/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/bot/generate/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/dsar/delete-request/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/dsar/export/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/feedback/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/health/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/host-messages/[id]/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/emergency-report/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/host-messages/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/notifications/[id]/read/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/notifications/[id]/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/monitoring/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/host-messages/[id]/read/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/profile/avatar/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/notifications/read-all/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/privacy-rights/request/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/payments/stripe/webhook/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/profile/stats/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/rooms/[id]/requests/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/status/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/security/csp-report/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/robots.txt/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/sitemap.xml/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/admin/seed/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/block/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/healthz/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/livez/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/matches/my/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/matches/[id]/messages/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/payments/stripe/checkout/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/notifications/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/ready/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/readyz/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/requests/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/reports/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/requests/my/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/requests/[id]/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/rooms/[id]/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/rooms/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/api/telemetry/web-vitals/route-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/auth/callback/page-bf405912bdd44a2d.js = 3KB
+📦 Chunk: static/chunks/app/auth/login/page-c89cac3b8f157761.js = 17KB
+📦 Chunk: static/chunks/app/auth/signup/page-4798c600479ef495.js = 29KB
+📦 Chunk: static/chunks/app/contact/page-64ea8b5b1d65a469.js = 21KB
+📦 Chunk: static/chunks/app/chat/[matchId]/page-45677a77218e464b.js = 19KB
+📦 Chunk: static/chunks/app/debug-landing/page-2a6cf70d8be64554.js = 3KB
+📦 Chunk: static/chunks/app/drink/page-fc2680bb532e7e1a.js = 22KB
+📦 Chunk: static/chunks/app/help/page-fba52912431615d4.js = 20KB
+📦 Chunk: static/chunks/app/legal/location/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/hobby/page-9a724e697ddfddde.js = 25KB
+📦 Chunk: static/chunks/app/legal/privacy/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/page-6d16aba41a192611.js = 6KB
+📦 Chunk: static/chunks/app/legal/terms/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/profile/[userId]/page-da15dd19b8b1ed59.js = 4KB
+📦 Chunk: static/chunks/app/exercise/page-68b56f5ed381c8d7.js = 24KB
+📦 Chunk: static/chunks/app/room/new/page-54ff39996dac692f.js = 8KB
+📦 Chunk: static/chunks/app/requests/page-d26cf61af1fc3777.js = 20KB
+📦 Chunk: static/chunks/app/room/[id]/page-d51f8cdd6fdc4215.js = 23KB
+📦 Chunk: static/chunks/app/room/[id]/edit/page-ec79be4af4be92f9.js = 16KB
+📦 Chunk: static/chunks/app/profile/page-9bc0e1dce71ac28c.js = 49KB
+📦 Chunk: static/chunks/app/rooms/page-06ce23604ff10fb3.js = 12KB
+📦 Chunk: static/chunks/app/settings/notifications/page-6cdb765c500ef6ac.js = 26KB
+📦 Chunk: static/chunks/app/room/[id]/requests/page-e577748c2f5956d4.js = 16KB
+📦 Chunk: static/chunks/app/legal/cookie-policy/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/legal/location-terms/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/status/page-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/system-status/page-9a9463ab7955e588.js = 0KB
+📦 Main: static/chunks/app/map/layout-9a9463ab7955e588.js = 0KB
+📦 Chunk: static/chunks/app/map/page-fd5746f4ae4bbd1d.js = 32KB
+📦 Chunk: static/chunks/webpack-b3014d7ae11e5024.js = 4KB
+📦 Chunk: static/chunks/9738.95e432ea52391d7b.js = 5KB
+📦 Chunk: static/chunks/5519.34b34a8470a69ab8.js = 1KB
+📦 Chunk: static/chunks/6216.6a3370b914eda7d2.js = 8KB
+📦 Chunk: static/chunks/3398.ddc603fc02b83e3b.js = 13KB
+📦 Chunk: static/chunks/1744.37477efab84d48b3.js = 6KB
+📦 Chunk: static/chunks/8658.5ff24bdc08fee52a.js = 39KB
+📦 Chunk: static/chunks/3613-bc12e2b2165043b4.js = 9KB
+📦 Chunk: static/chunks/6912.a81840705b3be103.js = 11KB
+📦 Chunk: static/chunks/4652.43348d481084b552.js = 0KB
+📦 Chunk: static/chunks/8837-b2a1855005e4a13a.js = 25KB
+📦 Chunk: static/chunks/4168.59ba83c4c27c29f5.js = 12KB
+📦 Chunk: static/chunks/5797.473117569d8c3bfb.js = 11KB
+📦 Chunk: static/chunks/3018.4c6bdbf67e0f72bb.js = 8KB
+📦 Chunk: static/chunks/6095.b819a5dfd89bdfa7.js = 22KB
+📦 Chunk: static/chunks/4834.4666b75c42be29e6.js = 9KB
+📦 Chunk: static/chunks/9265.4dbfc4357e3eafc6.js = 545KB
+📦 Chunk: static/chunks/framework-074a7f7f3ef28f17.js = 178KB
+📦 Chunk: static/chunks/5a553094.7287856dba65ca53.js = 146KB
+📦 Chunk: static/chunks/9fe63683-0d60bc5ba829e6ca.js = 169KB
+📦 Chunk: static/chunks/8685-852566b5ba45b0b5.js = 24KB
+📦 Chunk: static/chunks/7195-21d3372bf55947d0.js = 150KB
+📦 Chunk: static/chunks/5271-ee55bbe6f0f4b785.js = 14KB
+📦 Chunk: static/chunks/8209-1fe7cff0acc6db83.js = 8KB
+📦 Chunk: static/chunks/3361-8d714f7fab34bdfb.js = 14KB
+📦 Chunk: static/chunks/9817-71a48307def34472.js = 78KB
+📦 Chunk: static/chunks/7091-8441689ead07444c.js = 39KB
+📦 Chunk: static/chunks/3802-c0c995bdaae2f180.js = 16KB
+📦 Chunk: static/chunks/1581-e9e58183d913884e.js = 168KB
+📦 Chunk: static/chunks/5971-2797c9ce76b97712.js = 68KB
+📦 Chunk: static/chunks/2759.26fb968982860f26.js = 17KB
+📦 Chunk: static/chunks/3154-0876f03ce72f1e57.js = 13KB
+📦 Chunk: static/chunks/4234-84d10f01a99d5565.js = 8KB
+📦 Chunk: static/chunks/7759.cbde2b679484c6ec.js = 27KB
+📦 Chunk: static/chunks/4054-9407bceb960070cc.js = 7KB
+📦 Chunk: static/chunks/9759-e5c54c6ed045be19.js = 13KB
+📦 Chunk: static/chunks/2993-495fb807da4c2013.js = 12KB
+📦 Chunk: server/app/_not-found/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/age-verification/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/auth/demo-login/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/cron/cleanup-expired-boosts/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/cron/cleanup-old-notifications/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/cache/stats/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/bot/generate/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/dsar/delete-request/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/dsar/export/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/feedback/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/health/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/host-messages/[id]/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/emergency-report/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/host-messages/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/notifications/[id]/read/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/notifications/[id]/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/monitoring/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/host-messages/[id]/read/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/profile/avatar/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/notifications/read-all/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/privacy-rights/request/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/payments/stripe/webhook/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/profile/stats/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/rooms/[id]/requests/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/status/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/security/csp-report/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/robots.txt/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/sitemap.xml/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/admin/seed/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/block/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/healthz/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/livez/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/matches/my/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/matches/[id]/messages/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/payments/stripe/checkout/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/notifications/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/ready/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/readyz/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/requests/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/reports/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/requests/my/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/requests/[id]/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/rooms/[id]/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/rooms/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/api/telemetry/web-vitals/route_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/auth/callback/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/auth/login/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/auth/signup/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/contact/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/chat/[matchId]/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/debug-landing/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/drink/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/help/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/legal/location/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/hobby/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/legal/privacy/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/page_client-reference-manifest.js = 13KB
+📦 Chunk: server/app/legal/terms/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/profile/[userId]/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/exercise/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/room/new/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/requests/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/room/[id]/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/room/[id]/edit/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/profile/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/rooms/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/settings/notifications/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/room/[id]/requests/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/legal/cookie-policy/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/legal/location-terms/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/status/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/system-status/page_client-reference-manifest.js = 14KB
+📦 Chunk: server/app/map/page_client-reference-manifest.js = 14KB
+
+📊 Total Main Bundle: 193KB (limit: 300KB)
+✅ Bundle budget passed - Main: 193KB ≤ 300KB
+
+ ✓ Compiled successfully in 19.3s
+   Skipping validation of types
+   Linting ...
+
+Failed to compile.
+
+./src/components/landing/NewLanding.tsx
+15:3  Warning: 'Zap' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/landing/ProLanding.tsx
+6:8  Warning: 'Image' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+10:3  Warning: 'Calendar' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'Heart' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+17:3  Warning: 'Zap' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+21:3  Warning: 'Sparkles' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'MessageCircle' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+25:3  Warning: 'Award' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+26:3  Warning: 'Target' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+123:7  Warning: 'CATEGORY_STATS' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+594:7  Warning: 'styles' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/mobile/mobile-optimized-layout.tsx
+9:10  Warning: 'firstGrapheme' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/premium/enhanced-landing.tsx
+8:8  Warning: 'PremiumButton' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+9:10  Warning: 'RoomCard' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+10:10  Warning: 'Badge' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+11:8  Warning: 'LiveActivityStats' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+12:8  Warning: 'SignupIncentive' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+24:3  Warning: 'Heart' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+140:10  Warning: 'isPending' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+140:21  Warning: 'startTransition' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+171:13  Warning: 'preventNavigation' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+203:11  Error: 'currentPath' is never reassigned. Use 'const' instead.  prefer-const
+406:46  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+551:47  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.
