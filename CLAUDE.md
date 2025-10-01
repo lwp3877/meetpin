@@ -73,6 +73,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Automated data cleanup with cron jobs: `/api/cron/*`
    - Age verification system: `/api/age-verification`
 
+10. **Folder Structure & Organization**:
+   - **components/**: Domain-driven organization (auth, chat, map, room, etc.)
+     - `auth/` - Authentication components (social-login)
+     - `chat/` - Chat functionality (ChatPanel)
+     - `common/` - Shared components (Providers, theme-toggle)
+     - `error/` - Error handling (GlobalErrorBoundary)
+     - `landing/` - Landing pages (NewLanding, ProLanding, enhanced-landing)
+     - `layout/` - Layout components (LegalFooter)
+     - `map/` - Map features (DynamicMap, MapWithCluster, LocationPicker)
+     - `mobile/` - Mobile-optimized layouts
+     - `room/` - Room management (RoomForm)
+     - `ui/` - shadcn/ui components + feature-specific UI
+   - **lib/**: Functional organization by concern
+     - `accessibility/` - WCAG compliance utilities
+     - `bot/` - Bot room generation and scheduling
+     - `cache/` - Redis caching layer
+     - `config/` - Feature flags and configuration
+     - `design/` - Design system tokens
+     - `observability/` - Logging and monitoring
+     - `payments/` - Stripe integration
+     - `security/` - Security utilities and CSP
+     - `services/` - External service integrations (Supabase, auth)
+     - `utils/` - General utilities
+   - **types/**: Centralized type definitions
+     - `global.d.ts` - All project types organized by domain
+     - Domain sections: User, Room, API, Map, Payment, etc.
+   - **Naming Conventions**:
+     - Components: Both PascalCase and kebab-case accepted
+     - Utils/Hooks: camelCase.ts
+     - Types: Defined in global.d.ts
+     - Folders: lowercase with hyphens
+
 ## Current Project Status (최신 상태)
 
 ### ✅ Completed Advanced Features
