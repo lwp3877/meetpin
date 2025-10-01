@@ -1,6 +1,17 @@
 /**
- * 밋핀 봇 스케줄러
- * 자연스러운 패턴으로 봇 방을 자동 생성하고 관리
+ * 밋핀 봇 스케줄러 (Bot Manager)
+ *
+ * 자연스러운 패턴으로 봇 방을 자동 생성하고 관리합니다.
+ *
+ * 주요 기능:
+ * - 시간대별 자동 봇 방 생성 (15분 주기)
+ * - 요일별 생성 빈도 조정 (주말 증가)
+ * - 인기 지역별 봇 방 생성 (1시간 주기)
+ * - 오래된 봇 방 정리 (24시간 후, 6시간 주기)
+ *
+ * 아키텍처:
+ * - 이 파일은 봇 방의 실제 생성과 DB 저장을 담당 (실행 엔진)
+ * - `/lib/bot-scheduler.ts`는 시간 기반 스케줄링만 담당 (스케줄링 엔진)
  */
 
 import {
@@ -195,6 +206,11 @@ async function createBotRoomInDatabase(roomData: any) {
 
 /**
  * 현재 시간대에 맞는 봇 방 생성
+ *
+ * 자연스러운 패턴으로 봇 방을 생성합니다:
+ * 1. 시간대별 생성 빈도 확인 (dawn/morning/lunch/afternoon/evening/night)
+ * 2. 요일별 조정 팩터 적용 (주말 1.5배, 금요일 1.3배)
+ * 3. 각 봇 방 생성 간 10-40초 랜덤 간격 (자연스러운 패턴)
  */
 export async function generateBotsForCurrentTime() {
   if (!generationState.isActive) return
@@ -202,7 +218,7 @@ export async function generateBotsForCurrentTime() {
   const now = new Date()
   const currentHour = now.getHours()
 
-  // 같은 시간대에 이미 생성했으면 스킵
+  // 같은 시간대에 이미 생성했으면 스킵 (중복 생성 방지)
   if (
     generationState.currentHourGenerated &&
     now.getHours() === generationState.lastGeneration.getHours()
@@ -217,23 +233,25 @@ export async function generateBotsForCurrentTime() {
       timeOfDay as keyof typeof naturalPatterns.generationFrequency
     ]
 
+  // 새벽(dawn) 등 생성 빈도가 0이면 스킵
   if (frequency === 0) return
 
   try {
-    // 요일별 조정 팩터 적용
+    // 요일별 조정 팩터 적용 (금요일: 1.3배, 주말: 1.5배, 평일: 1.0배)
     const dayOfWeek = getDayOfWeek(now)
     const dayPattern =
       naturalPatterns.weeklyPatterns[dayOfWeek as keyof typeof naturalPatterns.weeklyPatterns]
     const adjustedFrequency = Math.ceil(frequency * dayPattern.factor)
 
-    // 봇 방 생성
+    // 봇 방 생성 (시간대별 자연스러운 패턴)
     const rooms = await generateTimeBasedBotRooms(adjustedFrequency)
 
     for (const roomData of rooms) {
       await createBotRoomInDatabase(roomData)
 
-      // 생성 간격 추가 (자연스러운 패턴)
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 30000 + 10000)) // 10-40초
+      // 생성 간격 추가: 10-40초 랜덤 대기
+      // Why: 모든 봇 방이 동시에 생성되면 부자연스러움
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 30000 + 10000))
     }
 
     // 상태 업데이트
@@ -347,16 +365,44 @@ function getDayOfWeek(date: Date): string {
   return days[date.getDay()]
 }
 
-// 봇 관리자 인터페이스
+/**
+ * 봇 관리자 인터페이스
+ *
+ * 봇 시스템의 시작/중지와 통계 조회를 제공합니다.
+ *
+ * 자동 실행 주기:
+ * - 시간대별 봇 방 생성: 15분마다
+ * - 인기 지역 봇 방 생성: 1시간마다
+ * - 오래된 봇 방 정리: 6시간마다
+ *
+ * 사용 예시:
+ * ```typescript
+ * // 서버 시작 시 (app/api/cron/bot-scheduler/route.ts)
+ * BotManager.start()
+ *
+ * // 수동 생성
+ * await BotManager.createManualBots(5)
+ *
+ * // 통계 확인
+ * const stats = BotManager.getStats()
+ * console.log(stats.dailyCount)  // 오늘 생성된 봇 방 수
+ * ```
+ */
 export const BotManager = {
+  /**
+   * 봇 시스템 시작
+   * - 초기 봇 방 생성
+   * - 주기적 실행 설정 (setInterval)
+   */
   async start() {
     generationState.isActive = true
     console.log('🤖 봇 시스템 시작')
 
-    // 초기 봇 방 생성
+    // 초기 봇 방 생성 (즉시 실행)
     await generateBotsForCurrentTime()
 
     // 주기적 실행 설정 (15분마다)
+    // Why: 너무 자주 실행하면 서버 부하, 너무 드물면 사용자 경험 저하
     setInterval(
       async () => {
         resetDailyStats()
@@ -366,6 +412,7 @@ export const BotManager = {
     )
 
     // 인기 지역 봇 방 생성 (1시간마다)
+    // Why: 강남, 마포, 용산 등 인기 지역에 봇 방 추가 배치
     setInterval(
       async () => {
         await generatePopularDistrictBots()
@@ -374,6 +421,7 @@ export const BotManager = {
     )
 
     // 오래된 방 정리 (6시간마다)
+    // Why: 24시간 지난 봇 방은 자동 삭제 (DB 정리)
     setInterval(
       async () => {
         await cleanupOldBotRooms()
@@ -382,11 +430,18 @@ export const BotManager = {
     )
   },
 
+  /**
+   * 봇 시스템 중지
+   * Note: setInterval은 여전히 실행 중이지만 생성은 중지됨
+   */
   stop() {
     generationState.isActive = false
     console.log('🤖 봇 시스템 중지')
   },
 
+  /**
+   * 봇 시스템 통계 조회
+   */
   getStats() {
     return {
       isActive: generationState.isActive,
@@ -395,7 +450,10 @@ export const BotManager = {
     }
   },
 
-  // 수동 봇 방 생성
+  /**
+   * 수동 봇 방 생성 (관리자용)
+   * @param count 생성할 봇 방 개수 (기본값: 3)
+   */
   async createManualBots(count: number = 3) {
     console.log(`🎯 수동 봇 방 ${count}개 생성 시작`)
     const rooms = await generateTimeBasedBotRooms(count)
