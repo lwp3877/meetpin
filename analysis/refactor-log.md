@@ -203,4 +203,64 @@ b57436f - 정리: Step 5 완료 - 불필요한 코드 정리 (lint 0 warnings, b
 
 **작업 완료 시각**: 2025-10-01 12:15
 **총 소요 시간**: ~60분 (Step 4 + Step 5)
-**다음 단계**: Step 6 - 중복 코드 통합 및 파일명 명확화
+
+---
+
+## 🎉 Step 6 완료 (2025-10-01)
+
+### 작업 내용
+
+#### 1. Step 3 분석 리뷰
+- 분석 결과: 실제 중복 파일 **1개** (Rate Limit 래퍼)
+- 유사 파일 10개는 의도적 분리 (서버/클라이언트, 기본/고급)
+- 통합 불필요: bot-scheduler, auth 서비스, logger, 버튼, 모달 등
+
+#### 2. Rate Limit 래퍼 제거 (유일한 실제 중복)
+**삭제된 파일**:
+- `src/lib/utils/rateLimit.ts` (53줄 레거시 래퍼)
+
+**수정된 파일** (import 경로 변경):
+1. `src/lib/api.ts`
+   - Before: `from '@/lib/utils/rateLimit'`
+   - After: `from '@/lib/rateLimit'`
+
+2. `src/app/api/privacy-rights/request/route.ts`
+   - Before: `rateLimit.check(key, options)`
+   - After: `await checkRateLimit(key, options)`
+
+3. `src/app/api/emergency-report/route.ts`
+   - Before: `rateLimit.check(key, options)`
+   - After: `await checkRateLimit(key, options)`
+
+4. `src/app/api/age-verification/route.ts`
+   - Before: `rateLimit.check(key, options)`
+   - After: `await checkRateLimit(key, options)`
+
+#### 3. 파일명 명확화 검토
+**검토 결과**: 현재 상태 유지 권장
+- bot-scheduler 파일들: 역할이 다름 (스케줄링 vs 실행)
+- auth 서비스 파일들: 서버/클라이언트 분리 명확
+- 파일명 변경 시 많은 import 경로 수정 필요
+- 리스크 > 이득
+
+#### 4. 최종 검증
+- ✅ `pnpm build`: 성공 (193KB 번들)
+- ✅ 모든 API 라우트 빌드 성공
+- ✅ Rate limit 기능 유지 (async로 변경)
+
+### 통합 효과
+- **제거된 중복 코드**: 53줄
+- **통일된 import 경로**: 4개 파일
+- **코드 일관성**: 향상
+- **유지보수성**: 개선
+
+### 커밋
+```
+9d3b4a7 - 리팩토링: Rate Limit 래퍼 파일 제거 및 import 경로 통일
+```
+
+---
+
+**작업 완료 시각**: 2025-10-01 12:30
+**총 소요 시간**: ~90분 (Step 4 + Step 5 + Step 6)
+**다음 단계**: Step 7 (요청 시)
