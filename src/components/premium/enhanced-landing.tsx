@@ -130,11 +130,8 @@ export default function EnhancedLanding() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-
     // 🚨 강력한 리다이렉트 방지 - 어떤 상황에서도 메인 페이지에서 벗어나지 않도록 함
     if (typeof window !== 'undefined') {
 
@@ -332,10 +329,10 @@ export default function EnhancedLanding() {
 
               {/* Luxury Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                {LUXURY_STATS.map((stat, index) => (
+                {LUXURY_STATS.map((stat, _index) => (
                   <div
                     key={stat.label}
-                    className={`transition-all duration-1000 delay-${index * 150} ${
+                    className={`transition-all duration-1000 delay-${_index * 150} ${
                       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                     }`}
                   >
@@ -372,7 +369,7 @@ export default function EnhancedLanding() {
                   className="flex transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
-                  {FEATURED_ROOMS.map((room, index) => (
+                  {FEATURED_ROOMS.map((room, _index) => (
                     <div key={room.id} className="w-full flex-shrink-0 px-4">
                       <div className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:bg-white/10">
                         {/* Room Image */}
@@ -517,7 +514,7 @@ export default function EnhancedLanding() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              {PREMIUM_FEATURES.map((feature, index) => (
+              {PREMIUM_FEATURES.map((feature, _index) => (
                 <div
                   key={feature.title}
                   className={`group transition-all duration-1000 delay-${feature.delay} ${
