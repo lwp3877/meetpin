@@ -1,0 +1,4 @@
+
+> meetpin@1.5.0 lint C:\Users\이원표\Desktop\meetpin
+> eslint . --ext .js,.jsx,.ts,.tsx --cache
+

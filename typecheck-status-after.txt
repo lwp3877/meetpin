@@ -1,0 +1,253 @@
+__tests__/components/social-login.test.tsx(8,1): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(9,33): error TS2694: Namespace 'global.jest' has no exported member 'Mocked'.
+__tests__/components/social-login.test.tsx(12,1): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(16,12): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(17,12): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(18,15): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(22,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(23,27): error TS2694: Namespace 'global.jest' has no exported member 'Mock'.
+__tests__/components/social-login.test.tsx(25,3): error TS2304: Cannot find name 'beforeEach'.
+__tests__/components/social-login.test.tsx(26,21): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(27,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(32,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(35,3): error TS2304: Cannot find name 'afterEach'.
+__tests__/components/social-login.test.tsx(37,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(40,3): error TS2304: Cannot find name 'afterAll'.
+__tests__/components/social-login.test.tsx(41,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(44,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(47,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(48,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(49,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(52,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(55,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(56,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(57,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(60,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(67,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(70,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(74,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(77,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(78,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(81,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(83,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(87,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(94,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(97,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(101,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(104,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(105,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(108,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(110,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(114,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(121,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(124,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(128,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(131,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(132,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(135,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(137,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(141,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(148,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(149,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(150,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(153,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(164,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(165,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(166,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(169,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(172,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(173,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(174,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(175,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(178,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(181,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(182,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(187,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(194,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(198,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(199,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(204,44): error TS7006: Parameter 'call' implicitly has an 'any' type.
+__tests__/components/social-login.test.tsx(205,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(208,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(209,11): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(214,19): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(218,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(219,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(220,5): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(223,3): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/components/social-login.test.tsx(227,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(230,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(234,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(239,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(242,7): error TS2304: Cannot find name 'expect'.
+__tests__/components/social-login.test.tsx(246,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(251,5): error TS2708: Cannot use namespace 'jest' as a value.
+__tests__/components/social-login.test.tsx(254,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(10,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(11,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(12,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(14,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(22,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(23,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(24,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(25,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(26,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(27,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(30,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(32,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(34,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(36,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(38,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(42,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(43,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(50,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(51,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(54,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(57,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(60,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(67,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(68,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(72,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(73,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(75,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(78,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(80,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(83,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(85,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(88,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(90,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(94,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(95,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(96,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(97,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(98,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(99,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(100,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(103,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(104,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(105,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(106,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(107,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(108,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(111,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/bbox.test.ts(112,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(113,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(114,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/bbox.test.ts(115,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(38,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(39,3): error TS2304: Cannot find name 'beforeEach'.
+__tests__/lib/webhook.test.ts(44,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(45,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(46,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(49,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(51,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(52,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(53,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(56,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(58,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(59,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(60,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(64,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(65,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(74,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(77,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(79,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(82,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(87,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(88,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(92,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(93,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(97,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(106,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(109,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(119,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(123,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(124,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(133,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(134,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(137,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(147,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(151,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(152,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(158,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(159,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(160,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(163,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(167,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(168,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(171,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/webhook.test.ts(176,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/webhook.test.ts(177,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(10,1): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(11,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(24,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(26,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(29,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(34,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(37,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(42,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(45,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(50,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(53,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(58,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(61,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(66,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(67,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(70,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(75,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(79,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(80,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(87,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(90,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(96,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(99,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(104,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(108,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(109,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(115,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(118,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(122,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(125,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(129,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(133,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(139,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(141,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(144,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(149,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(152,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(157,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(160,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(162,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(166,3): error TS2582: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(167,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(175,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(178,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(183,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(186,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(191,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(194,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(199,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(202,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(207,7): error TS2304: Cannot find name 'expect'.
+__tests__/lib/zodSchemas.test.ts(210,5): error TS2582: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+__tests__/lib/zodSchemas.test.ts(216,7): error TS2304: Cannot find name 'expect'.
+src/app/api/rooms/route.ts(91,31): error TS2339: Property 'visibility' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'visibility' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/api/rooms/route.ts(92,31): error TS2339: Property 'created_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'created_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/api/rooms/route.ts(94,34): error TS2339: Property 'uid' does not exist on type '{ nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { ...; } | { ...; }'.
+  Property 'uid' does not exist on type '{ nickname: string; avatar_url: string; age_range: string; }'.
+src/app/api/rooms/route.ts(101,25): error TS2339: Property 'description' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'description' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/api/rooms/route.ts(102,22): error TS2339: Property 'host_uid' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'host_uid' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/api/rooms/route.ts(102,49): error TS2339: Property 'uid' does not exist on type '{ nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { nickname: string; avatar_url: string; age_range: string; } | { ...; } | { ...; }'.
+  Property 'uid' does not exist on type '{ nickname: string; avatar_url: string; age_range: string; }'.
+src/app/api/rooms/route.ts(103,24): error TS2339: Property 'updated_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'updated_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/api/rooms/route.ts(103,43): error TS2339: Property 'created_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; } | ... 4 more ... | { ...; }'.
+  Property 'created_at' does not exist on type '{ id: string; title: string; category: "drink"; lat: number; lng: number; place_text: string; start_at: string; max_people: number; fee: number; boost_until: null; profiles: { nickname: string; avatar_url: string; age_range: string; }; }'.
+src/app/debug-landing/page.tsx(13,13): error TS7030: Not all code paths return a value.
+src/components/premium/enhanced-landing.tsx(134,13): error TS7030: Not all code paths return a value.
+src/lib/accessibility/a11yEnhancement.ts(480,62): error TS2339: Property 'src' does not exist on type 'Element'.
+src/lib/accessibility/a11yEnhancement.ts(492,74): error TS2339: Property 'href' does not exist on type 'Element'.
