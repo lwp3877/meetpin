@@ -132,26 +132,16 @@ export default function EnhancedLanding() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [mounted, setMounted] = useState(false)
 
-  // 강력한 디버깅 로그
-  console.log('🔍 [EnhancedLanding] 컴포넌트 렌더링됨 - v2')
-  console.log('🔍 [EnhancedLanding] user:', user)
-  console.log('🔍 [EnhancedLanding] mounted:', mounted)
-  console.log('🔍 [EnhancedLanding] NODE_ENV:', process.env.NODE_ENV)
-  console.log('🔍 [EnhancedLanding] window.location.pathname:', typeof window !== 'undefined' ? window.location.pathname : 'SSR')
-  console.log('🔍 [EnhancedLanding] localStorage meetpin_user:', typeof window !== 'undefined' ? localStorage.getItem('meetpin_user') : 'SSR')
-
   useEffect(() => {
     setMounted(true)
 
     // 🚨 강력한 리다이렉트 방지 - 어떤 상황에서도 메인 페이지에서 벗어나지 않도록 함
     if (typeof window !== 'undefined') {
-      console.log('🚨 [Landing] 강력한 리다이렉트 방지 활성화')
 
       // 개발 모드에서 mock 사용자 데이터가 있지만 랜딩 페이지를 보려는 경우 제거
       if (isDevelopmentMode) {
         const mockUser = localStorage.getItem('meetpin_user')
         if (mockUser) {
-          console.log('[Landing] Mock user found, clearing for fresh experience')
           localStorage.removeItem('meetpin_user')
           // 쿠키도 제거
           if (typeof document !== 'undefined') {
@@ -164,7 +154,6 @@ export default function EnhancedLanding() {
       document.addEventListener('click', (e) => {
         const target = e.target as HTMLElement
         if (target.tagName === 'A' && target.getAttribute('href') !== '#') {
-          console.log('🚨 [Landing] 링크 클릭 차단됨:', target.getAttribute('href'))
           e.preventDefault()
           e.stopPropagation()
         }
