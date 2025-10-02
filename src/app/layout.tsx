@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { brandMessages } from '@/lib/config/brand'
 import Providers from '@/components/common/Providers'
+import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 
 // next/font 자체 호스팅으로 CSP 단순화
 const inter = Inter({
@@ -118,7 +119,21 @@ export default function RootLayout({
         {/* Favicons */}
         <link rel="icon" href="/icons/meetpin.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/icons/meetpin.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+
+        {/* PWA Meta Tags */}
+        <meta name="application-name" content="밋핀" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="밋핀" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#10b981" />
+        <meta name="format-detection" content="telephone=no" />
 
         {/* Resource Hints for Performance */}
         <link rel="preconnect" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
@@ -174,6 +189,7 @@ export default function RootLayout({
           </div>
           <div id="modal-root" />
           <div id="toast-root" />
+          <InstallPrompt />
         </Providers>
 
         {/* 터치 최적화 초기화 스크립트 */}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오프라인 - 밋핀</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      opacity: 0.95;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: #fff;
+      color: #10b981;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      margin-top: 30px;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      font-size: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon pulse">
+      📶
+    </div>
+    <h1>오프라인 모드</h1>
+    <p>
+      인터넷 연결이 끊어졌습니다.<br>
+      네트워크 연결을 확인하고<br>
+      다시 시도해주세요.
+    </p>
+    <a href="/" class="btn" onclick="location.reload(); return false;">
+      다시 시도
+    </a>
+    <div class="status">
+      💡 Wi-Fi 또는 모바일 데이터를 확인해주세요
+    </div>
+  </div>
+
+  <script>
+    // 온라인 상태 복구 시 자동 새로고침
+    window.addEventListener('online', () => {
+      window.location.href = '/';
+    });
+
+    // 페이지 로드 시 연결 상태 확인
+    if (navigator.onLine) {
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>
