@@ -29,7 +29,11 @@
       "Bash(grep:*)",
       "Bash(node:*)",
       "Bash(pnpm test:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "Bash(npx lighthouse:*)",
+      "Bash(if [ -f lighthouse-baseline.json ])",
+      "Bash(then cat lighthouse-baseline.json)",
+      "Bash(else echo \"Lighthouse still running...\")"
     ],
     "deny": [],
     "ask": []
