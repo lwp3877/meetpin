@@ -360,6 +360,7 @@ export default function MapPage() {
               <Button
                 variant="ghost"
                 onClick={() => router.push('/')}
+                aria-label="홈으로 이동"
                 className="group flex items-center space-x-3 rounded-2xl p-3 transition-all duration-300 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 shadow-xl transition-transform duration-300 group-hover:scale-110">
@@ -380,12 +381,13 @@ export default function MapPage() {
             {isFeatureEnabled('ENABLE_ADVANCED_SEARCH') && (
               <div className="mx-6 max-w-xl flex-1">
                 <div className="group relative">
-                  <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-emerald-500 transition-all group-focus-within:scale-110 dark:text-emerald-400" />
+                  <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-emerald-500 transition-all group-focus-within:scale-110 dark:text-emerald-400" aria-hidden="true" />
                   <Input
                     type="text"
                     placeholder="모임 제목이나 장소를 검색해보세요..."
                     value={searchQuery}
                     onChange={e => handleSearch(e.target.value)}
+                    aria-label="모임 검색"
                     className="rounded-2xl border-2 border-emerald-200/50 bg-white/80 py-3 pr-10 pl-12 text-sm font-medium shadow-lg shadow-emerald-500/5 backdrop-blur-sm transition-all placeholder:text-gray-500 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-500 dark:border-emerald-800/50 dark:bg-gray-800/80 dark:focus:bg-gray-700"
                   />
                   {searchQuery ? (
@@ -393,13 +395,14 @@ export default function MapPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setSearchQuery('')}
+                      aria-label="검색어 지우기"
                       className="absolute top-1/2 right-3 h-7 w-7 -translate-y-1/2 transform rounded-full p-0 text-gray-400 transition-all hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-4 w-4" aria-hidden="true" />
                     </Button>
                   ) : (
                     <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
-                      <div className="rounded-lg bg-gray-100 px-2 py-1 text-xs text-gray-400 dark:bg-gray-700">
+                      <div className="rounded-lg bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                         ⌘K
                       </div>
                     </div>
@@ -415,9 +418,10 @@ export default function MapPage() {
                 onClick={handleNearMe}
                 variant="outline"
                 size="sm"
+                aria-label="내 주변 모임 찾기"
                 className="group rounded-xl border-2 border-emerald-300 bg-white/90 px-3 py-2 text-emerald-600 shadow-md backdrop-blur-sm transition-all duration-300 hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-lg dark:border-emerald-600 dark:bg-gray-800/90 dark:text-emerald-400 dark:hover:border-emerald-400 dark:hover:bg-emerald-900/30"
               >
-                <Navigation className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                <Navigation className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" aria-hidden="true" />
                 <span className="hidden font-semibold sm:inline">내 주변</span>
               </Button>
 
@@ -438,6 +442,8 @@ export default function MapPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
+                aria-label={showFilters ? "필터 닫기" : "필터 열기"}
+                aria-expanded={showFilters}
                 className={`group rounded-xl p-3 shadow-md transition-all duration-300 hover:shadow-lg ${
                   showFilters
                     ? 'bg-emerald-100 text-emerald-600 shadow-emerald-500/20 dark:bg-emerald-900/30 dark:text-emerald-400'
@@ -446,6 +452,7 @@ export default function MapPage() {
               >
                 <SlidersHorizontal
                   className={`h-5 w-5 transition-transform ${showFilters ? 'rotate-180' : 'group-hover:scale-110'}`}
+                  aria-hidden="true"
                 />
               </Button>
 
@@ -456,6 +463,7 @@ export default function MapPage() {
                   <Button
                     variant="ghost"
                     onClick={() => router.push('/profile')}
+                    aria-label="내 프로필 보기"
                     className="group flex items-center space-x-2 rounded-xl bg-white/90 p-2 shadow-md transition-all duration-300 hover:bg-gray-50 hover:shadow-lg dark:bg-gray-800/90 dark:hover:bg-gray-800"
                   >
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-sm font-bold text-white shadow-lg transition-transform duration-300 group-hover:scale-110">
@@ -468,16 +476,18 @@ export default function MapPage() {
                     variant="ghost"
                     onClick={handleSignOut}
                     size="sm"
+                    aria-label="로그아웃"
                     className="group rounded-xl bg-white/90 p-3 text-red-600 shadow-md transition-all duration-300 hover:bg-red-50 hover:text-red-700 hover:shadow-lg dark:bg-gray-800/90 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                     title="로그아웃"
                   >
-                    <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+                    <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
                   </Button>
                 </div>
               ) : (
                 <Button
                   onClick={() => router.push('/auth/login')}
                   size="sm"
+                  aria-label="로그인"
                   className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 font-semibold text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:shadow-emerald-500/25"
                 >
                   로그인
@@ -488,9 +498,10 @@ export default function MapPage() {
               <Button
                 onClick={handleCreateRoom}
                 size="sm"
+                aria-label="새로운 방 만들기"
                 className="group rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-purple-600 hover:to-pink-600 hover:shadow-purple-500/25"
               >
-                <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+                <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:rotate-90" aria-hidden="true" />
                 <span className="hidden sm:inline">방 만들기</span>
                 <span className="sm:hidden">생성</span>
               </Button>
@@ -531,6 +542,7 @@ export default function MapPage() {
               </div>
               <Button
                 onClick={() => loadRooms()}
+                aria-label="모임 다시 불러오기"
                 className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg hover:from-emerald-600 hover:to-teal-600"
               >
                 다시 시도
@@ -538,14 +550,16 @@ export default function MapPage() {
             </CardContent>
           </Card>
         ) : (
-          <DynamicMap
-            rooms={filteredRooms}
-            center={{ lat: 37.5665, lng: 126.978 }}
-            level={3}
-            onBoundsChanged={handleBoundsChanged}
-            onRoomClick={handleRoomClick}
-            className="h-full w-full overflow-hidden rounded-t-3xl shadow-2xl"
-          />
+          <div role="region" aria-label="지도 영역">
+            <DynamicMap
+              rooms={filteredRooms}
+              center={{ lat: 37.5665, lng: 126.978 }}
+              level={3}
+              onBoundsChanged={handleBoundsChanged}
+              onRoomClick={handleRoomClick}
+              className="h-full w-full overflow-hidden rounded-t-3xl shadow-2xl"
+            />
+          </div>
         )}
 
         {/* Loading Overlay */}

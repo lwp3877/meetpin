@@ -120,9 +120,15 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/icons/meetpin.svg" />
 
-        {/* Preconnect for performance */}
+        {/* Resource Hints for Performance */}
         <link rel="preconnect" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
-        {/* Google Fonts preconnect 제거 - next/font 자체 호스팅 사용 */}
+        <link rel="dns-prefetch" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
+        <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://js.stripe.com" />
+        <link rel="dns-prefetch" href="//dapi.kakao.com" />
+        <link rel="dns-prefetch" href="//t1.daumcdn.net" />
+        {/* Preload critical assets */}
+        <link rel="preload" href="/icons/meetpin.svg" as="image" type="image/svg+xml" />
 
         {/* JSON-LD Structured Data */}
         <script

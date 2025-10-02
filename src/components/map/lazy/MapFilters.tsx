@@ -47,7 +47,7 @@ export default function MapFilters({
           <div className="space-y-4">
             <label className="flex items-center text-sm font-bold text-gray-800 dark:text-gray-200">
               <div className="mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500">
-                <Filter className="h-3 w-3 text-white" />
+                <Filter className="h-3 w-3 text-white" aria-hidden="true" />
               </div>
               카테고리
             </label>
@@ -98,11 +98,11 @@ export default function MapFilters({
           {/* Time Filter */}
           <div className="space-y-3">
             <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <Calendar className="mr-2 h-4 w-4" />
+              <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
               시간
             </label>
             <Select value={timeFilter} onValueChange={setTimeFilter}>
-              <SelectTrigger className="border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+              <SelectTrigger className="border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700" aria-label="시간 필터">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -117,7 +117,7 @@ export default function MapFilters({
           {/* Price Range */}
           <div className="space-y-3">
             <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <DollarSign className="mr-2 h-4 w-4" />
+              <DollarSign className="mr-2 h-4 w-4" aria-hidden="true" />
               참가비 (최대{' '}
               {priceRange[0] === 100000 ? '10만원+' : `${priceRange[0].toLocaleString()}원`})
             </label>
@@ -128,6 +128,7 @@ export default function MapFilters({
                 max={100000}
                 min={0}
                 step={10000}
+                aria-label="참가비 범위"
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -140,7 +141,7 @@ export default function MapFilters({
           {/* Max People */}
           <div className="space-y-3">
             <label className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-              <Users className="mr-2 h-4 w-4" />
+              <Users className="mr-2 h-4 w-4" aria-hidden="true" />
               최대 인원 ({maxPeople[0]}명 이하)
             </label>
             <div className="space-y-3">
@@ -150,6 +151,7 @@ export default function MapFilters({
                 max={20}
                 min={2}
                 step={1}
+                aria-label="최대 인원"
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
