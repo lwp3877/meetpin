@@ -33,7 +33,8 @@
       "Bash(npx lighthouse:*)",
       "Bash(if [ -f lighthouse-baseline.json ])",
       "Bash(then cat lighthouse-baseline.json)",
-      "Bash(else echo \"Lighthouse still running...\")"
+      "Bash(else echo \"Lighthouse still running...\")",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
