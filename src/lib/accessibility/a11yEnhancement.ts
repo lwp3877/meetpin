@@ -475,21 +475,23 @@ export class ScreenReaderSupport {
 
     // 이미지에 alt 텍스트 확인 (장식용 이미지 제외)
     document.querySelectorAll('img:not([alt])').forEach(img => {
+      const imgElement = img as HTMLImageElement
       // 장식용 이미지가 아닌 경우에만 경고
-      if (!img.closest('[role="presentation"]') && !img.classList.contains('decorative')) {
-        console.warn('Image without alt text detected:', img.src)
+      if (!imgElement.closest('[role="presentation"]') && !imgElement.classList.contains('decorative')) {
+        console.warn('Image without alt text detected:', imgElement.src)
         // 장식용으로 추정되는 이미지에는 빈 alt 추가
-        if (img.classList.contains('bg-') || img.classList.contains('decoration') || img.closest('.bg-')) {
-          img.setAttribute('alt', '')
+        if (imgElement.classList.contains('bg-') || imgElement.classList.contains('decoration') || imgElement.closest('.bg-')) {
+          imgElement.setAttribute('alt', '')
         }
       }
     })
 
     // 링크에 목적 설명 확인 (더 관대하게)
     document.querySelectorAll('a[href]:not([aria-label]):not([aria-labelledby])').forEach(link => {
-      const text = link.textContent?.trim()
+      const linkElement = link as HTMLAnchorElement
+      const text = linkElement.textContent?.trim()
       if (!text || ['더보기', '자세히', '보기', '클릭', '링크'].includes(text)) {
-        console.warn('Link with unclear purpose detected:', text || link.href)
+        console.warn('Link with unclear purpose detected:', text || linkElement.href)
 
         // 컨텍스트에서 유추할 수 있는 정보로 자동 레이블링
         const container = link.closest('[data-title], [data-name], h1, h2, h3, h4, h5, h6')

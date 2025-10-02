@@ -133,59 +133,58 @@ export default function EnhancedLanding() {
 
   useEffect(() => {
     // 🚨 강력한 리다이렉트 방지 - 어떤 상황에서도 메인 페이지에서 벗어나지 않도록 함
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return
 
-      // 개발 모드에서 mock 사용자 데이터가 있지만 랜딩 페이지를 보려는 경우 제거
-      if (isDevelopmentMode) {
-        const mockUser = localStorage.getItem('meetpin_user')
-        if (mockUser) {
-          localStorage.removeItem('meetpin_user')
-          // 쿠키도 제거
-          if (typeof document !== 'undefined') {
-            document.cookie = 'meetpin_mock_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
-          }
+    // 개발 모드에서 mock 사용자 데이터가 있지만 랜딩 페이지를 보려는 경우 제거
+    if (isDevelopmentMode) {
+      const mockUser = localStorage.getItem('meetpin_user')
+      if (mockUser) {
+        localStorage.removeItem('meetpin_user')
+        // 쿠키도 제거
+        if (typeof document !== 'undefined') {
+          document.cookie = 'meetpin_mock_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
         }
       }
+    }
 
-      // 모든 링크 클릭 방지
-      document.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement
-        if (target.tagName === 'A' && target.getAttribute('href') !== '#') {
-          e.preventDefault()
-          e.stopPropagation()
-        }
-      })
-
-      // History API 조작 방지
-      const originalPushState = window.history.pushState
-      const originalReplaceState = window.history.replaceState
-
-      window.history.pushState = function(...args) {
-        console.log('🚨 [Landing] history.pushState 차단됨:', args)
-        return
+    // 모든 링크 클릭 방지
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'A' && target.getAttribute('href') !== '#') {
+        e.preventDefault()
+        e.stopPropagation()
       }
+    })
 
-      window.history.replaceState = function(...args) {
-        console.log('🚨 [Landing] history.replaceState 차단됨:', args)
-        return
+    // History API 조작 방지
+    const originalPushState = window.history.pushState
+    const originalReplaceState = window.history.replaceState
+
+    window.history.pushState = function(...args) {
+      console.log('🚨 [Landing] history.pushState 차단됨:', args)
+      return undefined
+    }
+
+    window.history.replaceState = function(...args) {
+      console.log('🚨 [Landing] history.replaceState 차단됨:', args)
+      return undefined
+    }
+
+    // window.location 변경 시도 감지
+    const currentPath = window.location.pathname
+    const checkLocation = () => {
+      if (window.location.pathname !== currentPath) {
+        console.log('🚨 [Landing] 위치 변경 감지됨, 복원:', currentPath, '->', window.location.pathname)
+        window.history.replaceState(null, '', currentPath)
       }
+    }
 
-      // window.location 변경 시도 감지
-      const currentPath = window.location.pathname
-      const checkLocation = () => {
-        if (window.location.pathname !== currentPath) {
-          console.log('🚨 [Landing] 위치 변경 감지됨, 복원:', currentPath, '->', window.location.pathname)
-          window.history.replaceState(null, '', currentPath)
-        }
-      }
+    const locationWatcher = setInterval(checkLocation, 100)
 
-      const locationWatcher = setInterval(checkLocation, 100)
-
-      return () => {
-        clearInterval(locationWatcher)
-        window.history.pushState = originalPushState
-        window.history.replaceState = originalReplaceState
-      }
+    return () => {
+      clearInterval(locationWatcher)
+      window.history.pushState = originalPushState
+      window.history.replaceState = originalReplaceState
     }
   }, [])
 

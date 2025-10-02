@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Caching**: Redis (ioredis) with Upstash for distributed caching
 - **External APIs**: Kakao Maps SDK, Stripe payments
 - **Database**: PostgreSQL with Row Level Security (RLS)
-- **State Management**: React Query (@tanstack/react-query)
+- **State Management**: Zustand, React Context
 - **Form Handling**: React Hook Form with Zod validation
 - **Observability**: Structured logging with PII scrubbing and request tracing
 
@@ -121,7 +121,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
 - **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
 - **단위 테스트**: 60/60 테스트 통과 (RLS 보안 테스트 포함)
-- **개발 서버**: localhost:3000에서 안정적 실행 (포트 설정 가능)
+- **개발 서버**: localhost:3001에서 안정적 실행 (기본 포트)
 
 ### 🔧 Development Mode Features
 
@@ -134,7 +134,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development Environment
-pnpm dev          # Start development server (localhost:3000, use --port 3001 for alt port)
+pnpm dev          # Start development server (localhost:3001 by default)
 pnpm build        # Production build
 pnpm start        # Start production server
 pnpm preview      # Build and preview production version
@@ -179,7 +179,7 @@ pnpm approve-builds # Approve package build requirements
 
 # Package Management
 pnpm store prune  # Clean package cache
-npx kill-port 3000 # Kill process on port 3000 if needed (or 3001 for alt port)
+npx kill-port 3001 # Kill process on port 3001 if needed
 
 # Security & Compliance
 pnpm audit:security # Security vulnerability audit
@@ -423,7 +423,7 @@ Centralized in `src/lib/brand.ts`:
 
 ### Project Quality Standards
 
-- **TypeScript**: Strict mode with enhanced type safety (⚠️ 6 errors in tests/utils/smartLocator.ts need fixing)
+- **TypeScript**: Strict mode with enhanced type safety
 - **Code Quality**: Comprehensive ESLint + Prettier configuration (⚠️ Next.js lint deprecated in v16)
 - **Testing Suite**: Jest unit tests + Playwright E2E testing + WCAG 2.1 AA accessibility compliance
 - **Build Verification**: `pnpm repo:doctor` for complete quality checks
@@ -439,7 +439,8 @@ Centralized in `src/lib/brand.ts`:
 
 - **Platform**: Vercel (meetpin-weld.vercel.app)
 - **Git Integration**: Automatic deployment from GitHub main branch
-- **Build Status**: Latest version 1.4.17 with accessibility testing and performance improvements
+- **Build Status**: Latest version 1.5.0 with major refactoring and performance improvements
+- **Latest Deployment**: Commit 9cd2cca - Full refactoring with cleaned architecture
 - **Environment**: Production environment variables configured in Vercel dashboard
 
 ### Deployment Architecture
@@ -484,7 +485,6 @@ Common production deployment issues and solutions:
    - Solution: Verify environment variables and consider Mock mode fallback
 3. **Build Failures**: TypeScript or linting errors preventing deployment
    - Solution: Run `pnpm repo:doctor` locally before pushing
-   - ⚠️ **Current Issue**: 6 TypeScript errors in `tests/utils/smartLocator.ts` preventing clean builds
 4. **Git Synchronization**: Local changes not reflecting in deployment
    - Solution: Ensure all changes are committed and pushed to GitHub main branch
 5. **RLS Test Failures**: Security tests failing due to missing Supabase environment variables

@@ -13,46 +13,46 @@ export default function DebugLandingPage() {
   useEffect(() => {
     log('🚨 DEBUG 모드 활성화 - 모든 네비게이션 차단')
 
-    if (typeof window !== 'undefined') {
-      // 모든 네비게이션을 완전히 차단
-      const originalPushState = window.history.pushState
-      const originalReplaceState = window.history.replaceState
+    if (typeof window === 'undefined') return
 
-      window.history.pushState = function(...args) {
-        log(`🚨 history.pushState 차단됨: ${JSON.stringify(args)}`)
-        return
+    // 모든 네비게이션을 완전히 차단
+    const originalPushState = window.history.pushState
+    const originalReplaceState = window.history.replaceState
+
+    window.history.pushState = function(...args) {
+      log(`🚨 history.pushState 차단됨: ${JSON.stringify(args)}`)
+      return undefined
+    }
+
+    window.history.replaceState = function(...args) {
+      log(`🚨 history.replaceState 차단됨: ${JSON.stringify(args)}`)
+      return undefined
+    }
+
+    // window.location 변경 감지
+    let currentHref = window.location.href
+    const checkLocation = () => {
+      if (window.location.href !== currentHref) {
+        log(`🚨 location 변경 감지됨: ${currentHref} -> ${window.location.href}`)
+        // 강제로 원래 위치로 복원
+        window.history.replaceState(null, '', '/debug-landing')
+        currentHref = window.location.href
       }
+    }
 
-      window.history.replaceState = function(...args) {
-        log(`🚨 history.replaceState 차단됨: ${JSON.stringify(args)}`)
-        return
-      }
+    const interval = setInterval(checkLocation, 50)
 
-      // window.location 변경 감지
-      let currentHref = window.location.href
-      const checkLocation = () => {
-        if (window.location.href !== currentHref) {
-          log(`🚨 location 변경 감지됨: ${currentHref} -> ${window.location.href}`)
-          // 강제로 원래 위치로 복원
-          window.history.replaceState(null, '', '/debug-landing')
-          currentHref = window.location.href
-        }
-      }
+    // 모든 클릭 차단
+    document.addEventListener('click', (e) => {
+      log(`🚨 클릭 차단됨: ${(e.target as any)?.tagName}`)
+      e.preventDefault()
+      e.stopPropagation()
+    }, true)
 
-      const interval = setInterval(checkLocation, 50)
-
-      // 모든 클릭 차단
-      document.addEventListener('click', (e) => {
-        log(`🚨 클릭 차단됨: ${(e.target as any)?.tagName}`)
-        e.preventDefault()
-        e.stopPropagation()
-      }, true)
-
-      return () => {
-        clearInterval(interval)
-        window.history.pushState = originalPushState
-        window.history.replaceState = originalReplaceState
-      }
+    return () => {
+      clearInterval(interval)
+      window.history.pushState = originalPushState
+      window.history.replaceState = originalReplaceState
     }
   }, [])
 

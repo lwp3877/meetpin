@@ -88,19 +88,19 @@ async function getRooms(request: NextRequest) {
       start_at: String(room.start_at || new Date().toISOString()),
       max_people: Number(room.max_people || 1),
       fee: Number(room.fee || 0),
-      visibility: String(room.visibility || "public"),
-      created_at: String(room.created_at || new Date().toISOString()),
+      visibility: "public" as const, // Mock 데이터는 항상 public
+      created_at: new Date().toISOString(), // Mock 데이터 생성 시간
       host: room.profiles ? {
-        id: String(room.profiles.uid || "host_unknown"),
+        id: "host_unknown", // Mock 데이터는 uid 필드 없음
         nickname: String(room.profiles.nickname || "Unknown"),
         avatar_url: room.profiles.avatar_url,
         age_range: room.profiles.age_range
-      } : { id: "host_unknown", nickname: "Unknown" },
+      } : { id: "host_unknown", nickname: "Unknown", avatar_url: "", age_range: "20s_late" },
       boost_until: room.boost_until,
       // 추가 필드들 보완
-      description: room.description || "",
-      host_uid: room.host_uid || room.profiles?.uid || "host_unknown",
-      updated_at: room.updated_at || room.created_at || new Date().toISOString()
+      description: "", // Mock 데이터는 description 필드 없음
+      host_uid: "host_unknown", // Mock 데이터는 host_uid 필드 없음
+      updated_at: new Date().toISOString() // Mock 데이터 갱신 시간
     }))
 
     return apiUtils.success({
