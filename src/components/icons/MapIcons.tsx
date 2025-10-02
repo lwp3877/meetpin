@@ -1,9 +1,6 @@
 /* src/components/icons/MapIcons.tsx */
 // 🎯 지도 페이지 아이콘 최적화: 개별 임포트로 번들 최소화
 
-import { ComponentType } from 'react'
-import type { LucideProps } from 'lucide-react'
-
 // 필수 아이콘만 즉시 로딩 - 개별 임포트로 번들 최소화
 import Search from 'lucide-react/dist/esm/icons/search'
 import MapPin from 'lucide-react/dist/esm/icons/map-pin'

@@ -27,7 +27,9 @@
       "Bash(npx kill-port:*)",
       "Bash(pnpm add:*)",
       "Bash(grep:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": [],
     "ask": []

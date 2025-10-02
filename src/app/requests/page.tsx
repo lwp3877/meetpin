@@ -310,7 +310,7 @@ export default function RequestsPage() {
                               >
                                 {request.status === 'pending' ? (
                                   <>
-                                    <ClockIcon className="mr-1 h-3 w-3" /> 대기 중
+                                    <Clock className="mr-1 h-3 w-3" /> 대기 중
                                   </>
                                 ) : request.status === 'accepted' ? (
                                   <>
