@@ -3,7 +3,11 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { X, Send, Wifi, WifiOff, User } from 'lucide-react'
+import X from 'lucide-react/dist/esm/icons/x'
+import Send from 'lucide-react/dist/esm/icons/send'
+import Wifi from 'lucide-react/dist/esm/icons/wifi'
+import WifiOff from 'lucide-react/dist/esm/icons/wifi-off'
+import User from 'lucide-react/dist/esm/icons/user'
 import toast from 'react-hot-toast'
 import { useAuth } from '@/lib/useAuth'
 import { useRealtimeChat } from '@/hooks/useRealtimeChat'

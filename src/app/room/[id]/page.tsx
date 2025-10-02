@@ -8,18 +8,16 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getCategoryDisplay } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
-import {
-  MapPin,
-  Clock,
-  Users,
-  DollarSign,
-  Star,
-  Edit,
-  ArrowLeft,
-  Navigation,
-  Heart,
-  Share2,
-} from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Users from 'lucide-react/dist/esm/icons/users'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Star from 'lucide-react/dist/esm/icons/star'
+import Edit from 'lucide-react/dist/esm/icons/edit'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import Navigation from 'lucide-react/dist/esm/icons/navigation'
+import Heart from 'lucide-react/dist/esm/icons/heart'
+import Share2 from 'lucide-react/dist/esm/icons/share-2'
 import dynamic from 'next/dynamic'
 
 // 모달 컴포넌트들을 필요할 때만 로딩

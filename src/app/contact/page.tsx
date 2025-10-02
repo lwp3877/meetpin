@@ -3,17 +3,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  Mail,
-  MessageCircle,
-  Phone,
-  MapPin,
-  Clock,
-  Send,
-  CheckCircle,
-  AlertCircle,
-} from 'lucide-react'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import Mail from 'lucide-react/dist/esm/icons/mail'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import Phone from 'lucide-react/dist/esm/icons/phone'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Send from 'lucide-react/dist/esm/icons/send'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import AlertCircle from 'lucide-react/dist/esm/icons/alert-circle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

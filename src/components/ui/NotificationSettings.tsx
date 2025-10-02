@@ -2,19 +2,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  Bell,
-  BellOff,
-  MessageCircle,
-  Users,
-  Clock,
-  Info,
-  Volume2,
-  VolumeX,
-  Vibrate,
-  Settings,
-  X,
-} from 'lucide-react'
+import Bell from 'lucide-react/dist/esm/icons/bell'
+import BellOff from 'lucide-react/dist/esm/icons/bell-off'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Info from 'lucide-react/dist/esm/icons/info'
+import Volume2 from 'lucide-react/dist/esm/icons/volume-2'
+import VolumeX from 'lucide-react/dist/esm/icons/volume-x'
+import Vibrate from 'lucide-react/dist/esm/icons/vibrate'
+import Settings from 'lucide-react/dist/esm/icons/settings'
+import X from 'lucide-react/dist/esm/icons/x'
 import {
   isNotificationSupported,
   getNotificationPermission,

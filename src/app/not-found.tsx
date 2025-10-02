@@ -4,7 +4,11 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Home, Search, ArrowLeft, MapPin, HelpCircle } from 'lucide-react'
+import Home from 'lucide-react/dist/esm/icons/home'
+import Search from 'lucide-react/dist/esm/icons/search'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import HelpCircle from 'lucide-react/dist/esm/icons/help-circle'
 
 export default function NotFoundPage() {
   const suggestions = [

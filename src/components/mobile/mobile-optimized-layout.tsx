@@ -9,18 +9,16 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import PremiumButton from '@/components/ui/premium-button'
-import {
-  MapPin,
-  Users,
-  Heart,
-  Star,
-  Clock,
-  ChevronDown,
-  Search,
-  Menu,
-  X,
-  Smartphone,
-} from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Heart from 'lucide-react/dist/esm/icons/heart'
+import Star from 'lucide-react/dist/esm/icons/star'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down'
+import Search from 'lucide-react/dist/esm/icons/search'
+import Menu from 'lucide-react/dist/esm/icons/menu'
+import X from 'lucide-react/dist/esm/icons/x'
+import Smartphone from 'lucide-react/dist/esm/icons/smartphone'
 
 interface MobileLayoutProps {
   children?: React.ReactNode

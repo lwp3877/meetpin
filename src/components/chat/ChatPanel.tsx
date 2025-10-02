@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
-import { Send } from 'lucide-react'
+import Send from 'lucide-react/dist/esm/icons/send'
 
 // 메시지 타입
 interface Message {

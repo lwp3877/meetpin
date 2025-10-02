@@ -8,7 +8,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { brandMessages } from '@/lib/config/brand'
-import { MapPin, Users, Star, Clock, Target, Zap, Trophy, Heart } from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Star from 'lucide-react/dist/esm/icons/star'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Target from 'lucide-react/dist/esm/icons/target'
+import Zap from 'lucide-react/dist/esm/icons/zap'
+import Trophy from 'lucide-react/dist/esm/icons/trophy'
+import Heart from 'lucide-react/dist/esm/icons/heart'
 
 const EXERCISE_SPOTS = [
   {

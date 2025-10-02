@@ -1,85 +1,38 @@
 /* src/components/icons/MapIcons.tsx */
-// 🎯 지도 페이지 아이콘 최적화: 필요할 때만 로딩
+// 🎯 지도 페이지 아이콘 최적화: 개별 임포트로 번들 최소화
 
-import dynamic from 'next/dynamic'
 import { ComponentType } from 'react'
-import { LucideProps } from 'lucide-react'
+import type { LucideProps } from 'lucide-react'
 
-// 필수 아이콘만 즉시 로딩
-export { Search, MapPin } from 'lucide-react'
+// 필수 아이콘만 즉시 로딩 - 개별 임포트로 번들 최소화
+import Search from 'lucide-react/dist/esm/icons/search'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import SlidersHorizontal from 'lucide-react/dist/esm/icons/sliders-horizontal'
+import Plus from 'lucide-react/dist/esm/icons/plus'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Mail from 'lucide-react/dist/esm/icons/mail'
+import User from 'lucide-react/dist/esm/icons/user'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import X from 'lucide-react/dist/esm/icons/x'
+import Navigation from 'lucide-react/dist/esm/icons/navigation'
+import LogOut from 'lucide-react/dist/esm/icons/log-out'
 
-// 사용자 인터랙션 시에만 필요한 아이콘들을 동적 로딩
-export const SlidersHorizontal = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.SlidersHorizontal })),
-  {
-    ssr: false,
-    loading: () => <div className="h-5 w-5 animate-pulse rounded bg-gray-200" />,
-  }
-) as ComponentType<LucideProps>
-
-export const Plus = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Plus })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const Users = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Users })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const Mail = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Mail })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const User = dynamic(() => import('lucide-react').then(mod => ({ default: mod.User })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const TrendingUp = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.TrendingUp })),
-  {
-    ssr: false,
-    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-  }
-) as ComponentType<LucideProps>
-
-export const Calendar = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.Calendar })),
-  {
-    ssr: false,
-    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-  }
-) as ComponentType<LucideProps>
-
-export const DollarSign = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.DollarSign })),
-  {
-    ssr: false,
-    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-  }
-) as ComponentType<LucideProps>
-
-export const Filter = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Filter })), {
-  ssr: false,
-  loading: () => <div className="h-3 w-3 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const X = dynamic(() => import('lucide-react').then(mod => ({ default: mod.X })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
-
-export const Navigation = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.Navigation })),
-  {
-    ssr: false,
-    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-  }
-) as ComponentType<LucideProps>
-
-export const LogOut = dynamic(() => import('lucide-react').then(mod => ({ default: mod.LogOut })), {
-  ssr: false,
-  loading: () => <div className="h-5 w-5 animate-pulse rounded bg-gray-200" />,
-}) as ComponentType<LucideProps>
+export {
+  Search,
+  MapPin,
+  SlidersHorizontal,
+  Plus,
+  Users,
+  Mail,
+  User,
+  TrendingUp,
+  Calendar,
+  DollarSign,
+  Filter,
+  X,
+  Navigation,
+  LogOut,
+}

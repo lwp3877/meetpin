@@ -3,16 +3,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  ArrowLeft,
-  ChevronDown,
-  ChevronUp,
-  Search,
-  MessageCircle,
-  Mail,
-  Phone,
-  HelpCircle,
-} from 'lucide-react'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import ChevronDown from 'lucide-react/dist/esm/icons/chevron-down'
+import ChevronUp from 'lucide-react/dist/esm/icons/chevron-up'
+import Search from 'lucide-react/dist/esm/icons/search'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import Mail from 'lucide-react/dist/esm/icons/mail'
+import Phone from 'lucide-react/dist/esm/icons/phone'
+import HelpCircle from 'lucide-react/dist/esm/icons/help-circle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

@@ -4,7 +4,8 @@
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import { NotificationSettings } from '@/components/ui/NotificationSettings'
-import { ArrowLeft, Bell } from 'lucide-react'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import Bell from 'lucide-react/dist/esm/icons/bell'
 import { useEffect } from 'react'
 
 export default function NotificationSettingsPage() {

@@ -7,7 +7,8 @@ import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import ChatPanel from '@/components/chat/ChatPanel'
-import { AlertCircle, ArrowLeft } from 'lucide-react'
+import AlertCircle from 'lucide-react/dist/esm/icons/alert-circle'
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
 
 export default function ChatPage({ params }: { params: Promise<{ matchId: string }> }) {
   const { matchId } = use(params)

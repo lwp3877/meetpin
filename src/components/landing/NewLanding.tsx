@@ -3,20 +3,18 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import {
-  MapPin,
-  Users,
-  Calendar,
-  Coffee,
-  Dumbbell,
-  Music,
-  Heart,
-  Shield,
-  Star,
-  ArrowRight,
-  CheckCircle,
-  Sparkles,
-} from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import Coffee from 'lucide-react/dist/esm/icons/coffee'
+import Dumbbell from 'lucide-react/dist/esm/icons/dumbbell'
+import Music from 'lucide-react/dist/esm/icons/music'
+import Heart from 'lucide-react/dist/esm/icons/heart'
+import Shield from 'lucide-react/dist/esm/icons/shield'
+import Star from 'lucide-react/dist/esm/icons/star'
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles'
 
 /**
  * 새로운 밋핀 랜딩 페이지

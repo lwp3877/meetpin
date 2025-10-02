@@ -7,23 +7,21 @@ import { useRouter } from 'next/navigation'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import MobileOptimizedLayout from '@/components/mobile/mobile-optimized-layout'
 import LegalFooter from '@/components/layout/LegalFooter'
-import {
-  MapPin,
-  Users,
-  Calendar,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  Zap,
-  TrendingUp,
-  ArrowRight,
-  Play,
-  Shield,
-  Globe,
-  Cpu,
-  MessageCircle,
-} from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import Star from 'lucide-react/dist/esm/icons/star'
+import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left'
+import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right'
+import Sparkles from 'lucide-react/dist/esm/icons/sparkles'
+import Zap from 'lucide-react/dist/esm/icons/zap'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right'
+import Play from 'lucide-react/dist/esm/icons/play'
+import Shield from 'lucide-react/dist/esm/icons/shield'
+import Globe from 'lucide-react/dist/esm/icons/globe'
+import Cpu from 'lucide-react/dist/esm/icons/cpu'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
 
 // 새로운 프리미엄 피처드 룸
 const FEATURED_ROOMS = [

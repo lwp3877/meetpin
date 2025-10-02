@@ -8,7 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { brandMessages } from '@/lib/config/brand'
-import { MapPin, Users, Star, Clock, Wine, PartyPopper } from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Star from 'lucide-react/dist/esm/icons/star'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Wine from 'lucide-react/dist/esm/icons/wine'
+import PartyPopper from 'lucide-react/dist/esm/icons/party-popper'
 
 const DRINK_SPOTS = [
   {

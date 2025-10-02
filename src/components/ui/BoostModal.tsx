@@ -2,7 +2,14 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Star, Zap, Clock, Users, TrendingUp, CreditCard, Check } from 'lucide-react'
+import X from 'lucide-react/dist/esm/icons/x'
+import Star from 'lucide-react/dist/esm/icons/star'
+import Zap from 'lucide-react/dist/esm/icons/zap'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Users from 'lucide-react/dist/esm/icons/users'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import CreditCard from 'lucide-react/dist/esm/icons/credit-card'
+import Check from 'lucide-react/dist/esm/icons/check'
 import {
   BOOST_PLANS,
   type BoostPlanId,

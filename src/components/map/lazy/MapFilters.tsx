@@ -13,31 +13,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
-import dynamic from 'next/dynamic'
-
-// 아이콘들도 필요할 때만 로딩
-const Filter = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Filter })), {
-  ssr: false,
-  loading: () => <div className="h-3 w-3 animate-pulse rounded bg-gray-200" />,
-})
-
-const Calendar = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Calendar })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-})
-
-const DollarSign = dynamic(
-  () => import('lucide-react').then(mod => ({ default: mod.DollarSign })),
-  {
-    ssr: false,
-    loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-  }
-)
-
-const Users = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Users })), {
-  ssr: false,
-  loading: () => <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />,
-})
+import Filter from 'lucide-react/dist/esm/icons/filter'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign'
+import Users from 'lucide-react/dist/esm/icons/users'
 
 interface MapFiltersProps {
   selectedCategory: string

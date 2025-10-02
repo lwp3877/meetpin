@@ -4,7 +4,10 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react'
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle'
+import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw'
+import Home from 'lucide-react/dist/esm/icons/home'
+import Bug from 'lucide-react/dist/esm/icons/bug'
 import toast from 'react-hot-toast'
 
 interface Props {

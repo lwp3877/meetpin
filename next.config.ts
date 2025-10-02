@@ -260,8 +260,8 @@ const nextConfig: NextConfig = {
                 // 청크 번들 체크
                 else {
                   console.log(`📦 Chunk: ${assetName} = ${sizeKB}KB`);
-                  if (sizeKB > 600) { // 일시적으로 완화
-                    console.error(`❌ CHUNK EXCEEDED: ${assetName} = ${sizeKB}KB (limit: 600KB)`);
+                  if (sizeKB > 300) {
+                    console.error(`❌ CHUNK EXCEEDED: ${assetName} = ${sizeKB}KB (limit: 300KB)`);
                     hasChunkExceeded = true;
                   }
                 }
@@ -271,7 +271,7 @@ const nextConfig: NextConfig = {
             const mainSizeKB = Math.round(mainBundleSize / 1024);
             console.log(`\n📊 Total Main Bundle: ${mainSizeKB}KB (limit: 300KB)`);
 
-            if (mainSizeKB > 500) { // 일시적으로 완화
+            if (mainSizeKB > 300) {
               console.error(`❌ TOTAL MAIN BUNDLE EXCEEDED: ${mainSizeKB}KB`);
               hasMainExceeded = true;
             }
@@ -311,7 +311,7 @@ const nextConfig: NextConfig = {
 
   // TypeScript 최적화
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
   // ESLint 최적화

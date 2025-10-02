@@ -4,18 +4,16 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/useAuth'
-import {
-  User,
-  Users,
-  MessageSquare,
-  Trophy,
-  Activity,
-  MapPin,
-  Clock,
-  TrendingUp,
-  Award,
-  Star,
-} from 'lucide-react'
+import User from 'lucide-react/dist/esm/icons/user'
+import Users from 'lucide-react/dist/esm/icons/users'
+import MessageSquare from 'lucide-react/dist/esm/icons/message-square'
+import Trophy from 'lucide-react/dist/esm/icons/trophy'
+import Activity from 'lucide-react/dist/esm/icons/activity'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import Award from 'lucide-react/dist/esm/icons/award'
+import Star from 'lucide-react/dist/esm/icons/star'
 import { getCategoryDisplay } from '@/lib/config/brand'
 
 interface ProfileStats {

@@ -10,18 +10,15 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getCategoryDisplay } from '@/lib/config/brand'
-import {
-  Clock,
-  MapPin,
-  User,
-  Calendar,
-  MessageCircle,
-  ClockIcon,
-  CheckCircle,
-  XCircle,
-  Heart,
-  Search,
-} from 'lucide-react'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import User from 'lucide-react/dist/esm/icons/user'
+import Calendar from 'lucide-react/dist/esm/icons/calendar'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import XCircle from 'lucide-react/dist/esm/icons/x-circle'
+import Heart from 'lucide-react/dist/esm/icons/heart'
+import Search from 'lucide-react/dist/esm/icons/search'
 import toast from 'react-hot-toast'
 
 interface Request {

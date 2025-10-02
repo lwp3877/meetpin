@@ -4,7 +4,11 @@
 import { useState } from 'react'
 import { useAuth } from '@/lib/useAuth'
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications'
-import { Bell, MessageCircle, Clock, User, X } from 'lucide-react'
+import Bell from 'lucide-react/dist/esm/icons/bell'
+import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import User from 'lucide-react/dist/esm/icons/user'
+import X from 'lucide-react/dist/esm/icons/x'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 

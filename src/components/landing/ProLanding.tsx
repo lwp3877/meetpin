@@ -3,17 +3,15 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
-import {
-  MapPin,
-  Users,
-  Clock,
-  Shield,
-  Star,
-  ArrowRight,
-  CheckCircle,
-  TrendingUp,
-  ChevronRight,
-} from 'lucide-react'
+import MapPin from 'lucide-react/dist/esm/icons/map-pin'
+import Users from 'lucide-react/dist/esm/icons/users'
+import Clock from 'lucide-react/dist/esm/icons/clock'
+import Shield from 'lucide-react/dist/esm/icons/shield'
+import Star from 'lucide-react/dist/esm/icons/star'
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right'
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle'
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
+import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right'
 
 // 실제 서울 지역 기반 리얼 모임 데이터
 const LIVE_ROOMS = [
