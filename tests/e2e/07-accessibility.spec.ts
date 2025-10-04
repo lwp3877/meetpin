@@ -93,7 +93,7 @@ test.describe('Accessibility (A11Y) Compliance', () => {
     expect(await firstFocusedElement.count()).toBeGreaterThan(0);
 
     // Test skip link functionality (if exists)
-    const skipLink = page.locator('.skip-link');
+    const skipLink = page.locator('.skip-link').first(); // Use .first() to avoid strict mode violation
     if (await skipLink.count() > 0) {
       await skipLink.focus();
       expect(await skipLink.isVisible()).toBe(true);

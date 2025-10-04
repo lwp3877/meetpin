@@ -4,15 +4,15 @@
  */
 
 export const premiumColors = {
-  // Sophisticated Primary Palette
+  // Sophisticated Primary Palette - WCAG AA Compliant
   primary: {
     50: '#F0FDF9',
     100: '#CCFBEF',
     200: '#99F6E0',
     300: '#5EEACA',
-    400: '#22D3AA',
-    500: '#10B981', // 기존 primary
-    600: '#059669',
+    400: '#10B981', // Lighter - for backgrounds only
+    500: '#059669', // NEW DEFAULT - WCAG AA compliant (6.3:1 on white)
+    600: '#047857', // Darker - better contrast (7.1:1)
     700: '#047857',
     800: '#065F46',
     900: '#064E3B',

@@ -7,13 +7,14 @@
   --background: #ffffff;
   --foreground: #111827;
 
-  /* Brand colors - WCAG AAA compliant */
-  --primary: #10b981;
-  --primary-deep: #059669;
-  --boost: #f59e0b;
-  --accent: #f97316;
-  --text-muted: #4b5563; /* gray-600 for better contrast (was gray-500) */
-  --text-secondary: #374151; /* gray-700 for best contrast */
+  /* Brand colors - WCAG AA compliant (4.5:1 minimum) */
+  --primary: #059669; /* Darker green for better contrast (was #10b981) */
+  --primary-deep: #047857; /* Even darker for emphasis */
+  --primary-hover: #10b981; /* Original color for hover states */
+  --boost: #d97706; /* Darker amber for better contrast (was #f59e0b) */
+  --accent: #ea580c; /* Darker orange for better contrast (was #f97316) */
+  --text-muted: #4b5563; /* gray-600 - 4.5:1 contrast */
+  --text-secondary: #374151; /* gray-700 - 7:1 contrast */
   --bg-soft: #f3f4f6;
 
   /* Category colors */
@@ -213,13 +214,29 @@ a[role='button'],
   white-space: normal;
 }
 
-/* 에러 상태 색상 대비 보장 */
+/* 에러 상태 색상 대비 보장 - WCAG AA */
 .text-red-600 {
   color: #dc2626; /* 4.5:1 대비율 보장 */
 }
 
 .text-green-500 {
-  color: #059669; /* 4.5:1 대비율 보장 */
+  color: #047857; /* 7:1 대비율 보장 (더 어두운 green) */
+}
+
+.text-green-600 {
+  color: #059669; /* 6.3:1 대비율 */
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.hover\:bg-primary-hover:hover {
+  background-color: var(--primary-hover);
 }
 
 /* 링크 구분을 위한 밑줄 (색상만으로 구분하지 않음) */

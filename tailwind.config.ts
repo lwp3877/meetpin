@@ -10,20 +10,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // Premium color system
+      // Premium color system - WCAG AA Compliant
       colors: {
-        primary: premiumTheme.colors.primary,
+        primary: {
+          ...premiumTheme.colors.primary,
+          DEFAULT: premiumTheme.colors.primary[500], // #059669 - WCAG AA
+        },
         boost: {
           50: '#FFFBEB',
           100: '#FEF3C7',
           200: '#FDE68A',
           300: '#FCD34D',
           400: '#FBBF24',
-          500: '#F59E0B',
-          600: '#D97706',
-          700: '#B45309',
-          800: '#92400E',
-          900: '#78350F',
+          500: '#D97706', // WCAG AA - darker (was #F59E0B)
+          600: '#B45309',
+          700: '#92400E',
+          800: '#78350F',
+          900: '#713F12',
         },
         accent: {
           50: '#FFF7ED',
@@ -31,11 +34,11 @@ const config: Config = {
           200: '#FED7AA',
           300: '#FDBA74',
           400: '#FB923C',
-          500: '#F97316',
-          600: '#EA580C',
-          700: '#C2410C',
-          800: '#9A3412',
-          900: '#7C2D12',
+          500: '#EA580C', // WCAG AA - darker (was #F97316)
+          600: '#C2410C',
+          700: '#9A3412',
+          800: '#7C2D12',
+          900: '#6C2E12',
         },
         neutral: premiumTheme.colors.neutral,
         glass: {

@@ -32,7 +32,13 @@ const eslintConfig = [
       'jest.config.js',
       'next.config.ts',
       'playwright.config.ts',
-      'tests/**'
+      'tests/**',
+      '__tests__/**',
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      'public/sw.js', // PWA Service Worker - auto-generated
+      'public/workbox-*.js' // PWA Workbox runtime - auto-generated
     ],
   },
   {
