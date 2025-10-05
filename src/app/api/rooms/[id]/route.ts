@@ -12,6 +12,7 @@ import {
   ApiError,
   apiUtils,
 } from '@/lib/api'
+import { logger } from '@/lib/observability/logger'
 
 // GET /api/rooms/[id] - 특정 방 상세 조회
 async function getRoom(request: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -125,7 +126,7 @@ async function updateRoom(request: NextRequest, context: { params: Promise<{ id:
     .single()) as { data: any | null; error: any }
 
   if (error) {
-    console.error('Room update error:', error)
+    logger.error('Room update error', { error: error.message || String(error), roomId: id })
     throw new ApiError('방 정보 수정에 실패했습니다')
   }
 
@@ -160,7 +161,7 @@ async function deleteRoom(request: NextRequest, context: { params: Promise<{ id:
   const { error } = await supabase.from('rooms').delete().eq('id', id)
 
   if (error) {
-    console.error('Room deletion error:', error)
+    logger.error('Room deletion error', { error: error.message || String(error), roomId: id })
     throw new ApiError('방 삭제에 실패했습니다')
   }
 

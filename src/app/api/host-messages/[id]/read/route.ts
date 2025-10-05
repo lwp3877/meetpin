@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 // 호스트 메시지 읽음 처리
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     if (isDevelopmentMode) {
       // 개발 모드에서는 단순 성공 응답
-      console.log(`[DEV] Marking host message ${messageId} as read by user ${user.id}`)
+      logger.info(`[DEV] Marking host message ${messageId} as read by user ${user.id}`)
 
       return Response.json({
         ok: true,
@@ -47,7 +48,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       if (error.code === 'PGRST116') {
         throw new ApiError('메시지를 찾을 수 없습니다', 404)
       }
-      console.error('Host message read error:', error)
+      logger.error('Host message read error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('메시지 읽음 처리에 실패했습니다', 500)
     }
 
@@ -69,7 +70,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       )
     }
 
-    console.error('Host message read API error:', error)
+    logger.error('Host message read API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }

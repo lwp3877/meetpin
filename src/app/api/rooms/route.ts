@@ -16,6 +16,7 @@ import { parseBBoxParam } from '@/lib/utils/bbox'
 import { mockRooms } from '@/lib/config/mockData'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import { withCache, CacheKeys, CacheTTL, invalidateRoomCache } from '@/lib/cache/redis'
+import { logger } from '@/lib/observability/logger'
 
 // API 캐싱 설정 - 방 목록 데이터는 1분간 캐싱
 export const revalidate = 60 // 1분마다 재검증
@@ -25,7 +26,7 @@ async function getRooms(request: NextRequest) {
   // Supabase 환경변수 검증 (프로덕션에서 실제 DB 사용 시)
   if (!isDevelopmentMode) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.error('Missing Supabase environment variables')
+      logger.error('Missing Supabase environment variables')
       return apiUtils.error('서버 설정 오류입니다', 500)
     }
   }
@@ -163,7 +164,7 @@ async function getRooms(request: NextRequest) {
     const { data: rooms, error } = await query
 
     if (error) {
-      console.error('Rooms fetch error:', error)
+      logger.error('Rooms fetch error', { error: error.message || String(error) })
       throw new Error('방 목록을 가져올 수 없습니다')
     }
 
@@ -185,7 +186,7 @@ async function getRooms(request: NextRequest) {
     const { count, error: countError } = await countQuery
 
     if (countError) {
-      console.error('Count error:', countError)
+      logger.error('Count error', { error: countError.message || String(countError) })
     }
 
     return {
@@ -256,7 +257,7 @@ async function createRoom(request: NextRequest) {
   )) as { data: any | null; error: any }
 
   if (error) {
-    console.error('Room creation transaction error:', error)
+    logger.error('Room creation transaction error', { error: error.message || String(error) })
 
     // 특정 에러 메시지에 따른 사용자 친화적 응답
     if (error.message?.includes('시작 시간은 최소 30분 후여야 합니다')) {

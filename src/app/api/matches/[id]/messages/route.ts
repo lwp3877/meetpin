@@ -12,6 +12,7 @@ import {
 } from '@/lib/api'
 import { withCache, CacheKeys, CacheTTL, invalidateMessageCache } from '@/lib/cache/redis'
 
+import { logger } from '@/lib/observability/logger'
 // 금칙어 목록 (1차 필터링)
 const FORBIDDEN_WORDS = [
   '시발',
@@ -118,7 +119,7 @@ async function getMessages(request: NextRequest, context: { params: Promise<{ id
       .range(offset, offset + limit - 1)
 
     if (error) {
-      console.error('Messages fetch error:', error)
+      logger.error('Messages fetch error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('메시지를 가져오는데 실패했습니다')
     }
 
@@ -206,7 +207,7 @@ async function createMessage(request: NextRequest, context: { params: Promise<{ 
     .single()
 
   if (error) {
-    console.error('Message creation error:', error)
+    logger.error('Message creation error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('메시지 전송에 실패했습니다')
   }
 

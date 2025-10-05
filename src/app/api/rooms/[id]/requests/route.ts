@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, createSuccessResponse, parseUrlParams } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const supabase = await createServerSupabaseClient()
   const user = await getAuthenticatedUser()
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     .order('created_at', { ascending: false })
 
   if (reqError) {
-    console.error('Failed to fetch requests:', reqError)
+    logger.error('Failed to fetch requests:', { error: reqError instanceof Error ? reqError.message : String(reqError) })
     throw new ApiError('요청 목록을 불러오지 못했습니다')
   }
 

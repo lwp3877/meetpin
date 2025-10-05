@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 
+import { logger } from '@/lib/observability/logger'
 // Vercel Cron Job - 만료된 부스트 정리
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       .lt('boost_until', now)
 
     if (selectError) {
-      console.error('Failed to select expired boosts:', selectError)
+      logger.error('Failed to select expired boosts:', { error: selectError instanceof Error ? selectError.message : String(selectError) })
       return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
     }
 
@@ -42,11 +43,11 @@ export async function GET(request: NextRequest) {
       .lt('boost_until', now)) as { error: any }
 
     if (updateError) {
-      console.error('Failed to cleanup expired boosts:', updateError)
+      logger.error('Failed to cleanup expired boosts:', { error: updateError instanceof Error ? updateError.message : String(updateError) })
       return NextResponse.json({ error: 'Cleanup failed' }, { status: 500 })
     }
 
-    console.log(`[Cron] Cleaned up ${expiredBoosts.length} expired boosts`)
+    logger.info(`[Cron] Cleaned up ${expiredBoosts.length} expired boosts`)
 
     return NextResponse.json({
       message: 'Expired boosts cleaned up successfully',
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
       timestamp: now,
     })
   } catch (error) {
-    console.error('Cron job error:', error)
+    logger.error('Cron job error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json(
       {
         error: 'Internal server error',

@@ -10,6 +10,7 @@ import {
   ApiError,
 } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 // 요청 상태 업데이트 스키마
 const updateRequestSchema = z.object({
   status: z
@@ -87,7 +88,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
     )
 
     if (transactionError) {
-      console.error('Transaction error:', transactionError)
+      logger.error('Transaction error:', { error: transactionError instanceof Error ? transactionError.message : String(transactionError) })
       if (transactionError.message?.includes('room_full')) {
         throw new ApiError('방이 가득 찼습니다')
       }
@@ -105,7 +106,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
       .eq('id', id)
 
     if (updateError) {
-      console.error('Request update error:', updateError)
+      logger.error('Request update error:', { error: updateError instanceof Error ? updateError.message : String(updateError) })
       throw new ApiError('요청 처리에 실패했습니다')
     }
   }
@@ -140,7 +141,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
     .single()
 
   if (fetchError) {
-    console.error('Updated request fetch error:', fetchError)
+    logger.error('Updated request fetch error:', { error: fetchError instanceof Error ? fetchError.message : String(fetchError) })
     throw new ApiError('처리된 요청 정보를 가져올 수 없습니다')
   }
 
@@ -183,7 +184,7 @@ async function deleteRequest(request: NextRequest, context: { params: Promise<{ 
   const { error: deleteError } = await supabase.from('requests').delete().eq('id', id)
 
   if (deleteError) {
-    console.error('Request deletion error:', deleteError)
+    logger.error('Request deletion error:', { error: deleteError instanceof Error ? deleteError.message : String(deleteError) })
     throw new ApiError('요청 취소에 실패했습니다')
   }
 

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import { ApiResponse } from '@/lib/api'
+import { logger } from '@/lib/observability/logger'
 
 interface DemoLoginRequest {
   email: string
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('Demo login error:', error)
+    logger.error('Demo login error', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json(
       { ok: false, message: 'Internal server error' },
       { status: 500 }

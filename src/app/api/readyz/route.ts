@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
@@ -89,7 +90,7 @@ export async function GET(): Promise<NextResponse> {
     }
 
     // 로깅
-    console.log(`[READY] Status: ${allReady ? 'READY' : 'NOT_READY'}, Latency: ${totalLatency}ms`)
+    logger.info(`[READY] Status: ${allReady ? 'READY' : 'NOT_READY'}, Latency: ${totalLatency}ms`)
 
     return NextResponse.json(response, {
       status: allReady ? 200 : 503,
@@ -99,7 +100,7 @@ export async function GET(): Promise<NextResponse> {
       },
     })
   } catch (error: any) {
-    console.error('[READY] Critical error:', error)
+    logger.error('[READY] Critical error:', { error: error instanceof Error ? error.message : String(error) })
 
     return NextResponse.json(
       {

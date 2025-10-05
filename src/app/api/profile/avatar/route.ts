@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 // 프로필 아바타 업데이트
 export async function PATCH(req: NextRequest) {
   try {
@@ -118,7 +119,7 @@ export async function PATCH(req: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Profile avatar update error:', error)
+      logger.error('Profile avatar update error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('프로필 사진 업데이트에 실패했습니다', 500, 'UPDATE_ERROR')
     }
 
@@ -131,11 +132,11 @@ export async function PATCH(req: NextRequest) {
       })
 
       if (authError) {
-        console.warn('Auth metadata update failed:', authError)
+        logger.warn('Auth metadata update failed:', authError)
         // 메타데이터 업데이트 실패는 치명적이지 않음
       }
     } catch (authError) {
-      console.warn('Auth metadata update error:', authError)
+      logger.warn('Auth metadata update error', { error: authError instanceof Error ? authError.message : String(authError) })
       // 계속 진행
     }
 
@@ -162,7 +163,7 @@ export async function PATCH(req: NextRequest) {
       )
     }
 
-    console.error('Profile avatar API error:', error)
+    logger.error('Profile avatar API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }
@@ -222,7 +223,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    console.error('Profile avatar GET API error:', error)
+    logger.error('Profile avatar GET API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }

@@ -9,6 +9,7 @@ import { checkRateLimit } from '@/lib/rateLimit'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { z } from 'zod'
 
+import { logger } from '@/lib/observability/logger'
 const privacyRightsRequestSchema = z.object({
   requestType: z.enum([
     'data_access', // 개인정보 열람권
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .single()) as { data: any | null; error: any }
 
     if (insertError) {
-      console.error('Privacy rights request insert error:', insertError)
+      logger.error('Privacy rights request insert error:', { error: insertError instanceof Error ? insertError.message : String(insertError) })
       throw new ApiError('개인정보 권리 요청 접수 중 오류가 발생했습니다.', 500)
     }
 
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       message: string
     }>)
   } catch (error) {
-    console.error('Privacy rights request API error:', error)
+    logger.error('Privacy rights request API error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -260,7 +261,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     }>)
   } catch (error) {
-    console.error('Get privacy rights requests error:', error)
+    logger.error('Get privacy rights requests error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(

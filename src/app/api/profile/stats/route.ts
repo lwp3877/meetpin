@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 interface UserStats {
   hostedRooms: number
   joinedRooms: number
@@ -249,7 +250,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    console.error('Profile stats API error:', error)
+    logger.error('Profile stats API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }

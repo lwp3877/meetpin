@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, ApiResponse, rateLimit } from '@/lib/api'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 // 특정 호스트 메시지 조회
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       )
     }
 
-    console.error('Host message API error:', error)
+    logger.error('Host message API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }
@@ -138,7 +139,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       )
     }
 
-    console.error('Host message delete API error:', error)
+    logger.error('Host message delete API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }

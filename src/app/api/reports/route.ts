@@ -10,6 +10,7 @@ import {
   ApiError,
 } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 // 신고 생성 스키마
 const createReportSchema = z
   .object({
@@ -120,7 +121,7 @@ async function createReport(request: NextRequest) {
     .single()
 
   if (error) {
-    console.error('Report creation error:', error)
+    logger.error('Report creation error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('신고 접수에 실패했습니다')
   }
 
@@ -180,7 +181,7 @@ async function getReports(request: NextRequest) {
   const { data: reports, error, count } = await query
 
   if (error) {
-    console.error('Reports fetch error:', error)
+    logger.error('Reports fetch error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('신고 목록을 가져오는데 실패했습니다')
   }
 

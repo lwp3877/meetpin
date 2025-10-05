@@ -6,6 +6,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import { withCache, CacheKeys, CacheTTL, invalidateUserCache } from '@/lib/cache/redis'
 
+import { logger } from '@/lib/observability/logger'
 // API 캐싱 설정 - 알림은 실시간성이 중요하므로 15초간만 캐싱
 export const revalidate = 15 // 15초마다 재검증
 export const dynamic = 'force-dynamic' // 사용자별 알림 데이터
@@ -114,7 +115,7 @@ export async function GET(_request: NextRequest) {
       )
     }
 
-    console.error('Notifications fetch error:', error)
+    logger.error('Notifications fetch error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '알림을 가져오는데 실패했습니다' }, { status: 500 })
   }
 }
@@ -162,7 +163,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error('Notification creation error:', error)
+    logger.error('Notification creation error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '알림 생성에 실패했습니다' }, { status: 500 })
   }
 }

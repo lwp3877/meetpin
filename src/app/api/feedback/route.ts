@@ -9,6 +9,7 @@ import {
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { z } from 'zod'
 
+import { logger } from '@/lib/observability/logger'
 // 피드백 검증 스키마
 const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'improvement', 'other']),
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Feedback creation error:', error)
+      logger.error('Feedback creation error:', { error: error instanceof Error ? error.message : String(error) })
       return NextResponse.json(
         {
           ok: false,
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       201
     )
   } catch (error) {
-    console.error('Feedback API error:', error)
+    logger.error('Feedback API error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json(
       {
         ok: false,

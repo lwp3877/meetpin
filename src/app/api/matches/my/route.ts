@@ -10,6 +10,7 @@ import {
 } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 
+import { logger } from '@/lib/observability/logger'
 // GET /api/matches/my - 내 매치 목록 조회
 async function getMyMatches(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -50,7 +51,7 @@ async function getMyMatches(request: NextRequest) {
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Matches fetch error:', error)
+    logger.error('Matches fetch error:', { error: error instanceof Error ? error.message : String(error) })
     return apiUtils.error('매치 목록을 가져올 수 없습니다', 500)
   }
 
@@ -61,7 +62,7 @@ async function getMyMatches(request: NextRequest) {
     .or(`host_uid.eq.${user.id},guest_uid.eq.${user.id}`)
 
   if (countError) {
-    console.error('Count error:', countError)
+    logger.error('Count error:', { error: countError instanceof Error ? countError.message : String(countError) })
   }
 
   return apiUtils.success({

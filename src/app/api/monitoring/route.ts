@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { requireAdmin } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 interface SystemMetrics {
   timestamp: string
   database: {
@@ -114,7 +115,7 @@ export async function GET(_request: NextRequest) {
       data: metrics,
     })
   } catch (error) {
-    console.error('Monitoring API error:', error)
+    logger.error('Monitoring API error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json(
       {
         ok: false,

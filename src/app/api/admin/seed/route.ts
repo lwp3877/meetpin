@@ -2,6 +2,7 @@
 import { createMethodRouter, apiUtils, requireAdmin } from '@/lib/api'
 import { supabaseAdmin } from '@/lib/supabaseClient'
 
+import { logger } from '@/lib/observability/logger'
 const BOT_USERS = [
   {
     email: 'mina_seoul@meetpin.bot',
@@ -118,7 +119,7 @@ const SAMPLE_ROOMS = [
 
 async function seedData() {
   try {
-    console.log('🌱 시드 데이터 생성 시작...')
+    logger.info('🌱 시드 데이터 생성 시작...')
 
     // 1. 봇 사용자 생성
     const botUsers = []
@@ -127,7 +128,7 @@ async function seedData() {
         // 이미 존재하는지 확인 - skip check for now, just create
         // const { data: existingUser } = await supabaseAdmin.auth.admin.getUserById(botData.email)
         // if (existingUser.user) {
-        //   console.log(`🤖 봇 사용자 이미 존재: ${botData.nickname}`)
+        //   logger.info(`🤖 봇 사용자 이미 존재: ${botData.nickname}`)
         //   botUsers.push(existingUser.user)
         //   continue
         // }
@@ -145,7 +146,7 @@ async function seedData() {
         })
 
         if (userError) {
-          console.error(`❌ 봇 사용자 생성 실패: ${botData.nickname}`, userError)
+          logger.error(`❌ 봇 사용자 생성 실패: ${botData.nickname}`, { error: userError })
           continue
         }
 
@@ -160,14 +161,14 @@ async function seedData() {
         } as any)
 
         if (profileError) {
-          console.error(`❌ 프로필 생성 실패: ${botData.nickname}`, profileError)
+          logger.error(`❌ 프로필 생성 실패: ${botData.nickname}`, { error: profileError })
           continue
         }
 
         botUsers.push(newUser.user)
-        console.log(`✅ 봇 사용자 생성 완료: ${botData.nickname}`)
+        logger.info(`✅ 봇 사용자 생성 완료: ${botData.nickname}`)
       } catch (error) {
-        console.error(`❌ 봇 사용자 생성 중 오류: ${botData.nickname}`, error)
+        logger.error(`❌ 봇 사용자 생성 중 오류: ${botData.nickname}`, { error: error instanceof Error ? error.message : String(error) })
       }
     }
 
@@ -181,7 +182,7 @@ async function seedData() {
         )
 
         if (!botUser) {
-          console.error(`❌ 봇 사용자를 찾을 수 없음: ${roomData.bot_nickname}`)
+          logger.error(`❌ 봇 사용자를 찾을 수 없음: ${roomData.bot_nickname}`)
           continue
         }
 
@@ -194,7 +195,7 @@ async function seedData() {
           .single()
 
         if (existingRoom) {
-          console.log(`🏠 방 이미 존재: ${roomData.title}`)
+          logger.info(`🏠 방 이미 존재: ${roomData.title}`)
           continue
         }
 
@@ -218,14 +219,14 @@ async function seedData() {
         } as any)
 
         if (roomError) {
-          console.error(`❌ 방 생성 실패: ${roomData.title}`, roomError)
+          logger.error(`❌ 방 생성 실패: ${roomData.title}`, { error: roomError })
           continue
         }
 
         roomsCreated++
-        console.log(`✅ 방 생성 완료: ${roomData.title}`)
+        logger.info(`✅ 방 생성 완료: ${roomData.title}`)
       } catch (error) {
-        console.error(`❌ 방 생성 중 오류: ${roomData.title}`, error)
+        logger.error(`❌ 방 생성 중 오류: ${roomData.title}`, { error: error instanceof Error ? error.message : String(error) })
       }
     }
 
@@ -234,7 +235,7 @@ async function seedData() {
       message: `🎉 시드 데이터 생성 완료! 봇 사용자: ${botUsers.length}명, 방: ${roomsCreated}개 생성됨`,
     }
   } catch (error) {
-    console.error('❌ 시드 데이터 생성 실패:', error)
+    logger.error('❌ 시드 데이터 생성 실패:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
       message: `시드 데이터 생성 실패: ${error}`,

@@ -6,6 +6,7 @@ import { getAuthenticatedUser } from '@/lib/services/auth'
 import { createHostMessageSchema } from '@/lib/utils/zodSchemas'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 // 호스트 메시지 전송
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     if (isDevelopmentMode) {
       // 개발 모드에서는 메시지를 로컬 스토리지에 시뮬레이션
-      console.log(`[DEV] Host message sent:`, {
+      logger.info('[DEV] Host message sent', {
         roomId,
         senderId: user.id,
         message,
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (messageError) {
-      console.error('Host message creation error:', messageError)
+      logger.error('Host message creation error:', { error: messageError instanceof Error ? messageError.message : String(messageError) })
       throw new ApiError('메시지 전송에 실패했습니다', 500)
     }
 
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.error('Host message API error:', error)
+    logger.error('Host message API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }
@@ -143,7 +144,7 @@ export async function GET(req: NextRequest) {
     const { data: messages, error } = await query
 
     if (error) {
-      console.error('Host messages fetch error:', error)
+      logger.error('Host messages fetch error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('메시지 조회에 실패했습니다', 500)
     }
 
@@ -161,7 +162,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    console.error('Host messages GET API error:', error)
+    logger.error('Host messages GET API error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '서버 오류가 발생했습니다' }, { status: 500 })
   }
 }

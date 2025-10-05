@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server'
 import { ApiResponse, apiUtils, requireAdmin } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
+import { logger } from '@/lib/observability/logger'
 
 interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy'
@@ -157,8 +158,8 @@ export async function GET(_request: NextRequest): Promise<Response> {
       }
     )
   } catch (error) {
-    console.error('Health check failed:', error)
-    console.error('Environment debug info:', {
+    logger.error('Health check failed', {
+      error: error instanceof Error ? error.message : String(error),
       NODE_ENV: process.env.NODE_ENV,
       NEXT_PUBLIC_USE_MOCK_DATA: process.env.NEXT_PUBLIC_USE_MOCK_DATA,
       isDevelopmentMode,
@@ -287,7 +288,7 @@ export async function POST(_request: NextRequest): Promise<Response> {
       message: '상세 진단 정보입니다',
     } as ApiResponse<any>)
   } catch (error) {
-    console.error('Detailed diagnostics failed:', error)
+    logger.error('Detailed diagnostics failed', { error: error instanceof Error ? error.message : String(error) })
     return apiUtils.error('진단 정보 수집에 실패했습니다', 500)
   }
 }

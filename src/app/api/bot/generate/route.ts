@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { BotManager } from '@/lib/bot/bot-scheduler'
 import { rateLimit, requireAdmin } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 /**
  * 봇 방 수동 생성 API
  * POST /api/bot/generate
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
       message: `${rooms.length}개의 봇 방이 생성되었습니다`,
     })
   } catch (error) {
-    console.error('봇 방 생성 API 오류:', error)
+    logger.error('봇 방 생성 API 오류:', { error: error instanceof Error ? error.message : String(error) })
 
     return NextResponse.json(
       {
@@ -91,7 +92,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error('봇 상태 조회 오류:', error)
+    logger.error('봇 상태 조회 오류:', { error: error instanceof Error ? error.message : String(error) })
 
     return NextResponse.json(
       {

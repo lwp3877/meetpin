@@ -28,6 +28,7 @@ import {
   ApiError,
 } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 // GET /api/requests - 내 요청 목록 또는 내 방의 요청 목록 조회
 async function getRequests(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -83,7 +84,7 @@ async function getRequests(request: NextRequest) {
   const { data: requests, error, count } = await query
 
   if (error) {
-    console.error('Requests fetch error:', error)
+    logger.error('Requests fetch error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('요청 목록을 가져오는데 실패했습니다')
   }
 
@@ -209,7 +210,7 @@ async function createRequest(request: NextRequest) {
     if (error.code === '23505') {
       throw new ApiError('이미 참가 요청을 보냈습니다', 409)
     }
-    console.error('Request creation error:', error)
+    logger.error('Request creation error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('참가 요청에 실패했습니다')
   }
 

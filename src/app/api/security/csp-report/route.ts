@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rateLimit'
 
+import { logger } from '@/lib/observability/logger'
 interface CSPReport {
   'csp-report': {
     'document-uri': string
@@ -72,14 +73,14 @@ export async function POST(request: NextRequest) {
       )
 
       if (isImportant) {
-        console.error('🚨 Critical CSP Violation:', violation)
+        logger.error('🚨 Critical CSP Violation:', { error: violation instanceof Error ? violation.message : String(violation) })
 
         // Sentry나 다른 모니터링 서비스로 전송
         // await sendToMonitoring(violation)
       }
     } else {
       // 개발 환경에서는 모든 위반 로깅
-      console.warn('⚠️ CSP Violation:', violation)
+      logger.warn('⚠️ CSP Violation:', violation)
     }
 
     // 위반 패턴 분석을 위한 간단한 통계
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('CSP Report Processing Error:', error)
+    logger.error('CSP Report Processing Error:', { error: error instanceof Error ? error.message : String(error) })
     return new NextResponse('Internal Server Error', { status: 500 })
   }
 }

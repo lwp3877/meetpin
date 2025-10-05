@@ -7,6 +7,7 @@ import {
 import { createSuccessResponse, createErrorResponse } from '@/lib/api'
 import { createClient } from '@supabase/supabase-js'
 import { isDevelopmentMode } from '@/lib/config/flags'
+import { logger } from '@/lib/observability/logger'
 
 // POST /api/payments/stripe/webhook - Stripe 웹훅 처리
 export async function POST(request: NextRequest) {
@@ -24,14 +25,14 @@ export async function POST(request: NextRequest) {
 
     if (isDevelopmentMode) {
       // 개발 모드에서는 직접 JSON 파싱
-      console.log(`[Mock Webhook] Processing development mode webhook`)
+      logger.info('[Mock Webhook] Processing development mode webhook')
       event = JSON.parse(payload)
     } else {
       // 프로덕션 모드에서는 서명 검증
       event = verifyWebhookSignature(payload, signature!)
     }
 
-    console.log(`Received Stripe webhook: ${event.type}`)
+    logger.info('Received Stripe webhook', { eventType: event.type })
 
     // 이벤트 처리
     const result = await handleWebhookEvent(event)
@@ -46,10 +47,12 @@ export async function POST(request: NextRequest) {
       if (isDevelopmentMode) {
         // 개발 모드에서는 DB 업데이트 시뮬레이션만 수행
         const boostExpiry = calculateBoostExpiry(result.days)
-        console.log(
-          `[Mock DB Update] Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`
-        )
-        console.log(`[Mock DB Update] Development mode - No actual database update performed`)
+        logger.info('[Mock DB Update] Room boosted', {
+          roomId: result.roomId,
+          days: result.days,
+          boostUntil: boostExpiry.toISOString(),
+          mode: 'development'
+        })
       } else {
         try {
           // 환경 변수 검증
@@ -76,16 +79,22 @@ export async function POST(request: NextRequest) {
             .eq('id', result.roomId)
 
           if (updateError) {
-            console.error('CRITICAL: Failed to update boost after payment:', updateError)
+            logger.error('CRITICAL: Failed to update boost after payment', {
+              error: updateError.message || String(updateError),
+              roomId: result.roomId,
+              days: result.days
+            })
             // 결제는 완료되었지만 DB 업데이트 실패 - 관리자 알림 필요
             return createErrorResponse('Payment completed but boost activation failed', 500)
           } else {
-            console.log(
-              `Room ${result.roomId} boosted for ${result.days} days until ${boostExpiry.toISOString()}`
-            )
+            logger.info('Room boosted successfully', {
+              roomId: result.roomId,
+              days: result.days,
+              boostUntil: boostExpiry.toISOString()
+            })
           }
         } catch (error) {
-          console.error('CRITICAL: DB update error after payment:', error)
+          logger.error('CRITICAL: DB update error after payment', { error: error instanceof Error ? error.message : String(error) })
           // 결제 완료 후 DB 업데이트 실패는 치명적 오류
           return createErrorResponse('Payment completed but boost activation failed', 500)
         }
@@ -94,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     return createSuccessResponse({ received: true })
   } catch (error: any) {
-    console.error('Webhook error:', error)
+    logger.error('Webhook error', { error: error?.message || String(error) })
     return createErrorResponse(error.message || 'Webhook processing failed', 400)
   }
 }

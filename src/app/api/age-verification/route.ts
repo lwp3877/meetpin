@@ -9,6 +9,7 @@ import { verifyAge, AgeVerificationData } from '@/lib/age-verification'
 import { checkRateLimit } from '@/lib/rateLimit'
 import { z } from 'zod'
 
+import { logger } from '@/lib/observability/logger'
 const ageVerificationSchema = z.object({
   ageRange: z.enum(['20s_early', '20s_late', '30s_early', '30s_late', '40s', '50s+']),
   birthYear: z.number().min(1940).max(2010).optional(),
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       verifiedAt: string
     }>)
   } catch (error: any) {
-    console.error('Age verification API error:', error)
+    logger.error('Age verification API error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -157,7 +158,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
       requiresVerification: boolean
     }>)
   } catch (error: any) {
-    console.error('Get age verification status error:', error)
+    logger.error('Get age verification status error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(

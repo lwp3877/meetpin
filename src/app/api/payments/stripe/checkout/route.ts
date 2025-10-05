@@ -10,6 +10,7 @@ import {
   ApiError,
 } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 // POST /api/payments/stripe/checkout - Stripe Checkout 세션 생성
 async function createCheckoutSession(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -23,7 +24,7 @@ async function createCheckoutSession(request: NextRequest) {
     const mockSessionId = `cs_test_mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     const mockCheckoutUrl = `${config.baseUrl}/room/${room_id}?payment=success&mock=true`
 
-    console.log(`[Mock Payment] Room ${room_id} boost for ${days} days by user ${user.id}`)
+    logger.info(`[Mock Payment] Room ${room_id} boost for ${days} days by user ${user.id}`)
 
     return createSuccessResponse({
       checkout_url: mockCheckoutUrl,

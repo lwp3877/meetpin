@@ -10,6 +10,7 @@ import {
   ApiError,
 } from '@/lib/api'
 
+import { logger } from '@/lib/observability/logger'
 // 차단/해제 스키마
 const blockActionSchema = z.object({
   target_uid: z.string().uuid(),
@@ -58,7 +59,7 @@ async function handleBlockAction(request: NextRequest) {
     )
 
     if (error) {
-      console.error('Block creation error:', error)
+      logger.error('Block creation error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('사용자 차단에 실패했습니다')
     }
 
@@ -78,7 +79,7 @@ async function handleBlockAction(request: NextRequest) {
       .eq('blocked_uid', target_uid)
 
     if (error) {
-      console.error('Unblock error:', error)
+      logger.error('Unblock error:', { error: error instanceof Error ? error.message : String(error) })
       throw new ApiError('사용자 차단 해제에 실패했습니다')
     }
 
@@ -128,7 +129,7 @@ async function getBlockedUsers(request: NextRequest) {
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Blocked users fetch error:', error)
+    logger.error('Blocked users fetch error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('차단 목록을 가져오는데 실패했습니다')
   }
 

@@ -3,6 +3,7 @@ import { getAuthenticatedUser, ApiError } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import JSZip from 'jszip'
 
+import { logger } from '@/lib/observability/logger'
 export async function POST(_req: NextRequest): Promise<NextResponse> {
   try {
     // 사용자 인증 확인
@@ -25,7 +26,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .single()
 
     if (profileError) {
-      console.error('Profile fetch error:', profileError)
+      logger.error('Profile fetch error:', { error: profileError instanceof Error ? profileError.message : String(profileError) })
     }
 
     // 2. 사용자가 생성한 방들
@@ -35,7 +36,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .eq('host_id', userId)
 
     if (roomsError) {
-      console.error('Rooms fetch error:', roomsError)
+      logger.error('Rooms fetch error:', { error: roomsError instanceof Error ? roomsError.message : String(roomsError) })
     }
 
     // 3. 사용자의 참가 요청들
@@ -50,7 +51,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .eq('user_id', userId)
 
     if (requestsError) {
-      console.error('Requests fetch error:', requestsError)
+      logger.error('Requests fetch error:', { error: requestsError instanceof Error ? requestsError.message : String(requestsError) })
     }
 
     // 4. 사용자의 매칭된 대화들
@@ -67,7 +68,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .or(`requester_id.eq.${userId},host_id.eq.${userId}`)
 
     if (matchesError) {
-      console.error('Matches fetch error:', matchesError)
+      logger.error('Matches fetch error:', { error: matchesError instanceof Error ? matchesError.message : String(matchesError) })
     }
 
     // 5. 사용자의 메시지들 (보낸 것만)
@@ -88,7 +89,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .limit(1000) // 최근 1000개 메시지
 
     if (messagesError) {
-      console.error('Messages fetch error:', messagesError)
+      logger.error('Messages fetch error:', { error: messagesError instanceof Error ? messagesError.message : String(messagesError) })
     }
 
     // 6. 호스트 메시지들 (보낸 것과 받은 것)
@@ -110,7 +111,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .limit(500) // 최근 500개 호스트 메시지
 
     if (hostMessagesError) {
-      console.error('Host messages fetch error:', hostMessagesError)
+      logger.error('Host messages fetch error:', { error: hostMessagesError instanceof Error ? hostMessagesError.message : String(hostMessagesError) })
     }
 
     // 7. 사용자 신고 기록 (신고한 것만)
@@ -130,7 +131,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .eq('reporter_id', userId)
 
     if (reportsError) {
-      console.error('Reports fetch error:', reportsError)
+      logger.error('Reports fetch error:', { error: reportsError instanceof Error ? reportsError.message : String(reportsError) })
     }
 
     // 8. 차단된 사용자들
@@ -147,7 +148,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .eq('blocker_id', userId)
 
     if (blockedError) {
-      console.error('Blocked users fetch error:', blockedError)
+      logger.error('Blocked users fetch error:', { error: blockedError instanceof Error ? blockedError.message : String(blockedError) })
     }
 
     // 개인정보 삭제를 위한 데이터 정리
@@ -310,7 +311,7 @@ MeetPin 개인데이터 내보내기
       headers,
     })
   } catch (error) {
-    console.error('DSAR export error:', error)
+    logger.error('DSAR export error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(

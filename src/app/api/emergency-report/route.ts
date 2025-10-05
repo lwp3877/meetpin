@@ -9,6 +9,7 @@ import { checkRateLimit } from '@/lib/rateLimit'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { z } from 'zod'
 
+import { logger } from '@/lib/observability/logger'
 const emergencyReportSchema = z.object({
   reportType: z.enum([
     'harassment',
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         reporterId = user.id
       } catch (_error) {
         // 익명 신고로 처리
-        console.log('Anonymous emergency report submitted')
+        logger.info('Anonymous emergency report submitted')
       }
     }
 
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .single()) as { data: any | null; error: any }
 
     if (insertError) {
-      console.error('Emergency report insert error:', insertError)
+      logger.error('Emergency report insert error:', { error: insertError instanceof Error ? insertError.message : String(insertError) })
       throw new ApiError('신고 접수 중 오류가 발생했습니다.', 500)
     }
 
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 긴급도에 따른 즉시 알림 (critical이나 high인 경우)
     if (report.priority === 'critical' || report.priority === 'high') {
       // 실제 구현시 여기서 관리자 알림 발송
-      console.log(`URGENT: Emergency report ${report.id} with priority ${report.priority}`)
+      logger.info(`URGENT: Emergency report ${report.id} with priority ${report.priority}`)
 
       // 관리자 알림 로그 저장
       await (supabase as any).from('admin_notifications').insert([
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       message: string
     }>)
   } catch (error) {
-    console.error('Emergency report API error:', error)
+    logger.error('Emergency report API error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(
@@ -244,7 +245,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
     }>)
   } catch (error) {
-    console.error('Get emergency reports error:', error)
+    logger.error('Get emergency reports error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(

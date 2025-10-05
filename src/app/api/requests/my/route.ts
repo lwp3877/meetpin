@@ -10,6 +10,7 @@ import {
 } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 
+import { logger } from '@/lib/observability/logger'
 // GET /api/requests/my - 내가 보낸 요청과 받은 요청 조회
 async function getMyRequests(request: NextRequest) {
   const user = await getAuthenticatedUser()
@@ -87,7 +88,7 @@ async function getMyRequests(request: NextRequest) {
     .range(offset, offset + limit - 1)
 
   if (error) {
-    console.error('Requests fetch error:', error)
+    logger.error('Requests fetch error:', { error: error instanceof Error ? error.message : String(error) })
     return apiUtils.error('요청 목록을 가져올 수 없습니다', 500)
   }
 
@@ -118,7 +119,7 @@ async function getMyRequests(request: NextRequest) {
   const { count, error: countError } = await countQuery
 
   if (countError) {
-    console.error('Count error:', countError)
+    logger.error('Count error:', { error: countError instanceof Error ? countError.message : String(countError) })
   }
 
   return apiUtils.success({

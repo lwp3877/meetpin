@@ -5,6 +5,7 @@ import { ApiResponse, ApiError, getAuthenticatedUser } from '@/lib/api'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
+import { logger } from '@/lib/observability/logger'
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getAuthenticatedUser()
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       )
     }
 
-    console.error('Mark notification as read error:', error)
+    logger.error('Mark notification as read error:', { error: error instanceof Error ? error.message : String(error) })
     return Response.json({ ok: false, message: '알림 읽음 처리에 실패했습니다' }, { status: 500 })
   }
 }
