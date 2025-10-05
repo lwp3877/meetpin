@@ -11,7 +11,7 @@ const ProLanding = dynamic(() => import('@/components/landing/ProLanding'), {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
       <Card className="mx-4 w-full max-w-md border-0 bg-white/90 shadow-2xl backdrop-blur-xl">
         <CardContent className="space-y-4 p-8 text-center">
-          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 shadow-2xl mx-auto">
+          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-blue-600 shadow-2xl mx-auto">
             <span className="text-2xl">📍</span>
           </div>
           <div className="text-lg font-semibold text-gray-600">

@@ -227,7 +227,7 @@ export default function NewLanding() {
                 <button
                   key={index}
                   onClick={() => router.push(category.path)}
-                  className="p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 hover:border-green-500 transition-all transform hover:scale-105 hover:shadow-xl"
+                  className="p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 hover:border-primary-600 transition-all transform hover:scale-105 hover:shadow-xl"
                 >
                   <div className={`w-16 h-16 ${category.color} rounded-2xl flex items-center justify-center mb-4 mx-auto`}>
                     <Icon className="w-8 h-8" />
@@ -323,7 +323,7 @@ export default function NewLanding() {
               return (
                 <div key={index} className="text-center">
                   <div className="relative inline-block mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary-600 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
                       <Icon className="w-10 h-10 text-white" />
                     </div>
                     <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
@@ -385,17 +385,17 @@ export default function NewLanding() {
               <h4 className="text-white font-semibold mb-4">서비스</h4>
               <ul className="space-y-2">
                 <li>
-                  <button onClick={() => router.push('/drink')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/drink')} className="hover:text-primary-500 transition-colors">
                     술모임
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => router.push('/exercise')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/exercise')} className="hover:text-primary-500 transition-colors">
                     운동
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => router.push('/hobby')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/hobby')} className="hover:text-primary-500 transition-colors">
                     취미
                   </button>
                 </li>
@@ -405,12 +405,12 @@ export default function NewLanding() {
               <h4 className="text-white font-semibold mb-4">회사</h4>
               <ul className="space-y-2">
                 <li>
-                  <button onClick={() => router.push('/help')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/help')} className="hover:text-primary-500 transition-colors">
                     도움말
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => router.push('/contact')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/contact')} className="hover:text-primary-500 transition-colors">
                     문의하기
                   </button>
                 </li>
@@ -420,17 +420,17 @@ export default function NewLanding() {
               <h4 className="text-white font-semibold mb-4">법적고지</h4>
               <ul className="space-y-2">
                 <li>
-                  <button onClick={() => router.push('/legal/terms')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/legal/terms')} className="hover:text-primary-500 transition-colors">
                     이용약관
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => router.push('/legal/privacy')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/legal/privacy')} className="hover:text-primary-500 transition-colors">
                     개인정보처리방침
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => router.push('/legal/location-terms')} className="hover:text-green-400 transition-colors">
+                  <button onClick={() => router.push('/legal/location-terms')} className="hover:text-primary-500 transition-colors">
                     위치정보 이용약관
                   </button>
                 </li>
@@ -439,7 +439,7 @@ export default function NewLanding() {
             <div>
               <h4 className="text-white font-semibold mb-4">밋핀</h4>
               <div className="flex items-center space-x-2 mb-4">
-                <MapPin className="w-6 h-6 text-green-500" />
+                <MapPin className="w-6 h-6 text-primary-600" />
                 <span className="text-white font-bold">밋핀</span>
               </div>
               <p className="text-sm">
