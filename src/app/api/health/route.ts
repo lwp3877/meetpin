@@ -210,7 +210,7 @@ async function checkServices() {
       services.database = 'connected' // Mock 모드에서는 항상 연결됨
     } else {
       const supabase = await createServerSupabaseClient()
-      const { data: _data, error } = await supabase.from('profiles').select('id').limit(1)
+      const { data: _data, error } = await supabase.from('profiles').select('uid').limit(1)
 
       services.database = error ? 'disconnected' : 'connected'
     }
