@@ -13,6 +13,7 @@ import {
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { createRoomSchema } from '@/lib/utils/zodSchemas'
 import { parseBBoxParam } from '@/lib/utils/bbox'
+import type { SupabaseSingleResponse } from '@/types/supabase'
 import { mockRooms } from '@/lib/config/mockData'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import { withCache, CacheKeys, CacheTTL, invalidateRoomCache } from '@/lib/cache/redis'
@@ -254,7 +255,7 @@ async function createRoom(request: NextRequest) {
       host_user_id: user.id,
       room_data: roomData,
     }
-  )) as { data: any | null; error: any }
+  )) as SupabaseSingleResponse<unknown>
 
   if (error) {
     logger.error('Room creation transaction error', { error: (error as Error).message || String(error) })

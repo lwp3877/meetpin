@@ -2,7 +2,6 @@
 // 🔍 구조화 로깅 유틸리티 - requestId, userId, 지연시간, PII 스크러빙
 
 import { NextRequest } from 'next/server'
-import { getAuthenticatedUser } from '@/lib/api'
 
 // 로그 레벨 정의
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal'
@@ -143,15 +142,8 @@ export async function createRequestLogger(request: NextRequest): Promise<Structu
     sampling: shouldSample(),
   }
 
-  // 인증된 사용자 정보 추가 (에러 무시)
-  try {
-    const user = await getAuthenticatedUser()
-    if (user) {
-      context.userId = user.id
-    }
-  } catch {
-    // 인증 실패는 무시 (익명 요청일 수 있음)
-  }
+  // 인증된 사용자 정보는 호출자가 context에 추가
+  // (순환 의존성 방지를 위해 getAuthenticatedUser 직접 호출하지 않음)
 
   return new StructuredLogger(context)
 }
