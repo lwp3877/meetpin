@@ -165,11 +165,11 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       if (error) throw error
 
       setMessages(data || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       // 프로덕션 모드에서만 오류 로그 출력
       if (process.env.NODE_ENV === 'production') {
         logger.error('Failed to load messages:', { error: err instanceof Error ? err.message : String(err) })
-        setError(err.message || '메시지를 불러오는데 실패했습니다')
+        setError((err as Error).message || '메시지를 불러오는데 실패했습니다')
       }
     } finally {
       setLoading(false)
@@ -234,11 +234,11 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
         if (error) throw error
 
         return true
-      } catch (err: any) {
+      } catch (err: unknown) {
         // 프로덕션 모드에서만 오류 로그 출력
         if (process.env.NODE_ENV === 'production') {
           logger.error('Failed to send message:', { error: err instanceof Error ? err.message : String(err) })
-          setError(err.message || '메시지 전송에 실패했습니다')
+          setError((err as Error).message || '메시지 전송에 실패했습니다')
         }
         return false
       }
@@ -259,7 +259,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
           .eq('receiver_uid', user.id)
 
         if (error) throw error
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error('Failed to mark message as read:', { error: err instanceof Error ? err.message : String(err) })
       }
     },

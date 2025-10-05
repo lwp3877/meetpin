@@ -245,8 +245,8 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
-        { ok: false, code: error.code, message: error.message },
-        { status: error.status }
+        { ok: false, code: error.code, message: (error as Error).message },
+        { status: (error as any).status }
       )
     }
 

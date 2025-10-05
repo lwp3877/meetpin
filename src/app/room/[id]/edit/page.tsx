@@ -86,9 +86,9 @@ export default function EditRoomPage() {
       }
 
       setRoom(roomData)
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Room load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setLoading(false)
     }
@@ -114,10 +114,10 @@ export default function EditRoomPage() {
 
       toast.success('방 정보가 성공적으로 수정되었습니다!')
       router.push(`/room/${roomId}`)
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Room update error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
-      toast.error(err.message)
+      setError((err as Error).message)
+      toast.error((err as Error).message)
     } finally {
       setIsSubmitting(false)
     }
@@ -149,10 +149,10 @@ export default function EditRoomPage() {
 
       toast.success('모임이 성공적으로 삭제되었습니다')
       router.push('/map')
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Room delete error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
-      toast.error(err.message)
+      setError((err as Error).message)
+      toast.error((err as Error).message)
     } finally {
       setIsDeleting(false)
     }

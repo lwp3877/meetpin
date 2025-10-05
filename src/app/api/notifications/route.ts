@@ -110,8 +110,8 @@ export async function GET(_request: NextRequest) {
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
-        { ok: false, message: error.message, code: error.code },
-        { status: error.status }
+        { ok: false, message: (error as Error).message, code: error.code },
+        { status: (error as any).status }
       )
     }
 
@@ -158,8 +158,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
-        { ok: false, message: error.message, code: error.code },
-        { status: error.status }
+        { ok: false, message: (error as Error).message, code: error.code },
+        { status: (error as any).status }
       )
     }
 

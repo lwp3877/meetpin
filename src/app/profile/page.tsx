@@ -87,8 +87,8 @@ export default function ProfilePage() {
       } else {
         Toast.error(result.error || '프로필 업데이트에 실패했습니다')
       }
-    } catch (error: any) {
-      Toast.error(error.message || '프로필 업데이트 중 오류가 발생했습니다')
+    } catch (error: unknown) {
+      Toast.error((error as Error).message || '프로필 업데이트 중 오류가 발생했습니다')
     } finally {
       setIsLoading(false)
     }

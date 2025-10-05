@@ -18,8 +18,8 @@ export async function GET(_request: NextRequest) {
       environment: process.env.NODE_ENV,
       redisUrl: process.env.REDIS_URL ? '설정됨' : '미설정',
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Cache stats error:', { error: error instanceof Error ? error.message : String(error) })
-    return apiUtils.error(error.message || '캐시 통계를 가져올 수 없습니다', error.status || 500)
+    return apiUtils.error((error as Error).message || '캐시 통계를 가져올 수 없습니다', (error as any).status || 500)
   }
 }

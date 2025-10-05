@@ -111,11 +111,11 @@ export function useRealtimeNotifications({
       } else {
         throw new Error(data.message || '메시지를 불러오는데 실패했습니다')
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // 프로덕션 모드에서만 오류 로그 출력
       if (process.env.NODE_ENV === 'production') {
         logger.error('Failed to load notifications:', { error: err instanceof Error ? err.message : String(err) })
-        setError(err.message)
+        setError((err as Error).message)
       }
     } finally {
       setLoading(false)
@@ -149,7 +149,7 @@ export function useRealtimeNotifications({
         } else {
           throw new Error('읽음 처리에 실패했습니다')
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (process.env.NODE_ENV === 'production') {
           logger.error('Failed to mark message as read:', { error: err instanceof Error ? err.message : String(err) })
         }
@@ -175,7 +175,7 @@ export function useRealtimeNotifications({
 
       setMessages(prev => prev.map(msg => ({ ...msg, is_read: true })))
       setUnreadCount(0)
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Failed to mark all messages as read:', { error: err instanceof Error ? err.message : String(err) })
     }
   }, [user, messages])

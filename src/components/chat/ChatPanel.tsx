@@ -107,9 +107,9 @@ export default function ChatPanel({
           setOtherUser(profile)
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Messages load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setIsLoading(false)
     }
@@ -141,9 +141,9 @@ export default function ChatPanel({
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto'
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Message send error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setIsSending(false)
     }

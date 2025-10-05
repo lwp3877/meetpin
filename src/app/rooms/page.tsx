@@ -46,9 +46,9 @@ export default function MyRoomsPage() {
       }
 
       setRooms(result.data.rooms || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('My rooms load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setLoading(false)
     }
@@ -73,8 +73,8 @@ export default function MyRoomsPage() {
         newStatus === 'cancelled' ? '모임이 취소되었습니다' : '모임이 재활성화되었습니다'
       )
       await loadMyRooms()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error((err as Error).message)
     }
   }
 
@@ -95,8 +95,8 @@ export default function MyRoomsPage() {
 
       toast.success('모임이 삭제되었습니다')
       await loadMyRooms()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error((err as Error).message)
     }
   }
 

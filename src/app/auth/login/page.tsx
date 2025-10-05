@@ -174,7 +174,7 @@ export default function LoginPage() {
         }
         setFormStatus(`로그인 오류: ${errorMessage}`)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Login error:', { error: error instanceof Error ? error.message : String(error) })
       const errorMessage =
         '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인하고 다시 시도해주세요.'

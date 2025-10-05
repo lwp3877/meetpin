@@ -41,11 +41,11 @@ export async function GET(): Promise<NextResponse> {
           ready: true,
           latency: Date.now() - dbStart,
         })
-      } catch (error: any) {
+      } catch (error: unknown) {
         checks.push({
           component: 'database',
           ready: false,
-          error: error.message,
+          error: (error as Error).message,
         })
       }
     }
@@ -99,14 +99,14 @@ export async function GET(): Promise<NextResponse> {
         Pragma: 'no-cache',
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('[READY] Critical error:', { error: error instanceof Error ? error.message : String(error) })
 
     return NextResponse.json(
       {
         ready: false,
         timestamp: new Date().toISOString(),
-        error: error.message,
+        error: (error as Error).message,
         checks: [],
         summary: { total: 0, ready: 0, not_ready: 1 },
       },

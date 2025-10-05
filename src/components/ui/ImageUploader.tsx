@@ -110,7 +110,7 @@ export function ImageUploader({
           toast.error(result.error || '이미지 업로드에 실패했습니다')
           setPreview(null)
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         logger.error('Image upload error:', { error: error instanceof Error ? error.message : String(error) })
         toast.error('이미지 업로드 중 오류가 발생했습니다')
         setPreview(null)

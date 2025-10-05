@@ -86,9 +86,9 @@ export default function RequestsPage() {
       }
 
       setMyRequests(result.data.requests || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('My requests load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     }
   }
 
@@ -103,9 +103,9 @@ export default function RequestsPage() {
       }
 
       setMyMatches(result.data.matches || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('My matches load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     }
   }
 
@@ -139,8 +139,8 @@ export default function RequestsPage() {
 
       toast.success('요청이 취소되었습니다')
       await loadMyRequests()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error((err as Error).message)
     }
   }
 

@@ -51,11 +51,11 @@ export default function NewRoomPage() {
 
       // 생성된 방으로 이동
       router.push(`/room/${result.data.id}`)
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Room creation error:', { error: err instanceof Error ? err.message : String(err) })
       Toast.dismiss(loadingToastId)
-      Toast.error(err.message || '모임 생성 중 오류가 발생했습니다')
-      setError(err.message)
+      Toast.error((err as Error).message || '모임 생성 중 오류가 발생했습니다')
+      setError((err as Error).message)
     } finally {
       setIsSubmitting(false)
     }

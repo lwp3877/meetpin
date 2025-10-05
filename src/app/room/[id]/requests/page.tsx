@@ -80,9 +80,9 @@ export default function RoomRequestsPage() {
       }
 
       setRequests(requestsResult.data.requests || [])
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Data load error:', { error: err instanceof Error ? err.message : String(err) })
-      setError(err.message)
+      setError((err as Error).message)
     } finally {
       setLoading(false)
     }
@@ -116,9 +116,9 @@ export default function RoomRequestsPage() {
 
       // 데이터 새로고침
       await loadData()
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.error('Request action error:', { error: err instanceof Error ? err.message : String(err) })
-      toast.error(err.message)
+      toast.error((err as Error).message)
     } finally {
       setProcessing(null)
     }

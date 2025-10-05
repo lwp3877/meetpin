@@ -110,7 +110,7 @@ export async function uploadImage(
       url: publicUrl,
       fileName: data.path,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Image upload error:', { error: error instanceof Error ? error.message : String(error) })
     return { success: false, error: '이미지 업로드 중 오류가 발생했습니다' }
   }

@@ -135,9 +135,9 @@ export async function parseAndValidateBody<T>(
   try {
     const body = await request.json()
     return schema.parse(body)
-  } catch (error: any) {
-    if (error.name === 'ZodError' && error.errors && Array.isArray(error.errors)) {
-      const message = error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
+  } catch (error: unknown) {
+    if ((error as Error).name === 'ZodError' && (error as any).errors && Array.isArray((error as any).errors)) {
+      const message = (error as any).errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
       throw new ApiError(`입력 데이터가 올바르지 않습니다: ${message}`, 400, 'VALIDATION_ERROR')
     }
     logger.error('Parse error', { error: error instanceof Error ? error.message : String(error) })
@@ -232,29 +232,29 @@ export function withErrorHandling(handler: ApiHandler) {
   return async (request: NextRequest, context: any): Promise<NextResponse> => {
     try {
       return await handler(request, context)
-    } catch (error: any) {
-      logger.error('API Error', { error: error instanceof Error ? error.message : String(error), stack: error?.stack })
+    } catch (error: unknown) {
+      logger.error('API Error', { error: error instanceof Error ? error.message : String(error), stack: (error as Error)?.stack })
 
       if (error instanceof ApiError) {
-        return createErrorResponse(error.message, error.status, error.code)
+        return createErrorResponse((error as Error).message, (error as any).status, error.code)
       }
 
       // 네트워크 및 연결 에러 처리
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      if ((error as Error).name === 'TypeError' && (error as Error).message.includes('fetch')) {
         return createErrorResponse('네트워크 연결에 실패했습니다', 503, 'NETWORK_ERROR')
       }
 
-      if (error.name === 'AbortError') {
+      if ((error as Error).name === 'AbortError') {
         return createErrorResponse('요청 시간이 초과되었습니다', 408, 'TIMEOUT_ERROR')
       }
 
-      if (error.code === 'ECONNREFUSED' || error.code === 'ENOTFOUND') {
+      if ((error as any).code === 'ECONNREFUSED' || (error as any).code === 'ENOTFOUND') {
         return createErrorResponse('서비스에 연결할 수 없습니다', 503, 'CONNECTION_ERROR')
       }
 
       // Supabase 에러 처리 (확장됨)
-      if (error.code) {
-        switch (error.code) {
+      if ((error as any).code) {
+        switch ((error as any).code) {
           case 'PGRST116':
             return createErrorResponse('리소스를 찾을 수 없습니다', 404, 'NOT_FOUND')
           case '23505':
@@ -278,17 +278,17 @@ export function withErrorHandling(handler: ApiHandler) {
           case 'JWT_INVALID':
             return createErrorResponse('잘못된 인증 토큰입니다', 401, 'TOKEN_INVALID')
           default:
-            logger.error('Supabase Error', { error: error.message || String(error), code: error.code })
+            logger.error('Supabase Error', { error: (error as Error).message || String(error), code: (error as any).code })
         }
       }
 
       // JSON 파싱 에러 처리
-      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      if (error instanceof SyntaxError && (error as Error).message.includes('JSON')) {
         return createErrorResponse('잘못된 요청 형식입니다', 400, 'INVALID_JSON')
       }
 
       // 메모리 부족 에러
-      if (error.code === 'ERR_MEMORY_ALLOCATION_FAILED' || error.message?.includes('memory')) {
+      if ((error as any).code === 'ERR_MEMORY_ALLOCATION_FAILED' || (error as Error).message?.includes('memory')) {
         return createErrorResponse('서버 리소스가 부족합니다', 503, 'MEMORY_ERROR')
       }
 

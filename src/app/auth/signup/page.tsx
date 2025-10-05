@@ -259,8 +259,8 @@ export default function SignUpPage() {
       } else {
         toast.error(result.error || '회원가입에 실패했습니다')
       }
-    } catch (error: any) {
-      toast.error(error.message || '회원가입 중 오류가 발생했습니다')
+    } catch (error: unknown) {
+      toast.error((error as Error).message || '회원가입 중 오류가 발생했습니다')
     } finally {
       setIsLoading(false)
     }

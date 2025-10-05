@@ -35,7 +35,7 @@ export function getRedisClient(): Redis | null {
       })
 
       redis.on('error', err => {
-        logger.error('[Redis] Connection error', { error: err.message })
+        logger.error('[Redis] Connection error', { error: (err as Error).message })
         // 개발 환경에서는 Redis 연결 실패를 허용
         if (process.env.NODE_ENV === 'development') {
           redis = null

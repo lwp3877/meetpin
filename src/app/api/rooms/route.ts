@@ -164,7 +164,7 @@ async function getRooms(request: NextRequest) {
     const { data: rooms, error } = await query
 
     if (error) {
-      logger.error('Rooms fetch error', { error: error.message || String(error) })
+      logger.error('Rooms fetch error', { error: (error as Error).message || String(error) })
       throw new Error('방 목록을 가져올 수 없습니다')
     }
 
@@ -257,13 +257,13 @@ async function createRoom(request: NextRequest) {
   )) as { data: any | null; error: any }
 
   if (error) {
-    logger.error('Room creation transaction error', { error: error.message || String(error) })
+    logger.error('Room creation transaction error', { error: (error as Error).message || String(error) })
 
     // 특정 에러 메시지에 따른 사용자 친화적 응답
-    if (error.message?.includes('시작 시간은 최소 30분 후여야 합니다')) {
+    if ((error as Error).message?.includes('시작 시간은 최소 30분 후여야 합니다')) {
       return apiUtils.validation('방 시작 시간은 최소 30분 후여야 합니다')
     }
-    if (error.message?.includes('존재하지 않는 사용자입니다')) {
+    if ((error as Error).message?.includes('존재하지 않는 사용자입니다')) {
       return apiUtils.error('사용자 인증에 실패했습니다', 401)
     }
 

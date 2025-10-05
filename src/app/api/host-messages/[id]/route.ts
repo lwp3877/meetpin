@@ -80,8 +80,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
-        { ok: false, code: error.code, message: error.message },
-        { status: error.status }
+        { ok: false, code: error.code, message: (error as Error).message },
+        { status: (error as any).status }
       )
     }
 
@@ -134,8 +134,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   } catch (error) {
     if (error instanceof ApiError) {
       return Response.json(
-        { ok: false, code: error.code, message: error.message },
-        { status: error.status }
+        { ok: false, code: error.code, message: (error as Error).message },
+        { status: (error as any).status }
       )
     }
 

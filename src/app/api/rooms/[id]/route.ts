@@ -126,7 +126,7 @@ async function updateRoom(request: NextRequest, context: { params: Promise<{ id:
     .single()) as { data: any | null; error: any }
 
   if (error) {
-    logger.error('Room update error', { error: error.message || String(error), roomId: id })
+    logger.error('Room update error', { error: (error as Error).message || String(error), roomId: id })
     throw new ApiError('방 정보 수정에 실패했습니다')
   }
 
@@ -161,7 +161,7 @@ async function deleteRoom(request: NextRequest, context: { params: Promise<{ id:
   const { error } = await supabase.from('rooms').delete().eq('id', id)
 
   if (error) {
-    logger.error('Room deletion error', { error: error.message || String(error), roomId: id })
+    logger.error('Room deletion error', { error: (error as Error).message || String(error), roomId: id })
     throw new ApiError('방 삭제에 실패했습니다')
   }
 

@@ -210,10 +210,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
       { status: 200 }
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Web Vitals collection failed', {
-      error: error.message,
-      stack: error.stack?.substring(0, 500),
+      error: (error as Error).message,
+      stack: (error as Error).stack?.substring(0, 500),
     })
 
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
@@ -237,7 +237,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json(stats)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

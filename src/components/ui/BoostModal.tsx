@@ -72,7 +72,7 @@ export function BoostModal({
         }
         // 성공시에는 Stripe으로 리다이렉트됨
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Boost purchase error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('결제 중 오류가 발생했습니다')
     } finally {

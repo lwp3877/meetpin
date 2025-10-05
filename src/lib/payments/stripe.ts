@@ -157,8 +157,8 @@ export function verifyWebhookSignature(payload: string | Buffer, signature: stri
 
   try {
     return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
-  } catch (error: any) {
-    throw new Error(`웹훅 서명 검증 실패: ${error.message}`)
+  } catch (error: unknown) {
+    throw new Error(`웹훅 서명 검증 실패: ${(error as Error).message}`)
   }
 }
 
@@ -259,11 +259,11 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<{
           success: true, // 처리하지 않는 이벤트는 성공으로 표시
         }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       type: event.type,
       success: false,
-      error: error.message,
+      error: (error as Error).message,
     }
   }
 }

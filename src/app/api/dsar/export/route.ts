@@ -315,8 +315,8 @@ MeetPin 개인데이터 내보내기
 
     if (error instanceof ApiError) {
       return NextResponse.json(
-        { ok: false, code: error.code, message: error.message },
-        { status: error.status }
+        { ok: false, code: error.code, message: (error as Error).message },
+        { status: (error as any).status }
       )
     }
 

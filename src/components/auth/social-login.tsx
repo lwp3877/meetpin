@@ -39,7 +39,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       localStorage.setItem('meetpin_user', JSON.stringify(mockKakaoUser))
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockKakaoUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Kakao login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('카카오 로그인 중 오류가 발생했습니다')
     } finally {
@@ -71,7 +71,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       localStorage.setItem('meetpin_user', JSON.stringify(mockGoogleUser))
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockGoogleUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Google login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('구글 로그인 중 오류가 발생했습니다')
     } finally {
@@ -103,7 +103,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       localStorage.setItem('meetpin_user', JSON.stringify(mockNaverUser))
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockNaverUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Naver login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('네이버 로그인 중 오류가 발생했습니다')
     } finally {

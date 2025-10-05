@@ -135,7 +135,7 @@ export const signInWithEmail = async (email: string, password: string): Promise<
         return {
           success: false,
           error:
-            error.message === 'Invalid login credentials'
+            (error as Error).message === 'Invalid login credentials'
               ? '이메일 또는 비밀번호가 잘못되었습니다'
               : '로그인에 실패했습니다. 다시 시도해주세요.',
         }
@@ -147,7 +147,7 @@ export const signInWithEmail = async (email: string, password: string): Promise<
 
       return { success: true }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logAuthState('Unexpected error in signInWithEmail', error)
     return {
       success: false,
@@ -210,7 +210,7 @@ export const signUpWithEmail = async (
 
       return { success: true }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logAuthState('Unexpected error in signUpWithEmail', error)
     return {
       success: false,
@@ -305,7 +305,7 @@ export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<Aut
 
       return { success: true }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logAuthState('Unexpected error in updateUserProfile', error)
     return {
       success: false,

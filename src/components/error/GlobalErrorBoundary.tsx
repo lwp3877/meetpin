@@ -47,8 +47,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error('Error Boundary caught an error', {
-      error: error.message,
-      stack: error.stack,
+      error: (error as Error).message,
+      stack: (error as Error).stack,
       componentStack: errorInfo.componentStack
     })
 
@@ -62,7 +62,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       console.group('🚨 Error Boundary Details')
       logger.error('Error', { error: error instanceof Error ? error.message : String(error) })
       logger.error('Component Stack', { componentStack: errorInfo.componentStack })
-      logger.error('Error Stack', { stack: error.stack })
+      logger.error('Error Stack', { stack: (error as Error).stack })
       console.groupEnd()
     }
 
@@ -83,8 +83,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   private reportError(error: Error, errorInfo: ErrorInfo) {
     const errorReport = {
       id: this.state.errorId,
-      message: error.message,
-      stack: error.stack,
+      message: (error as Error).message,
+      stack: (error as Error).stack,
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
@@ -133,8 +133,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   private getErrorCategory(error: Error): string {
-    const message = error.message.toLowerCase()
-    const stack = error.stack?.toLowerCase() || ''
+    const message = (error as Error).message.toLowerCase()
+    const stack = (error as Error).stack?.toLowerCase() || ''
 
     if (message.includes('chunk') || message.includes('loading') || stack.includes('chunk')) {
       return 'LOADING_ERROR'
@@ -220,13 +220,13 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                         <strong>카테고리:</strong> {errorCategory}
                       </div>
                       <div>
-                        <strong>메시지:</strong> {error.message}
+                        <strong>메시지:</strong> {(error as Error).message}
                       </div>
-                      {error.stack && (
+                      {(error as Error).stack && (
                         <div>
                           <strong>스택:</strong>
                           <pre className="mt-1 max-h-32 overflow-auto rounded bg-gray-200 p-2 text-xs dark:bg-gray-700">
-                            {error.stack}
+                            {(error as Error).stack}
                           </pre>
                         </div>
                       )}

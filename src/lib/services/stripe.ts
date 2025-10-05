@@ -161,7 +161,7 @@ export async function createCheckoutSession(data: CreateCheckoutSessionData): Pr
       sessionId: result.sessionId,
       url: result.url,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Create checkout session error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
@@ -190,12 +190,12 @@ export async function redirectToCheckout(sessionId: string): Promise<{
     if (error) {
       return {
         success: false,
-        error: error.message,
+        error: (error as any).message,
       }
     }
 
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Redirect to checkout error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
@@ -246,7 +246,7 @@ export async function processBoostPayment(
       sessionId: result.data?.session_id,
       url: result.data?.checkout_url,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Process boost payment error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,

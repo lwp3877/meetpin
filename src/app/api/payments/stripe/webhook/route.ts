@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
     }
 
     return createSuccessResponse({ received: true })
-  } catch (error: any) {
-    logger.error('Webhook error', { error: error?.message || String(error) })
-    return createErrorResponse(error.message || 'Webhook processing failed', 400)
+  } catch (error: unknown) {
+    logger.error('Webhook error', { error: (error as Error)?.message || String(error) })
+    return createErrorResponse((error as Error).message || 'Webhook processing failed', 400)
   }
 }

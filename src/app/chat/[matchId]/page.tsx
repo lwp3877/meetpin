@@ -80,15 +80,15 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
         }
 
         setCurrentUserId(user.id)
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error('User fetch error:', { error: err instanceof Error ? err.message : String(err) })
 
-        if (err.name === 'AbortError') {
+        if ((err as Error).name === 'AbortError') {
           setError('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')
-        } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        } else if ((err as Error).name === 'TypeError' && (err as Error).message.includes('fetch')) {
           setError('네트워크 연결을 확인해주세요')
         } else {
-          setError(err.message || '채팅을 불러오는 중 오류가 발생했습니다')
+          setError((err as Error).message || '채팅을 불러오는 중 오류가 발생했습니다')
         }
       } finally {
         setIsLoading(false)

@@ -107,17 +107,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       method: string
       verifiedAt: string
     }>)
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Age verification API error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(
         {
           ok: false,
-          message: error.message,
+          message: (error as Error).message,
           code: 'AGE_VERIFICATION_ERROR',
         } satisfies ApiResponse<null>,
-        { status: error.status }
+        { status: (error as any).status }
       )
     }
 
@@ -157,16 +157,16 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
       verifiedAt?: string
       requiresVerification: boolean
     }>)
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Get age verification status error:', { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof ApiError) {
       return NextResponse.json(
         {
           ok: false,
-          message: error.message,
+          message: (error as Error).message,
         } satisfies ApiResponse<null>,
-        { status: error.status }
+        { status: (error as any).status }
       )
     }
 

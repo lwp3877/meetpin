@@ -174,10 +174,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           ok: false,
-          message: error.message,
+          message: (error as Error).message,
           code: 'PRIVACY_RIGHTS_REQUEST_ERROR',
         } satisfies ApiResponse<null>,
-        { status: error.status }
+        { status: (error as any).status }
       )
     }
 
@@ -267,9 +267,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         {
           ok: false,
-          message: error.message,
+          message: (error as Error).message,
         } satisfies ApiResponse<null>,
-        { status: error.status }
+        { status: (error as any).status }
       )
     }
 

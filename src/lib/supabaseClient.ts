@@ -820,7 +820,7 @@ export type ReportWithDetails = Report & {
 
 // 유틸리티 함수들
 export function isSupabaseError(error: any): error is { code: string; message: string } {
-  return error && typeof error.code === 'string' && typeof error.message === 'string'
+  return error && typeof error.code === 'string' && typeof (error as Error).message === 'string'
 }
 
 export function handleSupabaseError(error: any): never {

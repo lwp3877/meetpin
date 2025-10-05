@@ -47,8 +47,8 @@ async function createCheckoutSession(request: NextRequest) {
       checkout_url: session.url,
       session_id: session.id,
     })
-  } catch (error: any) {
-    throw new ApiError(error.message || '결제 세션 생성에 실패했습니다')
+  } catch (error: unknown) {
+    throw new ApiError((error as Error).message || '결제 세션 생성에 실패했습니다')
   }
 }
 

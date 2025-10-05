@@ -137,19 +137,19 @@ export default function RoomDetailPage() {
       } else {
         throw new Error(result.message || 'INVALID_RESPONSE')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Error fetching room:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss(loadingToastId)
 
-      if (error.name === 'AbortError') {
+      if ((error as Error).name === 'AbortError') {
         toast.error('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')
-      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      } else if ((error as Error).name === 'TypeError' && (error as Error).message.includes('fetch')) {
         toast.error('네트워크 연결을 확인해주세요. Wi-Fi 또는 모바일 데이터를 확인하세요')
-      } else if (error.message === 'ROOM_NOT_FOUND') {
+      } else if ((error as Error).message === 'ROOM_NOT_FOUND') {
         toast.error('존재하지 않는 모임입니다')
-      } else if (error.message === 'ROOM_ACCESS_DENIED') {
+      } else if ((error as Error).message === 'ROOM_ACCESS_DENIED') {
         toast.error('접근 권한이 없는 모임입니다')
-      } else if (error.message === 'SERVER_ERROR') {
+      } else if ((error as Error).message === 'SERVER_ERROR') {
         toast.error('서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요')
       } else {
         toast.error('모임 정보를 불러오는 중 오류가 발생했습니다')
@@ -225,21 +225,21 @@ export default function RoomDetailPage() {
       } else {
         throw new Error(result.message || 'UNKNOWN_ERROR')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Join request error:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss(loadingToastId)
 
-      if (error.name === 'AbortError') {
+      if ((error as Error).name === 'AbortError') {
         toast.error('요청 시간이 초과되었습니다. 다시 시도해주세요')
-      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      } else if ((error as Error).name === 'TypeError' && (error as Error).message.includes('fetch')) {
         toast.error('네트워크 연결을 확인해주세요')
-      } else if (error.message === 'ALREADY_REQUESTED') {
+      } else if ((error as Error).message === 'ALREADY_REQUESTED') {
         toast.error('이미 참가 신청한 모임입니다')
-      } else if (error.message === 'ACCESS_DENIED') {
+      } else if ((error as Error).message === 'ACCESS_DENIED') {
         toast.error('이 모임에 참가할 권한이 없습니다')
-      } else if (error.message === 'INVALID_REQUEST') {
+      } else if ((error as Error).message === 'INVALID_REQUEST') {
         toast.error('잘못된 참가 신청입니다')
-      } else if (error.message === 'SERVER_ERROR') {
+      } else if ((error as Error).message === 'SERVER_ERROR') {
         toast.error('서버 오류로 참가 신청에 실패했습니다. 잠시 후 다시 시도해주세요')
       } else {
         toast.error('참가 신청 중 오류가 발생했습니다')

@@ -152,17 +152,17 @@ export default function MapPage() {
         if (result.data.rooms?.length === 0) {
           toast.info('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.error('Rooms load error:', { error: err instanceof Error ? err.message : String(err) })
 
-        if (err.name === 'AbortError') {
+        if ((err as Error).name === 'AbortError') {
           setError('요청 시간이 초과되었습니다')
           toast.error('네트워크가 느려 요청이 취소되었습니다. 다시 시도해주세요')
-        } else if (err.message?.includes('fetch')) {
+        } else if ((err as Error).message?.includes('fetch')) {
           setError('인터넷 연결을 확인해주세요')
           toast.error('인터넷 연결이 불안정합니다. 연결을 확인하고 다시 시도해주세요')
         } else {
-          setError(err.message || '알 수 없는 오류가 발생했습니다')
+          setError((err as Error).message || '알 수 없는 오류가 발생했습니다')
           toast.error(
             retryCount >= MAX_RETRIES
               ? '모임을 불러오는데 계속 실패했습니다. 잠시 후 다시 시도해주세요'
@@ -240,17 +240,17 @@ export default function MapPage() {
       await loadRooms(bounds)
       toast.success('내 주변 모임을 찾았습니다', { id: 'location-loading' })
       trackFeatureUsage()
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Location error:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss('location-loading')
 
-      if (error.code === 1) {
+      if ((error as any).code === 1) {
         toast.error('위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요', {
           duration: 5000,
         })
-      } else if (error.code === 2) {
+      } else if ((error as any).code === 2) {
         toast.error('위치를 찾을 수 없습니다. 인터넷 연결과 GPS를 확인해주세요')
-      } else if (error.code === 3) {
+      } else if ((error as any).code === 3) {
         toast.error('위치 요청 시간이 초과되었습니다. 다시 시도해주세요')
       } else {
         toast.error('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요')
