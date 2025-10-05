@@ -3,6 +3,8 @@
  * 자연스럽고 매력적인 방을 자동으로 생성하여 플랫폼을 활성화
  */
 
+import { logger } from '@/lib/observability/logger'
+
 // Supabase admin client for future database integration from '@/lib/supabaseClient'
 
 // 서울 핫플레이스 좌표 데이터
@@ -281,7 +283,7 @@ export async function generateSingleBotRoom(): Promise<any> {
       location: hotspot,
     }
   } catch (error) {
-    console.error('봇 방 생성 중 오류:', error)
+    logger.error('봇 방 생성 중 오류:', { error: error instanceof Error ? error.message : String(error) })
     throw error
   }
 }
@@ -325,7 +327,7 @@ export async function generateTimeBasedBotRooms(count: number = 3): Promise<any[
 
       rooms.push(room)
     } catch (error) {
-      console.error(`봇 방 ${i + 1} 생성 실패:`, error)
+      logger.error(`봇 방 ${i + 1} 생성 실패:`, { error: error instanceof Error ? error.message : String(error) })
     }
   }
 
@@ -357,7 +359,7 @@ export async function generatePopularTimeRooms(
 
       rooms.push(room)
     } catch (error) {
-      console.error(`지역별 봇 방 ${i + 1} 생성 실패:`, error)
+      logger.error(`지역별 봇 방 ${i + 1} 생성 실패:`, { error: error instanceof Error ? error.message : String(error) })
     }
   }
 

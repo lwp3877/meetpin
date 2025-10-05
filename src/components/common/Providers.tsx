@@ -15,6 +15,7 @@ import { initializeBrowserCompatibility } from '@/lib/utils/browserCompat'
 import { initializeDataValidation } from '@/lib/utils/dataValidation'
 import { initializeSecurityMeasures } from '@/lib/security/securityHardening'
 import { initializeAccessibility } from '@/lib/accessibility/a11yEnhancement'
+import { logger } from '@/lib/observability/logger'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -35,7 +36,7 @@ export default function Providers({ children }: ProvidersProps) {
     logFeatureFlags()
 
     // 실제 사용자 테스트를 위한 모든 시스템 초기화
-    console.log('🚀 실제 사용자 테스트 준비: 모든 시스템 초기화 시작')
+    logger.info('🚀 실제 사용자 테스트 준비: 모든 시스템 초기화 시작')
 
     const cleanupFunctions: (() => void)[] = []
 
@@ -58,8 +59,8 @@ export default function Providers({ children }: ProvidersProps) {
       cleanupFunctions.push(accessibilityCleanup)
     }, 100) // 하이드레이션 후 100ms 대기
 
-    console.log('✅ 실제 사용자 테스트 준비 완료: 모든 시스템이 활성화되었습니다')
-    console.log(`
+    logger.info('✅ 실제 사용자 테스트 준비 완료: 모든 시스템이 활성화되었습니다')
+    logger.info(`
 🎯 실제 사용자 테스트 환경 설정 완료
 
 📋 활성화된 기능:
@@ -89,7 +90,7 @@ export default function Providers({ children }: ProvidersProps) {
     // cleanup 함수 반환
     return () => {
       cleanupFunctions.forEach(cleanup => cleanup())
-      console.log('🧹 시스템 정리 완료')
+      logger.info('🧹 시스템 정리 완료')
     }
   }, [isHydrated])
 

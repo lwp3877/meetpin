@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import ChatPanel from '@/components/chat/ChatPanel'
 import AlertCircle from 'lucide-react/dist/esm/icons/alert-circle'
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left'
+import { logger } from '@/lib/observability/logger'
 
 export default function ChatPage({ params }: { params: Promise<{ matchId: string }> }) {
   const { matchId } = use(params)
@@ -80,7 +81,7 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
 
         setCurrentUserId(user.id)
       } catch (err: any) {
-        console.error('User fetch error:', err)
+        logger.error('User fetch error:', { error: err instanceof Error ? err.message : String(err) })
 
         if (err.name === 'AbortError') {
           setError('요청 시간이 초과되었습니다. 인터넷 연결을 확인해주세요')

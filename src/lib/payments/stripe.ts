@@ -1,5 +1,6 @@
 /* src/lib/payments/stripe.ts */
 import Stripe from 'stripe'
+import { logger } from '@/lib/observability/logger'
 import { flags, config } from '@/lib/config/flags'
 
 // Stripe 초기화 (서버 전용)
@@ -398,7 +399,7 @@ export async function createBoostCheckoutSession({
 
     return session
   } catch (error) {
-    console.error('Stripe checkout session creation failed:', error)
+    logger.error('Stripe checkout session creation failed:', { error: error instanceof Error ? error.message : String(error) })
     throw new Error('결제 세션 생성에 실패했습니다')
   }
 }

@@ -6,6 +6,7 @@ import Download from 'lucide-react/dist/esm/icons/download'
 import Smartphone from 'lucide-react/dist/esm/icons/smartphone'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { logger } from '@/lib/observability/logger'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -72,7 +73,7 @@ export function InstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice
 
     if (outcome === 'accepted') {
-      console.log('PWA 설치 완료')
+      logger.info('PWA 설치 완료')
     }
 
     setDeferredPrompt(null)

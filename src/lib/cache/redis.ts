@@ -1,6 +1,7 @@
 /* src/lib/cache/redis.ts - Redis 캐시 시스템 */
 
 import Redis from 'ioredis'
+import { logger } from '@/lib/observability/logger'
 
 // Redis 클라이언트 싱글톤
 let redis: Redis | null = null
@@ -9,7 +10,7 @@ let redis: Redis | null = null
 export function getRedisClient(): Redis | null {
   // 개발 환경에서는 Redis 없이도 동작하도록 설정
   if (process.env.NODE_ENV === 'development' && !process.env.REDIS_URL) {
-    console.warn('[Redis] Redis URL not found in development - caching disabled')
+    logger.warn('[Redis] Redis URL not found in development - caching disabled')
     return null
   }
 
@@ -18,7 +19,7 @@ export function getRedisClient(): Redis | null {
       const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL
 
       if (!redisUrl) {
-        console.warn('[Redis] No Redis URL configured - caching disabled')
+        logger.warn('[Redis] No Redis URL configured - caching disabled')
         return null
       }
 
@@ -30,18 +31,18 @@ export function getRedisClient(): Redis | null {
       })
 
       redis.on('connect', () => {
-        console.log('[Redis] Connected successfully')
+        logger.info('[Redis] Connected successfully')
       })
 
       redis.on('error', err => {
-        console.error('[Redis] Connection error:', err.message)
+        logger.error('[Redis] Connection error', { error: err.message })
         // 개발 환경에서는 Redis 연결 실패를 허용
         if (process.env.NODE_ENV === 'development') {
           redis = null
         }
       })
     } catch (error) {
-      console.error('[Redis] Failed to initialize Redis client:', error)
+      logger.error('[Redis] Failed to initialize Redis client', { error: error instanceof Error ? error.message : String(error) })
       return null
     }
   }
@@ -93,7 +94,7 @@ export async function withCache<T>(
       try {
         return JSON.parse(cached) as T
       } catch (parseError) {
-        console.warn('[Redis] Failed to parse cached data:', parseError)
+        logger.warn('[Redis] Failed to parse cached data', { error: parseError instanceof Error ? parseError.message : String(parseError) })
         // 파싱 실패시 캐시 삭제하고 새로 가져오기
         await client.del(key)
       }
@@ -106,12 +107,12 @@ export async function withCache<T>(
     try {
       await client.setex(key, ttl, JSON.stringify(data))
     } catch (setError) {
-      console.warn('[Redis] Failed to cache data:', setError)
+      logger.warn('[Redis] Failed to cache data', { error: setError instanceof Error ? setError.message : String(setError) })
     }
 
     return data
   } catch (error) {
-    console.error('[Redis] Cache operation failed:', error)
+    logger.error('[Redis] Cache operation failed', { error: error instanceof Error ? error.message : String(error) })
     // Redis 에러시 DB에서 직접 가져오기
     return await fetcher()
   }
@@ -126,10 +127,10 @@ export async function invalidateCache(pattern: string): Promise<void> {
     const keys = await client.keys(pattern)
     if (keys.length > 0) {
       await client.del(...keys)
-      console.log(`[Redis] Invalidated ${keys.length} cache keys matching: ${pattern}`)
+      logger.info(`[Redis] Invalidated ${keys.length} cache keys matching: ${pattern}`)
     }
   } catch (error) {
-    console.error('[Redis] Failed to invalidate cache:', error)
+    logger.error('[Redis] Failed to invalidate cache', { error: error instanceof Error ? error.message : String(error) })
   }
 }
 
@@ -189,7 +190,7 @@ export async function getCacheStats(): Promise<{
       memoryUsage,
     }
   } catch (error) {
-    console.error('[Redis] Failed to get cache stats:', error)
+    logger.error('[Redis] Failed to get cache stats', { error: error instanceof Error ? error.message : String(error) })
     return { connected: false, keyCount: 0 }
   }
 }

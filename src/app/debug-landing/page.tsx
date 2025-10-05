@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { logger } from '@/lib/observability/logger'
 
 export default function DebugLandingPage() {
   const [logs, setLogs] = useState<string[]>([])
 
   const log = (message: string) => {
-    console.log(message)
+    logger.info(message)
     setLogs(prev => [...prev, `${new Date().toISOString()}: ${message}`])
   }
 

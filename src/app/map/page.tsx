@@ -38,6 +38,7 @@ import {
 } from '@/components/icons/MapIcons'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
 import { toast } from 'sonner'
+import { logger } from '@/lib/observability/logger'
 // 알림 컴포넌트들을 동적 로딩 - 초기 번들 사이즈 감소
 const HostMessageNotifications = dynamic(
   () =>
@@ -152,7 +153,7 @@ export default function MapPage() {
           toast.info('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
         }
       } catch (err: any) {
-        console.error('Rooms load error:', err)
+        logger.error('Rooms load error:', { error: err instanceof Error ? err.message : String(err) })
 
         if (err.name === 'AbortError') {
           setError('요청 시간이 초과되었습니다')
@@ -240,7 +241,7 @@ export default function MapPage() {
       toast.success('내 주변 모임을 찾았습니다', { id: 'location-loading' })
       trackFeatureUsage()
     } catch (error: any) {
-      console.error('Location error:', error)
+      logger.error('Location error:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss('location-loading')
 
       if (error.code === 1) {

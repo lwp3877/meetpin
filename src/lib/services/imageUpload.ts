@@ -1,5 +1,6 @@
 /* src/lib/imageUpload.ts */
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
+import { logger } from '@/lib/observability/logger'
 
 export interface ImageUploadOptions {
   maxSizeMB?: number
@@ -95,7 +96,7 @@ export async function uploadImage(
     })
 
     if (error) {
-      console.error('Upload error:', error)
+      logger.error('Upload error:', { error: error instanceof Error ? error.message : String(error) })
       return { success: false, error: '이미지 업로드에 실패했습니다' }
     }
 
@@ -110,7 +111,7 @@ export async function uploadImage(
       fileName: data.path,
     }
   } catch (error: any) {
-    console.error('Image upload error:', error)
+    logger.error('Image upload error:', { error: error instanceof Error ? error.message : String(error) })
     return { success: false, error: '이미지 업로드 중 오류가 발생했습니다' }
   }
 }
@@ -123,13 +124,13 @@ export async function deleteImage(filePath: string): Promise<boolean> {
     const { error } = await supabase.storage.from('images').remove([filePath])
 
     if (error) {
-      console.error('Delete error:', error)
+      logger.error('Delete error:', { error: error instanceof Error ? error.message : String(error) })
       return false
     }
 
     return true
   } catch (error) {
-    console.error('Image delete error:', error)
+    logger.error('Image delete error:', { error: error instanceof Error ? error.message : String(error) })
     return false
   }
 }

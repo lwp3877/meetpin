@@ -14,6 +14,7 @@ import Gift from 'lucide-react/dist/esm/icons/gift'
 import { useAuth } from '@/lib/useAuth'
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import { ko } from 'date-fns/locale/ko'
+import { logger } from '@/lib/observability/logger'
 
 interface Notification {
   id: string
@@ -94,7 +95,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
           retryCountRef.current = 0
         }
       } catch (error) {
-        console.error('Failed to fetch notifications:', error)
+        logger.error('Failed to fetch notifications:', { error: error instanceof Error ? error.message : String(error) })
         retryCountRef.current = Math.min(retryCountRef.current + 1, 5)
 
         // 첫 번째 에러가 아니면 토스트 표시
@@ -122,7 +123,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         setUnreadCount(prev => Math.max(0, prev - 1))
       }
     } catch (error) {
-      console.error('Failed to mark notification as read:', error)
+      logger.error('Failed to mark notification as read:', { error: error instanceof Error ? error.message : String(error) })
     }
   }
 
@@ -141,7 +142,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         setUnreadCount(0)
       }
     } catch (error) {
-      console.error('Failed to mark all notifications as read:', error)
+      logger.error('Failed to mark all notifications as read:', { error: error instanceof Error ? error.message : String(error) })
     } finally {
       setIsLoading(false)
     }
@@ -162,7 +163,7 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         }
       }
     } catch (error) {
-      console.error('Failed to delete notification:', error)
+      logger.error('Failed to delete notification:', { error: error instanceof Error ? error.message : String(error) })
     }
   }
 

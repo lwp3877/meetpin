@@ -1,5 +1,6 @@
 /* src/lib/auth.ts */
 import { User } from '@supabase/supabase-js'
+import { logger } from '@/lib/observability/logger'
 import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabaseClient'
 import { ApiError } from '@/lib/api'
 import { isDevelopmentMode } from '@/lib/config/flags'
@@ -46,7 +47,7 @@ export async function getAuthenticatedUser(): Promise<User> {
         return createMockSupabaseUser(mockUser)
       }
     } catch (_error) {
-      console.log('Mock user cookie not found, trying headers')
+      logger.info('Mock user cookie not found, trying headers')
     }
 
     // 헤더에서도 확인 (클라이언트에서 전송된 경우)
@@ -65,7 +66,7 @@ export async function getAuthenticatedUser(): Promise<User> {
         return createMockSupabaseUser(mockUser)
       }
     } catch (_error) {
-      console.log('Using fallback mock user')
+      logger.info('Using fallback mock user')
     }
   }
 
@@ -78,7 +79,7 @@ export async function getAuthenticatedUser(): Promise<User> {
   } = await supabase.auth.getUser()
 
   if (error) {
-    console.error('Auth error:', error)
+    logger.error('Auth error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('인증 오류가 발생했습니다', 401, 'AUTH_ERROR')
   }
 
@@ -119,7 +120,7 @@ export async function requireAdmin(): Promise<User> {
     .single()
 
   if (error) {
-    console.error('Profile fetch error:', error)
+    logger.error('Profile fetch error:', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('프로필 조회 중 오류가 발생했습니다', 500, 'PROFILE_ERROR')
   }
 

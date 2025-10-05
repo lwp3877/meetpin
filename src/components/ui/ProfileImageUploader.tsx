@@ -9,6 +9,7 @@ import User from 'lucide-react/dist/esm/icons/user'
 import Shuffle from 'lucide-react/dist/esm/icons/shuffle'
 import toast from 'react-hot-toast'
 import type { ImageUploadResult } from '@/lib/services/imageUpload'
+import { logger } from '@/lib/observability/logger'
 
 interface ProfileImageUploaderProps {
   currentAvatarUrl?: string
@@ -51,7 +52,7 @@ export function ProfileImageUploader({
         toast.error(data.message || '프로필 사진 업데이트에 실패했습니다')
       }
     } catch (error) {
-      console.error('Profile avatar update error:', error)
+      logger.error('Profile avatar update error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('프로필 사진 업데이트 중 오류가 발생했습니다')
     } finally {
       setSaving(false)
@@ -80,7 +81,7 @@ export function ProfileImageUploader({
         toast.error(data.message || '프로필 사진 삭제에 실패했습니다')
       }
     } catch (error) {
-      console.error('Profile avatar delete error:', error)
+      logger.error('Profile avatar delete error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('프로필 사진 삭제 중 오류가 발생했습니다')
     } finally {
       setSaving(false)
@@ -111,7 +112,7 @@ export function ProfileImageUploader({
         toast.error(data.message || '프로필 사진 설정에 실패했습니다')
       }
     } catch (error) {
-      console.error('Random avatar update error:', error)
+      logger.error('Random avatar update error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('프로필 사진 설정 중 오류가 발생했습니다')
     } finally {
       setSaving(false)

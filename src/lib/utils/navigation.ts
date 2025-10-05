@@ -3,6 +3,8 @@
  * Next.js 환경에서 클라이언트 사이드 네비게이션을 안전하게 처리
  */
 
+import { logger } from '@/lib/observability/logger'
+
 // Router instance를 위한 임시 저장소
 let routerInstance: any = null
 
@@ -27,7 +29,7 @@ export function safeNavigate(path: string): void {
     }
   } catch (error) {
     // Router 사용 실패 시 fallback
-    console.warn('Next.js router failed, using window.location:', error)
+    logger.warn('Next.js router failed, using window.location', { error: error instanceof Error ? error.message : String(error) })
     window.location.href = path
   }
 }

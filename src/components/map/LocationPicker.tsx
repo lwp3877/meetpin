@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { loadKakaoMaps, coordToAddress } from '@/lib/services/kakao'
+import { logger } from '@/lib/observability/logger'
 
 // Kakao Maps 타입 정의
 declare global {
@@ -40,7 +41,7 @@ export default function LocationPicker({
         setIsKakaoLoaded(true)
       })
       .catch(error => {
-        console.error('Kakao Maps 로드 실패:', error)
+        logger.error('Kakao Maps 로드 실패:', { error: error instanceof Error ? error.message : String(error) })
       })
   }, [])
 
@@ -52,7 +53,7 @@ export default function LocationPicker({
 
     // Geocoder 서비스 사용 가능한지 확인
     if (!kakao.maps.services || !kakao.maps.services.Geocoder) {
-      console.warn('Kakao Maps Geocoder service is not available')
+      logger.warn('Kakao Maps Geocoder service is not available')
       return
     }
 
@@ -93,7 +94,7 @@ export default function LocationPicker({
           })
         })
         .catch(error => {
-          console.warn('주소 변환 실패:', error)
+          logger.warn('주소 변환 실패:', error)
           // 주소 변환에 실패하면 좌표로 표시
           setSelectedLocation({
             lat,
@@ -160,7 +161,7 @@ export default function LocationPicker({
         })
       },
       error => {
-        console.error('Geolocation error:', error)
+        logger.error('Geolocation error:', { error: error instanceof Error ? error.message : String(error) })
         alert('현재 위치를 가져올 수 없습니다.')
       },
       { enableHighAccuracy: true, timeout: 10000 }

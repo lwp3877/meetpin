@@ -1,5 +1,6 @@
 /* src/lib/supabaseClient.ts */
 import { createClient } from '@supabase/supabase-js'
+import { logger } from '@/lib/observability/logger'
 import { createServerClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -654,14 +655,14 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
       _browserClient.channel('_ping').subscribe(status => {
         if (status === 'CHANNEL_ERROR') {
-          console.warn('Supabase realtime connection error, attempting reconnect...')
+          logger.warn('Supabase realtime connection error, attempting reconnect...')
         }
       })
     }
 
     return _browserClient
   } catch (error) {
-    console.error('Failed to create Supabase client:', error)
+    logger.error('Failed to create Supabase client:', { error: error instanceof Error ? error.message : String(error) })
     // 개발 환경에서는 Mock 클라이언트 반환
     if (process.env.NODE_ENV === 'development') {
       // Mock client for development fallback
@@ -739,7 +740,7 @@ export function getSupabaseAdmin() {
           },
         })
       } catch {
-        console.warn('Failed to create admin client, falling back to browser client')
+        logger.warn('Failed to create admin client, falling back to browser client')
         return createBrowserSupabaseClient()
       }
     } else {

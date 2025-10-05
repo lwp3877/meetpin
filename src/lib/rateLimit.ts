@@ -2,6 +2,7 @@
 // ⚡ Upstash Redis 기반 고성능 레이트 리밋 시스템
 
 import { Redis } from '@upstash/redis'
+import { logger } from '@/lib/observability/logger'
 import { Ratelimit } from '@upstash/ratelimit'
 
 // Redis 클라이언트 초기화
@@ -137,7 +138,7 @@ export async function rateLimit(
     // 폴백: 메모리 기반 레이트 리밋
     return memoryRateLimit(key, limit, windowMs)
   } catch (error) {
-    console.error('Rate limit error:', error)
+    logger.error('Rate limit error:', { error: error instanceof Error ? error.message : String(error) })
 
     // 에러 시 폴백
     return memoryRateLimit(key, limit, windowMs)
@@ -175,7 +176,7 @@ export async function rateLimitWithPreset(
       presetConfig.window
     )
   } catch (error) {
-    console.error('Preset rate limit error:', error)
+    logger.error('Preset rate limit error:', { error: error instanceof Error ? error.message : String(error) })
 
     const presetConfig = getPresetConfig(preset)
     return memoryRateLimit(
@@ -342,7 +343,7 @@ export async function resetRateLimit(key: string): Promise<boolean> {
       return true
     }
   } catch (error) {
-    console.error('Rate limit reset error:', error)
+    logger.error('Rate limit reset error:', { error: error instanceof Error ? error.message : String(error) })
     return false
   }
 }

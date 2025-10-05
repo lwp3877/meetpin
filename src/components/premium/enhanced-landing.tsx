@@ -22,6 +22,7 @@ import Shield from 'lucide-react/dist/esm/icons/shield'
 import Globe from 'lucide-react/dist/esm/icons/globe'
 import Cpu from 'lucide-react/dist/esm/icons/cpu'
 import MessageCircle from 'lucide-react/dist/esm/icons/message-circle'
+import { logger } from '@/lib/observability/logger'
 
 // 새로운 프리미엄 피처드 룸
 const FEATURED_ROOMS = [
@@ -159,12 +160,12 @@ export default function EnhancedLanding() {
     const originalReplaceState = window.history.replaceState
 
     window.history.pushState = function(...args) {
-      console.log('🚨 [Landing] history.pushState 차단됨:', args)
+      logger.info('🚨 [Landing] history.pushState 차단됨', { args })
       return undefined
     }
 
     window.history.replaceState = function(...args) {
-      console.log('🚨 [Landing] history.replaceState 차단됨:', args)
+      logger.info('🚨 [Landing] history.replaceState 차단됨', { args })
       return undefined
     }
 
@@ -172,7 +173,7 @@ export default function EnhancedLanding() {
     const currentPath = window.location.pathname
     const checkLocation = () => {
       if (window.location.pathname !== currentPath) {
-        console.log('🚨 [Landing] 위치 변경 감지됨, 복원:', currentPath, '->', window.location.pathname)
+        logger.info('🚨 [Landing] 위치 변경 감지됨, 복원', { from: currentPath, to: window.location.pathname })
         window.history.replaceState(null, '', currentPath)
       }
     }
@@ -300,7 +301,7 @@ export default function EnhancedLanding() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
                 <button
                   onClick={() => {
-                    console.log('[DEBUG] 버튼 클릭됨 - 리다이렉트 방지됨')
+                    logger.info('[DEBUG] 버튼 클릭됨 - 리다이렉트 방지됨')
                     alert('버튼이 클릭되었습니다. 리다이렉트가 비활성화되어 있습니다.')
                   }}
                   className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
@@ -548,7 +549,7 @@ export default function EnhancedLanding() {
 
             <button
               onClick={() => {
-                console.log('[DEBUG] 하단 버튼 클릭됨 - 리다이렉트 방지됨')
+                logger.info('[DEBUG] 하단 버튼 클릭됨 - 리다이렉트 방지됨')
                 alert('하단 버튼이 클릭되었습니다. 리다이렉트가 비활성화되어 있습니다.')
               }}
               className="group relative px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"

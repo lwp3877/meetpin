@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { brandColors, getCategoryDisplay } from '@/lib/config/brand'
 import { loadKakaoMaps } from '@/lib/services/kakao'
+import { logger } from '@/lib/observability/logger'
 
 // Kakao Maps 타입 정의
 declare global {
@@ -61,7 +62,7 @@ export default function MapWithCluster({
         setIsKakaoLoaded(true)
       })
       .catch(error => {
-        console.error('Kakao Maps 로드 실패:', error)
+        logger.error('Kakao Maps 로드 실패:', { error: error instanceof Error ? error.message : String(error) })
       })
   }, [])
 
@@ -376,7 +377,7 @@ export default function MapWithCluster({
               mapRef.current.panTo(moveLatLng)
             },
             error => {
-              console.error('Geolocation error:', error)
+              logger.error('Geolocation error:', { error: error instanceof Error ? error.message : String(error) })
               alert('현재 위치를 가져올 수 없습니다.')
             },
             { enableHighAccuracy: true, timeout: 10000 }

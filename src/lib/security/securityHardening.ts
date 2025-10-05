@@ -1,5 +1,7 @@
 /* src/lib/security/securityHardening.ts */
 
+import { logger } from '@/lib/observability/logger'
+
 /**
  * 보안 취약점 완전 차단 시스템
  * 실제 사용자 테스트에서 발생할 수 있는 모든 보안 위협 방어
@@ -308,7 +310,7 @@ export class SecurityRateLimit {
 
     if (isSuspicious) {
       this.suspiciousIPs.add(identifier)
-      console.warn(`🚨 Suspicious activity detected: ${activity} from ${identifier}`)
+      logger.warn(`🚨 Suspicious activity detected: ${activity} from ${identifier}`)
     }
 
     return isSuspicious
@@ -363,7 +365,7 @@ export class ContentSecurityPolicy {
   static setupMetaCSP(): void {
     // CSP는 next.config.ts 헤더에서만 설정
     // 메타 태그 사용 시 frame-ancestors 무시 문제 및 충돌 발생
-    console.log('🔒 CSP: HTTP 헤더에서만 설정 - 메타 태그 비활성화')
+    logger.info('🔒 CSP: HTTP 헤더에서만 설정 - 메타 태그 비활성화')
     return
   }
 }
@@ -516,7 +518,7 @@ export class FileUploadSecurity {
  * 전역 보안 설정 초기화
  */
 export function initializeSecurityMeasures(): () => void {
-  console.log('🔒 보안 시스템 초기화 시작...')
+  logger.info('🔒 보안 시스템 초기화 시작...')
 
   // CSP 설정
   ContentSecurityPolicy.setupMetaCSP()
@@ -538,8 +540,8 @@ export function initializeSecurityMeasures(): () => void {
         if (!devtools.open) {
           devtools.open = true
           console.clear()
-          console.log('%c🚨 보안 경고', 'color: red; font-size: 50px; font-weight: bold;')
-          console.log(
+          console.info('%c🚨 보안 경고', 'color: red; font-size: 50px; font-weight: bold;')
+          console.info(
             '%c개발자 도구 사용이 감지되었습니다.\n악의적인 코드 실행을 방지하기 위해 콘솔을 사용하지 마세요.',
             'color: red; font-size: 16px;'
           )
@@ -589,19 +591,19 @@ export function initializeSecurityMeasures(): () => void {
 
   // 전역 에러 핸들러
   window.addEventListener('error', e => {
-    console.error('Security: Unhandled error detected:', e.error)
+    logger.error('Security: Unhandled error detected:', e.error)
   })
 
   window.addEventListener('unhandledrejection', e => {
-    console.error('Security: Unhandled promise rejection:', e.reason)
+    logger.error('Security: Unhandled promise rejection:', e.reason)
   })
 
   // 클린업 함수
   const cleanup = () => {
-    console.log('🔒 보안 시스템 정리')
+    logger.info('🔒 보안 시스템 정리')
   }
 
-  console.log('✅ 보안 시스템 초기화 완료')
+  logger.info('✅ 보안 시스템 초기화 완료')
 
   return cleanup
 }

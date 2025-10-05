@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 export default function AuthCallback() {
   const router = useRouter()
@@ -18,7 +19,7 @@ export default function AuthCallback() {
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {
-          console.error('Auth callback error:', error)
+          logger.error('Auth callback error:', { error: error instanceof Error ? error.message : String(error) })
           toast.error('로그인 처리 중 오류가 발생했습니다')
           router.push('/auth/login?error=callback_failed')
           return
@@ -31,7 +32,7 @@ export default function AuthCallback() {
           router.push('/auth/login')
         }
       } catch (error) {
-        console.error('Auth callback unexpected error:', error)
+        logger.error('Auth callback unexpected error:', { error: error instanceof Error ? error.message : String(error) })
         router.push('/auth/login?error=unexpected')
       }
     }

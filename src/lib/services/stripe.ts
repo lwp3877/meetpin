@@ -1,5 +1,6 @@
 /* src/lib/stripe.ts */
 import { loadStripe, Stripe } from '@stripe/stripe-js'
+import { logger } from '@/lib/observability/logger'
 
 // Stripe 인스턴스를 전역적으로 관리
 let stripePromise: Promise<Stripe | null>
@@ -9,7 +10,7 @@ export const getStripe = (): Promise<Stripe | null> => {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 
     if (!publishableKey) {
-      console.warn('Stripe publishable key not found')
+      logger.warn('Stripe publishable key not found')
       return Promise.resolve(null)
     }
 
@@ -161,7 +162,7 @@ export async function createCheckoutSession(data: CreateCheckoutSessionData): Pr
       url: result.url,
     }
   } catch (error: any) {
-    console.error('Create checkout session error:', error)
+    logger.error('Create checkout session error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
       error: '네트워크 오류가 발생했습니다',
@@ -195,7 +196,7 @@ export async function redirectToCheckout(sessionId: string): Promise<{
 
     return { success: true }
   } catch (error: any) {
-    console.error('Redirect to checkout error:', error)
+    logger.error('Redirect to checkout error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
       error: '결제 페이지로 이동하는데 실패했습니다',
@@ -246,7 +247,7 @@ export async function processBoostPayment(
       url: result.data?.checkout_url,
     }
   } catch (error: any) {
-    console.error('Process boost payment error:', error)
+    logger.error('Process boost payment error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       success: false,
       error: '결제 처리 중 오류가 발생했습니다',

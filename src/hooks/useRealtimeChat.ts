@@ -34,7 +34,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useAuth } from '@/lib/useAuth'
-import { logger } from '@/lib/utils/logger'
+import { logger } from '@/lib/observability/logger'
 
 interface ChatMessage {
   id: string
@@ -168,7 +168,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     } catch (err: any) {
       // 프로덕션 모드에서만 오류 로그 출력
       if (process.env.NODE_ENV === 'production') {
-        console.error('Failed to load messages:', err)
+        logger.error('Failed to load messages:', { error: err instanceof Error ? err.message : String(err) })
         setError(err.message || '메시지를 불러오는데 실패했습니다')
       }
     } finally {
@@ -237,7 +237,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
       } catch (err: any) {
         // 프로덕션 모드에서만 오류 로그 출력
         if (process.env.NODE_ENV === 'production') {
-          console.error('Failed to send message:', err)
+          logger.error('Failed to send message:', { error: err instanceof Error ? err.message : String(err) })
           setError(err.message || '메시지 전송에 실패했습니다')
         }
         return false
@@ -260,7 +260,7 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
 
         if (error) throw error
       } catch (err: any) {
-        console.error('Failed to mark message as read:', err)
+        logger.error('Failed to mark message as read:', { error: err instanceof Error ? err.message : String(err) })
       }
     },
     [user, supabase]
@@ -374,18 +374,18 @@ export function useRealtimeChat({ roomId, otherUserId, enabled = true }: UseReal
     })
 
     channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
-      logger.debug('User joined:', key, newPresences)
+      logger.debug('User joined', { key, newPresences })
     })
 
     channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-      logger.debug('User left:', key, leftPresences)
+      logger.debug('User left', { key, leftPresences })
     })
 
     // 채널 구독 먼저 수행
     channel.subscribe(status => {
       // 개발 모드에서는 로그 출력 안함
       if (process.env.NODE_ENV !== 'development') {
-        logger.info('Chat channel status:', status)
+        logger.info('Chat channel status', { status })
       }
       setConnectionStatus(
         status === 'SUBSCRIBED'

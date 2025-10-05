@@ -4,6 +4,7 @@
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface SocialLoginProps {
   type?: 'login' | 'signup'
@@ -39,7 +40,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockKakaoUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Kakao login error:', error)
+      logger.error('Kakao login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('카카오 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)
@@ -71,7 +72,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockGoogleUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Google login error:', error)
+      logger.error('Google login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('구글 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)
@@ -103,7 +104,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       document.cookie = `meetpin_mock_user=${encodeURIComponent(JSON.stringify(mockNaverUser))}; path=/; max-age=86400`
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Naver login error:', error)
+      logger.error('Naver login error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('네이버 로그인 중 오류가 발생했습니다')
     } finally {
       setLoadingProvider(null)

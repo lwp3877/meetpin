@@ -4,6 +4,7 @@
  */
 
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
+import { logger } from '@/lib/observability/logger'
 
 // Database types for Supabase operations
 interface ProfileUpdate {
@@ -316,6 +317,6 @@ export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<Aut
 // 개발 모드 로깅 유틸리티
 export const logAuthState = (message: string, data?: any): void => {
   if (isDevelopmentMode()) {
-    console.debug(`[authService] ${message}`, data)
+    logger.debug(`[authService] ${message}`, data)
   }
 }

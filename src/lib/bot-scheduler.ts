@@ -6,6 +6,7 @@
 'use client'
 
 import smartRoomGenerator from '@/lib/bot/smart-room-generator'
+import { logger } from '@/lib/observability/logger'
 
 interface ScheduleSlot {
   hour: number
@@ -199,12 +200,12 @@ export class BotRoomScheduler {
    */
   start(): void {
     if (this.isRunning) {
-      console.log('봇 스케줄러가 이미 실행 중입니다.')
+      logger.info('봇 스케줄러가 이미 실행 중입니다.')
       return
     }
 
     this.isRunning = true
-    console.log('🤖 봇 방 스케줄러 시작됨')
+    logger.info('🤖 봇 방 스케줄러 시작됨')
 
     // 모든 스케줄 등록
     this.registerDailySchedules()
@@ -222,7 +223,7 @@ export class BotRoomScheduler {
     this.isRunning = false
     this.timers.forEach(timer => clearTimeout(timer))
     this.timers = []
-    console.log('🛑 봇 방 스케줄러 중지됨')
+    logger.info('🛑 봇 방 스케줄러 중지됨')
   }
 
   /**
@@ -259,7 +260,7 @@ export class BotRoomScheduler {
 
     this.timers.push(timer)
 
-    console.log(
+    logger.info(
       `📅 봇 방 생성 예약: ${scheduleTime.toLocaleString('ko-KR')} - ${slot.roomCount}개 방`
     )
   }
@@ -273,7 +274,7 @@ export class BotRoomScheduler {
       const multiplier = WEEKDAY_MULTIPLIER[weekday as keyof typeof WEEKDAY_MULTIPLIER] || 1.0
       const adjustedRoomCount = Math.ceil(slot.roomCount * multiplier)
 
-      console.log(`🤖 봇 방 생성 시작: ${adjustedRoomCount}개 방 (${slot.description})`)
+      logger.info(`🤖 봇 방 생성 시작: ${adjustedRoomCount}개 방 (${slot.description})`)
 
       for (let i = 0; i < adjustedRoomCount; i++) {
         // 카테고리 랜덤 선택
@@ -288,9 +289,9 @@ export class BotRoomScheduler {
         }, i * 2000) // 2초 간격
       }
 
-      console.log(`✅ 봇 방 생성 완료: ${adjustedRoomCount}개 방`)
+      logger.info(`✅ 봇 방 생성 완료: ${adjustedRoomCount}개 방`)
     } catch (error) {
-      console.error('봇 방 생성 오류:', error)
+      logger.error('봇 방 생성 오류:', { error: error instanceof Error ? error.message : String(error) })
     }
   }
 
@@ -327,7 +328,7 @@ export class BotRoomScheduler {
 
     const timer = setTimeout(() => {
       if (this.isRunning) {
-        console.log('🌅 새로운 하루 스케줄 등록')
+        logger.info('🌅 새로운 하루 스케줄 등록')
         this.registerDailySchedules()
         this.scheduleNextDay() // 다음 날도 예약
       }
@@ -365,7 +366,7 @@ export class BotRoomScheduler {
    * 특정 시간에 즉시 방 생성 (테스트용)
    */
   async generateTestRooms(count: number = 3, category?: string): Promise<void> {
-    console.log(`🧪 테스트 봇 방 ${count}개 생성 시작`)
+    logger.info(`🧪 테스트 봇 방 ${count}개 생성 시작`)
 
     for (let i = 0; i < count; i++) {
       const _testCategory =

@@ -22,6 +22,7 @@ import {
   initializeNotifications,
 } from '@/lib/services/notifications'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface NotificationSettingsProps {
   className?: string
@@ -86,7 +87,7 @@ export function NotificationSettings({ className = '' }: NotificationSettingsPro
         toast.error('알림 권한이 거부되었습니다')
       }
     } catch (error) {
-      console.error('Permission request failed:', error)
+      logger.error('Permission request failed:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('알림 권한 요청에 실패했습니다')
     } finally {
       setLoading(false)

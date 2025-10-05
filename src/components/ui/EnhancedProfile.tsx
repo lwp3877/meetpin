@@ -15,6 +15,7 @@ import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
 import Award from 'lucide-react/dist/esm/icons/award'
 import Star from 'lucide-react/dist/esm/icons/star'
 import { getCategoryDisplay } from '@/lib/config/brand'
+import { logger } from '@/lib/observability/logger'
 
 interface ProfileStats {
   hostedRooms: number
@@ -73,7 +74,7 @@ export function EnhancedProfile({ showHeader = false, className = '' }: Enhanced
           setStats(data.data)
         }
       } catch (error) {
-        console.error('Failed to fetch profile stats:', error)
+        logger.error('Failed to fetch profile stats:', { error: error instanceof Error ? error.message : String(error) })
       } finally {
         setLoading(false)
       }

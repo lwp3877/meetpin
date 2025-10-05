@@ -9,6 +9,7 @@ import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw'
 import Home from 'lucide-react/dist/esm/icons/home'
 import Bug from 'lucide-react/dist/esm/icons/bug'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface Props {
   children: ReactNode
@@ -45,7 +46,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error Boundary caught an error:', error, errorInfo)
+    logger.error('Error Boundary caught an error', {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack
+    })
 
     this.setState({
       error,
@@ -55,9 +60,9 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     // 개발 모드에서는 상세한 에러 정보를 콘솔에 출력
     if (process.env.NODE_ENV === 'development') {
       console.group('🚨 Error Boundary Details')
-      console.error('Error:', error)
-      console.error('Component Stack:', errorInfo.componentStack)
-      console.error('Error Stack:', error.stack)
+      logger.error('Error', { error: error instanceof Error ? error.message : String(error) })
+      logger.error('Component Stack', { componentStack: errorInfo.componentStack })
+      logger.error('Error Stack', { stack: error.stack })
       console.groupEnd()
     }
 
@@ -90,7 +95,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     // 실제 운영에서는 에러 추적 서비스로 전송
     if (process.env.NODE_ENV === 'production') {
       // 예: Sentry, LogRocket, Bugsnag 등으로 전송
-      console.error('Error Report:', errorReport)
+      logger.error('Error Report:', { error: errorReport instanceof Error ? errorReport.message : String(errorReport) })
     }
   }
 

@@ -7,6 +7,7 @@ import RoomForm from '@/components/room/RoomForm'
 import PageTransition, { CardAnimation } from '@/components/ui/PageTransition'
 import Toast from '@/components/ui/Toast'
 import { ButtonPresets } from '@/components/ui/EnhancedButton'
+import { logger } from '@/lib/observability/logger'
 
 type RoomFormData = {
   title: string
@@ -51,7 +52,7 @@ export default function NewRoomPage() {
       // 생성된 방으로 이동
       router.push(`/room/${result.data.id}`)
     } catch (err: any) {
-      console.error('Room creation error:', err)
+      logger.error('Room creation error:', { error: err instanceof Error ? err.message : String(err) })
       Toast.dismiss(loadingToastId)
       Toast.error(err.message || '모임 생성 중 오류가 발생했습니다')
       setError(err.message)

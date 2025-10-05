@@ -4,6 +4,7 @@
  */
 
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
+import { logger } from '@/lib/observability/logger'
 
 export interface AgeVerificationResult {
   isAdult: boolean
@@ -80,7 +81,7 @@ export async function verifyAge(
     })
 
     if (logError) {
-      console.error('Age verification log error:', logError)
+      logger.error('Age verification log error:', { error: logError instanceof Error ? logError.message : String(logError) })
     }
 
     // 4. 사용자 인증 테이블에 기록
@@ -99,7 +100,7 @@ export async function verifyAge(
       })
 
     if (verificationError) {
-      console.error('User verification error:', verificationError)
+      logger.error('User verification error:', { error: verificationError instanceof Error ? verificationError.message : String(verificationError) })
       return {
         isAdult: true,
         verified: false,
@@ -116,7 +117,7 @@ export async function verifyAge(
       message: '연령 인증이 완료되었습니다.',
     }
   } catch (error) {
-    console.error('Age verification error:', error)
+    logger.error('Age verification error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       isAdult: false,
       verified: false,
@@ -160,7 +161,7 @@ export async function getUserAgeVerificationStatus(userId: string): Promise<{
       verifiedAt: (data as any).verified_at,
     }
   } catch (error) {
-    console.error('Get age verification status error:', error)
+    logger.error('Get age verification status error:', { error: error instanceof Error ? error.message : String(error) })
     return {
       isVerified: false,
       isAdult: false,

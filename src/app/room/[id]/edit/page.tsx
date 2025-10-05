@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { brandMessages } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
 import dynamic from 'next/dynamic'
+import { logger } from '@/lib/observability/logger'
 
 // RoomForm을 필요할 때만 로딩
 const RoomForm = dynamic(() => import('@/components/room/RoomForm'), {
@@ -86,7 +87,7 @@ export default function EditRoomPage() {
 
       setRoom(roomData)
     } catch (err: any) {
-      console.error('Room load error:', err)
+      logger.error('Room load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     } finally {
       setLoading(false)
@@ -114,7 +115,7 @@ export default function EditRoomPage() {
       toast.success('방 정보가 성공적으로 수정되었습니다!')
       router.push(`/room/${roomId}`)
     } catch (err: any) {
-      console.error('Room update error:', err)
+      logger.error('Room update error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
       toast.error(err.message)
     } finally {
@@ -149,7 +150,7 @@ export default function EditRoomPage() {
       toast.success('모임이 성공적으로 삭제되었습니다')
       router.push('/map')
     } catch (err: any) {
-      console.error('Room delete error:', err)
+      logger.error('Room delete error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
       toast.error(err.message)
     } finally {

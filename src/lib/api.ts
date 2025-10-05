@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
 import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
+import { logger } from '@/lib/observability/logger'
 
 /**
  * 간단한 인메모리 레이트 리미팅 스토어
@@ -139,7 +140,7 @@ export async function parseAndValidateBody<T>(
       const message = error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
       throw new ApiError(`입력 데이터가 올바르지 않습니다: ${message}`, 400, 'VALIDATION_ERROR')
     }
-    console.error('Parse error:', error)
+    logger.error('Parse error', { error: error instanceof Error ? error.message : String(error) })
     throw new ApiError('요청 데이터 처리 중 오류가 발생했습니다', 400, 'PARSE_ERROR')
   }
 }
@@ -232,7 +233,7 @@ export function withErrorHandling(handler: ApiHandler) {
     try {
       return await handler(request, context)
     } catch (error: any) {
-      console.error('API Error:', error)
+      logger.error('API Error', { error: error instanceof Error ? error.message : String(error), stack: error?.stack })
 
       if (error instanceof ApiError) {
         return createErrorResponse(error.message, error.status, error.code)
@@ -277,7 +278,7 @@ export function withErrorHandling(handler: ApiHandler) {
           case 'JWT_INVALID':
             return createErrorResponse('잘못된 인증 토큰입니다', 401, 'TOKEN_INVALID')
           default:
-            console.error('Supabase Error:', error)
+            logger.error('Supabase Error', { error: error.message || String(error), code: error.code })
         }
       }
 

@@ -19,6 +19,7 @@ import Navigation from 'lucide-react/dist/esm/icons/navigation'
 import Heart from 'lucide-react/dist/esm/icons/heart'
 import Share2 from 'lucide-react/dist/esm/icons/share-2'
 import dynamic from 'next/dynamic'
+import { logger } from '@/lib/observability/logger'
 
 // 모달 컴포넌트들을 필요할 때만 로딩
 const RealtimeChatModal = dynamic(
@@ -84,7 +85,7 @@ export default function RoomDetailPage() {
 
   const fetchRoom = useCallback(async () => {
     if (!params?.id || params.id === 'undefined' || params.id === 'null') {
-      console.warn('Invalid room ID:', params?.id)
+      logger.warn('Invalid room ID', { id: params?.id })
       toast.error('올바르지 않은 방 ID입니다')
       router.push('/map')
       return
@@ -137,7 +138,7 @@ export default function RoomDetailPage() {
         throw new Error(result.message || 'INVALID_RESPONSE')
       }
     } catch (error: any) {
-      console.error('Error fetching room:', error)
+      logger.error('Error fetching room:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss(loadingToastId)
 
       if (error.name === 'AbortError') {
@@ -225,7 +226,7 @@ export default function RoomDetailPage() {
         throw new Error(result.message || 'UNKNOWN_ERROR')
       }
     } catch (error: any) {
-      console.error('Join request error:', error)
+      logger.error('Join request error:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss(loadingToastId)
 
       if (error.name === 'AbortError') {

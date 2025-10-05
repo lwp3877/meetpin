@@ -18,6 +18,7 @@ import {
 } from '@/lib/services/imageUpload'
 import { useAuth } from '@/lib/useAuth'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface ImageUploaderProps {
   currentImageUrl?: string
@@ -110,7 +111,7 @@ export function ImageUploader({
           setPreview(null)
         }
       } catch (error: any) {
-        console.error('Image upload error:', error)
+        logger.error('Image upload error:', { error: error instanceof Error ? error.message : String(error) })
         toast.error('이미지 업로드 중 오류가 발생했습니다')
         setPreview(null)
       } finally {
@@ -146,7 +147,7 @@ export function ImageUploader({
         toast.success('이미지가 제거되었습니다')
       }
     } catch (error) {
-      console.error('Image delete error:', error)
+      logger.error('Image delete error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('이미지 삭제 중 오류가 발생했습니다')
     } finally {
       setDeleting(false)

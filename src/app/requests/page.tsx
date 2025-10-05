@@ -20,6 +20,7 @@ import XCircle from 'lucide-react/dist/esm/icons/x-circle'
 import Heart from 'lucide-react/dist/esm/icons/heart'
 import Search from 'lucide-react/dist/esm/icons/search'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface Request {
   id: string
@@ -86,7 +87,7 @@ export default function RequestsPage() {
 
       setMyRequests(result.data.requests || [])
     } catch (err: any) {
-      console.error('My requests load error:', err)
+      logger.error('My requests load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     }
   }
@@ -103,7 +104,7 @@ export default function RequestsPage() {
 
       setMyMatches(result.data.matches || [])
     } catch (err: any) {
-      console.error('My matches load error:', err)
+      logger.error('My matches load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     }
   }

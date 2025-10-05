@@ -1,5 +1,7 @@
 /* src/lib/utils/browserCompat.ts */
 
+import { logger } from '@/lib/observability/logger'
+
 /**
  * 브라우저 호환성 및 성능 최적화 유틸리티
  * 실제 사용자 테스트에서 모든 브라우저와 기기에서 완벽한 동작 보장
@@ -287,7 +289,7 @@ export class PerformanceOptimizer {
 
     // 리소스 프리로드
     this.preloadImages(criticalUrls).catch(error => {
-      console.warn('Resource preload failed:', error)
+      logger.warn('Resource preload failed:', error)
     })
   }
 
@@ -296,7 +298,7 @@ export class PerformanceOptimizer {
    */
   static monitorMemoryUsage(): () => void {
     if (!('memory' in performance)) {
-      console.warn('Memory monitoring not supported')
+      logger.warn('Memory monitoring not supported')
       return () => {}
     }
 
@@ -310,7 +312,7 @@ export class PerformanceOptimizer {
 
       // 메모리 사용량이 80% 이상이면 경고
       if (memoryInfo.used / memoryInfo.limit > 0.8) {
-        console.warn('High memory usage detected:', memoryInfo)
+        logger.warn('High memory usage detected:', memoryInfo)
         this.cleanupMemory()
       }
     }
@@ -332,7 +334,7 @@ export class PerformanceOptimizer {
         observer.disconnect()
         this.observers.delete(key)
       } catch (error) {
-        console.warn(`Failed to cleanup observer ${key}:`, error)
+        logger.warn(`Failed to cleanup observer ${key}`, { error: error instanceof Error ? error.message : String(error) })
       }
     })
 
@@ -360,7 +362,7 @@ export class PerformanceOptimizer {
       // 에러 처리
       img.onerror = () => {
         img.style.display = 'none'
-        console.warn('Failed to load image:', img.src)
+        logger.warn('Failed to load image', { src: img.src })
       }
     })
   }
@@ -379,9 +381,9 @@ export class NetworkOptimizer {
       document.body.classList.toggle('offline', !isOnline)
 
       if (!isOnline) {
-        console.warn('네트워크 연결이 끊어졌습니다')
+        logger.warn('네트워크 연결이 끊어졌습니다')
       } else {
-        console.log('네트워크 연결이 복구되었습니다')
+        logger.info('네트워크 연결이 복구되었습니다')
       }
     }
 
@@ -431,7 +433,7 @@ export class NetworkOptimizer {
       case 'slow':
         // 저품질 설정
         document.documentElement.classList.add('low-bandwidth')
-        console.log('저대역폭 모드 활성화')
+        logger.info('저대역폭 모드 활성화')
         break
       case 'good':
         // 중간 품질 설정
@@ -460,10 +462,10 @@ export class CompatibilityPatches {
       polyfills.push(
         import('intersection-observer')
           .then(() => {
-            console.log('IntersectionObserver polyfill loaded')
+            logger.info('IntersectionObserver polyfill loaded')
           })
           .catch(() => {
-            console.warn('Failed to load IntersectionObserver polyfill')
+            logger.warn('Failed to load IntersectionObserver polyfill')
           })
       )
     }
@@ -473,7 +475,7 @@ export class CompatibilityPatches {
       window.navigator.share = async (data: ShareData) => {
         if (navigator.clipboard && data.url) {
           await navigator.clipboard.writeText(data.url)
-          console.log('URL copied to clipboard (Web Share polyfill)')
+          logger.info('URL copied to clipboard (Web Share polyfill)')
         }
       }
     }
@@ -518,7 +520,7 @@ export class CompatibilityPatches {
 
     // 패치가 필요한 경우 글로벌 설정
     if (!supportsPassive) {
-      console.warn('Passive event listeners not supported')
+      logger.warn('Passive event listeners not supported')
     }
   }
 }
@@ -527,7 +529,7 @@ export class CompatibilityPatches {
  * 전역 브라우저 호환성 초기화
  */
 export async function initializeBrowserCompatibility() {
-  console.log('🔧 브라우저 호환성 초기화 시작...')
+  logger.info('🔧 브라우저 호환성 초기화 시작...')
 
   // 브라우저 정보 로깅
   const browserInfo = {
@@ -540,7 +542,7 @@ export async function initializeBrowserCompatibility() {
     isOnline: BrowserDetector.isOnline(),
   }
 
-  console.log('📱 브라우저 정보:', browserInfo)
+  logger.info('📱 브라우저 정보:', browserInfo)
 
   // 호환성 패치 적용
   await CompatibilityPatches.loadPolyfills()
@@ -574,7 +576,7 @@ export async function initializeBrowserCompatibility() {
     document.documentElement.classList.add('mobile')
   }
 
-  console.log('✅ 브라우저 호환성 초기화 완료')
+  logger.info('✅ 브라우저 호환성 초기화 완료')
 
   // cleanup 함수 반환
   return () => {

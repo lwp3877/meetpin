@@ -1,5 +1,7 @@
 /* src/lib/accessibility/a11yEnhancement.ts */
 
+import { logger } from '@/lib/observability/logger'
+
 /**
  * 접근성 및 사용성 개선 시스템
  * 실제 사용자 테스트에서 모든 사용자가 앱을 쉽게 사용할 수 있도록 보장
@@ -419,7 +421,7 @@ export class ScreenReaderSupport {
     // 버튼에 적절한 접근성 이름 확인 및 개선
     document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])').forEach(btn => {
       if (!btn.textContent?.trim()) {
-        console.warn('Button without accessible name detected:', btn)
+        logger.warn('Button without accessible name detected', { button: btn.outerHTML })
 
         // 아이콘 기반 버튼 자동 레이블링
         const icon = btn.querySelector('svg, [class*="icon"], [class*="Icon"]')
@@ -466,10 +468,10 @@ export class ScreenReaderSupport {
       if (id) {
         const label = document.querySelector(`label[for="${id}"]`)
         if (!label && !placeholder) {
-          console.warn('Input without associated label or placeholder detected:', input)
+          logger.warn('Input without associated label or placeholder detected', { input: (input as HTMLInputElement).outerHTML })
         }
       } else if (!placeholder) {
-        console.warn('Input without label, id, or placeholder detected:', input)
+        logger.warn('Input without label, id, or placeholder detected', { input: (input as HTMLInputElement).outerHTML })
       }
     })
 
@@ -478,7 +480,7 @@ export class ScreenReaderSupport {
       const imgElement = img as HTMLImageElement
       // 장식용 이미지가 아닌 경우에만 경고
       if (!imgElement.closest('[role="presentation"]') && !imgElement.classList.contains('decorative')) {
-        console.warn('Image without alt text detected:', imgElement.src)
+        logger.warn('Image without alt text detected', { src: imgElement.src })
         // 장식용으로 추정되는 이미지에는 빈 alt 추가
         if (imgElement.classList.contains('bg-') || imgElement.classList.contains('decoration') || imgElement.closest('.bg-')) {
           imgElement.setAttribute('alt', '')
@@ -491,7 +493,7 @@ export class ScreenReaderSupport {
       const linkElement = link as HTMLAnchorElement
       const text = linkElement.textContent?.trim()
       if (!text || ['더보기', '자세히', '보기', '클릭', '링크'].includes(text)) {
-        console.warn('Link with unclear purpose detected:', text || linkElement.href)
+        logger.warn('Link with unclear purpose detected', { text: text || linkElement.href })
 
         // 컨텍스트에서 유추할 수 있는 정보로 자동 레이블링
         const container = link.closest('[data-title], [data-name], h1, h2, h3, h4, h5, h6')
@@ -509,14 +511,14 @@ export class ScreenReaderSupport {
     // 헤딩 요소에 적절한 역할 확인
     document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
       if (!heading.textContent?.trim()) {
-        console.warn('Empty heading detected:', heading.tagName)
+        logger.warn('Empty heading detected', { tag: heading.tagName })
       }
     })
 
     // 대화형 요소의 포커스 가능성 확인
     document.querySelectorAll('[onclick], [onkeydown]').forEach(element => {
       if (!element.hasAttribute('tabindex') && element.tagName !== 'BUTTON' && element.tagName !== 'A') {
-        console.warn('Interactive element without keyboard accessibility:', element)
+        logger.warn('Interactive element without keyboard accessibility', { element: (element as HTMLElement).outerHTML })
         // 키보드 접근성 자동 추가
         element.setAttribute('tabindex', '0')
         element.setAttribute('role', 'button')
@@ -537,15 +539,15 @@ export class ScreenReaderSupport {
 
       if (level === 1) {
         if (hasH1) {
-          console.warn('Multiple H1 elements detected. Consider using only one H1 per page.')
+          logger.warn('Multiple H1 elements detected. Consider using only one H1 per page.')
         }
         hasH1 = true
       }
 
       if (level > currentLevel + 1) {
-        console.warn(
+        logger.warn(
           `Heading level skip detected: jumping from H${currentLevel} to H${level}`,
-          heading
+          { heading: heading.outerHTML }
         )
       }
 
@@ -553,7 +555,7 @@ export class ScreenReaderSupport {
     })
 
     if (!hasH1) {
-      console.warn('No H1 element found. Consider adding a main heading to the page.')
+      logger.warn('No H1 element found. Consider adding a main heading to the page.')
     }
   }
 }
@@ -587,7 +589,7 @@ export class UsabilityEnhancement {
         const totalHeight = rect.height + parseInt(computedStyle.paddingTop) + parseInt(computedStyle.paddingBottom)
 
         if (totalWidth < currentSize || totalHeight < currentSize) {
-          console.warn(`Touch target too small (${Math.round(rect.width)}x${Math.round(rect.height)}):`, element.textContent?.substring(0, 30) || element.tagName)
+          logger.warn(`Touch target too small (${Math.round(rect.width)}x${Math.round(rect.height)})`, { element: element.textContent?.substring(0, 30) || element.tagName })
 
           // 자동으로 최소 크기 보장 클래스 추가 (조건부)
           if (!element.closest('.ignore-touch-target') && !element.classList.contains('text-xs')) {
@@ -602,7 +604,7 @@ export class UsabilityEnhancement {
           !element.getAttribute('aria-labelledby') &&
           !element.textContent?.trim()) {
 
-        console.warn('Interactive element without accessible name:', element)
+        logger.warn('Interactive element without accessible name', { element: (element as HTMLElement).outerHTML })
 
         // 아이콘 버튼인 경우 자동으로 aria-label 추가
         const icon = element.querySelector('svg, [class*="icon"]')
@@ -870,7 +872,7 @@ function waitForHydration(): Promise<void> {
  * 전역 접근성 개선 시스템 초기화 (하이드레이션 안전)
  */
 export function initializeAccessibility(): () => void {
-  console.log('♿ 접근성 개선 시스템 초기화 시작...')
+  logger.info('♿ 접근성 개선 시스템 초기화 시작...')
 
   const cleanupFunctions: (() => void)[] = []
 
@@ -906,7 +908,7 @@ export function initializeAccessibility(): () => void {
       if (process.env.NODE_ENV === 'development') {
         setTimeout(() => {
           const report = AccessibilityTesting.generateReport()
-          console.log('♿ 접근성 검사 결과:\n', report)
+          logger.info('♿ 접근성 검사 결과', { report })
         }, 3000) // 모든 컴포넌트 마운트 후 검사
       }
 
@@ -922,12 +924,12 @@ export function initializeAccessibility(): () => void {
         nav.id = 'navigation'
       }
 
-      console.log('✅ 접근성 개선 시스템 초기화 완료')
+      logger.info('✅ 접근성 개선 시스템 초기화 완료')
     } catch (error) {
-      console.warn('♿ 접근성 개선 시스템 초기화 중 오류:', error)
+      logger.warn('♿ 접근성 개선 시스템 초기화 중 오류', { error: error instanceof Error ? error.message : String(error) })
     }
   }).catch(error => {
-    console.warn('♿ 접근성 시스템 하이드레이션 대기 중 오류:', error)
+    logger.warn('♿ 접근성 시스템 하이드레이션 대기 중 오류', { error: error instanceof Error ? error.message : String(error) })
   })
 
   // cleanup 함수 반환
@@ -936,10 +938,10 @@ export function initializeAccessibility(): () => void {
       try {
         cleanup()
       } catch (error) {
-        console.warn('접근성 시스템 정리 중 오류:', error)
+        logger.warn('접근성 시스템 정리 중 오류', { error: error instanceof Error ? error.message : String(error) })
       }
     })
-    console.log('♿ 접근성 개선 시스템 정리 완료')
+    logger.info('♿ 접근성 개선 시스템 정리 완료')
   }
 }
 

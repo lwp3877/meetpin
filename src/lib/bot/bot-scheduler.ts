@@ -20,6 +20,7 @@ import {
   naturalPatterns,
 } from './smart-room-generator'
 import { supabaseAdmin, type ProfileInsert, type RoomInsert } from '@/lib/supabaseClient'
+import { logger } from '@/lib/observability/logger'
 
 // 봇 생성 상태 추적
 interface BotGenerationState {
@@ -57,7 +58,7 @@ async function ensureBotProfile(botProfile: any) {
     )
 
     if (authError && !authError.message.includes('already')) {
-      console.error('봇 계정 생성 실패:', authError)
+      logger.error('봇 계정 생성 실패:', { error: authError instanceof Error ? authError.message : String(authError) })
       return null
     }
 
@@ -79,13 +80,13 @@ async function ensureBotProfile(botProfile: any) {
       .upsert(profileData)
 
     if (profileError) {
-      console.error('봇 프로필 생성 실패:', profileError)
+      logger.error('봇 프로필 생성 실패:', { error: profileError instanceof Error ? profileError.message : String(profileError) })
       return null
     }
 
     return userId
   } catch (error) {
-    console.error('봇 프로필 처리 중 오류:', error)
+    logger.error('봇 프로필 처리 중 오류:', { error: error instanceof Error ? error.message : String(error) })
     return null
   }
 }
@@ -167,7 +168,7 @@ async function createBotRoomInDatabase(roomData: any) {
     // 봇 프로필 확인/생성
     const hostUid = await ensureBotProfile(roomData.botProfile)
     if (!hostUid) {
-      console.error('봇 프로필 생성 실패')
+      logger.error('봇 프로필 생성 실패')
       return null
     }
 
@@ -192,14 +193,14 @@ async function createBotRoomInDatabase(roomData: any) {
       .single()
 
     if (error) {
-      console.error('봇 방 생성 실패:', error)
+      logger.error('봇 방 생성 실패:', { error: error instanceof Error ? error.message : String(error) })
       return null
     }
 
-    console.log(`✅ 봇 방 생성 성공: ${roomData.title} (${roomData.location.name})`)
+    logger.info(`✅ 봇 방 생성 성공: ${roomData.title} (${roomData.location.name})`)
     return data
   } catch (error) {
-    console.error('봇 방 데이터베이스 생성 중 오류:', error)
+    logger.error('봇 방 데이터베이스 생성 중 오류:', { error: error instanceof Error ? error.message : String(error) })
     return null
   }
 }
@@ -259,9 +260,9 @@ export async function generateBotsForCurrentTime() {
     generationState.dailyCount += rooms.length
     generationState.currentHourGenerated = true
 
-    console.log(`🤖 ${timeOfDay} 시간대 봇 방 ${rooms.length}개 생성 완료`)
+    logger.info(`🤖 ${timeOfDay} 시간대 봇 방 ${rooms.length}개 생성 완료`)
   } catch (error) {
-    console.error('봇 방 생성 중 오류:', error)
+    logger.error('봇 방 생성 중 오류:', { error: error instanceof Error ? error.message : String(error) })
   }
 }
 
@@ -282,7 +283,7 @@ export async function generatePopularDistrictBots() {
       // 지역간 생성 간격
       await new Promise(resolve => setTimeout(resolve, Math.random() * 20000 + 5000))
     } catch (error) {
-      console.error(`${district} 봇 방 생성 실패:`, error)
+      logger.error(`${district} 봇 방 생성 실패:`, { error: error instanceof Error ? error.message : String(error) })
     }
   }
 }
@@ -316,7 +317,7 @@ export async function cleanupOldBotRooms() {
         }
       } catch (_error) {
         // 사용자 조회 실패 시 무시
-        console.warn('Failed to get user profile for cleanup:', (room as any).host_uid)
+        logger.warn('Failed to get user profile for cleanup:', (room as any).host_uid)
       }
     }
 
@@ -328,11 +329,11 @@ export async function cleanupOldBotRooms() {
         .in('id', botRooms)
 
       if (!deleteError) {
-        console.log(`🧹 오래된 봇 방 ${botRooms.length}개 정리 완료`)
+        logger.info(`🧹 오래된 봇 방 ${botRooms.length}개 정리 완료`)
       }
     }
   } catch (error) {
-    console.error('봇 방 정리 중 오류:', error)
+    logger.error('봇 방 정리 중 오류:', { error: error instanceof Error ? error.message : String(error) })
   }
 }
 
@@ -346,7 +347,7 @@ export function resetDailyStats() {
   if (now.getDate() !== lastReset.getDate()) {
     generationState.dailyCount = 0
     generationState.currentHourGenerated = false
-    console.log('📊 일일 봇 통계 리셋')
+    logger.info('📊 일일 봇 통계 리셋')
   }
 }
 
@@ -385,7 +386,7 @@ function getDayOfWeek(date: Date): string {
  *
  * // 통계 확인
  * const stats = BotManager.getStats()
- * console.log(stats.dailyCount)  // 오늘 생성된 봇 방 수
+ * logger.info(stats.dailyCount)  // 오늘 생성된 봇 방 수
  * ```
  */
 export const BotManager = {
@@ -396,7 +397,7 @@ export const BotManager = {
    */
   async start() {
     generationState.isActive = true
-    console.log('🤖 봇 시스템 시작')
+    logger.info('🤖 봇 시스템 시작')
 
     // 초기 봇 방 생성 (즉시 실행)
     await generateBotsForCurrentTime()
@@ -436,7 +437,7 @@ export const BotManager = {
    */
   stop() {
     generationState.isActive = false
-    console.log('🤖 봇 시스템 중지')
+    logger.info('🤖 봇 시스템 중지')
   },
 
   /**
@@ -455,7 +456,7 @@ export const BotManager = {
    * @param count 생성할 봇 방 개수 (기본값: 3)
    */
   async createManualBots(count: number = 3) {
-    console.log(`🎯 수동 봇 방 ${count}개 생성 시작`)
+    logger.info(`🎯 수동 봇 방 ${count}개 생성 시작`)
     const rooms = await generateTimeBasedBotRooms(count)
 
     for (const roomData of rooms) {

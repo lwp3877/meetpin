@@ -1,5 +1,7 @@
 /* src/lib/kakao.ts */
 
+import { logger } from '@/lib/observability/logger'
+
 // Kakao Maps API 관련 타입과 유틸리티
 
 // 기본 타입 정의
@@ -38,13 +40,13 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
 
   // 프로덕션에서 API 키가 없으면 더 자세한 오류 정보 제공
   if (!key) {
-    console.error('❌ Kakao Maps API 키가 설정되지 않았습니다.')
-    console.error('🔧 환경변수 확인 필요: NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY')
-    console.error('🌐 현재 도메인:', typeof window !== 'undefined' ? window.location.hostname : 'Unknown')
+    logger.error('❌ Kakao Maps API 키가 설정되지 않았습니다.')
+    logger.error('🔧 환경변수 확인 필요: NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY')
+    logger.error('🌐 현재 도메인', { domain: typeof window !== 'undefined' ? window.location.hostname : 'Unknown' })
 
     // 개발 환경에서는 Mock 모드 권장, 프로덕션에서는 즉시 실패
     if (process.env.NODE_ENV === 'development') {
-      console.warn('⚠️ 개발 환경: Mock 모드를 권장합니다.')
+      logger.warn('⚠️ 개발 환경: Mock 모드를 권장합니다.')
     }
 
     return Promise.reject(new Error(`Kakao Maps API 키가 설정되지 않았습니다. 환경변수 NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY를 확인하세요. (도메인: ${typeof window !== 'undefined' ? window.location.hostname : 'Unknown'})`))

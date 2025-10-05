@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import Send from 'lucide-react/dist/esm/icons/send'
+import { logger } from '@/lib/observability/logger'
 
 // 메시지 타입
 interface Message {
@@ -107,7 +108,7 @@ export default function ChatPanel({
         }
       }
     } catch (err: any) {
-      console.error('Messages load error:', err)
+      logger.error('Messages load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     } finally {
       setIsLoading(false)
@@ -141,7 +142,7 @@ export default function ChatPanel({
         textareaRef.current.style.height = 'auto'
       }
     } catch (err: any) {
-      console.error('Message send error:', err)
+      logger.error('Message send error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     } finally {
       setIsSending(false)

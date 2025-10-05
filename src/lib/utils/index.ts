@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx'
+import { logger } from '@/lib/observability/logger'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -157,7 +158,7 @@ export const storage = {
     try {
       localStorage.setItem(key, JSON.stringify(value))
     } catch (error) {
-      console.error('Failed to save to localStorage:', error)
+      logger.error('Failed to save to localStorage:', { error: error instanceof Error ? error.message : String(error) })
     }
   },
 
@@ -165,7 +166,7 @@ export const storage = {
     try {
       localStorage.removeItem(key)
     } catch (error) {
-      console.error('Failed to remove from localStorage:', error)
+      logger.error('Failed to remove from localStorage:', { error: error instanceof Error ? error.message : String(error) })
     }
   },
 }

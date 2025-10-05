@@ -7,7 +7,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useAuth } from '@/lib/useAuth'
 import toast from 'react-hot-toast'
 import { MeetPinNotifications, NotificationSettings } from '@/lib/services/notifications'
-import { logger } from '@/lib/utils/logger'
+import { logger } from '@/lib/observability/logger'
 
 interface HostMessage {
   id: string
@@ -114,7 +114,7 @@ export function useRealtimeNotifications({
     } catch (err: any) {
       // 프로덕션 모드에서만 오류 로그 출력
       if (process.env.NODE_ENV === 'production') {
-        console.error('Failed to load notifications:', err)
+        logger.error('Failed to load notifications:', { error: err instanceof Error ? err.message : String(err) })
         setError(err.message)
       }
     } finally {
@@ -151,7 +151,7 @@ export function useRealtimeNotifications({
         }
       } catch (err: any) {
         if (process.env.NODE_ENV === 'production') {
-          console.error('Failed to mark message as read:', err)
+          logger.error('Failed to mark message as read:', { error: err instanceof Error ? err.message : String(err) })
         }
       }
     },
@@ -176,7 +176,7 @@ export function useRealtimeNotifications({
       setMessages(prev => prev.map(msg => ({ ...msg, is_read: true })))
       setUnreadCount(0)
     } catch (err: any) {
-      console.error('Failed to mark all messages as read:', err)
+      logger.error('Failed to mark all messages as read:', { error: err instanceof Error ? err.message : String(err) })
     }
   }, [user, messages])
 
@@ -235,7 +235,7 @@ export function useRealtimeNotifications({
             }
           }
         } catch (err) {
-          console.error('Failed to process new message notification:', err)
+          logger.error('Failed to process new message notification:', { error: err instanceof Error ? err.message : String(err) })
           // 실패해도 전체 목록을 다시 로드
           loadMessages()
         }
@@ -294,7 +294,7 @@ export function useRealtimeNotifications({
     channel.subscribe(status => {
       // 개발 모드에서만 상태 로그 출력 (CLOSED는 정상)
       if (process.env.NODE_ENV === 'development' && status !== 'CLOSED') {
-        logger.info('Notifications channel status:', status)
+        logger.info('Notifications channel status', { status })
       }
 
       if (status === 'SUBSCRIBED') {

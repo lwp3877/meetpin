@@ -1,6 +1,8 @@
 /* src/lib/notifications.ts */
 'use client'
 
+import { logger } from '@/lib/observability/logger'
+
 export type NotificationPermission = 'default' | 'granted' | 'denied'
 
 export interface PushNotificationOptions {
@@ -51,16 +53,16 @@ export function getNotificationPermission(): NotificationPermission {
 // 알림 권한 요청
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!isNotificationSupported()) {
-    console.warn('Notifications not supported in this browser')
+    logger.warn('Notifications not supported in this browser')
     return 'denied'
   }
 
   try {
     const permission = await Notification.requestPermission()
-    console.log('Notification permission:', permission)
+    logger.info('Notification permission', { permission })
     return permission
   } catch (error) {
-    console.error('Error requesting notification permission:', error)
+    logger.error('Error requesting notification permission', { error: error instanceof Error ? error.message : String(error) })
     return 'denied'
   }
 }
@@ -68,7 +70,7 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 // 간단한 브라우저 알림 표시
 export function showNotification(options: PushNotificationOptions): Notification | null {
   if (!isNotificationSupported() || getNotificationPermission() !== 'granted') {
-    console.warn('Notifications not allowed')
+    logger.warn('Notifications not allowed')
     return null
   }
 
@@ -104,13 +106,13 @@ export function showNotification(options: PushNotificationOptions): Notification
         window.open(options.data.url, '_blank')
       } else if (options.data?.action) {
         // 커스텀 액션 처리
-        console.log('Notification action:', options.data.action)
+        logger.info('Notification action:', options.data.action)
       }
     }
 
     // 알림 에러 처리
     notification.onerror = error => {
-      console.error('Notification error:', error)
+      logger.error('Notification error:', { error: error instanceof Error ? error.message : String(error) })
     }
 
     // 자동 닫기 (30초 후)
@@ -120,7 +122,7 @@ export function showNotification(options: PushNotificationOptions): Notification
 
     return notification
   } catch (error) {
-    console.error('Error showing notification:', error)
+    logger.error('Error showing notification:', { error: error instanceof Error ? error.message : String(error) })
     return null
   }
 }
@@ -130,7 +132,7 @@ export async function showServiceWorkerNotification(
   options: PushNotificationOptions
 ): Promise<void> {
   if (!isServiceWorkerSupported()) {
-    console.warn('Service Worker not supported')
+    logger.warn('Service Worker not supported')
     return showNotification(options) ? undefined : undefined
   }
 
@@ -149,7 +151,7 @@ export async function showServiceWorkerNotification(
       // vibrate는 브라우저 호환성 문제로 제거
     })
   } catch (error) {
-    console.error('Error showing service worker notification:', error)
+    logger.error('Error showing service worker notification:', { error: error instanceof Error ? error.message : String(error) })
     // 폴백으로 일반 알림 사용
     showNotification(options)
   }
@@ -323,27 +325,27 @@ export async function initializeNotifications(): Promise<boolean> {
   try {
     // 기본 지원 확인
     if (!isNotificationSupported()) {
-      console.warn('Notifications not supported')
+      logger.warn('Notifications not supported')
       return false
     }
 
     // 권한 확인
     const permission = getNotificationPermission()
     if (permission === 'denied') {
-      console.warn('Notifications denied by user')
+      logger.warn('Notifications denied by user')
       return false
     }
 
     // 권한이 없으면 요청하지 않음 (사용자가 직접 허용해야 함)
     if (permission === 'default') {
-      console.info('Notification permission not granted yet')
+      logger.info('Notification permission not granted yet')
       return false
     }
 
-    console.log('Notifications initialized successfully')
+    logger.info('Notifications initialized successfully')
     return true
   } catch (error) {
-    console.error('Error initializing notifications:', error)
+    logger.error('Error initializing notifications:', { error: error instanceof Error ? error.message : String(error) })
     return false
   }
 }

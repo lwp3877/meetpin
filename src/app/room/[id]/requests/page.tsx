@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
 import { getCategoryDisplay } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface Request {
   id: string
@@ -80,7 +81,7 @@ export default function RoomRequestsPage() {
 
       setRequests(requestsResult.data.requests || [])
     } catch (err: any) {
-      console.error('Data load error:', err)
+      logger.error('Data load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     } finally {
       setLoading(false)
@@ -116,7 +117,7 @@ export default function RoomRequestsPage() {
       // 데이터 새로고침
       await loadData()
     } catch (err: any) {
-      console.error('Request action error:', err)
+      logger.error('Request action error:', { error: err instanceof Error ? err.message : String(err) })
       toast.error(err.message)
     } finally {
       setProcessing(null)

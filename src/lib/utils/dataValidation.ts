@@ -6,6 +6,7 @@
  */
 
 import { isDevelopmentMode } from '@/lib/services/authService'
+import { logger } from '@/lib/observability/logger'
 
 /**
  * 데이터 검증 결과 인터페이스
@@ -426,12 +427,12 @@ export class DataValidationMonitor {
    */
   static startMonitoring(): () => void {
     if (this.isMonitoring) {
-      console.warn('Data validation monitoring already started')
+      logger.warn('Data validation monitoring already started')
       return () => {}
     }
 
     this.isMonitoring = true
-    console.log('🔍 데이터 검증 모니터링 시작')
+    logger.info('🔍 데이터 검증 모니터링 시작')
 
     // 주기적으로 검증 결과 요약 출력
     const interval = setInterval(() => {
@@ -441,7 +442,7 @@ export class DataValidationMonitor {
     return () => {
       this.isMonitoring = false
       clearInterval(interval)
-      console.log('🔍 데이터 검증 모니터링 종료')
+      logger.info('🔍 데이터 검증 모니터링 종료')
     }
   }
 
@@ -539,14 +540,14 @@ export class DataValidationMonitor {
     // 에러가 있으면 콘솔에 즉시 출력 (개발 모드에서는 경고로)
     if (!result.isValid) {
       if (isDevelopmentMode()) {
-        console.warn(`⚠️ Data validation issues for ${endpoint} (Dev Mode):`, result.errors)
+        logger.warn(`⚠️ Data validation issues for ${endpoint} (Dev Mode):`, result.errors)
       } else {
-        console.error(`❌ Data validation failed for ${endpoint}:`, result.errors)
+        logger.error(`❌ Data validation failed for ${endpoint}:`, result.errors)
       }
     }
 
     if (result.warnings.length > 0) {
-      console.warn(`⚠️ Data validation warnings for ${endpoint}:`, result.warnings)
+      logger.warn(`⚠️ Data validation warnings for ${endpoint}:`, result.warnings)
     }
 
     return result
@@ -557,7 +558,7 @@ export class DataValidationMonitor {
    */
   static printValidationSummary() {
     if (this.validationResults.size === 0) {
-      console.log('📊 검증 결과: 아직 데이터가 없습니다')
+      logger.info('📊 검증 결과: 아직 데이터가 없습니다')
       return
     }
 
@@ -581,7 +582,7 @@ export class DataValidationMonitor {
       })
     })
 
-    console.log(`
+    logger.info(`
 📊 데이터 검증 요약 (환경: ${isDevelopmentMode() ? 'Mock' : 'Production'})
    - 검증된 엔드포인트: ${summary.totalEndpoints}개
    - 총 검증 횟수: ${summary.totalValidations}회
@@ -592,11 +593,11 @@ export class DataValidationMonitor {
 
     // 실패한 엔드포인트 상세 정보
     if (summary.failedValidations > 0) {
-      console.log('❌ 실패한 엔드포인트:')
+      logger.info('❌ 실패한 엔드포인트:')
       this.validationResults.forEach((results, endpoint) => {
         const failures = results.filter(r => !r.isValid)
         if (failures.length > 0) {
-          console.log(`   ${endpoint}: ${failures.length}회 실패`)
+          logger.info(`   ${endpoint}: ${failures.length}회 실패`)
         }
       })
     }
@@ -607,7 +608,7 @@ export class DataValidationMonitor {
    */
   static clearResults() {
     this.validationResults.clear()
-    console.log('🗑️ 검증 결과 초기화됨')
+    logger.info('🗑️ 검증 결과 초기화됨')
   }
 }
 
@@ -615,11 +616,11 @@ export class DataValidationMonitor {
  * 전역 데이터 검증 초기화
  */
 export function initializeDataValidation() {
-  console.log('🔍 데이터 검증 시스템 초기화')
+  logger.info('🔍 데이터 검증 시스템 초기화')
 
   // 현재 환경 로깅
   const environment = isDevelopmentMode() ? 'Mock' : 'Production'
-  console.log(`📊 현재 환경: ${environment}`)
+  logger.info(`📊 현재 환경: ${environment}`)
 
   // 실시간 모니터링 시작
   const stopMonitoring = DataValidationMonitor.startMonitoring()
@@ -648,7 +649,7 @@ export function initializeDataValidation() {
     }
   }
 
-  console.log('✅ 데이터 검증 시스템 초기화 완료')
+  logger.info('✅ 데이터 검증 시스템 초기화 완료')
 
   return stopMonitoring
 }

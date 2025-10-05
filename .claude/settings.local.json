@@ -1,10 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm playwright install:*)",
-      "Bash(set TEST_URL=https://meetpin-weld.vercel.app)",
-      "Bash(for endpoint in \"/api/health\" \"/api/ready\" \"/api/status\")",
-      "Bash(do echo -n \"$endpoint: \")"
+      "Bash(git restore:*)",
+      "Bash(for file in src/lib/api.ts src/lib/cache/redis.ts src/lib/rateLimit.ts src/lib/supabaseClient.ts)",
+      "Bash(do echo \"=== $file ===\")"
     ],
     "deny": [],
     "ask": []

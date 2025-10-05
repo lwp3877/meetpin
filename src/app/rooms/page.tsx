@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/useAuth'
 import { Button } from '@/components/ui/button'
 import { getCategoryDisplay } from '@/lib/config/brand'
 import toast from 'react-hot-toast'
+import { logger } from '@/lib/observability/logger'
 
 interface Room {
   id: string
@@ -46,7 +47,7 @@ export default function MyRoomsPage() {
 
       setRooms(result.data.rooms || [])
     } catch (err: any) {
-      console.error('My rooms load error:', err)
+      logger.error('My rooms load error:', { error: err instanceof Error ? err.message : String(err) })
       setError(err.message)
     } finally {
       setLoading(false)
