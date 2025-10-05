@@ -1,0 +1,255 @@
+
+Running 12 tests using 1 worker
+
+[1A[2K[1/12] [chromium] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance
+Network mocks setup completed
+
+[1A[2K🔍 A11Y Scan Results:
+      - Critical violations: 0
+      - Serious violations: 1
+      - Moderate violations: 0
+      - Minor violations: 0
+    
+
+[1A[2K❌ SERIOUS A11Y VIOLATIONS: [
+  {
+    id: [32m'color-contrast'[39m,
+    impact: [32m'serious'[39m,
+    tags: [
+      [32m'cat.color'[39m,
+      [32m'wcag2aa'[39m,
+      [32m'wcag143'[39m,
+      [32m'TTv5'[39m,
+      [32m'TT13.c'[39m,
+      [32m'EN-301-549'[39m,
+      [32m'EN-9.1.4.3'[39m,
+      [32m'ACT'[39m
+    ],
+    description: [32m'Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds'[39m,
+    help: [32m'Elements must meet minimum color contrast ratio thresholds'[39m,
+    helpUrl: [32m'https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright'[39m,
+    nodes: [ [36m[Object][39m, [36m[Object][39m, [36m[Object][39m, [36m[Object][39m, [36m[Object][39m, [36m[Object][39m ]
+  }
+]
+
+[1A[2K
+ VIOLATION 1: color-contrast
+
+[1A[2K  Description: Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
+
+[1A[2K
+  Element 1:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(1) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K
+  Element 2:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(2) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K
+  Element 3:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(3) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K
+  Element 4:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(4) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K
+  Element 5:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(5) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K
+  Element 6:
+
+[1A[2K    HTML: <span>자세히 보기</span>
+
+[1A[2K    Target: [
+  [32m'.hover\\:border-green-500.cursor-pointer.hover\\:-translate-y-1:nth-child(6) > .pt-4.border-t.justify-between > .group-hover\\:translate-x-1.transition-transform.space-x-1 > span'[39m
+]
+
+[1A[2K    Message: Fix any of the following:
+  Element has insufficient color contrast of 3.76 (foreground color: #059669, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1
+
+[1A[2K  1) [chromium] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance 
+
+    Error: Serious accessibility violations must be 0
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      54 |     // High severity issues (critical + serious) must be 0
+      55 |     expect(criticalViolations.length, 'Critical accessibility violations must be 0').toBe(0);
+    > 56 |     expect(seriousViolations.length, 'Serious accessibility violations must be 0').toBe(0);
+         |                                                                                    ^
+      57 |
+      58 |     console.log('✅ High severity accessibility issues: 0');
+      59 |   });
+        at C:\Users\이원표\Desktop\meetpin\tests\e2e\07-accessibility.spec.ts:56:84
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-8d680-an---WCAG-2-1-AA-compliance-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-8d680-an---WCAG-2-1-AA-compliance-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-8d680-an---WCAG-2-1-AA-compliance-chromium\video-1.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-accessibility-Accessibi-8d680-an---WCAG-2-1-AA-compliance-chromium\error-context.md
+
+
+[1A[2K[2/12] [chromium] › tests\e2e\07-accessibility.spec.ts:61:7 › Accessibility (A11Y) Compliance › map page accessibility scan
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:61:7 › Accessibility (A11Y) Compliance › map page accessibility scan
+Network mocks setup completed
+
+[1A[2K🗺️ Map A11Y Scan: 0 high severity violations
+
+[1A[2K[3/12] [chromium] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan
+Network mocks setup completed
+
+[1A[2K📝 Auth Forms A11Y Scan: 1 high severity violations
+
+[1A[2K  2) [chromium] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan 
+
+    Error: High severity violations on auth forms must be 0
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      91 |     console.log(`📝 Auth Forms A11Y Scan: ${highSeverityViolations.length} high severity violations`);
+      92 |
+    > 93 |     expect(highSeverityViolations.length, 'High severity violations on auth forms must be 0').toBe(0);
+         |                                                                                               ^
+      94 |   });
+      95 |
+      96 |   test('keyboard navigation support', async ({ page }) => {
+        at C:\Users\이원표\Desktop\meetpin\tests\e2e\07-accessibility.spec.ts:93:95
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-ac92a-th-forms-accessibility-scan-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-ac92a-th-forms-accessibility-scan-chromium\video-1.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\07-accessibility-Accessibi-ac92a-th-forms-accessibility-scan-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-accessibility-Accessibi-ac92a-th-forms-accessibility-scan-chromium\error-context.md
+
+
+[1A[2K[4/12] [chromium] › tests\e2e\07-accessibility.spec.ts:96:7 › Accessibility (A11Y) Compliance › keyboard navigation support
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:96:7 › Accessibility (A11Y) Compliance › keyboard navigation support
+Network mocks setup completed
+
+[1A[2K✅ Keyboard navigation support verified
+
+[1A[2K[5/12] [chromium] › tests\e2e\07-accessibility.spec.ts:115:7 › Accessibility (A11Y) Compliance › aria labels and roles verification
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:115:7 › Accessibility (A11Y) Compliance › aria labels and roles verification
+Network mocks setup completed
+
+[1A[2K✅ ARIA labels and roles verification passed
+
+[1A[2K[6/12] [chromium] › tests\e2e\07-accessibility.spec.ts:143:7 › Accessibility (A11Y) Compliance › color contrast verification
+[1A[2K[chromium] › tests\e2e\07-accessibility.spec.ts:143:7 › Accessibility (A11Y) Compliance › color contrast verification
+Network mocks setup completed
+
+[1A[2K🎨 Color Contrast Check: 0 violations
+
+[1A[2K[7/12] [firefox] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance
+Network mocks setup completed
+
+[1A[2K🔍 A11Y Scan Results:
+      - Critical violations: 0
+      - Serious violations: 0
+      - Moderate violations: 0
+      - Minor violations: 0
+    
+
+[1A[2K✅ High severity accessibility issues: 0
+
+[1A[2K[8/12] [firefox] › tests\e2e\07-accessibility.spec.ts:61:7 › Accessibility (A11Y) Compliance › map page accessibility scan
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:61:7 › Accessibility (A11Y) Compliance › map page accessibility scan
+Network mocks setup completed
+
+[1A[2K🗺️ Map A11Y Scan: 0 high severity violations
+
+[1A[2K[9/12] [firefox] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan
+Network mocks setup completed
+
+[1A[2K📝 Auth Forms A11Y Scan: 0 high severity violations
+
+[1A[2K[10/12] [firefox] › tests\e2e\07-accessibility.spec.ts:96:7 › Accessibility (A11Y) Compliance › keyboard navigation support
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:96:7 › Accessibility (A11Y) Compliance › keyboard navigation support
+Network mocks setup completed
+
+[1A[2K✅ Keyboard navigation support verified
+
+[1A[2K[11/12] [firefox] › tests\e2e\07-accessibility.spec.ts:115:7 › Accessibility (A11Y) Compliance › aria labels and roles verification
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:115:7 › Accessibility (A11Y) Compliance › aria labels and roles verification
+Network mocks setup completed
+
+[1A[2K✅ ARIA labels and roles verification passed
+
+[1A[2K[12/12] [firefox] › tests\e2e\07-accessibility.spec.ts:143:7 › Accessibility (A11Y) Compliance › color contrast verification
+[1A[2K[firefox] › tests\e2e\07-accessibility.spec.ts:143:7 › Accessibility (A11Y) Compliance › color contrast verification
+Network mocks setup completed
+
+[1A[2K🎨 Color Contrast Check: 0 violations
+
+[1A[2K  2 failed
+    [chromium] › tests\e2e\07-accessibility.spec.ts:13:7 › Accessibility (A11Y) Compliance › homepage accessibility scan - WCAG 2.1 AA compliance 
+    [chromium] › tests\e2e\07-accessibility.spec.ts:79:7 › Accessibility (A11Y) Compliance › auth forms accessibility scan 
+  10 passed (42.0s)
