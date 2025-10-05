@@ -197,10 +197,10 @@ export default function ProLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <button onClick={() => router.push('/')} className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-emerald-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                 <MapPin className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-emerald-700 bg-clip-text text-transparent">
                 밋핀
               </span>
             </button>
@@ -209,7 +209,7 @@ export default function ProLanding() {
               {user ? (
                 <button
                   onClick={() => router.push('/map')}
-                  className="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all"
+                  className="px-6 py-2.5 bg-gradient-to-r from-primary-600 to-emerald-700 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all"
                 >
                   지도 보기
                 </button>
@@ -217,13 +217,13 @@ export default function ProLanding() {
                 <>
                   <button
                     onClick={() => router.push('/auth/login')}
-                    className="px-4 py-2 text-gray-600 hover:text-green-600 font-medium transition-colors"
+                    className="px-4 py-2 text-gray-600 hover:text-primary-600 font-medium transition-colors"
                   >
                     로그인
                   </button>
                   <button
                     onClick={handleGetStarted}
-                    className="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all"
+                    className="px-6 py-2.5 bg-gradient-to-r from-primary-600 to-emerald-700 text-white rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all"
                   >
                     시작하기
                   </button>
@@ -241,10 +241,10 @@ export default function ProLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
             {/* 라이브 뱃지 */}
-            <div className="inline-flex items-center space-x-2 bg-white shadow-sm px-4 py-2 rounded-full mb-8 border border-green-100">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="inline-flex items-center space-x-2 bg-white shadow-sm px-4 py-2 rounded-full mb-8 border border-primary-100">
+              <div className="w-2 h-2 bg-primary-600 rounded-full animate-pulse"></div>
               <span className="text-sm font-medium text-gray-700">
-                지금 <span className="text-green-600 font-bold">127개 모임</span>이 진행중이에요
+                지금 <span className="text-primary-600 font-bold">127개 모임</span>이 진행중이에요
               </span>
             </div>
 
@@ -252,21 +252,21 @@ export default function ProLanding() {
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               내 주변에서
               <br />
-              <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary-600 via-emerald-700 to-teal-700 bg-clip-text text-transparent">
                 바로 만나요
               </span>
             </h1>
 
             <p className="text-xl sm:text-2xl text-gray-600 mb-10 leading-relaxed">
               술 한잔, 운동, 취미까지<br className="sm:hidden" />
-              <span className="font-semibold text-green-600">오늘 바로 만날 수 있어요</span>
+              <span className="font-semibold text-primary-600">오늘 바로 만날 수 있어요</span>
             </p>
 
             {/* CTA 버튼 */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <button
                 onClick={handleGetStarted}
-                className="w-full sm:w-auto group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center space-x-2"
+                className="w-full sm:w-auto group px-8 py-4 bg-gradient-to-r from-primary-600 to-emerald-700 text-white rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center space-x-2"
               >
                 <span>무료로 시작하기</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -275,7 +275,7 @@ export default function ProLanding() {
                 onClick={handleExploreMap}
                 className="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 rounded-full font-bold text-lg hover:shadow-xl transition-all border-2 border-gray-200 flex items-center justify-center space-x-2"
               >
-                <MapPin className="w-5 h-5 text-green-600" />
+                <MapPin className="w-5 h-5 text-primary-600" />
                 <span>지도에서 둘러보기</span>
               </button>
             </div>
@@ -283,11 +283,11 @@ export default function ProLanding() {
             {/* 소셜 프루프 */}
             <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5 text-primary-600" />
                 <span className="font-medium">신용카드 필요 없음</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5 text-primary-600" />
                 <span className="font-medium">3,200+ 활동 회원</span>
               </div>
               <div className="flex items-center space-x-2">
@@ -363,20 +363,20 @@ export default function ProLanding() {
               <div
                 key={room.id}
                 onClick={() => handleRoomClick(room.id)}
-                className="group bg-white rounded-2xl border-2 border-gray-100 hover:border-green-500 p-6 cursor-pointer hover:shadow-xl transition-all transform hover:-translate-y-1"
+                className="group bg-white rounded-2xl border-2 border-gray-100 hover:border-primary-600 p-6 cursor-pointer hover:shadow-xl transition-all transform hover:-translate-y-1"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 flex-1 group-hover:text-green-600 transition-colors">
+                  <h3 className="text-lg font-bold text-gray-900 flex-1 group-hover:text-primary-600 transition-colors">
                     {room.title}
                   </h3>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                  <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
                     {room.participants}/{room.maxParticipants}
                   </span>
                 </div>
 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-gray-600 text-sm">
-                    <MapPin className="w-4 h-4 mr-2 text-green-600 flex-shrink-0" />
+                    <MapPin className="w-4 h-4 mr-2 text-primary-600 flex-shrink-0" />
                     <span className="truncate">{room.location}</span>
                     <span className="ml-auto text-xs text-gray-500">{room.distance}</span>
                   </div>
@@ -405,10 +405,7 @@ export default function ProLanding() {
                   <span className="text-sm font-semibold text-gray-900">
                     {room.fee === 0 ? '무료' : `₩${room.fee.toLocaleString()}`}
                   </span>
-                  <button className="text-green-600 font-medium text-sm flex items-center space-x-1 group-hover:translate-x-1 transition-transform">
-                    <span>자세히 보기</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <ChevronRight className="w-5 h-5 text-primary-700 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             ))}
@@ -417,7 +414,7 @@ export default function ProLanding() {
           <div className="text-center">
             <button
               onClick={handleExploreMap}
-              className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center space-x-2"
+              className="px-8 py-4 bg-gradient-to-r from-primary-600 to-emerald-700 text-white rounded-full font-bold text-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center space-x-2"
             >
               <span>지도에서 더 많은 모임 보기</span>
               <ArrowRight className="w-5 h-5" />
@@ -434,7 +431,7 @@ export default function ProLanding() {
               const Icon = feature.icon
               return (
                 <div key={idx} className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Icon className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -443,7 +440,7 @@ export default function ProLanding() {
                   <p className="text-gray-600 text-sm mb-3">
                     {feature.description}
                   </p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-primary-600">
                     {feature.stat}
                   </p>
                 </div>
@@ -481,7 +478,7 @@ export default function ProLanding() {
                     <p className="font-semibold text-gray-900">{review.name}</p>
                     <p className="text-sm text-gray-500">{review.age}세 • {review.category}</p>
                   </div>
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-emerald-700 rounded-full flex items-center justify-center text-white font-bold">
                     {review.name[0]}
                   </div>
                 </div>
@@ -492,28 +489,28 @@ export default function ProLanding() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-primary-600 via-emerald-600 to-teal-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             오늘 바로 만나보세요
           </h2>
-          <p className="text-xl text-green-100 mb-10">
+          <p className="text-xl text-primary-100 mb-10">
             회원가입 30초면 끝. 지금 바로 내 주변 모임을 찾아보세요.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <button
               onClick={handleGetStarted}
-              className="w-full sm:w-auto px-10 py-5 bg-white text-green-600 rounded-full font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-2"
+              className="w-full sm:w-auto px-10 py-5 bg-white text-primary-600 rounded-full font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl flex items-center justify-center space-x-2"
             >
               <span>무료로 시작하기</span>
               <ArrowRight className="w-6 h-6" />
             </button>
           </div>
 
-          <div className="flex items-center justify-center space-x-6 text-green-100">
+          <div className="flex items-center justify-center space-x-6 text-primary-100">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5" />
               <span>신용카드 불필요</span>
@@ -533,29 +530,29 @@ export default function ProLanding() {
             <div>
               <h4 className="text-white font-semibold mb-4">서비스</h4>
               <ul className="space-y-2">
-                <li><button onClick={() => router.push('/map')} className="hover:text-green-400 transition-colors">모임 찾기</button></li>
-                <li><button onClick={() => router.push('/room/new')} className="hover:text-green-400 transition-colors">모임 만들기</button></li>
+                <li><button onClick={() => router.push('/map')} className="hover:text-primary-500 transition-colors">모임 찾기</button></li>
+                <li><button onClick={() => router.push('/room/new')} className="hover:text-primary-500 transition-colors">모임 만들기</button></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">고객지원</h4>
               <ul className="space-y-2">
-                <li><button onClick={() => router.push('/help')} className="hover:text-green-400 transition-colors">도움말</button></li>
-                <li><button onClick={() => router.push('/contact')} className="hover:text-green-400 transition-colors">문의하기</button></li>
+                <li><button onClick={() => router.push('/help')} className="hover:text-primary-500 transition-colors">도움말</button></li>
+                <li><button onClick={() => router.push('/contact')} className="hover:text-primary-500 transition-colors">문의하기</button></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">법적고지</h4>
               <ul className="space-y-2">
-                <li><button onClick={() => router.push('/legal/terms')} className="hover:text-green-400 transition-colors">이용약관</button></li>
-                <li><button onClick={() => router.push('/legal/privacy')} className="hover:text-green-400 transition-colors">개인정보처리방침</button></li>
+                <li><button onClick={() => router.push('/legal/terms')} className="hover:text-primary-500 transition-colors">이용약관</button></li>
+                <li><button onClick={() => router.push('/legal/privacy')} className="hover:text-primary-500 transition-colors">개인정보처리방침</button></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">밋핀</h4>
               <p className="text-sm mb-4">내 주변에서 바로 만나요</p>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-emerald-700 rounded-lg flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-white font-bold">밋핀</span>

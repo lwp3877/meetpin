@@ -319,6 +319,7 @@ input[type='submit']:active,
    터치 인터페이스 최적화
    ====================================== */
 
+
 /* 터치 하이라이트 제거 */
 * {
   -webkit-tap-highlight-color: transparent;
