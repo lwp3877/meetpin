@@ -492,6 +492,36 @@ export default function ProfilePage() {
               </div>
             </Link>
 
+            {/* Safety Settings */}
+            <Link href="/settings/safety" className="block">
+              <div className="transform rounded-2xl border border-white/50 bg-white/80 p-5 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-500">
+                      <span className="text-xl">🛡️</span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">안전 설정</div>
+                      <div className="text-sm text-gray-600">안전 옵션 및 본인 인증</div>
+                    </div>
+                  </div>
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+
             {/* Admin Panel (관리자만) */}
             {user.role === 'admin' && (
               <Link href="/admin" className="block">
