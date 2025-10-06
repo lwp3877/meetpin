@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
 import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
-import { logger } from '@/lib/observability/logger'
+// logger import 제거 - 순환 의존성 방지 (api.ts는 서버 전용, logger는 클라이언트/서버 공용)
 
 /**
  * 간단한 인메모리 레이트 리미팅 스토어
@@ -140,7 +140,7 @@ export async function parseAndValidateBody<T>(
       const message = (error as any).errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
       throw new ApiError(`입력 데이터가 올바르지 않습니다: ${message}`, 400, 'VALIDATION_ERROR')
     }
-    logger.error('Parse error', { error: error instanceof Error ? error.message : String(error) })
+    console.error('[API] Parse error:', error instanceof Error ? error.message : String(error))
     throw new ApiError('요청 데이터 처리 중 오류가 발생했습니다', 400, 'PARSE_ERROR')
   }
 }
@@ -174,7 +174,7 @@ export function parsePaginationParams(searchParams: URLSearchParams): {
 // Rate Limit 체크 미들웨어
 export function withRateLimit(type: RateLimitType = 'api') {
   return (handler: ApiHandler) => {
-    return async (request: NextRequest, context: any) => {
+    return async (request: NextRequest, context: ApiRouteContext) => {
       const ip = getClientIP(request)
 
       // IP 기반 Rate Limit
@@ -193,7 +193,7 @@ export function withRateLimit(type: RateLimitType = 'api') {
 
 // 인증 미들웨어
 export function withAuth(handler: AuthenticatedApiHandler) {
-  return async (request: NextRequest, context: any) => {
+  return async (request: NextRequest, context: ApiRouteContext) => {
     const user = await getAuthenticatedUser()
     return await handler(request, context, user)
   }
@@ -201,7 +201,7 @@ export function withAuth(handler: AuthenticatedApiHandler) {
 
 // 관리자 권한 미들웨어
 export function withAdminAuth(handler: AuthenticatedApiHandler) {
-  return async (request: NextRequest, context: any) => {
+  return async (request: NextRequest, context: ApiRouteContext) => {
     const user = await requireAdmin()
     return await handler(request, context, user)
   }
@@ -210,7 +210,7 @@ export function withAdminAuth(handler: AuthenticatedApiHandler) {
 // 사용자별 Rate Limit 체크 (인증 필요)
 export function withUserRateLimit(type: RateLimitType) {
   return (handler: AuthenticatedApiHandler) => {
-    return withAuth(async (request: NextRequest, context: any, user) => {
+    return withAuth(async (request: NextRequest, context: ApiRouteContext, user) => {
       const ip = getClientIP(request)
 
       // 사용자 + IP 기반 Rate Limit (더 엄격)
@@ -229,11 +229,11 @@ export function withUserRateLimit(type: RateLimitType) {
 
 // 에러 처리 미들웨어 (강화된 버전)
 export function withErrorHandling(handler: ApiHandler) {
-  return async (request: NextRequest, context: any): Promise<NextResponse> => {
+  return async (request: NextRequest, context: ApiRouteContext): Promise<NextResponse> => {
     try {
       return await handler(request, context)
     } catch (error: unknown) {
-      logger.error('API Error', { error: error instanceof Error ? error.message : String(error), stack: (error as Error)?.stack })
+      console.error('[API] Error:', error instanceof Error ? error.message : String(error), (error as Error)?.stack)
 
       if (error instanceof ApiError) {
         return createErrorResponse((error as Error).message, (error as any).status, error.code)
@@ -278,7 +278,7 @@ export function withErrorHandling(handler: ApiHandler) {
           case 'JWT_INVALID':
             return createErrorResponse('잘못된 인증 토큰입니다', 401, 'TOKEN_INVALID')
           default:
-            logger.error('Supabase Error', { error: (error as Error).message || String(error), code: (error as any).code })
+            console.error('[API] Supabase Error:', (error as Error).message || String(error), 'code:', (error as any).code)
         }
       }
 
@@ -315,11 +315,13 @@ export function createMethodRouter(handlers: {
 }
 
 // 타입 정의
-export type ApiHandler = (request: NextRequest, context: any) => Promise<NextResponse>
+export type ApiRouteContext = { params: Promise<Record<string, string | string[]>> }
+
+export type ApiHandler = (request: NextRequest, context: ApiRouteContext) => Promise<NextResponse>
 
 export type AuthenticatedApiHandler = (
   request: NextRequest,
-  context: any,
+  context: ApiRouteContext,
   user: { id: string; email?: string }
 ) => Promise<NextResponse>
 

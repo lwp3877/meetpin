@@ -92,7 +92,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // 데이터베이스에 신고 저장
-    const { data: report, error: insertError } = (await (supabase as any)
+    const { data: report, error: insertError } = await (supabase as any)
       .from('emergency_reports')
       .insert([reportData])
       .select(
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         created_at
       `
       )
-      .single()) as { data: any | null; error: any }
+      .single()
 
     if (insertError) {
       logger.error('Emergency report insert error:', { error: insertError instanceof Error ? insertError.message : String(insertError) })
@@ -183,13 +183,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const user = await getAuthenticatedUser()
     const supabase = await createServerSupabaseClient()
 
-    const { data: profile } = (await supabase
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()) as { data: any | null; error: any }
+      .single()
 
-    if (profile?.role !== 'admin') {
+    if ((profile as Record<string, unknown> | null)?.role !== 'admin') {
       throw new ApiError('관리자 권한이 필요합니다.', 403)
     }
 
@@ -236,8 +236,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         },
       },
     } satisfies ApiResponse<{
-      reports: any[]
-      stats: any
+      reports: Record<string, unknown>[]
+      stats: unknown
       pagination: {
         limit: number
         offset: number

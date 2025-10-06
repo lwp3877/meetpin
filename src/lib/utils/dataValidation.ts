@@ -160,9 +160,9 @@ export class APIResponseValidator {
       }
 
       // Mock 데이터의 실제성 검증
-      if (data.lat && data.lng) {
+      if ((data as any).lat && (data as any).lng) {
         const isSeoulArea =
-          data.lat >= 37.4 && data.lat <= 37.7 && data.lng >= 126.7 && data.lng <= 127.2
+          (data as any).lat >= 37.4 && (data as any).lat <= 37.7 && (data as any).lng >= 126.7 && (data as any).lng <= 127.2
         if (!isSeoulArea) {
           result.warnings.push('Location outside Seoul area (unusual for mock data)')
         }
@@ -188,37 +188,37 @@ export class APIResponseValidator {
     const requiredFields = ['id', 'email', 'role', 'created_at']
 
     requiredFields.forEach(field => {
-      if (!data.hasOwnProperty(field)) {
+      if (!(data as any).hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
         result.isValid = false
       }
     })
 
     // 이메일 형식 검증
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    if ((data as any).email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((data as any).email)) {
       result.errors.push('email must be valid email format')
       result.isValid = false
     }
 
     // 역할 검증
-    if (data.role && !['user', 'admin'].includes(data.role)) {
+    if ((data as any).role && !['user', 'admin'].includes((data as any).role)) {
       result.errors.push('role must be user or admin')
       result.isValid = false
     }
 
     // 나이대 검증 (선택적)
-    if (data.age_range && !['10대', '20대', '30대', '40대', '50대 이상'].includes(data.age_range)) {
+    if ((data as any).age_range && !['10대', '20대', '30대', '40대', '50대 이상'].includes((data as any).age_range)) {
       result.errors.push('age_range must be valid Korean age range')
       result.isValid = false
     }
 
     // Mock vs Real 데이터 특징 확인
     if (result.environment === 'mock') {
-      if (data.email && data.email.endsWith('@meetpin.com')) {
+      if ((data as any).email && (data as any).email.endsWith('@meetpin.com')) {
         result.warnings.push('Mock email domain detected')
       }
 
-      if (data.id && data.id.startsWith('mock-')) {
+      if ((data as any).id && (data as any).id.startsWith('mock-')) {
         result.warnings.push('Mock ID prefix detected')
       }
     }
@@ -241,18 +241,18 @@ export class APIResponseValidator {
     const requiredFields = ['id', 'room_id', 'user1_id', 'user2_id', 'status', 'created_at']
 
     requiredFields.forEach(field => {
-      if (!data.hasOwnProperty(field)) {
+      if (!(data as any).hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
         result.isValid = false
       }
     })
 
-    if (data.status && !['active', 'ended', 'blocked'].includes(data.status)) {
+    if ((data as any).status && !['active', 'ended', 'blocked'].includes((data as any).status)) {
       result.errors.push('status must be active, ended, or blocked')
       result.isValid = false
     }
 
-    if (data.user1_id === data.user2_id) {
+    if ((data as any).user1_id === (data as any).user2_id) {
       result.errors.push('user1_id and user2_id must be different')
       result.isValid = false
     }
@@ -275,18 +275,18 @@ export class APIResponseValidator {
     const requiredFields = ['id', 'sender_id', 'match_id', 'content', 'created_at']
 
     requiredFields.forEach(field => {
-      if (!data.hasOwnProperty(field)) {
+      if (!(data as any).hasOwnProperty(field)) {
         result.errors.push(`Missing required field: ${field}`)
         result.isValid = false
       }
     })
 
-    if (data.content && typeof data.content !== 'string') {
+    if ((data as any).content && typeof (data as any).content !== 'string') {
       result.errors.push('content must be string')
       result.isValid = false
     }
 
-    if (data.content && data.content.length > 1000) {
+    if ((data as any).content && (data as any).content.length > 1000) {
       result.warnings.push('content is very long (>1000 chars)')
     }
 
@@ -301,7 +301,7 @@ export class MockDataQualityValidator {
   /**
    * Mock 데이터의 현실성 검증
    */
-  static validateMockRealism(data: any[], schema: string): ValidationResult {
+  static validateMockRealism(data: Record<string, unknown>[], schema: string): ValidationResult {
     const result: ValidationResult = {
       isValid: true,
       errors: [],
@@ -330,7 +330,7 @@ export class MockDataQualityValidator {
       }
 
       // 시간 분포 검증
-      const startTimes = data.map(item => new Date(item.start_at).getHours())
+      const startTimes = data.map((item: any) => new Date(item.start_at).getHours())
       const timeDistribution = new Set(startTimes)
       if (timeDistribution.size < 3) {
         result.warnings.push('Limited time diversity in mock data')
@@ -362,6 +362,8 @@ export class MockDataQualityValidator {
 
   /**
    * Mock과 실제 데이터 스키마 호환성 검증
+   * @param mockData - Mock data object (any is justified for schema comparison)
+   * @param realDataSample - Real data sample (any is justified for schema comparison)
    */
   static validateSchemaCompatibility(mockData: any, realDataSample: any): ValidationResult {
     const result: ValidationResult = {
@@ -448,6 +450,7 @@ export class DataValidationMonitor {
 
   /**
    * API 응답 자동 검증
+   * @param data - Dynamic API response data (any is justified for generic validation)
    */
   static validateAPIResponse(endpoint: string, data: any): ValidationResult {
     let result: ValidationResult

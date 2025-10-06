@@ -67,7 +67,7 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
       } = await supabase.auth.getUser()
 
       if (authError || !authUser) {
-        logAuthState('No authenticated user found', authError)
+        logAuthState('No authenticated user found', authError as any)
         return null
       }
 
@@ -79,7 +79,7 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
         .single()
 
       if (profileError) {
-        logAuthState('Failed to fetch user profile', profileError)
+        logAuthState('Failed to fetch user profile', profileError as any)
         return null
       }
 
@@ -101,8 +101,8 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
         created_at: profileData.created_at,
       }
     }
-  } catch (error) {
-    logAuthState('Error in getCurrentUser', error)
+  } catch (error: unknown) {
+    logAuthState('Error in getCurrentUser', error as any)
     return null
   }
 }
@@ -131,7 +131,7 @@ export const signInWithEmail = async (email: string, password: string): Promise<
       })
 
       if (error) {
-        logAuthState('Sign in failed', error)
+        logAuthState('Sign in failed', error as any)
         return {
           success: false,
           error:
@@ -148,7 +148,7 @@ export const signInWithEmail = async (email: string, password: string): Promise<
       return { success: true }
     }
   } catch (error: unknown) {
-    logAuthState('Unexpected error in signInWithEmail', error)
+    logAuthState('Unexpected error in signInWithEmail', error as any)
     return {
       success: false,
       error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
@@ -180,7 +180,7 @@ export const signUpWithEmail = async (
       })
 
       if (signUpError) {
-        logAuthState('Sign up failed', signUpError)
+        logAuthState('Sign up failed', signUpError as any)
         return {
           success: false,
           error: signUpError.message.includes('already registered')
@@ -204,14 +204,14 @@ export const signUpWithEmail = async (
         .eq('uid', data.user.id)
 
       if (profileError) {
-        logAuthState('Profile update failed after signup', profileError)
+        logAuthState('Profile update failed after signup', profileError as any)
         // 프로필 업데이트 실패해도 회원가입은 성공으로 처리
       }
 
       return { success: true }
     }
   } catch (error: unknown) {
-    logAuthState('Unexpected error in signUpWithEmail', error)
+    logAuthState('Unexpected error in signUpWithEmail', error as any)
     return {
       success: false,
       error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
@@ -237,12 +237,12 @@ export const signOut = async (): Promise<void> => {
       const { error } = await supabase.auth.signOut()
 
       if (error) {
-        logAuthState('Sign out failed', error)
+        logAuthState('Sign out failed', error as any)
         // 에러가 있어도 로그아웃 처리 (클라이언트 사이드 정리)
       }
     }
-  } catch (error) {
-    logAuthState('Unexpected error in signOut', error)
+  } catch (error: unknown) {
+    logAuthState('Unexpected error in signOut', error as any)
     // 에러가 있어도 로그아웃 처리
   }
 }
@@ -306,7 +306,7 @@ export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<Aut
       return { success: true }
     }
   } catch (error: unknown) {
-    logAuthState('Unexpected error in updateUserProfile', error)
+    logAuthState('Unexpected error in updateUserProfile', error as any)
     return {
       success: false,
       error: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
@@ -315,7 +315,7 @@ export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<Aut
 }
 
 // 개발 모드 로깅 유틸리티
-export const logAuthState = (message: string, data?: any): void => {
+export const logAuthState = (message: string, data?: Record<string, unknown>): void => {
   if (isDevelopmentMode()) {
     logger.debug(`[authService] ${message}`, data)
   }

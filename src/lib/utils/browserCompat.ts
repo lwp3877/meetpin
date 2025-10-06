@@ -1,7 +1,6 @@
 /* src/lib/utils/browserCompat.ts */
 
 import { logger } from '@/lib/observability/logger'
-
 /**
  * 브라우저 호환성 및 성능 최적화 유틸리티
  * 실제 사용자 테스트에서 모든 브라우저와 기기에서 완벽한 동작 보장
@@ -515,7 +514,7 @@ export class CompatibilityPatches {
           supportsPassive = true
         },
       })
-      window.addEventListener('test', null as any, opts)
+      window.addEventListener('test', null as any, opts as any)
     } catch (_e) {}
 
     // 패치가 필요한 경우 글로벌 설정

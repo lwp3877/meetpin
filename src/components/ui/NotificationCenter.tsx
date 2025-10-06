@@ -24,7 +24,7 @@ interface Notification {
   createdAt: string
   read: boolean
   actionUrl?: string
-  data?: any
+  data?: Record<string, unknown>
 }
 
 interface NotificationCenterProps {

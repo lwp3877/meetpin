@@ -19,7 +19,7 @@ export interface LogContext {
   status?: number
   error?: string | Error
   sampling?: boolean
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // PII 감지 패턴 (한국어 포함)

@@ -1,7 +1,7 @@
 /* src/app/api/cron/cleanup-expired-boosts/route.ts */
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-
+import type { PostgrestError } from '@supabase/supabase-js'
 import { logger } from '@/lib/observability/logger'
 // Vercel Cron Job - 만료된 부스트 정리
 export async function GET(request: NextRequest) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       .from('rooms')
       .update({ boost_until: null, updated_at: now })
       .not('boost_until', 'is', null)
-      .lt('boost_until', now)) as { error: any }
+      .lt('boost_until', now)) as { error: PostgrestError | null }
 
     if (updateError) {
       logger.error('Failed to cleanup expired boosts:', { error: updateError instanceof Error ? updateError.message : String(updateError) })
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       message: 'Expired boosts cleaned up successfully',
       cleaned: expiredBoosts.length,
-      rooms: expiredBoosts.map((room: any) => ({
+      rooms: expiredBoosts.map((room: Record<string, unknown>) => ({
         id: room.id,
         title: room.title,
         expired_at: room.boost_until,

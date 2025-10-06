@@ -1,11 +1,11 @@
 /* src/components/ui/Toast.tsx */
 import React from 'react'
-import toast, { Toaster, ToastBar } from 'react-hot-toast'
+import toast, { Toaster, ToastBar, type ToastOptions } from 'react-hot-toast'
 import { brandColors } from '@/lib/config/brand'
 
 // Enhanced toast functions with better styling
 export const Toast = {
-  success: (message: string, options?: any) => {
+  success: (message: string, options?: ToastOptions) => {
     return toast.success(message, {
       duration: 4000,
       style: {
@@ -26,7 +26,7 @@ export const Toast = {
     })
   },
 
-  error: (message: string, options?: any) => {
+  error: (message: string, options?: ToastOptions) => {
     return toast.error(message, {
       duration: 5000,
       style: {
@@ -47,7 +47,7 @@ export const Toast = {
     })
   },
 
-  info: (message: string, options?: any) => {
+  info: (message: string, options?: ToastOptions) => {
     return toast(message, {
       duration: 4000,
       icon: '💡',
@@ -65,7 +65,7 @@ export const Toast = {
     })
   },
 
-  warning: (message: string, options?: any) => {
+  warning: (message: string, options?: ToastOptions) => {
     return toast(message, {
       duration: 4000,
       icon: '⚠️',
@@ -83,7 +83,7 @@ export const Toast = {
     })
   },
 
-  loading: (message: string, options?: any) => {
+  loading: (message: string, options?: ToastOptions) => {
     return toast.loading(message, {
       style: {
         background: '#374151',
@@ -104,9 +104,9 @@ export const Toast = {
     msgs: {
       loading: string
       success: string | ((data: T) => string)
-      error: string | ((error: any) => string)
+      error: string | ((error: unknown) => string)
     },
-    options?: any
+    options?: ToastOptions
   ) => {
     return toast.promise(promise, msgs, {
       style: {
@@ -149,7 +149,7 @@ export const Toast = {
     })
   },
 
-  custom: (message: React.ReactNode, options?: any) => {
+  custom: (message: React.ReactNode, options?: ToastOptions) => {
     if (!message) return ''
     return toast.custom(message as any, {
       duration: 4000,

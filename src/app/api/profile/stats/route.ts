@@ -209,24 +209,25 @@ export async function GET(req: NextRequest) {
         totalMessages: messageCount || 0,
       }),
       recentActivity: [
-        ...(recentRooms || []).map((room: any) => ({
+        ...(recentRooms || []).map((room: Record<string, unknown>) => ({
           type: 'hosted',
           title: room.title,
           date: room.start_at,
           participants: room.max_people,
         })),
-        ...(recentRequests || []).map((request: any) => ({
+        ...(recentRequests || []).map((request: Record<string, unknown>) => ({
           type: 'joined',
-          title: request.rooms.title,
+          title: (request.rooms as Record<string, unknown>)?.title,
           date: request.created_at,
-          host: request.profiles?.nickname || '알 수 없음',
+          host: (request.profiles as Record<string, unknown> | undefined)?.nickname || '알 수 없음',
         })),
       ]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .sort((a, b) => new Date(b.date as string).getTime() - new Date(a.date as string).getTime())
         .slice(0, 10),
       favoriteCategories: Object.entries(
-        (categoryStats || []).reduce((acc: Record<string, number>, item: any) => {
-          acc[item.category] = (acc[item.category] || 0) + 1
+        (categoryStats || []).reduce((acc: Record<string, number>, item: Record<string, unknown>) => {
+          const category = item.category as string
+          acc[category] = (acc[category] || 0) + 1
           return acc
         }, {})
       ).map(([category, count]) => ({

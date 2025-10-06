@@ -75,14 +75,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // 사용자 정보 조회 (연락처 정보 확인)
-    const { data: profile } = (await supabase
+    const { data: profile } = await supabase
       .from('profiles')
       .select('email, nickname')
       .eq('id', user.id)
-      .single()) as { data: any | null; error: any }
+      .single()
 
     // 기본 연락처 설정
-    const finalContactEmail = contactEmail || profile?.email || ''
+    const finalContactEmail = (contactEmail || (profile as Record<string, unknown> | null)?.email || '') as string
 
     // 개인정보 권리 요청 데이터 생성
     const requestData = {
@@ -100,12 +100,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         user_agent: request.headers.get('user-agent'),
         ip_address: clientIP !== 'unknown' ? clientIP : null,
         timestamp: new Date().toISOString(),
-        user_nickname: profile?.nickname,
+        user_nickname: (profile as Record<string, unknown> | null)?.nickname,
       },
     }
 
     // 데이터베이스에 요청 저장
-    const { data: privacyRequest, error: insertError } = (await (supabase as any)
+    const { data: privacyRequest, error: insertError } = await (supabase as any)
       .from('privacy_rights_requests')
       .insert([requestData])
       .select(
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         created_at
       `
       )
-      .single()) as { data: any | null; error: any }
+      .single()
 
     if (insertError) {
       logger.error('Privacy rights request insert error:', { error: insertError instanceof Error ? insertError.message : String(insertError) })
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const notificationData = {
       type: 'privacy_rights_request',
       title: `개인정보 권리 요청: ${getRequestTypeKorean(requestType)}`,
-      message: `사용자 ${profile?.nickname || 'Unknown'}님이 ${getRequestTypeKorean(requestType)} 요청을 제출했습니다.`,
+      message: `사용자 ${(profile as Record<string, unknown> | null)?.nickname || 'Unknown'}님이 ${getRequestTypeKorean(requestType)} 요청을 제출했습니다.`,
       priority: urgency === 'high' ? 'high' : 'medium',
       reference_id: privacyRequest.id,
       metadata: {
@@ -236,10 +236,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // 요청 유형을 한국어로 변환
     const formattedRequests =
-      requests?.map((req: any) => ({
+      requests?.map((req: Record<string, unknown>) => ({
         ...req,
-        request_type_korean: getRequestTypeKorean(req.request_type),
-        status_korean: getStatusKorean(req.status),
+        request_type_korean: getRequestTypeKorean(req.request_type as string),
+        status_korean: getStatusKorean(req.status as string),
       })) || []
 
     return NextResponse.json({
@@ -253,7 +253,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         },
       },
     } satisfies ApiResponse<{
-      requests: any[]
+      requests: Record<string, unknown>[]
       pagination: {
         limit: number
         offset: number

@@ -4,7 +4,6 @@
 // useAuth.tsx에서 isDevelopmentMode 조건으로 사용됩니다.
 
 import { koreanAvatars } from '@/lib/config/koreanAvatars'
-
 export const mockUser = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   email: 'admin@meetpin.com',

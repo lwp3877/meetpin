@@ -8,7 +8,7 @@ import { logger } from '@/lib/observability/logger'
 
 // Kakao Maps 타입 정의
 declare global {
-  var kakao: any
+  var kakao: unknown
 }
 
 interface Room {

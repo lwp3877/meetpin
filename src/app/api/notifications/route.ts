@@ -90,14 +90,14 @@ export async function GET(_request: NextRequest) {
 
       // 데이터 형식 변환
       return (
-        notifications?.map((notification: any) => ({
+        notifications?.map((notification: Record<string, unknown>) => ({
           id: notification.id,
           type: notification.type,
           title: notification.title,
           message: notification.message,
           createdAt: notification.created_at,
           read: notification.is_read,
-          actionUrl: notification.metadata?.actionUrl,
+          actionUrl: (notification.metadata as Record<string, unknown> | undefined)?.actionUrl,
           data: notification.metadata,
         })) || []
       )

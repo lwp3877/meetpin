@@ -53,7 +53,7 @@ async function getMyRequests(request: NextRequest) {
     // 내가 받은 요청 (내가 호스트인 방의 요청들)
     const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
 
-    const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
+    const roomIds = (myRooms as any)?.map((room: Record<string, unknown>) => room.id) || []
     if (roomIds.length > 0) {
       query = query.in('room_id', roomIds)
     } else {
@@ -74,7 +74,7 @@ async function getMyRequests(request: NextRequest) {
     // 전체 (내가 보낸 것 + 내가 받은 것)
     const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
 
-    const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
+    const roomIds = (myRooms as any)?.map((room: Record<string, unknown>) => room.id) || []
 
     if (roomIds.length > 0) {
       query = query.or(`requester_uid.eq.${user.id},room_id.in.(${roomIds.join(',')})`)
@@ -100,14 +100,14 @@ async function getMyRequests(request: NextRequest) {
   } else if (type === 'received') {
     const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
 
-    const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
+    const roomIds = (myRooms as any)?.map((room: Record<string, unknown>) => room.id) || []
     if (roomIds.length > 0) {
       countQuery = countQuery.in('room_id', roomIds)
     }
   } else {
     const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
 
-    const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
+    const roomIds = (myRooms as any)?.map((room: Record<string, unknown>) => room.id) || []
 
     if (roomIds.length > 0) {
       countQuery = countQuery.or(`requester_uid.eq.${user.id},room_id.in.(${roomIds.join(',')})`)

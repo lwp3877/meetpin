@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     const payload = await request.text()
 
-    let event: any
+    let event: unknown
 
     if (isDevelopmentMode) {
       // 개발 모드에서는 직접 JSON 파싱
@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
       event = verifyWebhookSignature(payload, signature!)
     }
 
-    logger.info('Received Stripe webhook', { eventType: event.type })
+    logger.info('Received Stripe webhook', { eventType: (event as Record<string, unknown>).type })
 
     // 이벤트 처리
-    const result = await handleWebhookEvent(event)
+    const result = await handleWebhookEvent(event as any)
 
     // checkout.session.completed 이벤트의 경우 DB 업데이트
     if (

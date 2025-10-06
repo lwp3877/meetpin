@@ -75,7 +75,7 @@ async function getRequests(request: NextRequest) {
   } else if (type === 'my_rooms') {
     // 내 방에 온 참가 요청들
     const { data: myRooms } = await supabase.from('rooms').select('id').eq('host_uid', user.id)
-    const roomIds = (myRooms as any)?.map((room: any) => room.id) || []
+    const roomIds = (myRooms as any)?.map((room: Record<string, unknown>) => room.id) || []
     query = query.in('room_id', roomIds)
   }
 

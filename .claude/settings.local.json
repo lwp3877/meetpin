@@ -3,7 +3,12 @@
     "allow": [
       "Bash(git restore:*)",
       "Bash(for file in src/lib/api.ts src/lib/cache/redis.ts src/lib/rateLimit.ts src/lib/supabaseClient.ts)",
-      "Bash(do echo \"=== $file ===\")"
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(pnpm typecheck:*)",
+      "Bash(cut:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

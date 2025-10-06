@@ -7,17 +7,18 @@ import {
   createMethodRouter,
   getAuthenticatedUser,
   parseAndValidateBody,
-  parseUrlParams,
   createSuccessResponse,
   ApiError,
   apiUtils,
+  type ApiRouteContext,
 } from '@/lib/api'
 import { logger } from '@/lib/observability/logger'
 
 // GET /api/rooms/[id] - 특정 방 상세 조회
-async function getRoom(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function getRoom(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
-  const { id } = await parseUrlParams(context)
+  const params = await context.params
+  const id = params.id as string
 
   // 개발 모드에서는 Mock 데이터 사용
   if (isDevelopmentMode) {
@@ -82,10 +83,11 @@ async function getRoom(request: NextRequest, context: { params: Promise<{ id: st
 }
 
 // PATCH /api/rooms/[id] - 방 정보 수정
-async function updateRoom(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function updateRoom(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id } = await parseUrlParams(context)
+  const params = await context.params
+  const id = params.id as string
 
   // 방 소유자 확인
   const { data: room } = await supabase.from('rooms').select('host_uid').eq('id', id).single()
@@ -108,7 +110,7 @@ async function updateRoom(request: NextRequest, context: { params: Promise<{ id:
   }
 
   // 방 정보 업데이트
-  const { data: updatedRoom, error } = (await (supabase as any)
+  const { data: updatedRoom, error } = await (supabase as any)
     .from('rooms')
     .update(updateData)
     .eq('id', id)
@@ -123,7 +125,7 @@ async function updateRoom(request: NextRequest, context: { params: Promise<{ id:
       )
     `
     )
-    .single()) as { data: any | null; error: any }
+    .single()
 
   if (error) {
     logger.error('Room update error', { error: (error as Error).message || String(error), roomId: id })
@@ -134,10 +136,11 @@ async function updateRoom(request: NextRequest, context: { params: Promise<{ id:
 }
 
 // DELETE /api/rooms/[id] - 방 삭제
-async function deleteRoom(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function deleteRoom(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id } = await parseUrlParams(context)
+  const params = await context.params
+  const id = params.id as string
 
   // 방 소유자 확인
   const { data: room } = await supabase.from('rooms').select('host_uid').eq('id', id).single()

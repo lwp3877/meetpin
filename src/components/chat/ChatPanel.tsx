@@ -217,7 +217,7 @@ export default function ChatPanel({
           filter: `match_id=eq.${matchId}`,
         },
         payload => {
-          const newMessage = payload.new as any
+          const newMessage = payload.new as Message
           if (newMessage.sender_uid !== currentUserId) {
             // 상대방의 새 메시지만 추가
             setMessages(prev => [
@@ -225,7 +225,7 @@ export default function ChatPanel({
               {
                 ...newMessage,
                 sender: otherUser || { id: newMessage.sender_uid, nickname: '상대방' },
-              },
+              } as Message,
             ])
           }
         }

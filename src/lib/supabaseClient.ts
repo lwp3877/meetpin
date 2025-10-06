@@ -592,7 +592,7 @@ export interface Database {
           priority: string
           status: string
           created_at: string
-          [key: string]: any
+          [key: string]: unknown
         }
       }
       emergency_reports_stats: {
@@ -600,7 +600,7 @@ export interface Database {
           total_reports: number
           pending_reports: number
           resolved_reports: number
-          [key: string]: any
+          [key: string]: unknown
         }
       }
     }
@@ -666,7 +666,7 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     // 개발 환경에서는 Mock 클라이언트 반환
     if (process.env.NODE_ENV === 'development') {
       // Mock client for development fallback
-      return {
+      return ({
         from: () => ({
           select: () => ({ data: [], error: null }),
           insert: () => ({ data: [], error: null }),
@@ -683,7 +683,7 @@ export function createBrowserSupabaseClient(): SupabaseClient {
           unsubscribe: () => ({}),
           track: () => ({}),
         }),
-      } as any
+      } as any) as SupabaseClient
     }
     throw error
   }
@@ -819,11 +819,11 @@ export type ReportWithDetails = Report & {
 }
 
 // 유틸리티 함수들
-export function isSupabaseError(error: any): error is { code: string; message: string } {
-  return error && typeof error.code === 'string' && typeof (error as Error).message === 'string'
+export function isSupabaseError(error: unknown): error is { code: string; message: string } {
+  return !!error && typeof (error as any).code === 'string' && typeof (error as Error).message === 'string'
 }
 
-export function handleSupabaseError(error: any): never {
+export function handleSupabaseError(error: unknown): never {
   if (isSupabaseError(error)) {
     throw new Error(`Supabase Error [${error.code}]: ${error.message}`)
   }

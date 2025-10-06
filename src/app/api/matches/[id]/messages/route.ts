@@ -5,10 +5,10 @@ import {
   createMethodRouter,
   getAuthenticatedUser,
   parseAndValidateBody,
-  parseUrlParams,
   createSuccessResponse,
   parsePaginationParams,
   ApiError,
+  type ApiRouteContext,
 } from '@/lib/api'
 import { withCache, CacheKeys, CacheTTL, invalidateMessageCache } from '@/lib/cache/redis'
 
@@ -54,10 +54,11 @@ function containsForbiddenWords(text: string): boolean {
 }
 
 // GET /api/matches/[id]/messages - 매칭의 메시지 목록 조회
-async function getMessages(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function getMessages(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id: matchId } = await parseUrlParams(context)
+  const params = await context.params
+  const matchId = params.id as string
   const { searchParams } = new URL(request.url)
 
   // 페이지네이션 파라미터 (기본 limit 100)
@@ -75,7 +76,7 @@ async function getMessages(request: NextRequest, context: { params: Promise<{ id
   }
 
   // 매칭 당사자인지 확인 (host 또는 guest)
-  const matchData = match as any
+  const matchData = match as Record<string, unknown>
   if (matchData.host_uid !== user.id && matchData.guest_uid !== user.id) {
     throw new ApiError('메시지에 접근할 권한이 없습니다', 403)
   }
@@ -143,10 +144,11 @@ async function getMessages(request: NextRequest, context: { params: Promise<{ id
 }
 
 // POST /api/matches/[id]/messages - 새 메시지 생성
-async function createMessage(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function createMessage(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id: matchId } = await parseUrlParams(context)
+  const params = await context.params
+  const matchId = params.id as string
 
   // 요청 본문 검증
   const messageData = await parseAndValidateBody(request, createMessageSchema)
@@ -168,7 +170,7 @@ async function createMessage(request: NextRequest, context: { params: Promise<{ 
   }
 
   // 매칭 당사자인지 확인
-  const matchData = match as any
+  const matchData = match as Record<string, unknown>
   if (matchData.host_uid !== user.id && matchData.guest_uid !== user.id) {
     throw new ApiError('메시지를 보낼 권한이 없습니다', 403)
   }

@@ -2,7 +2,6 @@
 'use client'
 
 import { logger } from '@/lib/observability/logger'
-
 export type NotificationPermission = 'default' | 'granted' | 'denied'
 
 export interface PushNotificationOptions {
@@ -12,7 +11,7 @@ export interface PushNotificationOptions {
   badge?: string
   image?: string
   tag?: string
-  data?: any
+  data?: Record<string, unknown>
   requireInteraction?: boolean
   silent?: boolean
   actions?: NotificationAction[]
@@ -103,7 +102,7 @@ export function showNotification(options: PushNotificationOptions): Notification
 
       // 커스텀 데이터 처리
       if (options.data?.url) {
-        window.open(options.data.url, '_blank')
+        window.open(String(options.data.url), '_blank')
       } else if (options.data?.action) {
         // 커스텀 액션 처리
         logger.info('Notification action:', options.data.action)
@@ -308,7 +307,7 @@ export class NotificationSettings {
         }
   }
 
-  static updateSettings(settings: any) {
+  static updateSettings(settings: unknown) {
     if (typeof window === 'undefined') return
 
     localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings))

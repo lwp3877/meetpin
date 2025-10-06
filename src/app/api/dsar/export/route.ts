@@ -152,7 +152,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
     }
 
     // 개인정보 삭제를 위한 데이터 정리
-    const sanitizeData = (data: any): any => {
+    const sanitizeData = (data: unknown): unknown => {
       if (!data) return data
 
       if (Array.isArray(data)) {
@@ -160,16 +160,16 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       }
 
       if (typeof data === 'object') {
-        const sanitized = { ...data }
+        const sanitized = { ...(data as Record<string, unknown>) } as Record<string, unknown>
 
         // 민감한 필드들 제거 또는 마스킹
-        if (sanitized.email) {
+        if (sanitized.email && typeof sanitized.email === 'string') {
           const email = sanitized.email
           const [local, domain] = email.split('@')
           sanitized.email = `${local.slice(0, 2)}***@${domain}`
         }
 
-        if (sanitized.phone) {
+        if (sanitized.phone && typeof sanitized.phone === 'string') {
           sanitized.phone = sanitized.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
         }
 
@@ -231,7 +231,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
     zip.file('meetpin-data.json', JSON.stringify(exportData, null, 2))
 
     // CSV 형태로도 제공
-    const createCSV = (data: any[], filename: string) => {
+    const createCSV = (data: Record<string, unknown>[], filename: string) => {
       if (!data || data.length === 0) return
 
       const headers = Object.keys(data[0])
@@ -254,17 +254,34 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
     }
 
     // CSV 파일들 생성
-    if (exportData.rooms.data.length > 0) {
-      createCSV(exportData.rooms.data, 'rooms')
+    const roomsData = exportData.rooms.data as Record<string, unknown>[]
+    const requestsData = exportData.requests.data as Record<string, unknown>[]
+    const matchesData = exportData.matches.data as Record<string, unknown>[]
+    const messagesData = exportData.messages.data as Record<string, unknown>[]
+    const hostMessagesData = exportData.host_messages.data as Record<string, unknown>[]
+    const reportsData = exportData.reports.data as Record<string, unknown>[]
+    const blockedUsersData = exportData.blocked_users.data as Record<string, unknown>[]
+
+    if (Array.isArray(roomsData) && roomsData.length > 0) {
+      createCSV(roomsData, 'rooms')
     }
-    if (exportData.requests.data.length > 0) {
-      createCSV(exportData.requests.data, 'requests')
+    if (Array.isArray(requestsData) && requestsData.length > 0) {
+      createCSV(requestsData, 'requests')
     }
-    if (exportData.matches.data.length > 0) {
-      createCSV(exportData.matches.data, 'matches')
+    if (Array.isArray(matchesData) && matchesData.length > 0) {
+      createCSV(matchesData, 'matches')
     }
-    if (exportData.messages.data.length > 0) {
-      createCSV(exportData.messages.data, 'messages')
+    if (Array.isArray(messagesData) && messagesData.length > 0) {
+      createCSV(messagesData, 'messages')
+    }
+    if (Array.isArray(hostMessagesData) && hostMessagesData.length > 0) {
+      createCSV(hostMessagesData, 'host_messages')
+    }
+    if (Array.isArray(reportsData) && reportsData.length > 0) {
+      createCSV(reportsData, 'reports')
+    }
+    if (Array.isArray(blockedUsersData) && blockedUsersData.length > 0) {
+      createCSV(blockedUsersData, 'blocked_users')
     }
 
     // 법적 고지사항 추가
@@ -306,7 +323,7 @@ MeetPin 개인데이터 내보내기
     )
     headers.set('Content-Length', zipBuffer.length.toString())
 
-    return new NextResponse(zipBuffer as any, {
+    return new NextResponse(zipBuffer as BodyInit, {
       status: 200,
       headers,
     })

@@ -4,12 +4,13 @@
  */
 
 import { logger } from '@/lib/observability/logger'
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
-// Router instance를 위한 임시 저장소
-let routerInstance: any = null
+// Router instance를 위한 임시 저장소 (Next.js App Router instance)
+let routerInstance: AppRouterInstance | null = null
 
 // Router 인스턴스 설정 (컴포넌트에서 호출)
-export function setRouterInstance(router: any): void {
+export function setRouterInstance(router: AppRouterInstance): void {
   routerInstance = router
 }
 

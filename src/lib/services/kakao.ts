@@ -1,21 +1,20 @@
 /* src/lib/kakao.ts */
 
 import { logger } from '@/lib/observability/logger'
-
 // Kakao Maps API 관련 타입과 유틸리티
 
 // 기본 타입 정의
 
 // Kakao Maps API 전역 변수 타입 정의
 declare global {
-  var kakao: any
+  var kakao: unknown
 }
 
 /**
  * Kakao Maps API가 로드되었는지 확인
  */
 export function isKakaoMapsLoaded(): boolean {
-  return typeof kakao !== 'undefined' && kakao.maps
+  return typeof kakao !== 'undefined' && !!(kakao as any).maps
 }
 
 // 전역 로딩 상태 관리
@@ -55,8 +54,8 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
   // 로딩 시작
   loadPromise = new Promise((resolve, reject) => {
     // 이미 kakao 객체가 있는 경우
-    if (typeof kakao !== 'undefined' && kakao.maps) {
-      kakao.maps.load(() => {
+    if (typeof kakao !== 'undefined' && (kakao as any).maps) {
+      (kakao as any).maps.load(() => {
         resolve()
       })
       return
@@ -97,9 +96,9 @@ export function coordToAddress(lat: number, lng: number): Promise<string> {
       return
     }
 
-    const geocoder = new kakao.maps.services.Geocoder()
-    geocoder.coord2Address(lng, lat, (results: any[], status: string) => {
-      if (status === kakao.maps.services.Status.OK) {
+    const geocoder = new (kakao as any).maps.services.Geocoder()
+    geocoder.coord2Address(lng, lat, (results: any[], status: any) => {
+      if (status === (kakao as any).maps.services.Status.OK) {
         const address = results[0]?.address
         if (address) {
           resolve(address.address_name || address.region_3depth_name || '주소 불명')
@@ -123,13 +122,13 @@ export function addressToCoord(address: string): Promise<{ lat: number; lng: num
       return
     }
 
-    const geocoder = new kakao.maps.services.Geocoder()
-    geocoder.addressSearch(address, (results: any[], status: string) => {
-      if (status === kakao.maps.services.Status.OK && results.length > 0) {
+    const geocoder = new (kakao as any).maps.services.Geocoder()
+    geocoder.addressSearch(address, (results: any[], status: any) => {
+      if (status === (kakao as any).maps.services.Status.OK && results.length > 0) {
         const result = results[0]
         resolve({
-          lat: parseFloat(result.y),
-          lng: parseFloat(result.x),
+          lat: parseFloat(String(result.y)),
+          lng: parseFloat(String(result.x)),
         })
       } else {
         reject(new Error('좌표 변환에 실패했습니다'))

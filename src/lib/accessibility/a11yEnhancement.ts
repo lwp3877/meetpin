@@ -785,7 +785,7 @@ export class AccessibilityTesting {
   /**
    * 접근성 점수 계산
    */
-  static calculateA11yScore(): { score: number; details: any } {
+  static calculateA11yScore(): { score: number; details: Record<string, unknown> } {
     const checks = this.runAutomaticChecks()
     const totalElements = document.querySelectorAll('*').length
     const issues = checks.errors.length + checks.warnings.length * 0.5
@@ -815,23 +815,23 @@ export class AccessibilityTesting {
 
 🔍 검사 결과:
 - 전체 요소: ${score.details.totalElements}개
-- 오류: ${score.details.errors}개
-- 경고: ${score.details.warnings}개
+- 오류: ${(score.details as any).errors}개
+- 경고: ${(score.details as any).warnings}개
 
 ${
-  score.details.errors > 0
+  (score.details as any).errors > 0
     ? `
 ❌ 오류 목록:
-${score.details.errorsList.map((error: string) => `- ${error}`).join('\n')}
+${(score.details as any).errorsList.map((error: string) => `- ${error}`).join('\n')}
 `
     : ''
 }
 
 ${
-  score.details.warnings > 0
+  (score.details as any).warnings > 0
     ? `
 ⚠️ 경고 목록:
-${score.details.warningsList.map((warning: string) => `- ${warning}`).join('\n')}
+${(score.details as any).warningsList.map((warning: string) => `- ${warning}`).join('\n')}
 `
     : ''
 }

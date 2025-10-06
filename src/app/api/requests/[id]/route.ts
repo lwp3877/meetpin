@@ -5,9 +5,9 @@ import {
   createMethodRouter,
   getAuthenticatedUser,
   parseAndValidateBody,
-  parseUrlParams,
   createSuccessResponse,
   ApiError,
+  type ApiRouteContext,
 } from '@/lib/api'
 
 import { logger } from '@/lib/observability/logger'
@@ -19,10 +19,11 @@ const updateRequestSchema = z.object({
 })
 
 // PATCH /api/requests/[id] - 참가 요청 상태 변경 (수락/거절)
-async function updateRequest(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function updateRequest(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id } = await parseUrlParams(context)
+  const params = await context.params
+  const id = params.id as string
 
   // 요청 본문 검증
   const { status } = await parseAndValidateBody(request, updateRequestSchema)
@@ -49,8 +50,8 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
   }
 
   // 방 호스트인지 확인
-  const requestWithRoom = requestData as any
-  if (!requestWithRoom.room || requestWithRoom.room.host_uid !== user.id) {
+  const requestWithRoom = requestData as Record<string, unknown>
+  if (!requestWithRoom.room || (requestWithRoom.room as Record<string, unknown>).host_uid !== user.id) {
     throw new ApiError('요청을 처리할 권한이 없습니다', 403)
   }
 
@@ -60,7 +61,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
   }
 
   // 방 시작 시간이 지나지 않았는지 확인
-  const startTime = new Date(requestWithRoom.room.start_at)
+  const startTime = new Date((requestWithRoom.room as Record<string, unknown>).start_at as string)
   if (new Date() > startTime) {
     throw new ApiError('이미 시작된 방의 요청은 처리할 수 없습니다')
   }
@@ -68,7 +69,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
   // 수락하는 경우 추가 검증
   if (status === 'accepted') {
     // 방 시작 시간 확인
-    const startTime = new Date(requestWithRoom.room.start_at)
+    const startTime = new Date((requestWithRoom.room as Record<string, unknown>).start_at as string)
     const cutoffTime = new Date(startTime.getTime() - 30 * 60 * 1000) // 30분 전까지
 
     if (new Date() > cutoffTime) {
@@ -83,7 +84,7 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
       'accept_request_atomically',
       {
         request_id: id,
-        max_capacity: requestWithRoom.room.max_people,
+        max_capacity: (requestWithRoom.room as Record<string, unknown>).max_people,
       }
     )
 
@@ -154,10 +155,11 @@ async function updateRequest(request: NextRequest, context: { params: Promise<{ 
 }
 
 // DELETE /api/requests/[id] - 참가 요청 취소 (요청자만)
-async function deleteRequest(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+async function deleteRequest(request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
-  const { id } = await parseUrlParams(context)
+  const params = await context.params
+  const id = params.id as string
 
   // 요청 정보 조회
   const { data: requestData, error: requestError } = await supabase

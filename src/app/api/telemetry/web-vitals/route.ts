@@ -53,7 +53,7 @@ function sanitizeUserAgent(userAgent: string): string {
 }
 
 // 메트릭 검증
-function validateMetrics(metrics: any[]): WebVitalMetric[] {
+function validateMetrics(metrics: Record<string, unknown>[]): WebVitalMetric[] {
   const validMetrics: WebVitalMetric[] = []
 
   for (const metric of metrics) {
@@ -62,7 +62,7 @@ function validateMetrics(metrics: any[]): WebVitalMetric[] {
     }
 
     // 메트릭 이름 화이트리스트
-    if (!['CLS', 'FCP', 'FID', 'LCP', 'TTFB', 'INP'].includes(metric.name)) {
+    if (!['CLS', 'FCP', 'FID', 'LCP', 'TTFB', 'INP'].includes(metric.name as string)) {
       continue
     }
 
@@ -73,11 +73,11 @@ function validateMetrics(metrics: any[]): WebVitalMetric[] {
     }
 
     validMetrics.push({
-      name: metric.name,
+      name: metric.name as 'CLS' | 'FCP' | 'FID' | 'INP' | 'LCP' | 'TTFB',
       value: Math.round(metric.value * 100) / 100, // 소수점 2자리
-      rating: metric.rating || 'needs-improvement',
-      delta: metric.delta ? Math.round(metric.delta * 100) / 100 : undefined,
-      navigationType: metric.navigationType,
+      rating: (metric.rating as 'good' | 'needs-improvement' | 'poor') || 'needs-improvement',
+      delta: metric.delta ? Math.round((metric.delta as number) * 100) / 100 : undefined,
+      navigationType: metric.navigationType as string | undefined,
     })
   }
 
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // 메트릭 검증 및 정제
-    const validMetrics = validateMetrics(payload.metrics)
+    const validMetrics = validateMetrics(payload.metrics as unknown as Record<string, unknown>[])
     if (validMetrics.length === 0) {
       return NextResponse.json({ error: 'No valid metrics' }, { status: 400 })
     }
