@@ -8,7 +8,9 @@
       "Bash(cut:*)",
       "Bash(pnpm test:*)",
       "Bash(pnpm build:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: resolve all TypeScript strict mode errors and improve type safety\n\nMajor type safety improvements across the codebase:\n- Fix unknown type validation in API routes and services\n- Add proper type casting for Kakao Maps SDK integration\n- Improve error handling with proper type guards\n- Fix Supabase client type definitions\n- Resolve validation function parameter types\n- Update component prop types for strict null checks\n\nTechnical details:\n- 46+ TypeScript errors resolved\n- API context types standardized (ApiRouteContext)\n- Mock data type casting improved\n- Bot scheduler type safety enhanced\n- Accessibility enhancement type guards fixed\n\nTest results:\n- ✅ All 60 unit tests passing\n- ✅ TypeScript compilation successful\n- ✅ Production build verified\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
