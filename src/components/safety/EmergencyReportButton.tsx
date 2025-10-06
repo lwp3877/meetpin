@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Toast } from '@/components/ui/Toast'
 
 interface EmergencyReportButtonProps {
-  reportedUserId: string
+  reportedUserId?: string
   roomId?: string
   className?: string
 }
