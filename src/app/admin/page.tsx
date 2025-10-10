@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useAuth } from '@/lib/useAuth'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
 import Toast from '@/components/ui/Toast'
+import { logger } from '@/lib/observability/logger'
 
 interface EmergencyReport {
   id: string
@@ -59,7 +60,7 @@ export default function AdminDashboard() {
           if (data.ok) setVerifications(data.data.filter((v: Verification) => v.status === 'pending'))
         }
       } catch (error) {
-        console.error('Failed to fetch admin data:', error)
+        logger.error('Failed to fetch admin data:', { error })
       } finally {
         setIsLoading(false)
       }

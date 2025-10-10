@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/useAuth'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
 import Toast from '@/components/ui/Toast'
 import { EmergencyReportButton } from '@/components/safety/EmergencyReportButton'
+import { logger } from '@/lib/observability/logger'
 
 interface SafetySettings {
   allow_adult_only_meetings: boolean
@@ -60,7 +61,7 @@ export default function SafetySettingsPage() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch safety settings:', error)
+        logger.error('Failed to fetch safety settings:', { error })
       } finally {
         setIsLoading(false)
       }
@@ -82,7 +83,7 @@ export default function SafetySettingsPage() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch verifications:', error)
+        logger.error('Failed to fetch verifications:', { error })
       }
     }
 
