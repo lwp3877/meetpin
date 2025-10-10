@@ -87,7 +87,7 @@ export default function AdminDashboard() {
       } else {
         Toast.error(data.message || '업데이트에 실패했습니다')
       }
-    } catch (error) {
+    } catch (_error) {
       Toast.error('업데이트 중 오류가 발생했습니다')
     }
   }
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
       } else {
         Toast.error(data.message || '업데이트에 실패했습니다')
       }
-    } catch (error) {
+    } catch (_error) {
       Toast.error('업데이트 중 오류가 발생했습니다')
     }
   }

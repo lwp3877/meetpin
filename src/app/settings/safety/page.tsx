@@ -107,7 +107,7 @@ export default function SafetySettingsPage() {
       } else {
         Toast.error(data.message || '설정 저장에 실패했습니다')
       }
-    } catch (error) {
+    } catch (_error) {
       Toast.error('설정 저장 중 오류가 발생했습니다')
     } finally {
       setIsSaving(false)
@@ -128,7 +128,7 @@ export default function SafetySettingsPage() {
       } else {
         Toast.error(data.message || '인증 요청에 실패했습니다')
       }
-    } catch (error) {
+    } catch (_error) {
       Toast.error('인증 요청 중 오류가 발생했습니다')
     }
   }
