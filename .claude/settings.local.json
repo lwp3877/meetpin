@@ -16,7 +16,17 @@
       "Bash(awk:*)",
       "Bash(git rm:*)",
       "Bash(find:*)",
-      "Bash(pnpm eslint:*)"
+      "Bash(pnpm eslint:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(node:*)",
+      "Bash(cloc:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm repo:doctor:*)"
     ],
     "deny": [],
     "ask": []

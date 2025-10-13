@@ -63,6 +63,27 @@ next-env.d.ts
 
 # QA Automation Results
 lighthouse-results/
+lighthouse*.json
 .nyc_output/
 coverage/
 nul
+small
+target
+too
+
+# 캐시 파일
+.eslintcache
+*.cache
+
+# 빌드 임시 파일
+tsconfig.tsbuildinfo
+
+# 이미지 및 미디어
+*.jpg
+*.jpeg
+*.png
+*.gif
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.png
+!public/**/*.gif

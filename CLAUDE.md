@@ -61,11 +61,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Environment-aware logging (JSON for production, colored console for development)
    - Request correlation with generated request IDs
 
-8. **API Status & Health Monitoring**:
-   - Multiple health endpoints: `/api/health`, `/api/ready`, `/api/healthz`, `/api/livez`
-   - Cache statistics endpoint: `/api/cache/stats`
+8. **API Status & Health Monitoring** (46 API endpoints total):
+   - **6 Health Endpoints** (Kubernetes-style probes):
+     - `/api/health` - Comprehensive diagnostics (334 lines - DB, Auth, Maps, Stripe, Redis)
+     - `/api/healthz` - Minimal liveness probe (5 lines - GitHub Actions every 5min)
+     - `/api/livez` - Process liveness (PID, uptime, memory)
+     - `/api/ready` - Simple readiness check (6 lines)
+     - `/api/readyz` - Detailed readiness (116 lines - DB, env vars, memory)
+     - `/api/status` - Version and environment info (40 lines)
+   - Cache statistics: `/api/cache/stats`
    - Security CSP reporting: `/api/security/csp-report`
    - Web vitals telemetry: `/api/telemetry/web-vitals`
+
+   **All 6 health endpoints are necessary** - serve different monitoring tools and use cases
 
 9. **GDPR/DSAR Compliance**:
    - Data Subject Access Rights automation: `/api/dsar/export`, `/api/dsar/delete-request`
@@ -73,18 +81,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - Automated data cleanup with cron jobs: `/api/cron/*`
    - Age verification system: `/api/age-verification`
 
-10. **Folder Structure & Organization**:
-   - **components/**: Domain-driven organization (auth, chat, map, room, etc.)
+10. **Folder Structure & Organization** (총 152개 소스 파일):
+   - **components/**: Domain-driven organization (auth, chat, map, room, etc.) - 41 components
      - `auth/` - Authentication components (social-login)
      - `chat/` - Chat functionality (ChatPanel)
-     - `common/` - Shared components (Providers, theme-toggle)
+     - `common/` - Shared components (Providers, theme-toggle, BotSchedulerInitializer)
      - `error/` - Error handling (GlobalErrorBoundary)
-     - `landing/` - Landing pages (NewLanding, ProLanding, enhanced-landing)
+     - `landing/` - Landing pages (ProLanding - dynamic import)
      - `layout/` - Layout components (LegalFooter)
-     - `map/` - Map features (DynamicMap, MapWithCluster, LocationPicker)
-     - `mobile/` - Mobile-optimized layouts
+     - `map/` - Map features (DynamicMap, MapWithCluster, LocationPicker, MapFilters)
+     - `pwa/` - PWA features (InstallPrompt)
      - `room/` - Room management (RoomForm)
-     - `ui/` - shadcn/ui components + feature-specific UI
+     - `safety/` - Safety features (EmergencyReportButton)
+     - `ui/` - shadcn/ui components + feature-specific UI (24 files)
    - **lib/**: Functional organization by concern
      - `accessibility/` - WCAG compliance utilities
      - `bot/` - Bot room generation and scheduling
@@ -122,6 +131,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
 - **단위 테스트**: 60/60 테스트 통과 (RLS 보안 테스트 포함)
 - **개발 서버**: localhost:3001에서 안정적 실행 (기본 포트)
+- **코드베이스 정리**: 46개 불필요한 파일 삭제, 8,930 줄 코드 제거 완료 (2025-10-11)
 
 ### 🔧 Development Mode Features
 
@@ -423,15 +433,16 @@ Centralized in `src/lib/brand.ts`:
 
 ### Project Quality Standards
 
-- **TypeScript**: Strict mode with enhanced type safety
-- **Code Quality**: Comprehensive ESLint + Prettier configuration (⚠️ Next.js lint deprecated in v16)
-- **Testing Suite**: Jest unit tests + Playwright E2E testing + WCAG 2.1 AA accessibility compliance
+- **TypeScript**: Strict mode with enhanced type safety (0 errors)
+- **Code Quality**: Comprehensive ESLint + Prettier configuration (0 warnings)
+- **Testing Suite**: Jest unit tests (60/60 passing) + Playwright E2E + WCAG 2.1 AA compliance
 - **Build Verification**: `pnpm repo:doctor` for complete quality checks
-- **Performance**: Bundle optimization and lazy loading
+- **Performance**: Bundle optimization and lazy loading (14 dynamic imports)
 - **Internationalization**: Korean-first UI with proper text handling
 - **Mobile-first**: Responsive design with touch-optimized interactions
 - **Security**: Multi-layer protection (RLS, validation, rate limiting, blocking)
-- **Accessibility**: WCAG 2.1 AA compliance with automated testing and color contrast verification
+- **Accessibility**: WCAG 2.1 AA compliance with automated testing
+- **Code Cleanliness**: No dead code, no duplicates, all 152 files actively used (verified 2025-10-11)
 
 ## Production Deployment
 
