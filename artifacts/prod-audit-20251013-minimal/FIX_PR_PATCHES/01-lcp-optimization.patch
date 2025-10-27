@@ -1,0 +1,31 @@
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index abc1234..def5678 100644
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -140,6 +140,10 @@ export default function RootLayout({
+         <link rel="dns-prefetch" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
+         <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
+         <link rel="dns-prefetch" href="https://js.stripe.com" />
++
++        {/* LCP 최적화: Kakao Maps SDK preload */}
++        <link rel="preconnect" href="https://dapi.kakao.com" />
++        <link rel="preload" as="script" href="https://dapi.kakao.com/v2/maps/sdk.js" />
+         <link rel="dns-prefetch" href="//dapi.kakao.com" />
+         <link rel="dns-prefetch" href="//t1.daumcdn.net" />
+       </head>
+
+diff --git a/next.config.ts b/next.config.ts
+index 1234abc..5678def 100644
+--- a/next.config.ts
++++ b/next.config.ts
+@@ -48,6 +48,10 @@ const nextConfig: NextConfig = {
+     ],
+     formats: ['image/webp', 'image/avif'],
+     minimumCacheTTL: 60 * 60 * 24 * 30, // 30일
++    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
++    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
++    loader: 'default',
++    disableStaticImages: false,
+     dangerouslyAllowSVG: true,
+     contentDispositionType: 'attachment',
+     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

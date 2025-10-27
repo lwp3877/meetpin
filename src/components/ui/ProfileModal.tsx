@@ -145,6 +145,9 @@ export function ProfileModal({ isOpen, onClose, userId }: ProfileModalProps) {
                           width={112}
                           height={112}
                           className="h-full w-full rounded-full object-cover"
+                          loading="lazy"
+                          placeholder="blur"
+                          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTEyIiBoZWlnaHQ9IjExMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTEyIiBoZWlnaHQ9IjExMiIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg=="
                         />
                       ) : (
                         <span className="text-4xl font-bold text-white">

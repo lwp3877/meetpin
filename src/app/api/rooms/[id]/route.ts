@@ -15,7 +15,7 @@ import {
 import { logger } from '@/lib/observability/logger'
 
 // GET /api/rooms/[id] - 특정 방 상세 조회
-async function getRoom(request: NextRequest, context: ApiRouteContext) {
+async function getRoom(_request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const params = await context.params
   const id = params.id as string
@@ -136,7 +136,7 @@ async function updateRoom(request: NextRequest, context: ApiRouteContext) {
 }
 
 // DELETE /api/rooms/[id] - 방 삭제
-async function deleteRoom(request: NextRequest, context: ApiRouteContext) {
+async function deleteRoom(_request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const params = await context.params

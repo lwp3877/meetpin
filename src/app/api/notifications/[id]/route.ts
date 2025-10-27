@@ -7,7 +7,7 @@ import { isDevelopmentMode } from '@/lib/config/flags'
 
 import { logger } from '@/lib/observability/logger'
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

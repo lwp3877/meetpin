@@ -1,0 +1,136 @@
+{
+    "name": "\u8adb\ub5ee\udc95\udc80 - \uf9de\udc80\udceb\ub8c4\udcec\ubfc9\udcec\uaf4c \uf9cd\ub6ae\uad79\udcec\uc282",
+    "short_name": "\u8adb\ub5ee\udc95\udc80",
+    "description": "\udcec\uc41e\u79fb\udc98 \u6e72\uacd5\ucef2 \udcec\ub58e\udcec\ub586\u5a9b\udc84 \uf9cf\u2465\uc5eb \udced\ubd46\udceb\uc62f\udced\ub90c. \udceb\uada1 \u4e8c\uc1f0\udcb3\udc80\udcec\ubfc9\udcec\uaf4c \udcec\ub2e0, \udcec\uc2ab\udceb\ub8de, \u75cd\u2464\udcaf\udcb8 \u79fb\uc493\ub384\u745c\udcbc \uf9cd\ub6ae\uad79\u8e42\ub301\uaf6d\udcec\uc282!",
+    "start_url": "/map",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#059669",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "ko-KR",
+    "dir": "ltr",
+    "categories": [
+        "social",
+        "lifestyle",
+        "entertainment"
+    ],
+    "icons": [
+        {
+            "src": "/icons/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-152x152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/map-view.png",
+            "sizes": "1170x2532",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "\uf9de\udc80\udceb\ub8c4\udcec\ubfc9\udcec\uaf4c \uf9cf\u2465\uc5eb \uf9e1\uc598\ub9b0"
+        },
+        {
+            "src": "/screenshots/room-detail.png",
+            "sizes": "1170x2532",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "\uf9cf\u2465\uc5eb \udcec\uae3d\udcec\uaf6d \udcec\uc819\u8e42\udcb4"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "\uf9de\udc80\udceb\ub8c4 \u8e42\ub2ff\ub9b0",
+            "short_name": "\uf9de\udc80\udceb\ub8c4",
+            "description": "\uf9de\udc80\udceb\ub8c4\udcec\ubfc9\udcec\uaf4c \uf9cf\u2465\uc5eb \uf9e1\uc598\ub9b0",
+            "url": "/map",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "\u8adb\udca9 \uf9cd\ub6ae\ubc7e\u6e72\udcb0",
+            "short_name": "\udcec\uae6e\udcec\uaf66",
+            "description": "\udcec\uae49\u6fe1\uc496\uc2ab \uf9cf\u2465\uc5eb \uf9cd\ub6ae\ubc7e\u6e72\udcb0",
+            "url": "/room/new",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "\udceb\uada1 \udced\ubd3d\u6fe1\uc497\ube18",
+            "short_name": "\udced\ubd3d\u6fe1\uc497\ube18",
+            "description": "\udced\ubd3d\u6fe1\uc497\ube18 \u8adb\udc8f \udcec\uaf55\udcec\uc819",
+            "url": "/profile",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
+    "share_target": {
+        "action": "/room/new",
+        "method": "GET",
+        "enctype": "application/x-www-form-urlencoded",
+        "params": {
+            "title": "title",
+            "text": "description"
+        }
+    },
+    "related_applications": [],
+    "prefer_related_applications": false
+}

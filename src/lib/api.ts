@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'
 import { checkIPRateLimit, checkUserIPRateLimit, RateLimitType } from '@/lib/rateLimit'
-// logger import 제거 - 순환 의존성 방지 (api.ts는 서버 전용, logger는 클라이언트/서버 공용)
+import { createServerLogger, logApiRequest } from '@/lib/observability/logger-server'
 
 /**
  * 간단한 인메모리 레이트 리미팅 스토어
@@ -230,68 +230,110 @@ export function withUserRateLimit(type: RateLimitType) {
 // 에러 처리 미들웨어 (강화된 버전)
 export function withErrorHandling(handler: ApiHandler) {
   return async (request: NextRequest, context: ApiRouteContext): Promise<NextResponse> => {
+    const startTime = Date.now()
+    const logger = await createServerLogger(request)
+
     try {
-      return await handler(request, context)
+      const response = await handler(request, context)
+
+      // 성공 로깅
+      logApiRequest(logger, startTime, response.status)
+
+      return response
     } catch (error: unknown) {
-      console.error('[API] Error:', error instanceof Error ? error.message : String(error), (error as Error)?.stack)
+      logger.error('API Error occurred', error as Error, {
+        path: request.nextUrl.pathname,
+        method: request.method,
+      })
 
       if (error instanceof ApiError) {
+        logApiRequest(logger, startTime, (error as any).status, error as Error)
         return createErrorResponse((error as Error).message, (error as any).status, error.code)
       }
 
       // 네트워크 및 연결 에러 처리
       if ((error as Error).name === 'TypeError' && (error as Error).message.includes('fetch')) {
+        logApiRequest(logger, startTime, 503, error as Error)
         return createErrorResponse('네트워크 연결에 실패했습니다', 503, 'NETWORK_ERROR')
       }
 
       if ((error as Error).name === 'AbortError') {
+        logApiRequest(logger, startTime, 408, error as Error)
         return createErrorResponse('요청 시간이 초과되었습니다', 408, 'TIMEOUT_ERROR')
       }
 
       if ((error as any).code === 'ECONNREFUSED' || (error as any).code === 'ENOTFOUND') {
+        logApiRequest(logger, startTime, 503, error as Error)
         return createErrorResponse('서비스에 연결할 수 없습니다', 503, 'CONNECTION_ERROR')
       }
 
       // Supabase 에러 처리 (확장됨)
       if ((error as any).code) {
-        switch ((error as any).code) {
+        const errorCode = (error as any).code
+        const statusMap: Record<string, number> = {
+          PGRST116: 404,
+          '23505': 409,
+          '23503': 400,
+          '42501': 403,
+          '08006': 503,
+          '53300': 503,
+          '57014': 408,
+          JWT_EXPIRED: 401,
+          JWT_INVALID: 401,
+        }
+
+        const status = statusMap[errorCode] || 500
+
+        switch (errorCode) {
           case 'PGRST116':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('리소스를 찾을 수 없습니다', 404, 'NOT_FOUND')
           case '23505':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('중복된 데이터입니다', 409, 'CONFLICT')
           case '23503':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('참조 무결성 위반입니다', 400, 'FOREIGN_KEY_VIOLATION')
           case '42501':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('권한이 없습니다', 403, 'INSUFFICIENT_PRIVILEGE')
           case '08006':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse(
               '데이터베이스 연결에 실패했습니다',
               503,
               'DATABASE_CONNECTION_ERROR'
             )
           case '53300':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('서버가 과부하 상태입니다', 503, 'SERVER_OVERLOAD')
           case '57014':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('쿼리 실행 시간이 초과되었습니다', 408, 'QUERY_TIMEOUT')
           case 'JWT_EXPIRED':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('인증 토큰이 만료되었습니다', 401, 'TOKEN_EXPIRED')
           case 'JWT_INVALID':
+            logApiRequest(logger, startTime, status, error as Error)
             return createErrorResponse('잘못된 인증 토큰입니다', 401, 'TOKEN_INVALID')
           default:
-            console.error('[API] Supabase Error:', (error as Error).message || String(error), 'code:', (error as any).code)
+            logger.error('Supabase Error', error as Error, { code: errorCode })
         }
       }
 
       // JSON 파싱 에러 처리
       if (error instanceof SyntaxError && (error as Error).message.includes('JSON')) {
+        logApiRequest(logger, startTime, 400, error as Error)
         return createErrorResponse('잘못된 요청 형식입니다', 400, 'INVALID_JSON')
       }
 
       // 메모리 부족 에러
       if ((error as any).code === 'ERR_MEMORY_ALLOCATION_FAILED' || (error as Error).message?.includes('memory')) {
+        logApiRequest(logger, startTime, 503, error as Error)
         return createErrorResponse('서버 리소스가 부족합니다', 503, 'MEMORY_ERROR')
       }
 
+      logApiRequest(logger, startTime, 500, error as Error)
       return createErrorResponse('서버 내부 오류가 발생했습니다', 500, 'INTERNAL_ERROR')
     }
   }

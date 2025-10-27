@@ -111,9 +111,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       throw new ApiError('신고 접수 중 오류가 발생했습니다.', 500)
     }
 
-    // 추가 정보 수집 (분석용)
-    const _userAgent = request.headers.get('user-agent')
-    const _referer = request.headers.get('referer')
+    // 추가 정보 수집 (분석용) - 향후 확장 가능
 
     // 긴급도에 따른 즉시 알림 (critical이나 high인 경우)
     if (report.priority === 'critical' || report.priority === 'high') {

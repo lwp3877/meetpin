@@ -4,13 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import Bell from 'lucide-react/dist/esm/icons/bell'
-import X from 'lucide-react/dist/esm/icons/x'
-import Check from 'lucide-react/dist/esm/icons/check'
-import Users from 'lucide-react/dist/esm/icons/users'
-import MessageSquare from 'lucide-react/dist/esm/icons/message-square'
-import Star from 'lucide-react/dist/esm/icons/star'
-import Gift from 'lucide-react/dist/esm/icons/gift'
+import { Bell, X, Check, Users, MessageSquare, Star, Gift } from '@/components/icons'
 import { useAuth } from '@/lib/useAuth'
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import { ko } from 'date-fns/locale/ko'
@@ -255,6 +249,18 @@ export default function NotificationCenter({ className = '' }: NotificationCente
     }
   }, [])
 
+  // ESC 키로 알림 패널 닫기 (접근성)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen])
+
   if (!user) return null
 
   return (
@@ -263,13 +269,16 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="focus:ring-primary relative rounded-full p-2 text-gray-600 transition-all duration-200 hover:text-gray-900 focus:ring-2 focus:ring-offset-2 focus:outline-none"
-        aria-label="알림"
+        aria-label={unreadCount > 0 ? `알림 ${unreadCount}개` : '알림'}
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
         data-testid="notification-bell"
       >
         <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
           <span
             className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] animate-pulse items-center justify-center rounded-full bg-red-500 px-1 text-xs text-white"
+            aria-hidden="true"
             data-testid="notification-badge"
           >
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -281,15 +290,22 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       {isOpen && (
         <>
           {/* 배경 오버레이 */}
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
 
           {/* 알림 리스트 */}
           <Card
             className="absolute top-full right-0 z-50 mt-2 max-h-96 w-80 overflow-hidden shadow-xl"
+            role="dialog"
+            aria-label="알림 센터"
+            aria-modal="true"
             data-testid="notification-panel"
           >
             <div className="flex items-center justify-between border-b bg-white px-4 py-3">
-              <h3 className="font-semibold text-gray-900">알림</h3>
+              <h3 id="notification-title" className="font-semibold text-gray-900">알림</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <Button
@@ -306,7 +322,8 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  aria-label="알림 패널 닫기"
                   data-testid="close-notification-panel"
                 >
                   <X className="h-4 w-4" />
@@ -358,7 +375,8 @@ export default function NotificationCenter({ className = '' }: NotificationCente
                             e.stopPropagation()
                             deleteNotification(notification.id)
                           }}
-                          className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600"
+                          className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                          aria-label="알림 삭제"
                           data-testid={`delete-notification-${notification.id}`}
                         >
                           <X className="h-4 w-4" />

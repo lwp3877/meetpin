@@ -143,9 +143,9 @@ export default function ProfilePage() {
           </div>
         </header>
 
-        <div className="mx-auto max-w-lg px-4 py-6">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 py-6 sm:py-8">
           {/* Profile Header Card */}
-          <div className="mb-6 rounded-3xl border border-white/50 bg-white/80 p-8 shadow-xl backdrop-blur-sm">
+          <div className="mb-6 rounded-2xl sm:rounded-3xl border border-white/50 bg-white/80 p-6 sm:p-8 shadow-xl backdrop-blur-sm">
             <div className="text-center">
               {/* Avatar with gradient ring */}
               <div className="relative mx-auto mb-6 h-28 w-28">
@@ -158,6 +158,7 @@ export default function ProfilePage() {
                         width={112}
                         height={112}
                         className="h-full w-full rounded-full object-cover"
+                        priority
                       />
                     ) : (
                       <span className="text-4xl font-bold text-white">
@@ -173,11 +174,11 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <h2 className="mb-2 text-3xl font-bold text-gray-800">
+              <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-gray-800">
                 {user.nickname || '닉네임 설정 필요'}
               </h2>
 
-              <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+              <div className="mb-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                 <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-medium text-emerald-800">
                   {user.age_range ? getAgeRangeLabel(user.age_range) : '연령대 미설정'}
                 </span>

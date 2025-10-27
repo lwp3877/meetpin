@@ -155,7 +155,7 @@ async function updateRequest(request: NextRequest, context: ApiRouteContext) {
 }
 
 // DELETE /api/requests/[id] - 참가 요청 취소 (요청자만)
-async function deleteRequest(request: NextRequest, context: ApiRouteContext) {
+async function deleteRequest(_request: NextRequest, context: ApiRouteContext) {
   const user = await getAuthenticatedUser()
   const supabase = await createServerSupabaseClient()
   const params = await context.params

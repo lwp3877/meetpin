@@ -278,6 +278,7 @@ export default function ChatPanel({
               width={32}
               height={32}
               className="mr-3 h-8 w-8 rounded-full object-cover"
+              loading="lazy"
             />
           ) : (
             <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
@@ -324,6 +325,7 @@ export default function ChatPanel({
                           width={20}
                           height={20}
                           className="mr-2 h-5 w-5 rounded-full object-cover"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="mr-2 h-5 w-5 rounded-full bg-gray-200"></div>

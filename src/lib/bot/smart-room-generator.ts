@@ -157,20 +157,12 @@ const timePreferences = {
   night: { hours: [21, 22], categories: ['drink'] },
 }
 
-// 날씨별 활동 추천
-const _weatherActivities = {
-  sunny: ['조깅', '자전거', '피크닉', '야외 카페'],
-  rainy: ['실내 카페', '전시회', '영화관람', '보드게임'],
-  cloudy: ['산책', '쇼핑', '맛집탐방', '문화체험'],
-}
+// 날씨별 활동 추천 (향후 날씨 API 연동 시 사용 예정)
 
 /**
  * 자연스러운 방 제목 생성
  */
-function generateRoomTitle(template: string, location: string, time: Date): string {
-  const hour = time.getHours()
-  const _timeOfDay = hour < 12 ? '오전' : hour < 18 ? '오후' : '저녁'
-
+function generateRoomTitle(template: string, location: string, _time: Date): string {
   const title = template.replace('{location}', location)
 
   // 시간대별 수식어 추가
@@ -181,9 +173,9 @@ function generateRoomTitle(template: string, location: string, time: Date): stri
     night: ['신나는', '열정적인', '즐거운'],
   }
 
-  const _period = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : hour < 22 ? 'evening' : 'night'
-  const modifiers = timeModifiers[_period]
-  const modifier = modifiers[Math.floor(Math.random() * modifiers.length)]
+  // 랜덤하게 수식어 선택 (시간대 상관없이)
+  const allModifiers = Object.values(timeModifiers).flat()
+  const modifier = allModifiers[Math.floor(Math.random() * allModifiers.length)]
 
   return `${modifier} ${title}`
 }

@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { getAuthenticatedUser, ApiError, createSuccessResponse, parseUrlParams } from '@/lib/api'
 
 import { logger } from '@/lib/observability/logger'
-export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const supabase = await createServerSupabaseClient()
   const user = await getAuthenticatedUser()
   const { id: roomId } = await parseUrlParams(context)

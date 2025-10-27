@@ -277,7 +277,7 @@ async function checkServices() {
 export async function POST(_request: NextRequest): Promise<Response> {
   try {
     // 관리자 인증 필요
-    const _user = await requireAdmin()
+    await requireAdmin()
 
     // 상세 진단 정보 수집
     const diagnostics = await collectDetailedDiagnostics()

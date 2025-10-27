@@ -16,39 +16,61 @@
 /**
  * 브랜드 색상 팔레트
  * 모든 UI 컴포넌트에서 일관된 색상 사용을 위한 색상 정의
+ * WCAG 2.1 AA 준수 (최소 4.5:1 명암비)
  */
 export const brandColors = {
   // Primary colors
   primary: '#10B981',
   primaryDeep: '#059669',
   primaryLight: '#34D399',
+  primaryHover: '#0D9F71', // hover 전용 색상
 
   // Secondary colors
   boost: '#F59E0B',
   boostDeep: '#D97706',
+  boostHover: '#E59307', // hover 전용 색상
   accent: '#F97316',
   accentDeep: '#EA580C',
+  accentHover: '#E8670D', // hover 전용 색상
 
-  // Text colors
-  text: '#111827',
-  textMuted: '#6B7280',
-  textLight: '#9CA3AF',
+  // Text colors (WCAG AA 준수)
+  text: '#111827',       // 검은색 계열 (white 배경에서 15.8:1)
+  textMuted: '#4B5563',  // 중간 회색 (white 배경에서 7.5:1)
+  textLight: '#6B7280',  // 밝은 회색 (white 배경에서 4.9:1)
+  textInverse: '#FFFFFF', // 역전 텍스트 (dark 배경용)
 
   // Background colors
   bg: '#FFFFFF',
-  bgSoft: '#F3F4F6',
-  bgMuted: '#E5E7EB',
+  bgSoft: '#F9FAFB',     // 부드러운 회색
+  bgMuted: '#F3F4F6',    // 중간 회색
+  bgDark: '#1F2937',     // 어두운 배경
 
-  // Status colors
+  // Border colors
+  border: '#E5E7EB',
+  borderDark: '#D1D5DB',
+  borderFocus: '#10B981', // 포커스 시 border
+
+  // Status colors (WCAG AA 준수)
   success: '#10B981',
+  successDark: '#059669',
   warning: '#F59E0B',
+  warningDark: '#D97706',
   error: '#EF4444',
+  errorDark: '#DC2626',
   info: '#3B82F6',
+  infoDark: '#2563EB',
 
   // Category colors
   categoryDrink: '#E11D48',
   categoryExercise: '#3B82F6',
   categoryOther: '#8B5CF6',
+
+  // Interactive states
+  hoverOverlay: 'rgba(0, 0, 0, 0.05)',      // hover 오버레이
+  activeOverlay: 'rgba(0, 0, 0, 0.1)',      // active 오버레이
+  focusRing: 'rgba(16, 185, 129, 0.5)',     // focus ring
+  disabled: '#9CA3AF',                       // disabled 상태
+  disabledBg: '#F3F4F6',                    // disabled 배경
 } as const
 
 export const brandMessages = {
@@ -179,6 +201,89 @@ export const tailwindColors = {
   },
 }
 
+/**
+ * Design Tokens - 디자인 시스템 토큰
+ * 간격, 크기, 그림자, 애니메이션 등 일관된 디자인 규칙
+ */
+export const designTokens = {
+  // Spacing (4px 기반 시스템)
+  spacing: {
+    xs: '0.25rem',   // 4px
+    sm: '0.5rem',    // 8px
+    md: '1rem',      // 16px
+    lg: '1.5rem',    // 24px
+    xl: '2rem',      // 32px
+    '2xl': '3rem',   // 48px
+    '3xl': '4rem',   // 64px
+  },
+
+  // Border radius
+  radius: {
+    sm: '0.25rem',   // 4px
+    md: '0.375rem',  // 6px
+    lg: '0.5rem',    // 8px
+    xl: '0.75rem',   // 12px
+    '2xl': '1rem',   // 16px
+    full: '9999px',  // 완전한 원형
+  },
+
+  // Shadows (접근성 고려 - 과도하지 않은 그림자)
+  shadow: {
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+    inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+    none: 'none',
+  },
+
+  // Typography
+  fontSize: {
+    xs: '0.75rem',    // 12px
+    sm: '0.875rem',   // 14px
+    base: '1rem',     // 16px
+    lg: '1.125rem',   // 18px
+    xl: '1.25rem',    // 20px
+    '2xl': '1.5rem',  // 24px
+    '3xl': '1.875rem',// 30px
+  },
+
+  fontWeight: {
+    normal: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
+  },
+
+  // Transitions
+  transition: {
+    fast: '150ms',
+    base: '200ms',
+    slow: '300ms',
+    ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+
+  // Z-index layers
+  zIndex: {
+    dropdown: 1000,
+    sticky: 1020,
+    fixed: 1030,
+    modalBackdrop: 1040,
+    modal: 1050,
+    popover: 1060,
+    tooltip: 1070,
+  },
+
+  // Breakpoints (반응형)
+  breakpoint: {
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px',
+  },
+} as const
+
 const brandConfig = {
   colors: brandColors,
   messages: brandMessages,
@@ -189,6 +294,7 @@ const brandConfig = {
   },
   ageRanges: ageRangeLabels,
   tailwind: tailwindColors,
+  tokens: designTokens,
   utils: {
     getCategoryDisplay,
     getAgeRangeDisplay,

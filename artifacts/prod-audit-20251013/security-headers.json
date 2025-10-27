@@ -1,0 +1,30 @@
+{
+  "url": "https://meetpin-weld.vercel.app/",
+  "timestamp": "2025-10-13T00:57:28Z",
+  "headers": {
+    "Content-Security-Policy": "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https: http:; connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com; frame-src 'self' https://js.stripe.com; object-src 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(self), payment=(self)",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Cross-Origin-Resource-Policy": "same-origin"
+  },
+  "analysis": {
+    "CSP": "✅ PASS - Comprehensive policy with frame-ancestors 'none'",
+    "HSTS": "✅ PASS - 1 year max-age with includeSubDomains and preload",
+    "X-Frame-Options": "✅ PASS - DENY (redundant with CSP frame-ancestors but good defense-in-depth)",
+    "X-Content-Type-Options": "✅ PASS - nosniff",
+    "Referrer-Policy": "✅ PASS - strict-origin-when-cross-origin",
+    "Permissions-Policy": "✅ PASS - Restrictive camera/microphone, allows geolocation/payment",
+    "COOP": "✅ PASS - same-origin",
+    "CORP": "✅ PASS - same-origin",
+    "CORS": "⚠️ WARNING - Access-Control-Allow-Origin: * (too permissive for sensitive data)"
+  },
+  "score": "9/10",
+  "recommendations": [
+    "Consider restricting CORS to specific origins instead of '*' if API handles sensitive data",
+    "Consider tightening CSP by removing 'unsafe-inline' and 'unsafe-eval' for script-src (use nonces/hashes)"
+  ]
+}

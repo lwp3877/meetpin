@@ -2,8 +2,7 @@
 'use client'
 
 import * as React from 'react'
-import Moon from 'lucide-react/dist/esm/icons/moon'
-import Sun from 'lucide-react/dist/esm/icons/sun'
+import { Moon, Sun } from '@/components/icons'
 import { useTheme } from 'next-themes'
 
 import { Button } from '@/components/ui/button'

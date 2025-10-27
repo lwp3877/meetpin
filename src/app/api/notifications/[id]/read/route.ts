@@ -6,7 +6,7 @@ import { createServerSupabaseClient } from '@/lib/supabaseClient'
 import { isDevelopmentMode } from '@/lib/config/flags'
 
 import { logger } from '@/lib/observability/logger'
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getAuthenticatedUser()
     const { id: notificationId } = await params

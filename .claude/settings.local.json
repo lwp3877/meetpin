@@ -26,7 +26,15 @@
       "Bash(rm:*)",
       "Bash(npx kill-port:*)",
       "Bash(pnpm dev:*)",
-      "Bash(pnpm repo:doctor:*)"
+      "Bash(pnpm repo:doctor:*)",
+      "Bash(pnpm analyze:bundle:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm a11y:*)",
+      "Bash(pnpm audit:security:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm why:*)",
+      "Bash(pnpm audit:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
