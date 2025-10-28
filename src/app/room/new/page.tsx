@@ -1,13 +1,14 @@
 /* src/app/room/new/page.tsx */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import RoomForm from '@/components/room/RoomForm'
 import PageTransition, { CardAnimation } from '@/components/ui/PageTransition'
 import Toast from '@/components/ui/Toast'
 import { ButtonPresets } from '@/components/ui/EnhancedButton'
 import { logger } from '@/lib/observability/logger'
+import { useAuth } from '@/lib/useAuth'
 
 type RoomFormData = {
   title: string
@@ -24,8 +25,29 @@ type RoomFormData = {
 
 export default function NewRoomPage() {
   const router = useRouter()
+  const { user, loading } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // 비로그인 사용자 리다이렉트
+  useEffect(() => {
+    if (!loading && !user) {
+      Toast.error('로그인이 필요한 서비스입니다')
+      router.push('/auth/login')
+    }
+  }, [user, loading, router])
+
+  // 로딩 중이거나 비로그인 상태일 때
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
+          <p className="text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (data: RoomFormData) => {
     const loadingToastId = Toast.loading('모임을 생성하는 중...')
