@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react'
 import EnhancedButton from '@/components/ui/EnhancedButton'
 import { ModalAnimation, CardAnimation } from '@/components/ui/PageTransition'
-import Toast from '@/components/ui/Toast'
+import { Toast } from '@/components/ui/Toast'
 import { useAuth } from '@/lib/useAuth'
 
 interface ReferralData {

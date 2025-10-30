@@ -20,6 +20,12 @@ export default function SignUpPage() {
     nickname: '',
     ageRange: '',
   })
+  const [consents, setConsents] = useState({
+    terms: false,
+    privacy: false,
+    beta: false,
+    marketing: false,
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState({
@@ -235,6 +241,20 @@ export default function SignUpPage() {
     // Check if any validation error exists
     if (emailError || passwordError || confirmPasswordError || nicknameError || ageRangeError) {
       toast.error('입력 정보를 다시 확인해주세요')
+      return false
+    }
+
+    // Check required consents
+    if (!consents.terms) {
+      toast.error('이용약관에 동의해주세요')
+      return false
+    }
+    if (!consents.privacy) {
+      toast.error('개인정보처리방침에 동의해주세요')
+      return false
+    }
+    if (!consents.beta) {
+      toast.error('베타 테스트 이용 조건에 동의해주세요')
       return false
     }
 
@@ -880,42 +900,99 @@ export default function SignUpPage() {
                 )}
               </div>
 
-              {/* Terms */}
-              <div className="pt-3 sm:pt-4">
+              {/* Consent Checkboxes */}
+              <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4 sm:p-5">
+                <div className="mb-3 border-b border-gray-300 pb-2">
+                  <h3 className="text-sm font-semibold text-gray-900">서비스 이용 동의</h3>
+                </div>
+
+                {/* Terms of Service */}
                 <div className="flex items-start space-x-3">
                   <input
                     id="terms"
                     type="checkbox"
-                    required
-                    className="text-primary focus:ring-primary mt-1 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-6 sm:w-6"
+                    checked={consents.terms}
+                    onChange={e => setConsents(prev => ({ ...prev, terms: e.target.checked }))}
+                    className="text-primary focus:ring-primary mt-0.5 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-5 sm:w-5"
                     disabled={isLoading}
-                    aria-describedby="terms-description"
+                    aria-required="true"
                   />
-                  <label
-                    htmlFor="terms"
-                    className="cursor-pointer text-sm leading-relaxed text-gray-600 sm:text-base"
-                  >
-                    <span id="terms-description">
-                      <Link
-                        href="/legal/terms"
-                        className="text-primary focus:ring-primary touch-manipulation rounded transition-colors hover:underline focus:ring-2 focus:ring-offset-1 focus:outline-none"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="이용약관 (새 창에서 열기)"
-                      >
-                        이용약관
-                      </Link>{' '}
-                      및{' '}
-                      <Link
-                        href="/legal/privacy"
-                        className="text-primary focus:ring-primary touch-manipulation rounded transition-colors hover:underline focus:ring-2 focus:ring-offset-1 focus:outline-none"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="개인정보처리방침 (새 창에서 열기)"
-                      >
-                        개인정보처리방침
-                      </Link>
-                      에 동의합니다 *
+                  <label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed text-gray-700">
+                    <Link
+                      href="/legal/terms"
+                      className="text-primary font-medium underline transition-colors hover:text-primary/80"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      이용약관
+                    </Link>
+                    에 동의합니다{' '}
+                    <span className="text-red-500" aria-label="필수">
+                      (필수)
+                    </span>
+                  </label>
+                </div>
+
+                {/* Privacy Policy */}
+                <div className="flex items-start space-x-3">
+                  <input
+                    id="privacy"
+                    type="checkbox"
+                    checked={consents.privacy}
+                    onChange={e => setConsents(prev => ({ ...prev, privacy: e.target.checked }))}
+                    className="text-primary focus:ring-primary mt-0.5 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-5 sm:w-5"
+                    disabled={isLoading}
+                    aria-required="true"
+                  />
+                  <label htmlFor="privacy" className="cursor-pointer text-sm leading-relaxed text-gray-700">
+                    <Link
+                      href="/legal/privacy"
+                      className="text-primary font-medium underline transition-colors hover:text-primary/80"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      개인정보처리방침
+                    </Link>
+                    에 동의합니다{' '}
+                    <span className="text-red-500" aria-label="필수">
+                      (필수)
+                    </span>
+                  </label>
+                </div>
+
+                {/* Beta Test Agreement */}
+                <div className="flex items-start space-x-3">
+                  <input
+                    id="beta"
+                    type="checkbox"
+                    checked={consents.beta}
+                    onChange={e => setConsents(prev => ({ ...prev, beta: e.target.checked }))}
+                    className="text-primary focus:ring-primary mt-0.5 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-5 sm:w-5"
+                    disabled={isLoading}
+                    aria-required="true"
+                  />
+                  <label htmlFor="beta" className="cursor-pointer text-sm leading-relaxed text-gray-700">
+                    베타 테스트 서비스임을 이해하며, 데이터 손실 및 서비스 중단 가능성에 동의합니다{' '}
+                    <span className="text-red-500" aria-label="필수">
+                      (필수)
+                    </span>
+                  </label>
+                </div>
+
+                {/* Marketing (Optional) */}
+                <div className="flex items-start space-x-3 border-t border-gray-200 pt-3">
+                  <input
+                    id="marketing"
+                    type="checkbox"
+                    checked={consents.marketing}
+                    onChange={e => setConsents(prev => ({ ...prev, marketing: e.target.checked }))}
+                    className="text-primary focus:ring-primary mt-0.5 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-5 sm:w-5"
+                    disabled={isLoading}
+                  />
+                  <label htmlFor="marketing" className="cursor-pointer text-sm leading-relaxed text-gray-600">
+                    이벤트 및 서비스 정보 수신에 동의합니다{' '}
+                    <span className="text-gray-400" aria-label="선택">
+                      (선택)
                     </span>
                   </label>
                 </div>

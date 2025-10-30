@@ -466,5 +466,3 @@ export const BotManager = {
     return rooms
   },
 }
-
-export default BotManager

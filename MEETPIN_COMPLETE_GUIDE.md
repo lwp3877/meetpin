@@ -954,7 +954,6 @@ GET    /api/status                         # 상태 정보
 ```typescript
 GET    /api/monitoring                     # 시스템 모니터링
 GET    /api/cache/stats                    # 캐시 통계
-POST   /api/telemetry/web-vitals           # Web Vitals 수집
 POST   /api/security/csp-report            # CSP 위반 리포트
 ```
 

@@ -1,11 +1,11 @@
-/* src/lib/bbox.ts */
-// BBox (Bounding Box) 지리적 좌표 유틸리티
+/* src/lib/utils/bbox.ts */
+// 최소한의 BBox 유틸리티만 유지해 테스트와 API에서 사용하는 기능에 집중합니다.
 
 export interface BoundingBox {
-  south: number // 남쪽 위도
-  west: number // 서쪽 경도
-  north: number // 북쪽 위도
-  east: number // 동쪽 경도
+  south: number
+  west: number
+  north: number
+  east: number
 }
 
 export interface Point {
@@ -14,30 +14,22 @@ export interface Point {
 }
 
 /**
- * bbox 쿼리 파라미터를 파싱 (?bbox=south,west,north,east)
+ * `bbox=south,west,north,east` 형식의 문자열을 파싱합니다.
  */
 export function parseBBoxParam(bboxString: string | null): BoundingBox | null {
-  if (!bboxString || typeof bboxString !== 'string') {
-    return null
-  }
+  if (!bboxString || typeof bboxString !== 'string') return null
 
   const parts = bboxString.split(',').map(s => s.trim())
-  if (parts.length !== 4) {
-    return null
-  }
+  if (parts.length !== 4) return null
 
   const [southStr, westStr, northStr, eastStr] = parts
-  const south = parseFloat(southStr)
-  const west = parseFloat(westStr)
-  const north = parseFloat(northStr)
-  const east = parseFloat(eastStr)
+  const south = Number.parseFloat(southStr)
+  const west = Number.parseFloat(westStr)
+  const north = Number.parseFloat(northStr)
+  const east = Number.parseFloat(eastStr)
 
-  // 유효성 검사
-  if (
-    isNaN(south) ||
-    isNaN(west) ||
-    isNaN(north) ||
-    isNaN(east) ||
+  const isInvalid =
+    [south, west, north, east].some(value => Number.isNaN(value)) ||
     south < -90 ||
     south > 90 ||
     north < -90 ||
@@ -48,108 +40,34 @@ export function parseBBoxParam(bboxString: string | null): BoundingBox | null {
     east > 180 ||
     south >= north ||
     west >= east
-  ) {
-    return null
-  }
+
+  if (isInvalid) return null
 
   return { south, west, north, east }
 }
 
 /**
- * BoundingBox를 쿼리 파라미터 문자열로 변환
- */
-export function bboxToParam(bbox: BoundingBox): string {
-  return `${bbox.south},${bbox.west},${bbox.north},${bbox.east}`
-}
-
-/**
- * 좌표가 BoundingBox 안에 있는지 확인
- */
-export function inBBox(point: Point, bbox: BoundingBox): boolean {
-  return (
-    point.lat >= bbox.south &&
-    point.lat <= bbox.north &&
-    point.lng >= bbox.west &&
-    point.lng <= bbox.east
-  )
-}
-
-/**
- * 두 BoundingBox가 겹치는지 확인
- */
-export function bboxIntersects(bbox1: BoundingBox, bbox2: BoundingBox): boolean {
-  return !(
-    bbox1.east < bbox2.west ||
-    bbox1.west > bbox2.east ||
-    bbox1.north < bbox2.south ||
-    bbox1.south > bbox2.north
-  )
-}
-
-/**
- * BoundingBox의 중심점 계산
- */
-export function bboxCenter(bbox: BoundingBox): Point {
-  return {
-    lat: (bbox.south + bbox.north) / 2,
-    lng: (bbox.west + bbox.east) / 2,
-  }
-}
-
-/**
- * 좌표 주변의 BoundingBox 생성 (km 단위 반경)
- */
-export function createBBoxAroundPoint(point: Point, radiusKm: number): BoundingBox {
-  // 위도 1도 ≈ 111km
-  // 경도 1도는 위도에 따라 달라짐 (적도에서 111km, 극지방에서 0km)
-  const latDelta = radiusKm / 111
-  const lngDelta = radiusKm / (111 * Math.cos((point.lat * Math.PI) / 180))
-
-  return {
-    south: Math.max(-90, point.lat - latDelta),
-    north: Math.min(90, point.lat + latDelta),
-    west: Math.max(-180, point.lng - lngDelta),
-    east: Math.min(180, point.lng + lngDelta),
-  }
-}
-
-/**
- * BoundingBox의 면적 계산 (평방 km)
- */
-export function bboxArea(bbox: BoundingBox): number {
-  const latDiff = bbox.north - bbox.south
-  const lngDiff = bbox.east - bbox.west
-
-  // 대략적인 계산 (정확하지 않음, 단순 추정용)
-  const avgLat = (bbox.north + bbox.south) / 2
-  const latKm = latDiff * 111
-  const lngKm = lngDiff * 111 * Math.cos((avgLat * Math.PI) / 180)
-
-  return latKm * lngKm
-}
-
-/**
- * 한국 전체를 포함하는 기본 BoundingBox
+ * 대한민국 전체를 커버하는 기본 영역.
  */
 export const KOREA_BBOX: BoundingBox = {
-  south: 33.0, // 제주도 남쪽
-  west: 124.5, // 서해 끝
-  north: 38.7, // 북한 경계
-  east: 132.0, // 동해 끝
+  south: 33.0,
+  west: 124.5,
+  north: 38.7,
+  east: 132.0,
 }
 
 /**
- * 서울 시내 기본 BoundingBox
+ * 서울 도심을 감싸는 기본 영역.
  */
 export const SEOUL_BBOX: BoundingBox = {
-  south: 37.42, // 서울 남쪽
-  west: 126.76, // 서울 서쪽
-  north: 37.7, // 서울 북쪽
-  east: 127.18, // 서울 동쪽
+  south: 37.42,
+  west: 126.76,
+  north: 37.7,
+  east: 127.18,
 }
 
 /**
- * BoundingBox 유효성 검사
+ * BoundingBox 유효성 검증.
  */
 export function isValidBBox(bbox: BoundingBox): boolean {
   return (
@@ -171,24 +89,10 @@ export function isValidBBox(bbox: BoundingBox): boolean {
 }
 
 /**
- * PostgreSQL용 BoundingBox 조건 생성
- */
-export function createBBoxQuery(bbox: BoundingBox): {
-  condition: string
-  params: number[]
-} {
-  return {
-    condition: 'lat BETWEEN $1 AND $2 AND lng BETWEEN $3 AND $4',
-    params: [bbox.south, bbox.north, bbox.west, bbox.east],
-  }
-}
-
-/**
- * 두 좌표 간의 거리 계산 (km)
- * Haversine 공식 사용
+ * 두 좌표 간의 거리를 km 단위로 계산합니다. (Haversine 공식)
  */
 export function calculateDistance(point1: Point, point2: Point): number {
-  const R = 6371 // 지구 반지름 (km)
+  const R = 6371 // 지구 반지름(km)
 
   const lat1Rad = (point1.lat * Math.PI) / 180
   const lat2Rad = (point2.lat * Math.PI) / 180
@@ -203,26 +107,3 @@ export function calculateDistance(point1: Point, point2: Point): number {
 
   return R * c
 }
-
-// Export individual functions for named imports
-export const parseBBox = parseBBoxParam
-export const createBBoxFromBounds = createBBoxAroundPoint
-
-const bboxUtils = {
-  parse: parseBBoxParam,
-  toParam: bboxToParam,
-  inBBox,
-  intersects: bboxIntersects,
-  center: bboxCenter,
-  around: createBBoxAroundPoint,
-  area: bboxArea,
-  isValid: isValidBBox,
-  createQuery: createBBoxQuery,
-  distance: calculateDistance,
-  presets: {
-    KOREA: KOREA_BBOX,
-    SEOUL: SEOUL_BBOX,
-  },
-}
-
-export default bboxUtils

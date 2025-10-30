@@ -3,7 +3,7 @@
  * 고급스럽고 매력적인 UI/UX를 위한 확장된 테마 시스템
  */
 
-export const premiumColors = {
+const premiumColors = {
   // Sophisticated Primary Palette - WCAG AA Compliant
   primary: {
     50: '#F0FDF9',
@@ -77,7 +77,7 @@ export const premiumColors = {
   },
 }
 
-export const premiumShadows = {
+const premiumShadows = {
   xs: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
   sm: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
   md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
@@ -92,7 +92,7 @@ export const premiumShadows = {
   dramatic: '0 32px 64px rgba(0, 0, 0, 0.2)',
 }
 
-export const premiumTypography = {
+const premiumTypography = {
   // Font stacks - next/font 자체 호스팅으로 CSP 단순화
   fontFamily: {
     display: [
@@ -157,7 +157,7 @@ export const premiumTypography = {
   },
 }
 
-export const premiumSpacing = {
+const premiumSpacing = {
   // Enhanced spacing scale
   px: '1px',
   0: '0px',
@@ -196,7 +196,7 @@ export const premiumSpacing = {
   96: '24rem',
 }
 
-export const premiumBorderRadius = {
+const premiumBorderRadius = {
   none: '0px',
   sm: '0.125rem',
   base: '0.25rem',
@@ -208,7 +208,7 @@ export const premiumBorderRadius = {
   full: '9999px',
 }
 
-export const premiumAnimations = {
+const premiumAnimations = {
   // Smooth transitions
   transition: {
     none: 'none',
@@ -255,7 +255,7 @@ export const premiumAnimations = {
 }
 
 // Component-specific design tokens
-export const componentTokens = {
+const componentTokens = {
   button: {
     height: {
       sm: '2rem',
@@ -306,5 +306,3 @@ export const premiumTheme = {
   animations: premiumAnimations,
   components: componentTokens,
 }
-
-export default premiumTheme

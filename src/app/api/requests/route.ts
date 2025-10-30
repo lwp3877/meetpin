@@ -15,7 +15,7 @@
 
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabaseClient'
-import { requestSchema } from '@/lib/utils/zodSchemas'
+import { createRequestSchema } from '@/lib/utils/zodSchemas'
 import { isDevelopmentMode } from '@/lib/config/flags'
 import {
   createMethodRouter,
@@ -108,7 +108,7 @@ async function createRequest(request: NextRequest) {
   }
 
   // 요청 본문 검증
-  const requestData = await parseAndValidateBody(request, requestSchema)
+  const requestData = await parseAndValidateBody(request, createRequestSchema)
 
   if (isDevelopmentMode) {
     // 개발 모드에서는 성공 응답 반환

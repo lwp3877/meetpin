@@ -22,4 +22,3 @@ export function BotSchedulerInitializer() {
   return null
 }
 
-export default BotSchedulerInitializer

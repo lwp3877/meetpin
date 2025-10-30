@@ -4,6 +4,7 @@ import './globals.css'
 import { brandMessages } from '@/lib/config/brand'
 import Providers from '@/components/common/Providers'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
+import { BetaBanner } from '@/components/common/BetaBanner'
 
 // next/font 자체 호스팅으로 CSP 단순화
 const inter = Inter({
@@ -188,6 +189,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} bg-background min-h-screen touch-manipulation font-sans antialiased`} style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>
         <Providers>
+          <BetaBanner />
           <div id="root" className="mobile-full-height relative flex min-h-screen flex-col">
             <main className="flex-1">{children}</main>
           </div>

@@ -77,7 +77,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
      - `/api/status` - Version and environment info (40 lines)
    - Cache statistics: `/api/cache/stats`
    - Security CSP reporting: `/api/security/csp-report`
-   - Web vitals telemetry: `/api/telemetry/web-vitals`
 
    **All 6 health endpoints are necessary** - serve different monitoring tools and use cases
 
@@ -94,7 +93,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
      - `common/` - Shared components (Providers, theme-toggle, BotSchedulerInitializer)
      - `error/` - Error handling (GlobalErrorBoundary)
      - `landing/` - Landing pages (ProLanding - dynamic import)
-     - `layout/` - Layout components (LegalFooter)
+     - `layout/` - Layout scaffolding (currently unused)
      - `map/` - Map features (DynamicMap, MapWithCluster, LocationPicker, MapFilters)
      - `pwa/` - PWA features (InstallPrompt)
      - `room/` - Room management (RoomForm)
@@ -151,6 +150,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 # Development Environment
 pnpm dev          # Start development server (localhost:3001 by default)
+pnpm restart:clean # Clean .next and restart dev server
 pnpm build        # Production build
 pnpm start        # Start production server
 pnpm preview      # Build and preview production version
@@ -330,7 +330,7 @@ SENTRY_DSN=your_sentry_dsn
 TELEMETRY_SAMPLING_RATE=0.1
 
 # Development Mode Control
-NEXT_PUBLIC_USE_MOCK_DATA=true  # true for mock mode, false for production
+NEXT_PUBLIC_FORCE_MOCK=true  # true for mock mode, false for production
 
 # Testing Environment (RLS Security Tests)
 # Required only for advanced security testing

@@ -409,21 +409,3 @@ export const apiUtils = {
     createErrorResponse(message, 429, 'RATE_LIMIT_EXCEEDED'),
 }
 
-const apiUtilsCollection = {
-  ApiError,
-  createSuccessResponse,
-  createErrorResponse,
-  getClientIP,
-  parseAndValidateBody,
-  parseUrlParams,
-  parseQueryParams,
-  parsePaginationParams,
-  withRateLimit,
-  withAuth,
-  withAdminAuth,
-  withUserRateLimit,
-  withErrorHandling,
-  createMethodRouter,
-}
-
-export default apiUtilsCollection

@@ -8,13 +8,11 @@ import Zap from 'lucide-react/dist/esm/icons/zap'
 import Clock from 'lucide-react/dist/esm/icons/clock'
 import Users from 'lucide-react/dist/esm/icons/users'
 import TrendingUp from 'lucide-react/dist/esm/icons/trending-up'
-import CreditCard from 'lucide-react/dist/esm/icons/credit-card'
 import Check from 'lucide-react/dist/esm/icons/check'
 import {
   BOOST_PLANS,
   type BoostPlanId,
   formatPrice,
-  processBoostPayment,
   mockPaymentProcess,
 } from '@/lib/services/stripe'
 import { useAuth } from '@/lib/useAuth'
@@ -47,42 +45,28 @@ export function BoostModal({
       return
     }
 
+    // 베타 테스트 기간 동안 무료 부스트 제공
     setProcessing(true)
 
     try {
-      let result
+      const result = await mockPaymentProcess(roomId, selectedPlan)
 
-      if (isDevelopmentMode) {
-        // 개발 모드에서는 모의 결제 처리
-        result = await mockPaymentProcess(roomId, selectedPlan)
-
-        if (result.success) {
-          toast.success('부스트가 활성화되었습니다! 🚀')
-          onBoostSuccess?.()
-          onClose()
-        } else {
-          toast.error(result.error || '결제에 실패했습니다')
-        }
+      if (result.success) {
+        toast.success('🎉 베타 테스트 기간 동안 무료로 부스트가 활성화되었습니다!')
+        onBoostSuccess?.()
+        onClose()
       } else {
-        // 프로덕션 모드에서는 실제 Stripe 결제
-        result = await processBoostPayment(roomId, selectedPlan)
-
-        if (!result.success) {
-          toast.error(result.error || '결제 처리에 실패했습니다')
-        }
-        // 성공시에는 Stripe으로 리다이렉트됨
+        toast.error(result.error || '부스트 활성화에 실패했습니다')
       }
     } catch (error: unknown) {
-      logger.error('Boost purchase error:', { error: error instanceof Error ? error.message : String(error) })
-      toast.error('결제 중 오류가 발생했습니다')
+      logger.error('Boost activation error:', { error: error instanceof Error ? error.message : String(error) })
+      toast.error('부스트 활성화 중 오류가 발생했습니다')
     } finally {
       setProcessing(false)
     }
   }
 
   if (!isOpen) return null
-
-  const selectedPlanData = BOOST_PLANS[selectedPlan]
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
@@ -209,21 +193,16 @@ export function BoostModal({
           </div>
 
           {/* 결제 정보 */}
-          <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
             <div className="flex items-start space-x-2">
-              <Star className="mt-0.5 h-5 w-5 flex-shrink-0 fill-current text-yellow-600" />
-              <div className="text-sm text-yellow-800">
-                <p className="mb-1 font-medium">결제 후 즉시 적용됩니다</p>
+              <Star className="mt-0.5 h-5 w-5 flex-shrink-0 fill-current text-green-600" />
+              <div className="text-sm text-green-800">
+                <p className="mb-1 font-bold">🎉 베타 테스트 기간 동안 무료로 제공!</p>
                 <ul className="space-y-1 text-xs">
-                  <li>• 부스트는 결제 완료 후 바로 활성화됩니다</li>
+                  <li>• 결제 없이 즉시 부스트가 활성화됩니다</li>
                   <li>• 모임 목록 상단에 우선 노출됩니다</li>
                   <li>• ⭐ 부스트 배지가 표시됩니다</li>
-                  <li>
-                    •{' '}
-                    {isDevelopmentMode
-                      ? '개발 모드: 실제 결제되지 않습니다'
-                      : '안전한 Stripe 결제 시스템을 사용합니다'}
-                  </li>
+                  <li>• 베타 테스트 참여자 혜택입니다 (정식 출시 후 유료 전환 예정)</li>
                 </ul>
               </div>
             </div>
@@ -251,8 +230,8 @@ export function BoostModal({
               </>
             ) : (
               <>
-                <CreditCard className="h-5 w-5" />
-                <span>{formatPrice(selectedPlanData.price)} 결제하기</span>
+                <Zap className="h-5 w-5" />
+                <span>무료로 부스트하기</span>
               </>
             )}
           </button>

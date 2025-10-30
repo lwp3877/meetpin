@@ -457,29 +457,8 @@ export function rateLimitSync(key: string, limit: number, windowMs: number): boo
 }
 
 // 타입 호환성
-export const defaultLimits = RATE_LIMIT_PRESETS
 export type RateLimitType = keyof typeof RATE_LIMIT_PRESETS
 export interface RateLimitOptions {
   requests: number
   windowMs: number
 }
-
-// 기본 export
-const defaultExport = {
-  rateLimit,
-  rateLimitGlobal,
-  rateLimitUser,
-  rateLimitEndpoint,
-  emergencyRateLimit,
-  getRateLimitStats,
-  resetRateLimit,
-  resetAllRateLimits,
-  checkRateLimit,
-  checkTypedRateLimit,
-  checkIPRateLimit,
-  checkUserRateLimit,
-  checkUserIPRateLimit,
-  getRateLimitInfo,
-  presets: RATE_LIMIT_PRESETS,
-}
-export default defaultExport

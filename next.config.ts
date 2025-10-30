@@ -61,14 +61,12 @@ const nextConfig: NextConfig = {
       'lucide-react',
       '@tanstack/react-query',
       'date-fns',
-      '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',
       '@radix-ui/react-tabs',
       'react-hook-form',
       'zod',
     ],
-    webVitalsAttribution: ['CLS', 'LCP'],
   },
 
   // 서버 외부 패키지

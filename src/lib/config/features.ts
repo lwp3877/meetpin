@@ -95,4 +95,3 @@ export const trackFeatureUsage = () => {
   // Example: analytics.track('feature_usage', { feature, action })
 }
 
-export default getFeatures

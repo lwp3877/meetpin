@@ -39,7 +39,8 @@
       "Bash(npx playwright test:*)",
       "Bash(npx lighthouse:*)",
       "Bash(npx playwright install:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

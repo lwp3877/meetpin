@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/useAuth'
 import { PageLoader } from '@/components/ui/LoadingSpinner'
-import Toast from '@/components/ui/Toast'
+import { Toast } from '@/components/ui/Toast'
 import { logger } from '@/lib/observability/logger'
 
 interface EmergencyReport {
