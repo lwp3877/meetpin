@@ -85,7 +85,7 @@ jobs:
 
       - name: 🚨 Create incident issue on failure
         if: failure() && steps.healthcheck.outputs.failed == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -142,7 +142,7 @@ jobs:
 
       - name: 🔄 Close resolved incident issues
         if: success() && steps.healthcheck.outputs.failed == 'false'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
