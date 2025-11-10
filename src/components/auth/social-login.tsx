@@ -12,7 +12,7 @@ interface SocialLoginProps {
   disabled?: boolean
 }
 
-export function SocialLogin({ type = 'login', onSuccess, disabled = false }: SocialLoginProps) {
+export function SocialLogin({ type = 'login', disabled = false }: SocialLoginProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
 
   const handleKakaoLogin = async () => {
@@ -23,7 +23,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       const { createBrowserSupabaseClient } = await import('@/lib/supabaseClient')
       const supabase = createBrowserSupabaseClient()
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'kakao',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -39,9 +39,9 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
     } catch (error: unknown) {
       logger.error('Kakao login error:', { error: error instanceof Error ? error.message : String(error) })
 
-      // Supabase OAuth가 설정되지 않은 경우 Mock 사용
+      // Supabase OAuth가 설정되지 않은 경우
       if ((error as Error).message?.includes('not enabled')) {
-        toast.info('카카오 로그인이 아직 설정되지 않았습니다. 이메일로 가입해주세요.')
+        toast('카카오 로그인이 아직 설정되지 않았습니다. 이메일로 가입해주세요.', { icon: 'ℹ️' })
       } else {
         toast.error('카카오 로그인 중 오류가 발생했습니다')
       }
@@ -58,7 +58,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       const { createBrowserSupabaseClient } = await import('@/lib/supabaseClient')
       const supabase = createBrowserSupabaseClient()
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -72,7 +72,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
       logger.error('Google login error:', { error: error instanceof Error ? error.message : String(error) })
 
       if ((error as Error).message?.includes('not enabled')) {
-        toast.info('구글 로그인이 아직 설정되지 않았습니다. 이메일로 가입해주세요.')
+        toast('구글 로그인이 아직 설정되지 않았습니다. 이메일로 가입해주세요.', { icon: 'ℹ️' })
       } else {
         toast.error('구글 로그인 중 오류가 발생했습니다')
       }
@@ -86,7 +86,7 @@ export function SocialLogin({ type = 'login', onSuccess, disabled = false }: Soc
 
     try {
       // Naver는 Supabase에서 기본 지원하지 않음
-      toast.info('네이버 로그인은 현재 준비 중입니다. 다른 방법으로 로그인해주세요.')
+      toast('네이버 로그인은 현재 준비 중입니다. 다른 방법으로 로그인해주세요.', { icon: 'ℹ️' })
       setLoadingProvider(null)
     } catch (error: unknown) {
       logger.error('Naver login error:', { error: error instanceof Error ? error.message : String(error) })
