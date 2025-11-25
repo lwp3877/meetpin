@@ -40,7 +40,12 @@
       "Bash(npx lighthouse:*)",
       "Bash(npx playwright install:*)",
       "Bash(tee:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"\")",
+      "Bash(echo \"[$cat]:\")",
+      "Bash(done)",
+      "Bash(npx knip:*)"
     ],
     "deny": [],
     "ask": []

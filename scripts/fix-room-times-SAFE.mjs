@@ -1,12 +1,26 @@
 #!/usr/bin/env node
 /**
  * 과거 시간 방들을 미래 시간으로 업데이트
+ *
+ * 사용법:
+ * SUPABASE_URL=your_url SUPABASE_SERVICE_KEY=your_key node scripts/fix-room-times-SAFE.mjs
  */
 
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = 'https://xnrqfkecpabucnoxxtwa.supabase.co'
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhucnFma2VjcGFidWNub3h4dHdhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjI3NTI2NiwiZXhwIjoyMDcxODUxMjY2fQ.YxKU1hb8F9hTrjGP5UgoeCClaihaZDH7nZf3u0UQLWc'
+// 환경변수에서 가져오기 (절대 하드코딩하지 마세요!)
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error('❌ 환경변수가 설정되지 않았습니다!')
+  console.error('다음 변수가 필요합니다:')
+  console.error('  - SUPABASE_URL (또는 NEXT_PUBLIC_SUPABASE_URL)')
+  console.error('  - SUPABASE_SERVICE_KEY (또는 SUPABASE_SERVICE_ROLE_KEY)')
+  console.error('\n사용 예시:')
+  console.error('  SUPABASE_URL=https://xxx.supabase.co SUPABASE_SERVICE_KEY=xxx node scripts/fix-room-times-SAFE.mjs')
+  process.exit(1)
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 

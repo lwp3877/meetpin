@@ -78,6 +78,21 @@ too
 # 빌드 임시 파일
 tsconfig.tsbuildinfo
 
+# PWA 자동 생성 파일
+public/sw.js
+public/workbox-*.js
+
+# 위험한 스크립트 (하드코딩된 키 포함)
+scripts/*-sample-data.mjs
+scripts/*-production-db.mjs
+scripts/apply-rls-fix.mjs
+scripts/fix-room-times.mjs
+scripts/create-sample-data.mjs
+scripts/check-production-db.mjs
+
+# 백업 아카이브
+_archive/
+
 # 이미지 및 미디어
 *.jpg
 *.jpeg
