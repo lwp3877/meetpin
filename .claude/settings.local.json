@@ -46,7 +46,9 @@
       "Bash(echo \"[$cat]:\")",
       "Bash(done)",
       "Bash(npx knip:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(openssl rand:*)",
+      "Bash(ADMIN_API_KEY=BuxbmPIcvYX5jF8kmpplNTNO1oNg7xPp3QOGs1gjQs0= node scripts/seed-production-rooms.mjs)"
     ],
     "deny": [],
     "ask": []

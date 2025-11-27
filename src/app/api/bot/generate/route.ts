@@ -9,12 +9,33 @@ import { logger } from '@/lib/observability/logger'
  */
 export async function POST(request: NextRequest) {
   try {
-    // 관리자 전용 기능으로 제한
-    const admin = await requireAdmin()
+    // Authorization 헤더에서 API 키 확인 (외부 스크립트용)
+    const authHeader = request.headers.get('authorization')
+    const apiKey = authHeader?.replace('Bearer ', '')
+
+    // API 키가 있으면 검증, 없으면 일반 관리자 인증
+    let adminId = 'api-key'
+    if (apiKey && process.env.ADMIN_API_KEY) {
+      if (apiKey !== process.env.ADMIN_API_KEY) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: '유효하지 않은 API 키입니다',
+          },
+          { status: 401 }
+        )
+      }
+      // API 키 검증 성공 - 관리자로 간주
+      adminId = 'api-key'
+    } else {
+      // API 키가 없으면 일반 Supabase 관리자 인증
+      const admin = await requireAdmin()
+      adminId = admin.id
+    }
 
     // Rate limiting (관리자 기준)
     const rateLimitResult = rateLimit(
-      `bot-generate:${admin.id}`,
+      `bot-generate:${adminId}`,
       5, // 5회
       60 * 1000 // 1분
     )
