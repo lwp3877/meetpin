@@ -23,7 +23,7 @@ export default function SignUpPage() {
   const [consents, setConsents] = useState({
     terms: false,
     privacy: false,
-    beta: false,
+    service: false,
     marketing: false,
   })
   const [isLoading, setIsLoading] = useState(false)
@@ -253,8 +253,8 @@ export default function SignUpPage() {
       toast.error('개인정보처리방침에 동의해주세요')
       return false
     }
-    if (!consents.beta) {
-      toast.error('베타 테스트 이용 조건에 동의해주세요')
+    if (!consents.service) {
+      toast.error('서비스 이용 약관에 동의해주세요')
       return false
     }
 
@@ -960,19 +960,19 @@ export default function SignUpPage() {
                   </label>
                 </div>
 
-                {/* Beta Test Agreement */}
+                {/* Service Agreement */}
                 <div className="flex items-start space-x-3">
                   <input
-                    id="beta"
+                    id="service"
                     type="checkbox"
-                    checked={consents.beta}
-                    onChange={e => setConsents(prev => ({ ...prev, beta: e.target.checked }))}
+                    checked={consents.service}
+                    onChange={e => setConsents(prev => ({ ...prev, service: e.target.checked }))}
                     className="text-primary focus:ring-primary mt-0.5 h-5 w-5 touch-manipulation rounded border-2 border-gray-300 transition-colors focus:ring-2 focus:ring-offset-1 sm:h-5 sm:w-5"
                     disabled={isLoading}
                     aria-required="true"
                   />
-                  <label htmlFor="beta" className="cursor-pointer text-sm leading-relaxed text-gray-700">
-                    베타 테스트 서비스임을 이해하며, 데이터 손실 및 서비스 중단 가능성에 동의합니다{' '}
+                  <label htmlFor="service" className="cursor-pointer text-sm leading-relaxed text-gray-700">
+                    서비스 이용 중 발생할 수 있는 일시적 장애 및 데이터 변경에 동의합니다{' '}
                     <span className="text-red-500" aria-label="필수">
                       (필수)
                     </span>

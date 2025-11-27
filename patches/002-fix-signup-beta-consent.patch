@@ -1,0 +1,47 @@
+diff --git a/src/app/auth/signup/page.tsx b/src/app/auth/signup/page.tsx
+index h7i8j9k..l0m1n2o 100644
+--- a/src/app/auth/signup/page.tsx
++++ b/src/app/auth/signup/page.tsx
+@@ -23,7 +23,7 @@ export default function SignupPage() {
+   const [consents, setConsents] = useState({
+     terms: false,
+     privacy: false,
+-    beta: false,
++    service: false,
+     marketing: false,
+   })
+ 
+@@ -253,8 +253,8 @@ export default function SignupPage() {
+       return false
+     }
+ 
+-    if (!consents.beta) {
+-      toast.error('베타 테스트 이용 조건에 동의해주세요')
++    if (!consents.service) {
++      toast.error('서비스 이용 약관에 동의해주세요')
+       return false
+     }
+ 
+@@ -961,16 +961,16 @@ export default function SignupPage() {
+ 
+               {/* 베타 테스트 동의 */}
+               <div className="flex items-start space-x-3">
+                 <input
+-                  id="beta"
++                  id="service"
+                   type="checkbox"
+-                  checked={consents.beta}
+-                  onChange={e => setConsents(prev => ({ ...prev, beta: e.target.checked }))}
++                  checked={consents.service}
++                  onChange={e => setConsents(prev => ({ ...prev, service: e.target.checked }))}
+                   className="mt-1 h-5 w-5 rounded border-gray-300 text-emerald-600 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                 />
+-                <label htmlFor="beta" className="flex-1 select-text text-sm text-gray-600">
+-                  베타 테스트 서비스임을 이해하며, 데이터 손실 및 서비스 중단 가능성에 동의합니다
+-                  <span className="ml-1 text-red-500">*</span>
++                <label htmlFor="service" className="flex-1 select-text text-sm text-gray-600">
++                  서비스 이용 중 발생할 수 있는 일시적 장애 및 데이터 변경에 동의합니다
++                  <span className="ml-1 text-red-500"> *</span>
+                 </label>
+               </div>
+ 

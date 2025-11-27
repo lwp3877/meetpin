@@ -45,7 +45,8 @@
       "Bash(do echo \"\")",
       "Bash(echo \"[$cat]:\")",
       "Bash(done)",
-      "Bash(npx knip:*)"
+      "Bash(npx knip:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

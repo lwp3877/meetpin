@@ -352,27 +352,31 @@ export default function HelpPage() {
 
         {/* Additional Resources */}
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <Card className="border-0 bg-white/80 shadow-lg backdrop-blur-sm">
-            <CardContent className="p-8 text-center">
-              <div className="mb-4 text-4xl">🎯</div>
-              <h3 className="mb-3 text-xl font-bold text-gray-900">모임 참가 성공 팁</h3>
-              <p className="mb-4 text-sm text-gray-600">
-                첫 만남을 성공적으로 만들기 위한 실용적인 조언들을 확인해보세요.
-              </p>
-              <Badge className="border-blue-200 bg-blue-100 text-blue-800">곧 출시 예정</Badge>
-            </CardContent>
-          </Card>
+          <Link href="/legal/success-tips" className="block transition-transform hover:scale-105">
+            <Card className="border-0 bg-white/80 shadow-lg backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <div className="mb-4 text-4xl">🎯</div>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">모임 참가 성공 팁</h3>
+                <p className="mb-4 text-sm text-gray-600">
+                  첫 만남을 성공적으로 만들기 위한 실용적인 조언들을 확인해보세요.
+                </p>
+                <Badge className="border-blue-200 bg-blue-100 text-blue-800">바로가기 →</Badge>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card className="border-0 bg-white/80 shadow-lg backdrop-blur-sm">
-            <CardContent className="p-8 text-center">
-              <div className="mb-4 text-4xl">🔒</div>
-              <h3 className="mb-3 text-xl font-bold text-gray-900">안전 가이드라인</h3>
-              <p className="mb-4 text-sm text-gray-600">
-                안전하고 즐거운 모임을 위한 필수 안전 수칙을 알아보세요.
-              </p>
-              <Badge className="border-green-200 bg-green-100 text-green-800">곧 출시 예정</Badge>
-            </CardContent>
-          </Card>
+          <Link href="/legal/safety" className="block transition-transform hover:scale-105">
+            <Card className="border-0 bg-white/80 shadow-lg backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <div className="mb-4 text-4xl">🔒</div>
+                <h3 className="mb-3 text-xl font-bold text-gray-900">안전 가이드라인</h3>
+                <p className="mb-4 text-sm text-gray-600">
+                  안전하고 즐거운 모임을 위한 필수 안전 수칙을 알아보세요.
+                </p>
+                <Badge className="border-green-200 bg-green-100 text-green-800">바로가기 →</Badge>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>
