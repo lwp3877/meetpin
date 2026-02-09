@@ -154,7 +154,7 @@ jobs:
           retention-days: 30
 
       - name: '📊 Upload Test Results to GitHub'
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: E2E Test Results - ${{ matrix.project }}
