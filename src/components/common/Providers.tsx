@@ -8,7 +8,6 @@ import { CustomToaster } from '@/components/ui/Toast'
 import { ThemeProvider } from '@/components/common/theme-provider'
 import { BotSchedulerInitializer } from '@/components/common/BotSchedulerInitializer'
 import { GlobalErrorBoundary } from '@/components/error/GlobalErrorBoundary'
-import { Toaster } from 'sonner'
 import { logFeatureFlags } from '@/lib/config/features'
 import { useEffect, useState } from 'react'
 import { initializeBrowserCompatibility } from '@/lib/utils/browserCompat'
@@ -103,22 +102,6 @@ export default function Providers({ children }: ProvidersProps) {
           <BotSchedulerInitializer />
           {/* Enhanced Toast 알림 */}
           <CustomToaster />
-          {/* Sonner Toast (새로운 토스트 시스템) */}
-          <Toaster
-            position="top-center"
-            richColors
-            closeButton
-            expand={true}
-            duration={4000}
-            toastOptions={{
-              style: {
-                background: 'rgb(255 255 255 / 0.95)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgb(229 231 235)',
-                color: 'rgb(17 24 39)',
-              },
-            }}
-          />
         </AuthProvider>
       </ThemeProvider>
     </GlobalErrorBoundary>

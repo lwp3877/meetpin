@@ -59,7 +59,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: [
       'lucide-react',
-      '@tanstack/react-query',
       'date-fns',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',

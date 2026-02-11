@@ -16,6 +16,9 @@ export function BotSchedulerInitializer() {
       logger.info('🤖 봇 스케줄러 자동 초기화 시작')
       BotManager.start()
     }
+    return () => {
+      BotManager.stop()
+    }
   }, [])
 
   // 이 컴포넌트는 UI를 렌더링하지 않음

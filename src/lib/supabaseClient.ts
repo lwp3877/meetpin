@@ -754,9 +754,6 @@ export function getSupabaseAdmin() {
 // 하위 호환성을 위한 export
 export const supabaseAdmin = getSupabaseAdmin()
 
-// 클라이언트별 타입 export
-export type SupabaseServerClient = ReturnType<typeof createServerSupabaseClient>
-
 // 테이블 타입들
 export type Profile = Database['public']['Tables']['profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['profiles']['Insert']
@@ -792,53 +789,3 @@ export type BlockedUserUpdate = Database['public']['Tables']['blocked_users']['U
 
 export type AdminStats = Database['public']['Views']['admin_stats']['Row']
 
-// JOIN 결과를 위한 확장 타입들
-export type RoomWithProfile = Room & {
-  profiles: Pick<Profile, 'nickname' | 'avatar_url' | 'age_range'> | null
-}
-
-export type RequestWithDetails = Request & {
-  rooms: Pick<Room, 'title' | 'category' | 'start_at'> | null
-  profiles: Pick<Profile, 'nickname' | 'avatar_url'> | null
-}
-
-export type MatchWithDetails = Match & {
-  rooms: Pick<Room, 'title' | 'category'> | null
-  host_profile: Pick<Profile, 'nickname' | 'avatar_url'> | null
-  guest_profile: Pick<Profile, 'nickname' | 'avatar_url'> | null
-}
-
-export type MessageWithProfile = Message & {
-  profiles: Pick<Profile, 'nickname' | 'avatar_url'> | null
-}
-
-export type ReportWithDetails = Report & {
-  reporter_profile: Pick<Profile, 'nickname'> | null
-  target_profile: Pick<Profile, 'nickname'> | null
-  rooms: Pick<Room, 'title'> | null
-}
-
-// 유틸리티 함수들
-export function isSupabaseError(error: unknown): error is { code: string; message: string } {
-  return !!error && typeof (error as any).code === 'string' && typeof (error as Error).message === 'string'
-}
-
-export function handleSupabaseError(error: unknown): never {
-  if (isSupabaseError(error)) {
-    throw new Error(`Supabase Error [${error.code}]: ${error.message}`)
-  }
-  throw error
-}
-
-const supabaseConfig = {
-  createBrowserClient: createBrowserSupabaseClient,
-  createServerClient: createServerSupabaseClient,
-  admin: supabaseAdmin,
-  types: {} as Database,
-  utils: {
-    isSupabaseError,
-    handleSupabaseError,
-  },
-}
-
-export default supabaseConfig

@@ -346,7 +346,7 @@ export class ContentSecurityPolicy {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://xnrqfkecpabucnoxxtwa.supabase.co https://api.stripe.com https://dapi.kakao.com wss://xnrqfkecpabucnoxxtwa.supabase.co",
+      `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co'} https://api.stripe.com https://dapi.kakao.com ${(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co').replace('https://', 'wss://')}`,
       "frame-src 'self' https://js.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",
@@ -608,12 +608,3 @@ export function initializeSecurityMeasures(): () => void {
   return cleanup
 }
 
-const defaultExport = {
-  InputSanitizer,
-  SecurityRateLimit,
-  ContentSecurityPolicy,
-  SessionSecurity,
-  FileUploadSecurity,
-  initializeSecurityMeasures,
-}
-export default defaultExport

@@ -194,14 +194,3 @@ export const DEFAULT_MAP_OPTIONS = {
   level: 3,
 }
 
-const kakaoUtils = {
-  isLoaded: isKakaoMapsLoaded,
-  load: loadKakaoMaps,
-  coordToAddress,
-  addressToCoord,
-  getCurrentPosition,
-  SEOUL_CENTER,
-  DEFAULT_MAP_OPTIONS,
-}
-
-export default kakaoUtils

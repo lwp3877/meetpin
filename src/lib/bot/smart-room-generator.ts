@@ -390,11 +390,3 @@ export const naturalPatterns = {
   },
 }
 
-const smartRoomGenerator = {
-  generateSingleBotRoom,
-  generateTimeBasedBotRooms,
-  generatePopularTimeRooms,
-  naturalPatterns,
-}
-
-export default smartRoomGenerator

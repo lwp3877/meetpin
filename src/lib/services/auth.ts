@@ -399,23 +399,3 @@ export async function getUserStats() {
   return data
 }
 
-const authUtils = {
-  getAuthenticatedUser,
-  requireAuth,
-  requireAdmin,
-  getUserProfile,
-  checkOnboardingStatus,
-  getAdminUserProfile,
-  isUserBlocked,
-  isBlockedByUser,
-  checkMutualBlocking,
-  requireRoomOwner,
-  requireMatchParticipant,
-  signOut,
-  deleteUserAdmin,
-  updateUserRole,
-  checkEmailVerification,
-  getUserStats,
-}
-
-export default authUtils

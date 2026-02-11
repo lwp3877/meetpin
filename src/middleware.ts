@@ -8,6 +8,32 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api')) {
     const origin = request.headers.get('origin');
 
+    // CSRF Protection for state-changing operations
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+      const referer = request.headers.get('referer');
+
+      // Allow webhook endpoints and health checks without CSRF
+      const csrfExemptPaths = [
+        '/api/payments/stripe/webhook',
+        '/api/healthz',
+        '/api/livez',
+        '/api/ready',
+        '/api/readyz',
+        '/api/status',
+        '/api/health',
+        '/api/cron/',
+      ];
+
+      const isExempt = csrfExemptPaths.some(path =>
+        request.nextUrl.pathname.startsWith(path)
+      );
+
+      // Strict same-origin check for non-exempt paths
+      if (!isExempt && origin && referer && !referer.startsWith(origin)) {
+        return new NextResponse('CSRF validation failed', { status: 403 });
+      }
+    }
+
     // 허용된 오리진 화이트리스트
     const allowedOrigins = [
       'https://meetpin-weld.vercel.app',

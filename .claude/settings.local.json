@@ -48,7 +48,17 @@
       "Bash(npx knip:*)",
       "Bash(chmod:*)",
       "Bash(openssl rand:*)",
-      "Bash(ADMIN_API_KEY=BuxbmPIcvYX5jF8kmpplNTNO1oNg7xPp3QOGs1gjQs0= node scripts/seed-production-rooms.mjs)"
+      "Bash(ADMIN_API_KEY=BuxbmPIcvYX5jF8kmpplNTNO1oNg7xPp3QOGs1gjQs0= node scripts/seed-production-rooms.mjs)",
+      "Bash(pnpm update:*)",
+      "Bash(while read file)",
+      "Bash(do tsc:*)",
+      "Bash(echo:*)",
+      "Bash(git checkout:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx jest --no-coverage)",
+      "Bash(npx next build:*)"
     ],
     "deny": [],
     "ask": []

@@ -14,9 +14,24 @@ export async function POST(request: NextRequest) {
     const apiKey = authHeader?.replace('Bearer ', '')
 
     // API 키가 있으면 검증, 없으면 일반 관리자 인증
-    let adminId = 'api-key'
-    if (apiKey && process.env.ADMIN_API_KEY) {
+    let adminId: string
+    if (apiKey) {
+      // API key path - MUST be configured in production
+      if (!process.env.ADMIN_API_KEY) {
+        logger.error('ADMIN_API_KEY not configured - API key authentication disabled')
+        return NextResponse.json(
+          {
+            ok: false,
+            message: '서버 설정 오류',
+          },
+          { status: 500 }
+        )
+      }
+
       if (apiKey !== process.env.ADMIN_API_KEY) {
+        logger.warn('Invalid API key attempt', {
+          ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+        })
         return NextResponse.json(
           {
             ok: false,
@@ -25,8 +40,9 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         )
       }
-      // API 키 검증 성공 - 관리자로 간주
-      adminId = 'api-key'
+      // API 키 검증 성공 - 타임스탬프 추가로 로깅 개선
+      adminId = `api-key:${Date.now()}`
+      logger.info('API key authentication successful', { adminId })
     } else {
       // API 키가 없으면 일반 Supabase 관리자 인증
       const admin = await requireAdmin()

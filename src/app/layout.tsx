@@ -136,8 +136,12 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
 
         {/* Resource Hints for Performance */}
-        <link rel="preconnect" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
-        <link rel="dns-prefetch" href="https://xnrqfkecpabucnoxxtwa.supabase.co" />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <>
+            <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+            <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+          </>
+        )}
         <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://js.stripe.com" />
 

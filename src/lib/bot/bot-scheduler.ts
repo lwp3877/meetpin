@@ -37,6 +37,9 @@ const generationState: BotGenerationState = {
   currentHourGenerated: false,
 }
 
+// interval ID 저장 (stop에서 clear하기 위해)
+const intervalIds: ReturnType<typeof setInterval>[] = []
+
 /**
  * 봇 프로필을 Supabase에 생성/업데이트
  */
@@ -402,41 +405,43 @@ export const BotManager = {
     // 초기 봇 방 생성 (즉시 실행)
     await generateBotsForCurrentTime()
 
+    // 이전 interval 정리
+    intervalIds.forEach(id => clearInterval(id))
+    intervalIds.length = 0
+
     // 주기적 실행 설정 (15분마다)
-    // Why: 너무 자주 실행하면 서버 부하, 너무 드물면 사용자 경험 저하
-    setInterval(
+    intervalIds.push(setInterval(
       async () => {
         resetDailyStats()
         await generateBotsForCurrentTime()
       },
       15 * 60 * 1000
-    )
+    ))
 
     // 인기 지역 봇 방 생성 (1시간마다)
-    // Why: 강남, 마포, 용산 등 인기 지역에 봇 방 추가 배치
-    setInterval(
+    intervalIds.push(setInterval(
       async () => {
         await generatePopularDistrictBots()
       },
       60 * 60 * 1000
-    )
+    ))
 
     // 오래된 방 정리 (6시간마다)
-    // Why: 24시간 지난 봇 방은 자동 삭제 (DB 정리)
-    setInterval(
+    intervalIds.push(setInterval(
       async () => {
         await cleanupOldBotRooms()
       },
       6 * 60 * 60 * 1000
-    )
+    ))
   },
 
   /**
    * 봇 시스템 중지
-   * Note: setInterval은 여전히 실행 중이지만 생성은 중지됨
    */
   stop() {
     generationState.isActive = false
+    intervalIds.forEach(id => clearInterval(id))
+    intervalIds.length = 0
     logger.info('🤖 봇 시스템 중지')
   },
 

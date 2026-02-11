@@ -404,20 +404,3 @@ export async function createBoostCheckoutSession({
   }
 }
 
-const stripeUtils = {
-  stripe,
-  products: boostProducts,
-  createCheckoutSession,
-  createBoostCheckoutSession,
-  createPaymentLink,
-  verifyWebhookSignature,
-  calculateBoostExpiry,
-  extractSessionMetadata,
-  handleWebhookEvent,
-  findOrCreateCustomer,
-  createPaymentIntent,
-  createRefund,
-  getPaymentDetails,
-}
-
-export default stripeUtils

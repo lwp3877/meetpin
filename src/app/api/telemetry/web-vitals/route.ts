@@ -2,6 +2,7 @@
 // 📊 Web Vitals 수집 API - 샘플링율 적용, PII 제거, 일일 요약 로그
 
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/api'
 import { logger } from '@/lib/observability/logger'
 
 export const runtime = 'nodejs'
@@ -220,9 +221,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-// 통계 조회 엔드포인트 (개발/운영팀용)
+// 통계 조회 엔드포인트 (관리자 전용)
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
+    await requireAdmin()
     const { searchParams } = new URL(request.url)
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0]
 

@@ -945,13 +945,3 @@ export function initializeAccessibility(): () => void {
   }
 }
 
-const a11yEnhancements = {
-  KeyboardNavigation,
-  VisualAccessibility,
-  ScreenReaderSupport,
-  UsabilityEnhancement,
-  AccessibilityTesting,
-  initializeAccessibility,
-}
-
-export default a11yEnhancements

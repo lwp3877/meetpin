@@ -44,13 +44,6 @@ export const flags = {
   analyticsEnabled: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true',
 } as const
 
-export type FeatureFlag = keyof typeof flags
-
-// Feature flag 체크 함수
-export function isFeatureEnabled(flag: FeatureFlag): boolean {
-  return flags[flag]
-}
-
 // 환경별 설정
 export const config = {
   // API URLs
@@ -101,11 +94,6 @@ export const config = {
   } as const,
 } as const
 
-// 개발/프로덕션 환경 확인
-export const isDevelopment = process.env.NODE_ENV === 'development'
-export const isProduction = process.env.NODE_ENV === 'production'
-export const isTest = process.env.NODE_ENV === 'test'
-
 // 개발자 모드 (Mock 데이터 사용)
 // NEXT_PUBLIC_USE_MOCK_DATA가 'true'일 때만 Mock 모드 활성화
 // 프로덕션 환경에서는 실제 DB 사용 (환경 변수 미설정 시 기본값: false)
@@ -114,22 +102,3 @@ export const isDevelopmentMode =
     ? false // 프로덕션에서는 항상 Mock 모드 비활성화
     : process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
 
-// 디버그 모드
-export const isDebugMode = isDevelopment && process.env.DEBUG?.includes('meetpin')
-
-const flagsConfig = {
-  flags,
-  config,
-  utils: {
-    isFeatureEnabled,
-  },
-  env: {
-    isDevelopment,
-    isDevelopmentMode,
-    isProduction,
-    isTest,
-    isDebugMode,
-  },
-}
-
-export default flagsConfig

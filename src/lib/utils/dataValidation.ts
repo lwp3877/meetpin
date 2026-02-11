@@ -657,10 +657,3 @@ export function initializeDataValidation() {
   return stopMonitoring
 }
 
-const defaultExport = {
-  APIResponseValidator,
-  MockDataQualityValidator,
-  DataValidationMonitor,
-  initializeDataValidation,
-}
-export default defaultExport

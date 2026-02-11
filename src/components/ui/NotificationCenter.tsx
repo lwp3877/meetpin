@@ -240,6 +240,11 @@ export default function NotificationCenter({ className = '' }: NotificationCente
       clearInterval(intervalRef.current)
       intervalRef.current = setInterval(() => fetchNotifications(), getPollingInterval())
     }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
   }, [fetchNotifications, getPollingInterval])
 
   // 브라우저 알림 권한 요청

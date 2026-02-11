@@ -37,7 +37,7 @@ import {
   LogOut,
 } from '@/components/icons/MapIcons'
 import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
-import { toast } from 'sonner'
+import toast from 'react-hot-toast'
 import { logger } from '@/lib/observability/logger'
 // 알림 컴포넌트들을 동적 로딩 - 초기 번들 사이즈 감소
 const HostMessageNotifications = dynamic(
@@ -150,7 +150,7 @@ export default function MapPage() {
 
         setRooms(result.data.rooms || [])
         if (result.data.rooms?.length === 0) {
-          toast.info('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
+          toast('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
         }
       } catch (err: unknown) {
         logger.error('Rooms load error:', { error: err instanceof Error ? err.message : String(err) })

@@ -274,7 +274,7 @@ export class PerformanceOptimizer {
 
     // DNS 프리페치
     const dnsPrefetch = [
-      'https://xnrqfkecpabucnoxxtwa.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://*.supabase.co',
       'https://fonts.googleapis.com',
       'https://fonts.gstatic.com',
     ]
@@ -584,12 +584,3 @@ export async function initializeBrowserCompatibility() {
   }
 }
 
-const defaultExport = {
-  BrowserDetector,
-  FeatureSupport,
-  PerformanceOptimizer,
-  NetworkOptimizer,
-  CompatibilityPatches,
-  initializeBrowserCompatibility,
-}
-export default defaultExport

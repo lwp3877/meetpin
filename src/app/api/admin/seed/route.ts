@@ -133,10 +133,15 @@ async function seedData() {
         //   continue
         // }
 
+        // Validate environment variable is set
+        if (!process.env.BOT_DEFAULT_PASSWORD) {
+          throw new Error('BOT_DEFAULT_PASSWORD environment variable is required for seeding')
+        }
+
         // 새 봇 사용자 생성
         const { data: newUser, error: userError } = await supabaseAdmin.auth.admin.createUser({
           email: botData.email,
-          password: process.env.BOT_DEFAULT_PASSWORD || 'meetpin-bot-2024!',
+          password: process.env.BOT_DEFAULT_PASSWORD,
           email_confirm: true,
           user_metadata: {
             nickname: botData.nickname,

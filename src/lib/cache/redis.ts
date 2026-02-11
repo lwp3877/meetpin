@@ -195,16 +195,3 @@ export async function getCacheStats(): Promise<{
   }
 }
 
-const defaultExport = {
-  getClient: getRedisClient,
-  withCache,
-  invalidateCache,
-  invalidateUserCache,
-  invalidateRoomCache,
-  invalidateMessageCache,
-  getCacheStats,
-  close: closeRedis,
-  CacheKeys,
-  CacheTTL,
-}
-export default defaultExport

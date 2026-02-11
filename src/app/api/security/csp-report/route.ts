@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rateLimit'
+import { requireAdmin } from '@/lib/api'
 
 import { logger } from '@/lib/observability/logger'
 interface CSPReport {
@@ -109,17 +110,9 @@ export async function POST(request: NextRequest) {
 }
 
 // CSP 통계 조회 (관리자용)
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    // 관리자 권한 확인 (간단한 구현)
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new NextResponse('Unauthorized', { status: 401 })
-    }
-
-    // 실제로는 JWT 토큰 검증 필요
-    // const token = authHeader.replace('Bearer ', '')
-    // const user = await verifyAdminToken(token)
+    await requireAdmin()
 
     const stats = global.cspStats || new Map()
     const sortedStats = Array.from(stats.entries())
