@@ -22,6 +22,8 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
 
   // 현재 사용자 정보 가져오기
   useEffect(() => {
+    const controller = new AbortController()
+
     const getCurrentUser = async () => {
       try {
         setIsLoading(true)
@@ -39,16 +41,12 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
           throw new Error('잘못된 채팅 ID 형식입니다')
         }
 
-        // 타임아웃 처리를 위한 AbortController
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000)
-
         const {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser()
 
-        clearTimeout(timeoutId)
+        if (controller.signal.aborted) return
 
         if (userError) {
           if (userError.message.includes('session_expired')) {
@@ -63,12 +61,16 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
           throw new Error('로그인이 필요합니다')
         }
 
-        // 매치 접근 권한 확인
+        // 매치 접근 권한 확인 (타임아웃 10초)
+        const timeoutId = setTimeout(() => controller.abort(), 10000)
         const matchResponse = await fetch(`/api/matches/${matchId}/verify`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: controller.signal,
         })
+        clearTimeout(timeoutId)
+
+        if (controller.signal.aborted) return
 
         if (!matchResponse.ok) {
           if (matchResponse.status === 404) {
@@ -81,6 +83,8 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
 
         setCurrentUserId(user.id)
       } catch (err: unknown) {
+        if (controller.signal.aborted) return
+
         logger.error('User fetch error:', { error: err instanceof Error ? err.message : String(err) })
 
         if ((err as Error).name === 'AbortError') {
@@ -91,11 +95,15 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
           setError((err as Error).message || '채팅을 불러오는 중 오류가 발생했습니다')
         }
       } finally {
-        setIsLoading(false)
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+        }
       }
     }
 
     getCurrentUser()
+
+    return () => controller.abort()
   }, [supabase, matchId])
 
   const handleClose = () => {

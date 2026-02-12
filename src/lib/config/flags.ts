@@ -102,3 +102,27 @@ export const isDevelopmentMode =
     ? false // 프로덕션에서는 항상 Mock 모드 비활성화
     : process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
 
+// 필수 환경 변수 검증 (앱 시작 시 클라이언트에서 1회 호출)
+// 클라이언트 번들에는 NEXT_PUBLIC_* 만 포함되므로 여기서는 그것만 검증.
+// 서버 전용 env(SUPABASE_SERVICE_ROLE_KEY 등)는 각 API route에서 사용 시 검증됨.
+let envValidated = false
+export function validateEnvVars(): string[] {
+  if (envValidated) return []
+  envValidated = true
+
+  const warnings: string[] = []
+  const required = [
+    ['NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL],
+    ['NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY],
+    ['NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY', process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY],
+  ] as const
+
+  for (const [name, value] of required) {
+    if (!value && !isDevelopmentMode) {
+      warnings.push(`환경 변수 ${name}이(가) 설정되지 않았습니다`)
+    }
+  }
+
+  return warnings
+}
+

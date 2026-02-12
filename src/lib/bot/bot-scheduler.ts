@@ -22,6 +22,29 @@ import {
 import { supabaseAdmin, type ProfileInsert, type RoomInsert } from '@/lib/supabaseClient'
 import { logger } from '@/lib/observability/logger'
 
+// 봇 프로필 타입
+type AgeRange = 'early_twenties' | 'late_twenties' | 'early_thirties' | 'late_thirties' | 'forties' | 'fifties_plus'
+
+interface BotProfile {
+  nickname: string
+  ageRange: AgeRange
+  category: 'drink' | 'exercise' | 'other'
+}
+
+// 봇 방 데이터 타입
+interface BotRoomData {
+  title: string
+  category: 'drink' | 'exercise' | 'other'
+  lat: number
+  lng: number
+  place_text: string
+  start_at: string
+  max_people: number
+  fee: number
+  location: { name: string }
+  botProfile: BotProfile
+}
+
 // 봇 생성 상태 추적
 interface BotGenerationState {
   lastGeneration: Date
@@ -43,19 +66,19 @@ const intervalIds: ReturnType<typeof setInterval>[] = []
 /**
  * 봇 프로필을 Supabase에 생성/업데이트
  */
-async function ensureBotProfile(botProfile: unknown) {
+async function ensureBotProfile(botProfile: BotProfile) {
   try {
     // 봇 계정 생성 (이미 존재하면 무시)
     const { data: authData, error: authError } = await (supabaseAdmin as any).auth.admin.createUser(
       {
-        email: `bot_${(botProfile as any).nickname.toLowerCase()}@meetpin.bot`,
+        email: `bot_${botProfile.nickname.toLowerCase()}@meetpin.bot`,
         password: Math.random().toString(36),
         email_confirm: true,
         user_metadata: {
           is_bot: true,
-          nickname: (botProfile as any).nickname,
-          age_range: (botProfile as any).ageRange,
-          category_preference: (botProfile as any).category,
+          nickname: botProfile.nickname,
+          age_range: botProfile.ageRange,
+          category_preference: botProfile.category,
         },
       }
     )
@@ -65,16 +88,16 @@ async function ensureBotProfile(botProfile: unknown) {
       return null
     }
 
-    const userId = authData?.user?.id || (await getBotUserId((botProfile as any).nickname))
+    const userId = authData?.user?.id || (await getBotUserId(botProfile.nickname))
     if (!userId) return null
 
     // 프로필 생성/업데이트
     const profileData: ProfileInsert = {
       uid: userId,
-      nickname: (botProfile as any).nickname,
-      age_range: (botProfile as any).ageRange,
-      avatar_url: getBotAvatarUrl(botProfile as any),
-      intro: getBotIntro(botProfile as any),
+      nickname: botProfile.nickname,
+      age_range: botProfile.ageRange,
+      avatar_url: getBotAvatarUrl(botProfile),
+      intro: getBotIntro(botProfile),
       role: 'user', // 봇도 일반 사용자로 표시
     }
 
@@ -115,7 +138,7 @@ async function getBotUserId(nickname: string): Promise<string | null> {
 /**
  * 봇별 아바타 URL 생성
  */
-function getBotAvatarUrl(botProfile: unknown): string {
+function getBotAvatarUrl(botProfile: BotProfile): string {
   const avatarIds = [
     'photo-1438761681033-6461ffad8d80', // 여성
     'photo-1507003211169-0a1dd7228f2d', // 남성
@@ -127,7 +150,7 @@ function getBotAvatarUrl(botProfile: unknown): string {
     'photo-1534528741775-53994a69daeb', // 여성
   ]
 
-  const hash = (botProfile as any).nickname.split('').reduce((a: number, b: string) => {
+  const hash = botProfile.nickname.split('').reduce((a: number, b: string) => {
     a = (a << 5) - a + b.charCodeAt(0)
     return a & a
   }, 0)
@@ -140,7 +163,7 @@ function getBotAvatarUrl(botProfile: unknown): string {
 /**
  * 봇별 자기소개 생성
  */
-function getBotIntro(botProfile: any): string {
+function getBotIntro(botProfile: BotProfile): string {
   const intros = {
     drink: [
       '좋은 사람들과 맛있는 술 한잔 하는 게 최고예요! 🍻',
@@ -166,7 +189,7 @@ function getBotIntro(botProfile: any): string {
 /**
  * 봇 방을 실제 데이터베이스에 생성
  */
-async function createBotRoomInDatabase(roomData: any) {
+async function createBotRoomInDatabase(roomData: BotRoomData) {
   try {
     // 봇 프로필 확인/생성
     const hostUid = await ensureBotProfile(roomData.botProfile)

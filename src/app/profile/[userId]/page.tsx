@@ -1,4 +1,4 @@
-/* src/app/profile/[userId]/page-backup.tsx */
+/* src/app/profile/[userId]/page.tsx */
 'use client'
 
 import { useState, useEffect } from 'react'

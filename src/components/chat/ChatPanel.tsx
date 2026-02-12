@@ -293,7 +293,7 @@ export default function ChatPanel({
           </div>
         </div>
         {onClose && (
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label="채팅 닫기">
             ✕
           </Button>
         )}

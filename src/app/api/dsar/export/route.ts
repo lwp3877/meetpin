@@ -22,7 +22,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('uid', userId)
       .single()
 
     if (profileError) {
@@ -33,7 +33,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
     const { data: rooms, error: roomsError } = await supabase
       .from('rooms')
       .select('*')
-      .eq('host_id', userId)
+      .eq('host_uid', userId)
 
     if (roomsError) {
       logger.error('Rooms fetch error:', { error: roomsError instanceof Error ? roomsError.message : String(roomsError) })
@@ -45,10 +45,10 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .select(
         `
         *,
-        rooms!inner(id, title, host_id)
+        rooms!inner(id, title, host_uid)
       `
       )
-      .eq('user_id', userId)
+      .eq('requester_uid', userId)
 
     if (requestsError) {
       logger.error('Requests fetch error:', { error: requestsError instanceof Error ? requestsError.message : String(requestsError) })
@@ -60,12 +60,10 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .select(
         `
         *,
-        rooms!inner(id, title, host_id),
-        requester:profiles!matches_requester_id_fkey(id, nickname, email),
-        host:profiles!matches_host_id_fkey(id, nickname, email)
+        rooms!inner(id, title, host_uid)
       `
       )
-      .or(`requester_id.eq.${userId},host_id.eq.${userId}`)
+      .or(`host_uid.eq.${userId},guest_uid.eq.${userId}`)
 
     if (matchesError) {
       logger.error('Matches fetch error:', { error: matchesError instanceof Error ? matchesError.message : String(matchesError) })
@@ -77,14 +75,13 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .select(
         `
         id,
-        content,
+        text,
         created_at,
         match_id,
-        sender_id,
-        is_read
+        sender_uid
       `
       )
-      .eq('sender_id', userId)
+      .eq('sender_uid', userId)
       .order('created_at', { ascending: false })
       .limit(1000) // 최근 1000개 메시지
 
@@ -98,15 +95,15 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .select(
         `
         id,
-        content,
+        text,
         created_at,
         room_id,
-        sender_id,
-        recipient_id,
+        sender_uid,
+        receiver_uid,
         is_read
       `
       )
-      .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
+      .or(`sender_uid.eq.${userId},receiver_uid.eq.${userId}`)
       .order('created_at', { ascending: false })
       .limit(500) // 최근 500개 호스트 메시지
 
@@ -121,14 +118,13 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
         `
         id,
         reason,
-        description,
         created_at,
         status,
-        reported_user_id,
-        reported_room_id
+        target_uid,
+        room_id
       `
       )
-      .eq('reporter_id', userId)
+      .eq('reporter_uid', userId)
 
     if (reportsError) {
       logger.error('Reports fetch error:', { error: reportsError instanceof Error ? reportsError.message : String(reportsError) })
@@ -139,13 +135,12 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
       .from('blocked_users')
       .select(
         `
-        id,
-        blocked_user_id,
-        created_at,
-        blocked_user:profiles!blocked_users_blocked_user_id_fkey(id, nickname)
+        blocker_uid,
+        blocked_uid,
+        created_at
       `
       )
-      .eq('blocker_id', userId)
+      .eq('blocker_uid', userId)
 
     if (blockedError) {
       logger.error('Blocked users fetch error:', { error: blockedError instanceof Error ? blockedError.message : String(blockedError) })

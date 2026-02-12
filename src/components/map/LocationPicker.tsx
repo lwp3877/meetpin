@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { loadKakaoMaps, coordToAddress } from '@/lib/services/kakao'
+import { useKakaoMaps, coordToAddress } from '@/lib/services/kakao'
 import { logger } from '@/lib/observability/logger'
 
 // Kakao Maps 타입 정의
@@ -27,23 +27,12 @@ export default function LocationPicker({
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const markerRef = useRef<any>(null)
-  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
+  const isKakaoLoaded = useKakaoMaps()
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number
     lng: number
     place_text: string
   } | null>(null)
-
-  // Kakao Maps SDK 로드
-  useEffect(() => {
-    loadKakaoMaps()
-      .then(() => {
-        setIsKakaoLoaded(true)
-      })
-      .catch(error => {
-        logger.error('Kakao Maps 로드 실패:', { error: error instanceof Error ? error.message : String(error) })
-      })
-  }, [])
 
   // 지도 초기화
   useEffect(() => {

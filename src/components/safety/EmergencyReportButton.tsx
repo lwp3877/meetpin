@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Toast } from '@/components/ui/Toast'
@@ -21,6 +21,46 @@ export function EmergencyReportButton({
   const [description, setDescription] = useState('')
   const [locationInfo, setLocationInfo] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  // ESC 닫기 + 열릴 때 첫 포커스 가능 요소로 이동
+  useEffect(() => {
+    if (!isModalOpen) return
+
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsModalOpen(false)
+    }
+    document.addEventListener('keydown', handleEsc)
+
+    // 모달 내부 첫 포커스 가능 요소로 이동
+    const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+      'select, input, textarea, button, [tabindex]:not([tabindex="-1"])'
+    )
+    firstFocusable?.focus()
+
+    return () => document.removeEventListener('keydown', handleEsc)
+  }, [isModalOpen])
+
+  // 간단한 포커스 트랩: Tab이 모달 밖으로 나가지 않도록
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab' || !modalRef.current) return
+
+    const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+      'select, input, textarea, button, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }, [])
 
   const handleSubmit = async () => {
     if (!description.trim()) {
@@ -70,12 +110,12 @@ export function EmergencyReportButton({
       </Button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="emergency-report-title" onKeyDown={handleKeyDown}>
+          <div ref={modalRef} className="bg-white rounded-lg max-w-md w-full">
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-red-500" />
-                <h2 className="text-xl font-bold">긴급 신고</h2>
+                <AlertTriangle className="w-6 h-6 text-red-500" aria-hidden="true" />
+                <h2 id="emergency-report-title" className="text-xl font-bold">긴급 신고</h2>
               </div>
 
               <p className="text-sm text-gray-600">

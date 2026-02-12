@@ -67,12 +67,6 @@ export const isFeatureEnabled = (feature: keyof FeatureFlags): boolean => {
   return getFeatures()[feature]
 }
 
-// Development helpers (disabled to prevent console spam)
-export const logFeatureFlags = () => {
-  // Disabled in all environments to prevent console noise
-  return
-}
-
 // A/B testing helper
 export const getVariant = (testName: string, variants: string[]): string => {
   // Simple hash-based assignment for consistent user experience
@@ -87,11 +81,4 @@ export const getVariant = (testName: string, variants: string[]): string => {
   return variants[0] // default to first variant on server
 }
 
-// Growth tracking (disabled to prevent console spam)
-export const trackFeatureUsage = () => {
-  // Disabled in all environments to prevent console noise
-  return
-  // In production, this would send to analytics
-  // Example: analytics.track('feature_usage', { feature, action })
-}
 

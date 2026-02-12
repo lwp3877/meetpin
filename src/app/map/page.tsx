@@ -36,7 +36,7 @@ import {
   Navigation,
   LogOut,
 } from '@/components/icons/MapIcons'
-import { isFeatureEnabled, trackFeatureUsage } from '@/lib/config/features'
+import { isFeatureEnabled } from '@/lib/config/features'
 import toast from 'react-hot-toast'
 import { logger } from '@/lib/observability/logger'
 // 알림 컴포넌트들을 동적 로딩 - 초기 번들 사이즈 감소
@@ -198,14 +198,12 @@ export default function MapPage() {
 
   // 방 클릭 핸들러
   const handleRoomClick = (room: Room) => {
-    trackFeatureUsage()
     router.push(`/room/${room.id}`)
   }
 
   // 카테고리 변경
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)
-    trackFeatureUsage()
   }
 
   // 내 주변 버튼 핸들러
@@ -239,7 +237,6 @@ export default function MapPage() {
 
       await loadRooms(bounds)
       toast.success('내 주변 모임을 찾았습니다', { id: 'location-loading' })
-      trackFeatureUsage()
     } catch (error: unknown) {
       logger.error('Location error:', { error: error instanceof Error ? error.message : String(error) })
       toast.dismiss('location-loading')
@@ -277,7 +274,6 @@ export default function MapPage() {
   // 검색 핸들러
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    trackFeatureUsage()
   }
 
   // 필터링된 방 목록 계산

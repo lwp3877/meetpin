@@ -4,566 +4,193 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-밋핀(MeetPin) is a location-based social meeting platform where users create rooms on a map to meet nearby people for drinks, sports, and various activities. The platform uses Korean language and focuses on mobile-first design.
+MeetPin (밋핀) is a location-based social meeting platform where users create rooms on a map to meet nearby people for drinks, sports, and activities. Korean-language, mobile-first design. Deployed on Vercel at meetpin-weld.vercel.app.
 
-## Core Architecture
-
-### Technology Stack
-
-- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4, shadcn/ui, React 19
-- **Backend**: Supabase (PostgreSQL, Auth, Realtime, Storage)
-- **Caching**: Redis (ioredis) with Upstash for distributed caching
-- **External APIs**: Kakao Maps SDK, Stripe payments
-- **Database**: PostgreSQL with Row Level Security (RLS)
-- **State Management**: Zustand, React Context
-- **Form Handling**: React Hook Form with Zod validation
-- **Observability**: Structured logging with PII scrubbing and request tracing
-
-### Key Architectural Patterns
-
-1. **API Route Structure**: All API routes follow a consistent pattern using `src/lib/api.ts` utilities:
-   - `ApiResponse<T>` interface for consistent response format: `{ ok: boolean, data?: T, code?: string, message?: string }`
-   - `ApiError` class for structured error handling with status codes
-   - `rateLimit()` function for simple in-memory rate limiting
-   - Authentication functions: `getAuthenticatedUser()`, `requireAdmin()`
-
-1.5. **CORS Security** (`src/middleware.ts`):
-   - API routes protected with whitelist-based CORS policy
-   - Allowed origins: `meetpin-weld.vercel.app`, `meetpin.com`, localhost (dev)
-   - OPTIONS preflight handling with 204 response
-   - Static resources maintain `*` origin for CDN compatibility
-
-2. **Database Security**: Comprehensive RLS policies handle:
-   - User blocking relationships (bidirectional visibility filtering)
-   - Permission-based access (room owners, request participants)
-   - Admin-only access for reports and moderation
-
-3. **Feature Flags**: Configurable features via `src/lib/flags.ts`:
-   - Kakao OAuth (default: OFF)
-   - Stripe checkout vs Payment Links
-   - Admin panel, reporting, analytics
-   - Environment-based feature toggling
-
-4. **Supabase Client Architecture**:
-   - Browser client: `createBrowserSupabaseClient()`
-   - Server client: `createServerSupabaseClient()` with cookie handling
-   - Admin client: `supabaseAdmin` for RLS bypass operations
-
-5. **TypeScript Configuration**:
-   - `baseUrl: "src"` with `"@/*": ["*"]` path mapping
-   - All imports use `@/lib/*` pattern resolving to `src/lib/*`
-   - Strict TypeScript configuration with enhanced type safety
-   - Global type definitions in `src/types/global.d.ts`
-
-6. **Advanced Caching Architecture** (`src/lib/cache/redis.ts`):
-   - Redis/Upstash distributed caching with fallback to direct DB access
-   - Structured cache keys: `CacheKeys.rooms()`, `CacheKeys.roomDetail(id)`
-   - TTL-based invalidation with performance-optimized cache strategies
-   - Development mode gracefully handles missing Redis connections
-
-7. **Observability & Logging** (`src/lib/observability/logger.ts`):
-   - Structured logging with request tracing and PII scrubbing
-   - Performance timing with `PerformanceTimer` class
-   - Environment-aware logging (JSON for production, colored console for development)
-   - Request correlation with generated request IDs
-
-8. **API Status & Health Monitoring** (46 API endpoints total):
-   - **6 Health Endpoints** (Kubernetes-style probes):
-     - `/api/health` - Comprehensive diagnostics (334 lines - DB, Auth, Maps, Stripe, Redis)
-     - `/api/healthz` - Minimal liveness probe (5 lines - GitHub Actions every 5min)
-     - `/api/livez` - Process liveness (PID, uptime, memory)
-     - `/api/ready` - Simple readiness check (6 lines)
-     - `/api/readyz` - Detailed readiness (116 lines - DB, env vars, memory)
-     - `/api/status` - Version and environment info (40 lines)
-   - Cache statistics: `/api/cache/stats`
-   - Security CSP reporting: `/api/security/csp-report`
-
-   **All 6 health endpoints are necessary** - serve different monitoring tools and use cases
-
-9. **GDPR/DSAR Compliance**:
-   - Data Subject Access Rights automation: `/api/dsar/export`, `/api/dsar/delete-request`
-   - Privacy rights request handling: `/api/privacy-rights/request`
-   - Automated data cleanup with cron jobs: `/api/cron/*`
-   - Age verification system: `/api/age-verification`
-
-10. **Folder Structure & Organization** (총 152개 소스 파일):
-   - **components/**: Domain-driven organization (auth, chat, map, room, etc.) - 41 components
-     - `auth/` - Authentication components (social-login)
-     - `chat/` - Chat functionality (ChatPanel)
-     - `common/` - Shared components (Providers, theme-toggle, BotSchedulerInitializer)
-     - `error/` - Error handling (GlobalErrorBoundary)
-     - `landing/` - Landing pages (ProLanding - dynamic import)
-     - `layout/` - Layout scaffolding (currently unused)
-     - `map/` - Map features (DynamicMap, MapWithCluster, LocationPicker, MapFilters)
-     - `pwa/` - PWA features (InstallPrompt)
-     - `room/` - Room management (RoomForm)
-     - `safety/` - Safety features (EmergencyReportButton)
-     - `ui/` - shadcn/ui components + feature-specific UI (24 files)
-   - **lib/**: Functional organization by concern
-     - `accessibility/` - WCAG compliance utilities
-     - `bot/` - Bot room generation and scheduling
-     - `cache/` - Redis caching layer
-     - `config/` - Feature flags and configuration
-     - `design/` - Design system tokens
-     - `observability/` - Logging and monitoring
-     - `payments/` - Stripe integration
-     - `security/` - Security utilities and CSP
-     - `services/` - External service integrations (Supabase, auth)
-     - `utils/` - General utilities
-   - **types/**: Centralized type definitions
-     - `global.d.ts` - All project types organized by domain
-     - Domain sections: User, Room, API, Map, Payment, etc.
-   - **Naming Conventions**:
-     - Components: Both PascalCase and kebab-case accepted
-     - Utils/Hooks: camelCase.ts
-     - Types: Defined in global.d.ts
-     - Folders: lowercase with hyphens
-
-## Current Project Status (최신 상태)
-
-### ✅ Completed Advanced Features
-
-- **실시간 WebSocket 채팅 시스템**: Supabase Realtime을 활용한 실시간 메시징
-- **프로필/방 이미지 업로드 기능**: Supabase Storage 기반 이미지 처리 및 최적화
-- **Push 알림 시스템**: Browser Notification API 완전 구현
-- **Stripe 결제 시스템**: 부스트 기능을 위한 완전한 결제 처리
-- **Redis 캐싱 시스템**: 성능 최적화를 위한 분산 캐시 (개발환경에서는 선택적)
-- **구조화 로깅**: PII 스크러빙과 요청 추적을 포함한 관찰가능성 시스템
-- **GDPR/DSAR 준수**: 데이터 내보내기 및 삭제 요청 처리 자동화
-- **AI 콘텐츠 생성**: 자동 모임 봇 생성 및 스케줄링 시스템
-- **고급 보안**: CSP 헤더, 보안 강화, 취약점 자동 감사
-- **무한 루프 해결**: useAuth.tsx의 useCallback 의존성 문제 완전 해결
-- **하이드레이션 오류**: React Server/Client 컴포넌트 불일치 문제 해결
-- **단위 테스트**: 60/60 테스트 통과 (RLS 보안 테스트 포함)
-- **개발 서버**: localhost:3001에서 안정적 실행 (기본 포트)
-- **코드베이스 정리**: 46개 불필요한 파일 삭제, 8,930 줄 코드 제거 완료 (2025-10-11)
-
-### 🔧 Development Mode Features
-
-- **Mock Authentication**: `admin@meetpin.com` / `123456`로 테스트 로그인
-- **Sample Data**: 서울 지역 기준 샘플 모임 데이터
-- **API Mocking**: 실제 Supabase 없이도 모든 API 동작
-- **Error Handling**: 개발 친화적 오류 메시지
+**Stack**: Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui, backed by Supabase (PostgreSQL, Auth, Realtime, Storage), with Kakao Maps SDK, Stripe payments, and optional Redis/Upstash caching.
 
 ## Development Commands
 
 ```bash
-# Development Environment
-pnpm dev          # Start development server (localhost:3001 by default)
-pnpm restart:clean # Clean .next and restart dev server
-pnpm build        # Production build
-pnpm start        # Start production server
-pnpm preview      # Build and preview production version
-
-# Code Quality & Type Safety
-pnpm typecheck    # TypeScript type checking (0 errors expected)
-pnpm lint         # ESLint checking (0 warnings expected)
-pnpm lint:fix     # Auto-fix linting issues
-pnpm format       # Format code with Prettier
-pnpm format:check # Check code formatting
-
-# Testing Suite
-pnpm test         # Run Jest unit tests (60/60 passing)
-pnpm test:watch   # Run tests in watch mode
-pnpm e2e          # Run Playwright E2E tests
-pnpm e2e:ui       # Run E2E tests with UI
-pnpm playwright:install # Install Playwright browsers
-
-# Quality Assurance Extended
-pnpm qa:local     # Local Playwright tests
-pnpm qa:production # Production smoke tests
-pnpm qa:detailed  # Detailed production tests
-pnpm qa:performance # Performance tests
-pnpm qa:mobile    # Mobile device testing
-pnpm qa:validate  # Full validation pipeline
-pnpm qa:full      # Complete QA suite
-
-# Performance & Analysis
-pnpm analyze:bundle # Bundle analysis with ANALYZE=1
-pnpm perf:baseline  # Create performance baseline
-pnpm perf:compare   # Compare against baseline
-pnpm perf:guard     # Performance regression guard
-
-# Database Operations (Manual)
-pnpm db:migrate   # Reminder to run scripts/migrate.sql in Supabase
-pnpm db:rls       # Reminder to run scripts/rls.sql in Supabase
-pnpm db:seed      # Reminder to run scripts/seed.sql in Supabase
-
-# Quality Assurance
-pnpm repo:doctor  # Comprehensive check: typecheck + lint + build
-pnpm approve-builds # Approve package build requirements
-
-# Package Management
-pnpm store prune  # Clean package cache
-npx kill-port 3001 # Kill process on port 3001 if needed
-
-# Security & Compliance
-pnpm audit:security # Security vulnerability audit
-pnpm arch:check     # Architecture boundary validation
-pnpm smoke          # Quick smoke test for essential features
-pnpm a11y           # Run accessibility tests (WCAG 2.1 AA)
-pnpm a11y:report    # Generate accessibility report with HTML output
+pnpm dev              # Dev server on localhost:3001
+pnpm build            # Production build (fails on TS errors or lint warnings)
+pnpm typecheck        # TypeScript check (0 errors expected)
+pnpm lint             # ESLint (0 warnings expected)
+pnpm test             # Jest unit tests
+pnpm test -- __tests__/lib/zodSchemas.test.ts  # Run single test file
+pnpm e2e              # Playwright E2E tests
+pnpm repo:doctor      # Full check: typecheck + lint + build
+pnpm restart:clean    # Delete .next and restart dev server
 ```
 
-## Database Schema & Migration
+## Architecture
 
-Execute database scripts in Supabase SQL Editor in this order:
+### Import Paths
 
-1. `scripts/migrate.sql` - Creates tables, indexes, triggers
-2. `scripts/rls.sql` - Applies Row Level Security policies
-3. `scripts/seed.sql` - Adds sample data (development only)
+tsconfig `baseUrl: "src"` with `"@/*": ["*"]` path mapping. All imports use `@/` prefix resolving to `src/`:
+```typescript
+import { rateLimit } from '@/lib/api'       // → src/lib/api.ts
+import { flags } from '@/lib/config/flags'   // → src/lib/config/flags.ts
+```
 
-### Core Tables
+### API Route Pattern
 
-- `profiles` - User profiles linked to auth.users
-- `rooms` - Meeting rooms with location and metadata (includes `boost_until` for payment system)
-- `requests` - Join requests with status workflow
-- `matches` - Accepted requests enabling 1:1 chat
-- `messages` - Chat messages between matched users (realtime enabled)
-- `host_messages` - Direct messages to room hosts with notification system
-- `notifications` - User notifications system with read status
-- `reports` - User reporting system
-- `blocked_users` - User blocking relationships
-- `age_verification` - Age verification tracking for compliance
-- `feedback` - User feedback collection system
-
-## API Design Patterns
-
-### Consistent Response Format
+All API routes are in `src/app/api/` (45 endpoints). They use composable middleware from `src/lib/api.ts`:
 
 ```typescript
-interface ApiResponse<T> {
-  ok: boolean
-  data?: T
-  code?: string
-  message?: string
-}
+// Standard pattern in route.ts files:
+import { withErrorHandling, withAuth, withRateLimit, createSuccessResponse, ApiError } from '@/lib/api'
+
+export const GET = withErrorHandling(async (request, context) => {
+  // withErrorHandling wraps the handler with structured error logging and consistent error responses
+  return createSuccessResponse(data)
+})
+
+// With auth + rate limiting:
+export const POST = withErrorHandling(
+  withRateLimit('createRoom')(
+    withAuth(async (request, context, user) => {
+      // user is the authenticated Supabase User
+      return createSuccessResponse(result, '생성되었습니다', 201)
+    })
+  )
+)
 ```
 
-### Authentication Flow
+**Response format** — all endpoints return `ApiResponse<T>`:
+```typescript
+{ ok: boolean, data?: T, code?: string, message?: string }
+```
 
-- `getAuthenticatedUser()` - Validates JWT and returns user
-- `requireAuth()` - Throws 401 if not authenticated
-- `requireAdmin()` - Validates admin role
+**Key utilities in `src/lib/api.ts`**:
+- `withErrorHandling()` — catches errors, maps Supabase/network errors to proper HTTP codes, logs via structured logger
+- `withAuth()` / `withAdminAuth()` — injects authenticated user
+- `withRateLimit(type)` / `withUserRateLimit(type)` — IP and user-based rate limiting
+- `parseAndValidateBody(request, zodSchema)` — parse + Zod validate request body
+- `apiUtils.success/error/notFound/forbidden/unauthorized/conflict` — shorthand response helpers
+- `ApiError` class — throw with status code and error code for structured responses
+
+### Authentication
+
+`src/lib/services/auth.ts` — dual-mode authentication:
+- **Production**: Supabase JWT via `createServerSupabaseClient()` with cookie handling
+- **Development (Mock)**: When `NEXT_PUBLIC_USE_MOCK_DATA=true`, returns mock users from cookies or defaults to admin. Test login: `admin@meetpin.com` / `123456`
+
+Key functions: `getAuthenticatedUser()`, `requireAdmin()`, `requireRoomOwner(roomId)`, `requireMatchParticipant(matchId)`
+
+The `isDevelopmentMode` flag is exported from `src/lib/config/flags.ts` and controls mock behavior across the app.
+
+### Supabase Clients (`src/lib/supabaseClient.ts`)
+
+- `createBrowserSupabaseClient()` — client-side with cookie sync
+- `createServerSupabaseClient()` — server-side with Next.js cookie handling
+- `supabaseAdmin` — service role client, bypasses RLS
+
+### Database Schema
+
+SQL scripts in `scripts/` (run manually in Supabase SQL Editor, in order: migrate.sql → rls.sql → seed.sql).
+
+Core tables: `profiles`, `rooms` (with `host_uid`, location, `boost_until`), `requests` (join requests with status workflow), `matches` (accepted requests), `messages` (realtime chat), `host_messages`, `notifications`, `reports`, `blocked_users`, `age_verification`, `feedback`.
+
+RLS policies enforce: user blocking (bidirectional), permission-based access, admin-only for reports/moderation.
+
+### Room Lifecycle (Core Business Logic)
+
+Host creates room → Users send join requests → Host accepts/rejects → Accepted requests create matches → Matches enable 1:1 messaging.
 
 ### Geographic Filtering
 
-Uses BBox (bounding box) filtering instead of PostGIS for simplicity:
+Uses BBox (bounding box) instead of PostGIS. API endpoints accept `?bbox=south,west,north,east`. Utilities in `src/lib/bbox.ts` (coordinate validation, Haversine distance).
 
-- `src/lib/bbox.ts` contains geographic utilities
-- API endpoints accept `?bbox=south,west,north,east` parameters
-- Client-side map bounds determine search area
-- Haversine formula for distance calculations
+### Middleware (`src/middleware.ts`)
 
-### Rate Limiting
+Runs on `/api/:path*` only. Handles:
+- CORS whitelist (meetpin-weld.vercel.app, meetpin.com, localhost in dev)
+- CSRF protection for state-changing methods (POST/PUT/DELETE/PATCH) via referer/origin check
+- Webhook and health endpoints are CSRF-exempt
 
-Memory-based rate limiting in `src/lib/rateLimit.ts`:
+### Feature Flags (Two Systems)
 
-- API calls: 100/minute per IP
-- Room creation: 5/minute per user
-- Auth attempts: 5/15 minutes per IP
-- Message sending: 50/minute per user
-- Report creation: 3/minute per user
+1. **`src/lib/config/flags.ts`** — Core environment flags and app config. Exports `flags` object (`kakaoOAuthEnabled`, `stripeCheckoutEnabled`, `adminPanelEnabled`, etc.) and `config` object (default location, pagination, rate limits, boost prices). Also exports `isDevelopmentMode`.
 
-## Key Business Logic
+2. **`src/lib/config/features.ts`** — A/B testing and gradual rollout flags. Uses `NEXT_PUBLIC_FEATURE_*` env vars. Access via `isFeatureEnabled('ENABLE_DARK_MODE')` or `getFeatures()`. Includes hash-based A/B variant assignment via `getVariant()`.
 
-### Room Lifecycle
+## Project Structure
 
-1. Created by host user
-2. Other users send join requests
-3. Host accepts/rejects requests
-4. Accepted requests create matches
-5. Matches enable 1:1 messaging
-
-### Payment Integration
-
-- Stripe Checkout for boost purchases (1일/₩1,000, 3일/₩2,500, 7일/₩5,000)
-- Webhook handling updates `boost_until` timestamp
-- Development mode mock payment processing
-- Boost sorting: rooms with active boost appear first
-- Complete UI with BoostModal component for purchase flow
-
-### Security Considerations
-
-- RLS policies prevent data leakage between blocked users
-- Input validation using Zod schemas in `src/lib/zodSchemas.ts`
-- Forbidden words filtering for user-generated content
-- Rate limiting prevents abuse
-- Admin-only access to reports and user management
-
-## Environment Variables Required
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-
-# Kakao Maps
-NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY=
-
-# Stripe (부스트 결제)
-STRIPE_SECRET_KEY=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_WEBHOOK_SECRET=
-
-# Stripe Price IDs (옵션 - 고정 상품 사용 시)
-STRIPE_PRICE_1D_ID=
-STRIPE_PRICE_3D_ID=
-STRIPE_PRICE_7D_ID=
-
-# App
-SITE_URL=
-
-# Feature Flags (선택적)
-NEXT_PUBLIC_ENABLE_STRIPE_CHECKOUT=true
-NEXT_PUBLIC_ENABLE_REALTIME_NOTIFICATIONS=true
-NEXT_PUBLIC_ENABLE_FILE_UPLOAD=true
-
-# Redis/Upstash (선택적 - 캐싱 성능 향상)
-REDIS_URL=your_redis_url
-UPSTASH_REDIS_REST_URL=your_upstash_url
-UPSTASH_REDIS_REST_TOKEN=your_upstash_token
-
-# Observability (선택적)
-SENTRY_DSN=your_sentry_dsn
-TELEMETRY_SAMPLING_RATE=0.1
-
-# Development Mode Control
-NEXT_PUBLIC_FORCE_MOCK=true  # true for mock mode, false for production
-
-# Testing Environment (RLS Security Tests)
-# Required only for advanced security testing
-# NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_for_testing
-# SUPABASE_SERVICE_ROLE_KEY=your_service_role_for_testing
+```
+src/
+├── app/                    # Next.js App Router pages and API routes
+│   ├── api/                # 45 API endpoints
+│   ├── map/                # Main app page (map view)
+│   ├── room/[id]/          # Room detail, edit, requests
+│   ├── chat/[matchId]/     # 1:1 chat
+│   ├── auth/               # Login, signup, callback
+│   ├── admin/              # Admin panel
+│   ├── profile/            # User profile
+│   └── legal/              # Terms, privacy, location
+├── components/             # Domain-organized React components
+│   ├── ui/                 # shadcn/ui base components
+│   ├── map/                # DynamicMap, MapWithCluster, LocationPicker, MapFilters
+│   ├── chat/               # ChatPanel
+│   ├── room/               # RoomForm
+│   ├── auth/               # Social login
+│   ├── common/             # Providers, BotSchedulerInitializer
+│   └── ...                 # error, landing, pwa, safety
+├── lib/
+│   ├── api.ts              # API utilities, middleware, response helpers
+│   ├── supabaseClient.ts   # Supabase client instances
+│   ├── zodSchemas.ts       # Zod validation schemas
+│   ├── bbox.ts             # Geographic bounding box utilities
+│   ├── rateLimit.ts        # Rate limiting logic
+│   ├── config/             # flags, brand, features, mockData, koreanAvatars
+│   ├── services/           # auth.ts, authService.ts
+│   ├── cache/              # Redis caching layer
+│   ├── bot/                # AI room generation/scheduling
+│   ├── observability/      # Structured logging with PII scrubbing
+│   ├── payments/           # Stripe integration
+│   ├── security/           # CSP utilities
+│   ├── accessibility/      # WCAG utilities
+│   └── design/             # Design system tokens
+└── types/
+    └── global.d.ts         # Window/ProcessEnv augmentations (types are co-located with their modules)
 ```
 
-## Korean Language Considerations
+## Key Conventions
 
-- All UI text, error messages, and user-facing content in Korean
-- Database stores Korean text (nicknames, room titles, messages)
-- Pretendard font for optimal Korean display
-- Korean input validation patterns in zodSchemas.ts
+- **All UI text in Korean** — error messages, labels, toast notifications, everything user-facing
+- **Zod validation** — use schemas from `src/lib/zodSchemas.ts` for all API input validation
+- **Brand system** — `src/lib/config/brand.ts`: Primary (#10B981), Boost (#F59E0B), categories: 술/운동/기타
+- **Font**: Pretendard for Korean text
+- **Type definitions** — all in `src/types/global.d.ts`, organized by domain
+- **App Router only** — CI enforces no `pages/` directory exists (Pages Router guard in quality workflow)
 
-## Brand System
+## Testing
 
-Centralized in `src/lib/brand.ts`:
+- **Unit tests**: `__tests__/` directory, Jest with jsdom. Module mapper: `@/` → `src/`
+- **E2E tests**: `e2e/` directory, Playwright (chromium, firefox, mobile-chrome, mobile-safari)
+- **RLS security tests**: `tests/rls/` — requires live Supabase connection, excluded from Jest by default
+- **Coverage threshold**: 80% branches/functions/lines/statements
 
-- Color palette: Primary (#10B981), Boost (#F59E0B), Accent (#F97316)
-- Category badges: 술🍻, 운동💪, 기타✨
-- Brand messages: "밋핀", "핀 찍고, 지금 모여요"
+## CI/CD
 
-## Testing Strategy
+GitHub Actions workflows in `.github/workflows/`:
+- `quality.yml` — on push to main/develop: typecheck → lint → App Router guard → security audit → build → bundle budget (300KB limit) → architecture check → smoke test
+- `e2e-prod.yml` — daily E2E against production
+- `uptime.yml` — uptime monitoring
+- `deploy.yml` — deployment pipeline with error budget guard
 
-- **Jest** for unit tests of utilities and business logic (60/60 tests expected to pass)
-- **Advanced RLS Security Testing**: Comprehensive security test suite in `tests/rls/rls-security.spec.ts`
-  - Row Level Security policy validation
-  - User isolation and permission testing
-  - Cross-user data access prevention
-  - Admin privilege escalation protection
-  - Performance testing with large datasets
-- **Playwright** for E2E tests with UI support and comprehensive accessibility testing (WCAG 2.1 AA compliance)
-- **Multi-environment Testing**: Local, production, mobile, and performance test suites
-- **Critical User Flows**: signup → room creation → matching → chat
-- **Lighthouse Integration**: Performance, accessibility, and SEO auditing
-- **Mobile Testing**: Chrome and Safari mobile browser testing
+## Environment Variables
 
-## Important Development Notes
+Required: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL`.
 
-### Code Style & Patterns
+Mock mode: Set `NEXT_PUBLIC_USE_MOCK_DATA=true` in `.env.local` to run without Supabase (development only; always disabled in production builds).
 
-- Use `ApiResponse<T>` interface for all API responses: `{ ok: boolean, data?: T, code?: string, message?: string }`
-- Always validate input with Zod schemas from `src/lib/zodSchemas.ts`
-- Use `rateLimit(key, limit, windowMs)` for protecting endpoints
-- Use `ApiError` class for structured error handling with status codes
-- Import paths use `@/` prefix resolving to `src/`
-- **CRITICAL**: All authentication functions check `isDevelopmentMode` for Mock support
+Optional: `REDIS_URL`/`UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` (caching), `SENTRY_DSN` (error tracking), `NEXT_PUBLIC_ENABLE_*` flags.
 
-### Page Structure
+## Build Configuration
 
-- All application pages are in `src/app/` using Next.js 15 App Router
-- Key pages: `/map` (main app), `/room/new`, `/room/[id]`, `/chat/[matchId]`, `/profile`, `/admin`
-- Legal pages: `/legal/terms`, `/legal/privacy`, `/legal/location`
-- Landing page CTAs redirect to `/map`
-
-### Geographic Data Handling
-
-- Use BBox parameters instead of PostGIS: `?bbox=south,west,north,east` (comma-separated)
-- Utility functions in `src/lib/bbox.ts` for coordinate validation and distance calculations
-- Korea and Seoul preset bounding boxes available
-- Haversine formula for distance calculations
-
-### Authentication Patterns
-
-- Server-side: Use `getAuthenticatedUser()` or `requireAdmin()` from `@/lib/api`
-- Client-side: Use Supabase client with proper cookie handling
-- RLS policies handle data access control automatically
-- User blocking relationships affect data visibility bidirectionally
-
-### Real-time Features Architecture
-
-- **Supabase Realtime**: WebSocket connections for live updates
-- **Chat System**: `useRealtimeChat` hook for 1:1 messaging with typing indicators
-- **Notifications**: `useRealtimeNotifications` for host message alerts
-- **Online Presence**: Real-time user status tracking in chat
-- **Browser Push**: Native notification API for background alerts
-
-### Image Upload System
-
-- **Supabase Storage**: Secure file storage with RLS policies
-- **Image Optimization**: WebP conversion and compression
-- **Universal Component**: `ImageUploader` for profiles and rooms
-- **Drag & Drop**: Native file handling with preview
-- **Korean Avatars**: Curated avatar collection for local users
-
-### Testing Strategy
-
-- **Jest Unit Tests**: 60/60 tests passing, covering utilities, business logic, and security
-- **Test Locations**: `__tests__/` for unit tests, `tests/rls/` for security tests, `e2e/` for end-to-end
-- **RLS Security Tests**: Comprehensive Row Level Security validation requiring Supabase environment variables
-- **Single Test Run**: `pnpm test -- __tests__/lib/zodSchemas.test.ts`
-- **Environment-Specific Tests**: Separate test suites for development (Mock) and production environments
-- **Critical User Flows**: signup → room creation → matching → chat
-- **E2E Testing**: Playwright for cross-browser end-to-end testing with mobile device emulation
-- **Performance Testing**: Bundle analysis, baseline comparison, and regression guards
-- **Development Testing**: Mock data enables full feature testing without external services
-- **Security Testing**: RLS policy validation, privilege escalation prevention, user isolation testing
-
-### Advanced Component Architecture
-
-- **Modal System**: Centralized modal management (BoostModal, RealtimeChatModal)
-- **Hook Pattern**: Custom hooks for complex state (`useRealtimeChat`, `useRealtimeNotifications`)
-- **Form Integration**: React Hook Form + Zod validation throughout
-- **Notification Stack**: React Hot Toast + Browser Push + Real-time updates
-- **Payment Flow**: Complete Stripe integration with development/production modes
-
-### Project Quality Standards
-
-- **TypeScript**: Strict mode with enhanced type safety (0 errors)
-- **Code Quality**: Comprehensive ESLint + Prettier configuration (0 warnings)
-- **Testing Suite**: Jest unit tests (60/60 passing) + Playwright E2E + WCAG 2.1 AA compliance
-- **Build Verification**: `pnpm repo:doctor` for complete quality checks
-- **Performance**: Bundle optimization and lazy loading (14 dynamic imports)
-- **Internationalization**: Korean-first UI with proper text handling
-- **Mobile-first**: Responsive design with touch-optimized interactions
-- **Security**: Multi-layer protection (RLS, validation, rate limiting, blocking)
-- **Accessibility**: WCAG 2.1 AA compliance with automated testing
-- **Code Cleanliness**: No dead code, no duplicates, all 152 files actively used (verified 2025-10-11)
-
-## Production Deployment
-
-### Current Deployment Status
-
-- **Platform**: Vercel (meetpin-weld.vercel.app)
-- **Git Integration**: Automatic deployment from GitHub main branch
-- **Build Status**: Latest version 1.5.0 with major refactoring and performance improvements
-- **Latest Optimization**: Commit c4ad908 - LCP optimization + CORS security hardening
-  - Desktop LCP: 2.6s → ~2.3s (Kakao Maps preload, next/image optimization)
-  - Mobile LCP: 4.1s → ~3.4s
-  - API CORS whitelist protection
-- **Environment**: Production environment variables configured in Vercel dashboard
-
-### Deployment Architecture
-
-- **Frontend**: Next.js deployed to Vercel with automatic optimization
-- **Database**: Supabase PostgreSQL with RLS policies active
-- **CDN**: Vercel Edge Network for static assets
-- **Domain**: Custom domain available through Vercel configuration
-
-### Build Cache Management
-
-Critical for production deployments due to aggressive CDN caching:
-
-- **Build Buster System**: `src/lib/buildBuster.ts` contains version identifiers for cache invalidation
-- **Version Bumping**: Update `package.json` version to trigger new builds
-- **Force Update Pattern**: Create dummy files (like `FORCE_UPDATE.txt`) to ensure all files are refreshed
-- **Cache Headers**: Vercel automatically handles cache invalidation for new deployments
-
-### Production Environment Variables
-
-All environment variables must be configured in Vercel dashboard:
-
-- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- Kakao Maps: `NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY`
-- Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
-- App: `SITE_URL` (set to production domain)
-
-### Development vs Production Modes
-
-- **Development Mode**: Uses Mock authentication and sample data
-- **Production Mode**: Full Supabase integration with real authentication
-- **Feature Flags**: `src/lib/flags.ts` controls environment-specific features
-- **Build Detection**: `isDevelopmentMode` flag determines runtime behavior
-
-### Troubleshooting Production Issues
-
-Common production deployment issues and solutions:
-
-1. **Cache Issues**: Old JavaScript bundles served despite code changes
-   - Solution: Update `buildBuster.ts` and bump `package.json` version
-2. **Authentication Errors**: Supabase connection issues in production
-   - Solution: Verify environment variables and consider Mock mode fallback
-3. **Build Failures**: TypeScript or linting errors preventing deployment
-   - Solution: Run `pnpm repo:doctor` locally before pushing
-4. **Git Synchronization**: Local changes not reflecting in deployment
-   - Solution: Ensure all changes are committed and pushed to GitHub main branch
-5. **RLS Test Failures**: Security tests failing due to missing Supabase environment variables
-   - Solution: Either provide Supabase credentials for testing or skip RLS tests in development
-   - Note: RLS tests in `tests/rls/` require live Supabase connection and will fail in CI/CD without proper setup
-6. **Next.js Lint Deprecation**: `next lint` command deprecated and will be removed in Next.js 16
-   - Solution: Consider migrating to ESLint CLI: `npx @next/codemod@canary next-lint-to-eslint-cli .`
-7. **CORS Errors**: API calls blocked from unauthorized origins
-   - Check: `src/middleware.ts` whitelist includes your domain
-   - Dev: localhost:3001, localhost:3000 automatically allowed in development
-   - Production: Add new domains to `allowedOrigins` array
-
-### Test Environment Configuration
-
-- **Unit Tests**: All tests in `__tests__/` run without external dependencies
-- **RLS Security Tests**: Tests in `tests/rls/` require Supabase environment variables
-- **Jest Configuration**: `jest.config.js` excludes `tests/rls/` by default to prevent CI failures
-- **Test Isolation**: RLS tests create and cleanup their own test data to avoid conflicts
-- **Running RLS Tests**: To run security tests separately: `pnpm test tests/rls/rls-security.spec.ts` (requires Supabase environment variables)
-
-## Performance Optimization (Recent)
-
-### LCP (Largest Contentful Paint) Improvements
-
-**Target**: Desktop ≤2.5s, Mobile ≤3.5s
-
-**Applied Optimizations** (Commit c4ad908):
-
-1. **Resource Hints** (`src/app/layout.tsx`):
-   ```html
-   <link rel="preconnect" href="https://dapi.kakao.com" />
-   <link rel="preload" as="script" href="https://dapi.kakao.com/v2/maps/sdk.js" />
-   ```
-   - Reduces network latency by ~100ms
-   - Prioritizes critical Kakao Maps SDK loading
-
-2. **Image Optimization** (`next.config.ts`):
-   ```typescript
-   images: {
-     formats: ['image/webp', 'image/avif'],
-     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384]
-   }
-   ```
-   - Automatic WebP/AVIF conversion
-   - Responsive image sizing for all devices
-
-**Results** (Expected):
-- Desktop LCP: 2.6s → 2.3s (-0.3s)
-- Mobile LCP: 4.1s → 3.4s (-0.7s)
-
-**Verification**:
-```bash
-# After deployment (wait 30 minutes for CDN cache)
-npx lighthouse https://meetpin-weld.vercel.app/ --preset=desktop
-```
-
-### Performance Monitoring
-
-- **Core Web Vitals**: Tracked via Vercel Analytics
-- **Lighthouse CI**: Run on every deployment
-- **Performance Budget**: Main bundle < 300KB (enforced in build)
+`next.config.ts` chains: base Next.js config → PWA (`@ducanh2912/next-pwa`) → conditional Sentry (`@sentry/nextjs`). Key settings:
+- Bundle budget: 300KB per chunk (enforced via webpack plugin in production builds)
+- Image optimization: WebP/AVIF, remote patterns for Supabase Storage and social login avatars
+- Package import optimization for lucide-react, date-fns, Radix UI, react-hook-form, zod
+- Production security headers: HSTS, CSP, X-Frame-Options DENY, Permissions-Policy
+- API rewrite: `/api/stripe/*` → `/api/payments/stripe/*`

@@ -365,10 +365,10 @@ setInterval(() => {
   }
 }, 60 * 1000) // 1분마다 정리
 
-// === 하위 호환성을 위한 alias 함수들 ===
+// === 호환성 alias 함수들 (실제 사용 중) ===
 
 /**
- * 레거시 지원: checkRateLimit 함수 (async)
+ * 간단한 boolean 반환 레이트 리밋
  */
 export async function checkRateLimit(
   identifier: string,
@@ -385,16 +385,7 @@ export async function checkRateLimit(
 }
 
 /**
- * 레거시 지원: 타입별 레이트리밋
- */
-export async function checkTypedRateLimit(identifier: string, type: string): Promise<boolean> {
-  const config = getPresetConfig(type)
-  const result = await rateLimit(identifier, config.requests, config.window)
-  return result.success
-}
-
-/**
- * 레거시 지원: IP 기반 레이트리밋
+ * IP 기반 레이트리밋 (api.ts에서 사용)
  */
 export async function checkIPRateLimit(ip: string, _type: string = 'api'): Promise<boolean> {
   const result = await rateLimitGlobal(ip)
@@ -402,15 +393,7 @@ export async function checkIPRateLimit(ip: string, _type: string = 'api'): Promi
 }
 
 /**
- * 레거시 지원: 사용자 기반 레이트리밋
- */
-export async function checkUserRateLimit(uid: string, type: string): Promise<boolean> {
-  const result = await rateLimitUser(uid, type)
-  return result.success
-}
-
-/**
- * 레거시 지원: 사용자+IP 기반 레이트리밋
+ * 사용자+IP 기반 레이트리밋 (api.ts에서 사용)
  */
 export async function checkUserIPRateLimit(
   uid: string,
@@ -421,44 +404,4 @@ export async function checkUserIPRateLimit(
   return result.success
 }
 
-/**
- * 레거시 지원: 레이트리밋 정보 조회
- */
-export async function getRateLimitInfo(_identifier: string): Promise<any> {
-  // 기존 호환성을 위해 null 반환
-  return null
-}
-
-/**
- * 레거시 지원: 모든 레이트리밋 리셋
- */
-export async function resetAllRateLimits(): Promise<void> {
-  memoryStore.clear()
-}
-
-/**
- * 레거시 지원: 동기식 레이트리밋
- */
-export function rateLimitSync(key: string, limit: number, windowMs: number): boolean {
-  const now = Date.now()
-  const record = memoryStore.get(key)
-
-  if (!record || now > record.resetTime) {
-    memoryStore.set(key, { count: 1, resetTime: now + windowMs })
-    return true
-  }
-
-  if (record.count >= limit) {
-    return false
-  }
-
-  record.count++
-  return true
-}
-
-// 타입 호환성
 export type RateLimitType = keyof typeof RATE_LIMIT_PRESETS
-export interface RateLimitOptions {
-  requests: number
-  windowMs: number
-}

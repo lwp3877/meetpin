@@ -78,7 +78,11 @@ export default function EditRoomPage() {
         throw new Error(result.message || '방 정보를 불러올 수 없습니다')
       }
 
-      const roomData = result.data.room
+      const roomData = result.data?.room
+
+      if (!roomData) {
+        throw new Error('방 정보를 찾을 수 없습니다')
+      }
 
       // 호스트 권한 확인
       if (!roomData.is_host) {

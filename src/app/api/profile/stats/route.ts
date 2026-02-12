@@ -182,18 +182,29 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(5)
 
-    // 카테고리별 참여 통계
-    const { data: categoryStats } = await supabase
+    // 카테고리별 참여 통계: 먼저 참여한 방 ID를 가져온 후 별도 쿼리
+    const { data: acceptedRequests } = await supabase
+      .from('requests')
+      .select('room_id')
+      .eq('requester_uid', user.id)
+      .eq('status', 'accepted')
+
+    const joinedRoomIds = (acceptedRequests || []).map((r: Record<string, unknown>) => r.room_id as string)
+
+    // 호스팅한 방 + 참여한 방의 카테고리 조회
+    let categoryQuery = supabase
       .from('rooms')
       .select('category')
-      .or(
-        `host_uid.eq.${user.id},id.in.(${
-          // 사용자가 참여한 모임의 ID들을 서브쿼리로 가져오기
-          "SELECT room_id FROM requests WHERE requester_uid = '" +
-          user.id +
-          "' AND status = 'accepted'"
-        })`
-      )
+      .eq('host_uid', user.id)
+
+    if (joinedRoomIds.length > 0) {
+      categoryQuery = supabase
+        .from('rooms')
+        .select('category')
+        .or(`host_uid.eq.${user.id},id.in.(${joinedRoomIds.join(',')})`)
+    }
+
+    const { data: categoryStats } = await categoryQuery
 
     // 통계 데이터 구성
     const stats = {

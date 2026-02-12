@@ -1,4 +1,12 @@
 /* src/lib/api.ts */
+/**
+ * === API 에러 처리 규칙 ===
+ * 1. 모든 API 응답은 { ok: boolean, data?, code?, message? } 형식 (ApiResponse<T>)
+ * 2. 에러 발생 시 throw new ApiError(message, status, code) 사용
+ * 3. 최상위 withErrorHandling 미들웨어가 ApiError를 잡아 일관된 응답으로 변환
+ * 4. 직접 try/catch 시에도 createErrorResponse / createSuccessResponse 사용
+ * 5. { success: false } 등 비표준 형식 사용 금지
+ */
 import { NextRequest, NextResponse } from 'next/server'
 import { ZodSchema } from 'zod'
 import { getAuthenticatedUser, requireAdmin } from '@/lib/services/auth'

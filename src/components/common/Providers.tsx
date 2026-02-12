@@ -8,11 +8,11 @@ import { CustomToaster } from '@/components/ui/Toast'
 import { ThemeProvider } from '@/components/common/theme-provider'
 import { BotSchedulerInitializer } from '@/components/common/BotSchedulerInitializer'
 import { GlobalErrorBoundary } from '@/components/error/GlobalErrorBoundary'
-import { logFeatureFlags } from '@/lib/config/features'
 import { useEffect, useState } from 'react'
 import { initializeBrowserCompatibility } from '@/lib/utils/browserCompat'
 import { initializeDataValidation } from '@/lib/utils/dataValidation'
 import { initializeSecurityMeasures } from '@/lib/security/securityHardening'
+import { validateEnvVars } from '@/lib/config/flags'
 import { initializeAccessibility } from '@/lib/accessibility/a11yEnhancement'
 import { logger } from '@/lib/observability/logger'
 
@@ -31,8 +31,9 @@ export default function Providers({ children }: ProvidersProps) {
     // 하이드레이션 완료 후에만 DOM 변형 시스템 초기화
     if (!isHydrated) return
 
-    // 개발 모드에서 피처 플래그 로그 출력
-    logFeatureFlags()
+    // 환경 변수 검증
+    const envWarnings = validateEnvVars()
+    envWarnings.forEach(w => logger.warn(w))
 
     // 실제 사용자 테스트를 위한 모든 시스템 초기화
     logger.info('🚀 실제 사용자 테스트 준비: 모든 시스템 초기화 시작')

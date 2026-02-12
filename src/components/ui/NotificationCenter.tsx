@@ -208,10 +208,20 @@ export default function NotificationCenter({ className = '' }: NotificationCente
         fetchNotifications(true)
       }
 
-      // Visibility API로 백그라운드 최적화
+      // Visibility API로 백그라운드 최적화 - 숨겨진 탭에서 폴링 중지
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
           fetchNotifications(true)
+          // 다시 보이면 폴링 재개
+          if (!intervalRef.current) {
+            intervalRef.current = setInterval(() => fetchNotifications(), getPollingInterval())
+          }
+        } else {
+          // 탭이 숨겨지면 폴링 중지 (배터리/성능 절약)
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = undefined
+          }
         }
       }
 
@@ -234,18 +244,8 @@ export default function NotificationCenter({ className = '' }: NotificationCente
     }
   }, [user, fetchNotifications, getPollingInterval])
 
-  // 에러 발생 시 폴링 간격 조정
-  useEffect(() => {
-    if (intervalRef.current && retryCountRef.current > 0) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = setInterval(() => fetchNotifications(), getPollingInterval())
-    }
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [fetchNotifications, getPollingInterval])
+  // 에러 시 폴링 간격 조정은 메인 polling useEffect의 visibility 핸들러에서 처리.
+  // getPollingInterval()이 retryCountRef를 읽으므로 탭 전환 시 자동으로 백오프 반영됨.
 
   // 브라우저 알림 권한 요청
   useEffect(() => {

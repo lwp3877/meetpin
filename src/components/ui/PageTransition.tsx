@@ -38,10 +38,17 @@ export default function PageTransition({
     return () => clearTimeout(timer)
   }, [pathname, isMounted])
 
+  const durationClass =
+    duration <= 150 ? 'duration-150' :
+    duration <= 200 ? 'duration-200' :
+    duration <= 300 ? 'duration-300' :
+    duration <= 500 ? 'duration-500' :
+    'duration-700'
+
   const getTransitionClasses = () => {
     if (!isMounted) return '' // 마운트되지 않았으면 애니메이션 없음
 
-    const baseClasses = `transition-all duration-${duration} ease-out`
+    const baseClasses = `transition-all ${durationClass} ease-out`
 
     switch (type) {
       case 'fade':

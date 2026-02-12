@@ -1,5 +1,6 @@
 /* src/lib/kakao.ts */
 
+import { useState, useEffect } from 'react'
 import { logger } from '@/lib/observability/logger'
 // Kakao Maps API 관련 타입과 유틸리티
 
@@ -176,6 +177,28 @@ export function getCurrentPosition(): Promise<{ lat: number; lng: number }> {
       }
     )
   })
+}
+
+/**
+ * Kakao Maps SDK 로딩 상태를 관리하는 커스텀 훅
+ * MapWithCluster, LocationPicker 등에서 공통 사용
+ */
+export function useKakaoMaps(): boolean {
+  const [isLoaded, setIsLoaded] = useState(isKakaoMapsLoaded)
+
+  useEffect(() => {
+    if (isLoaded) return
+
+    loadKakaoMaps()
+      .then(() => setIsLoaded(true))
+      .catch(error => {
+        logger.error('Kakao Maps 로드 실패:', {
+          error: error instanceof Error ? error.message : String(error),
+        })
+      })
+  }, [isLoaded])
+
+  return isLoaded
 }
 
 /**

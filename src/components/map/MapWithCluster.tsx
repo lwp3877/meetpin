@@ -1,9 +1,9 @@
 /* src/components/MapWithCluster.tsx */
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { brandColors, getCategoryDisplay } from '@/lib/config/brand'
-import { loadKakaoMaps } from '@/lib/services/kakao'
+import { useKakaoMaps } from '@/lib/services/kakao'
 import { logger } from '@/lib/observability/logger'
 
 // Kakao Maps 타입 정의
@@ -53,18 +53,8 @@ export default function MapWithCluster({
   const markersRef = useRef<any[]>([])
   const clustererRef = useRef<any>(null)
   const infoWindowRef = useRef<any>(null)
-  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
-
-  // Kakao Maps SDK 로드
-  useEffect(() => {
-    loadKakaoMaps()
-      .then(() => {
-        setIsKakaoLoaded(true)
-      })
-      .catch(error => {
-        logger.error('Kakao Maps 로드 실패:', { error: error instanceof Error ? error.message : String(error) })
-      })
-  }, [])
+  const markerImageCache = useRef<Map<string, string>>(new Map())
+  const isKakaoLoaded = useKakaoMaps()
 
   // 지도 초기화
   useEffect(() => {
@@ -201,23 +191,27 @@ export default function MapWithCluster({
     markersRef.current = []
 
     // 새 마커 생성
+    const now = new Date()
     const newMarkers = rooms.map(room => {
       const categoryDisplay = getCategoryDisplay(room.category)
       const isSelected = selectedRoomId === room.id
-      const isBoosted = room.boost_until && new Date(room.boost_until) > new Date()
+      const isBoosted = room.boost_until && new Date(room.boost_until) > now
 
-      // 마커 이미지 생성 (btoa 대신 encodeURIComponent 사용)
-      const svgContent = `
-        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 0C7.164 0 0 7.164 0 16C0 24.836 16 40 16 40S32 24.836 32 16C32 7.164 24.836 0 16 0Z" 
-                fill="${isSelected ? brandColors.accent : isBoosted ? brandColors.boost : categoryDisplay.color}"/>
-          <circle cx="16" cy="16" r="8" fill="white"/>
-          <text x="16" y="20" text-anchor="middle" font-size="12" fill="${isSelected ? brandColors.accent : isBoosted ? brandColors.boost : categoryDisplay.color}">
-            ${categoryDisplay.emoji}
-          </text>
-        </svg>
-      `
-      const markerImageSrc = `data:image/svg+xml,${encodeURIComponent(svgContent)}`
+      // 마커 이미지 캐싱 (카테고리(3) × 선택(2) × 부스트(2) = 최대 12개로 자연 제한)
+      const cacheKey = `${room.category}-${isSelected}-${!!isBoosted}`
+      let markerImageSrc = markerImageCache.current.get(cacheKey)
+      if (!markerImageSrc) {
+        const color = isSelected ? brandColors.accent : isBoosted ? brandColors.boost : categoryDisplay.color
+        const svgContent = `
+          <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 0C7.164 0 0 7.164 0 16C0 24.836 16 40 16 40S32 24.836 32 16C32 7.164 24.836 0 16 0Z" fill="${color}"/>
+            <circle cx="16" cy="16" r="8" fill="white"/>
+            <text x="16" y="20" text-anchor="middle" font-size="12" fill="${color}">${categoryDisplay.emoji}</text>
+          </svg>
+        `
+        markerImageSrc = `data:image/svg+xml,${encodeURIComponent(svgContent)}`
+        markerImageCache.current.set(cacheKey, markerImageSrc)
+      }
 
       const markerImage = new kakao.maps.MarkerImage(markerImageSrc, new kakao.maps.Size(32, 40), {
         offset: new kakao.maps.Point(16, 40),
