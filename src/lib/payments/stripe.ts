@@ -4,7 +4,9 @@ import { logger } from '@/lib/observability/logger'
 import { flags, config } from '@/lib/config/flags'
 
 // Stripe 초기화 (서버 전용)
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// STRIPE_SECRET_KEY 미설정 시 더미 키로 초기화 — 모듈 import 크래시 방지
+// 실제 API 호출 시 Stripe가 인증 에러를 반환하지만, 부스트 UI가 숨겨져 있으므로 도달 불가
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_not_configured', {
   apiVersion: '2025-07-30.basil',
   typescript: true,
 })

@@ -98,7 +98,33 @@ USING (
 );
 
 -- ===========================================
--- 3. Storage RLS 활성화 확인
+-- 3. images 버킷 RLS 정책 (범용 이미지 업로드)
+-- ===========================================
+
+-- 3-1. 모든 사용자가 이미지 읽기 가능 (공개)
+CREATE POLICY "Public images are viewable by everyone"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'images');
+
+-- 3-2. 인증된 사용자만 자신의 폴더에 업로드 가능
+CREATE POLICY "Authenticated users can upload images"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'images'
+  AND auth.role() = 'authenticated'
+);
+
+-- 3-3. 업로더만 자신의 이미지 삭제 가능
+CREATE POLICY "Users can delete their own images"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'images'
+  AND auth.role() = 'authenticated'
+  AND (storage.foldername(name))[2] = auth.uid()::text
+);
+
+-- ===========================================
+-- 4. Storage RLS 활성화 확인
 -- ===========================================
 
 -- Storage objects 테이블의 RLS 활성화

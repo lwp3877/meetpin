@@ -87,9 +87,16 @@ The `isDevelopmentMode` flag is exported from `src/lib/config/flags.ts` and cont
 
 ### Database Schema
 
-SQL scripts in `scripts/` (run manually in Supabase SQL Editor, in order: migrate.sql → rls.sql → seed.sql).
+SQL scripts in `scripts/` (run manually in Supabase SQL Editor, in this order):
+1. `migrate.sql` — Core tables (profiles, rooms, requests, matches, messages, etc.)
+2. `migrate-extra.sql` — Additional tables (notifications, feedback, emergency_reports, etc.)
+3. `storage-setup.sql` — Storage buckets (avatars, room-images, images)
+4. `rls.sql` — Core table RLS policies
+5. `rls-extra.sql` — Additional table RLS policies
+6. `storage-rls.sql` — Storage bucket RLS policies
+7. `seed.sql` — Sample data (development only, skip for production)
 
-Core tables: `profiles`, `rooms` (with `host_uid`, location, `boost_until`), `requests` (join requests with status workflow), `matches` (accepted requests), `messages` (realtime chat), `host_messages`, `notifications`, `reports`, `blocked_users`, `age_verification`, `feedback`.
+Core tables: `profiles`, `rooms` (with `host_uid`, location, `boost_until`), `requests` (join requests with status workflow), `matches` (accepted requests), `messages` (realtime chat), `host_messages`, `notifications`, `reports`, `blocked_users`, `age_verification`, `feedback`, `emergency_reports`, `privacy_rights_requests`, `admin_notifications`, `user_verification_status`, `user_verifications`, `meetup_feedback`, `user_safety_settings`.
 
 RLS policies enforce: user blocking (bidirectional), permission-based access, admin-only for reports/moderation.
 
