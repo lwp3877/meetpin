@@ -531,12 +531,6 @@ export default function RoomDetailPage() {
                 >
                   ⚙️ 수정
                 </button>
-                <button
-                  onClick={() => setShowBoostModal(true)}
-                  className="flex-1 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 py-4 text-lg font-bold text-white shadow-xl transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:shadow-2xl"
-                >
-                  {isBoosted ? '🚀 부스트 중' : '⭐ 부스트'}
-                </button>
               </div>
               <p className="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">
                 호스트로서 모임을 관리할 수 있습니다

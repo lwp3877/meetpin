@@ -339,13 +339,6 @@ export default function MapWithCluster({
             ></div>
             <span className="text-xs">✨ 기타</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div
-              className="h-3 w-3 rounded-full"
-              style={{ backgroundColor: brandColors.boost }}
-            ></div>
-            <span className="text-xs">⭐ 부스트</span>
-          </div>
         </div>
       </div>
 

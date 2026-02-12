@@ -1197,7 +1197,7 @@ export default function SignUpPage() {
                   <span className="text-xs sm:text-sm">🎁</span>
                 </div>
                 <span className="text-xs leading-relaxed font-medium text-gray-700 sm:text-sm">
-                  신규 가입 시 프리미엄 부스트 3일 무료!
+                  모든 기능 100% 무료!
                 </span>
               </li>
             </ul>
