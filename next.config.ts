@@ -314,10 +314,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // ESLint 최적화
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
 }
 
 // Sentry configuration (only if DSN exists)
