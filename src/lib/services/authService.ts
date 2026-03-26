@@ -1,6 +1,16 @@
 /**
- * 인증 관련 서비스 로직을 담당하는 모듈
- * useAuth 훅에서 분리하여 테스트 가능성과 재사용성을 높임
+ * src/lib/services/authService.ts — 클라이언트 전용 인증 서비스
+ *
+ * ⚠️  이 파일은 브라우저(클라이언트 컴포넌트, useAuth 훅)에서만 사용하세요.
+ *     서버(API routes)에서는 src/lib/services/auth.ts를 사용하세요.
+ *
+ * 포함 기능:
+ *  - getCurrentUser(): 현재 로그인 사용자 조회
+ *  - signInWithEmail(): 이메일 로그인
+ *  - signUpWithEmail(): 이메일 회원가입
+ *  - signOut(): 로그아웃
+ *  - updateUserProfile(): 프로필 업데이트
+ *  - logAuthState(): 개발 모드 디버깅 로그
  */
 
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
@@ -41,17 +51,12 @@ export interface AuthResult {
   error?: string
 }
 
-import { isDevelopmentMode as _isDevelopmentMode } from '@/lib/config/flags'
-
-// Mock 모드 여부를 결정하는 함수
-export const isDevelopmentMode = (): boolean => {
-  return _isDevelopmentMode
-}
+import { isDevelopmentMode } from '@/lib/config/flags'
 
 // 현재 인증된 사용자 정보 가져오기
 export const getCurrentUser = async (): Promise<AuthUser | null> => {
   try {
-    if (isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       // Mock 모드: localStorage에서 사용자 정보 가져오기
       if (typeof window !== 'undefined') {
         const stored = localStorage.getItem('meetpin_user')
@@ -110,7 +115,7 @@ export const getCurrentUser = async (): Promise<AuthUser | null> => {
 // 이메일 로그인
 export const signInWithEmail = async (email: string, password: string): Promise<AuthResult> => {
   try {
-    if (isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       // Mock 모드: Mock 로그인 사용
       const { mockLogin } = await import('@/lib/config/mockData')
       const result = await mockLogin(email, password)
@@ -164,7 +169,7 @@ export const signUpWithEmail = async (
   ageRange: string
 ): Promise<AuthResult> => {
   try {
-    if (isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       // Mock 모드: Mock 회원가입 사용
       const { mockSignUp } = await import('@/lib/config/mockData')
       await mockSignUp(email, password, nickname, ageRange)
@@ -222,7 +227,7 @@ export const signUpWithEmail = async (
 // 로그아웃
 export const signOut = async (): Promise<void> => {
   try {
-    if (isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       // Mock 모드: localStorage에서 사용자 정보 제거
       if (typeof window !== 'undefined') {
         localStorage.removeItem('meetpin_user')
@@ -250,7 +255,7 @@ export const signOut = async (): Promise<void> => {
 // 프로필 업데이트
 export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<AuthResult> => {
   try {
-    if (isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       // Mock 모드: localStorage에서 사용자 정보 업데이트
       if (typeof window !== 'undefined') {
         const stored = localStorage.getItem('meetpin_user')
@@ -316,7 +321,7 @@ export const updateUserProfile = async (updates: Partial<AuthUser>): Promise<Aut
 
 // 개발 모드 로깅 유틸리티
 export const logAuthState = (message: string, data?: Record<string, unknown>): void => {
-  if (isDevelopmentMode()) {
+  if (isDevelopmentMode) {
     logger.debug(`[authService] ${message}`, data)
   }
 }

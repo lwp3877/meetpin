@@ -539,12 +539,14 @@ export function initializeSecurityMeasures(): () => void {
       ) {
         if (!devtools.open) {
           devtools.open = true
+          /* eslint-disable no-console */ // 브라우저 보안 경고 표시용 — 의도된 console 사용
           console.clear()
           console.info('%c🚨 보안 경고', 'color: red; font-size: 50px; font-weight: bold;')
           console.info(
             '%c개발자 도구 사용이 감지되었습니다.\n악의적인 코드 실행을 방지하기 위해 콘솔을 사용하지 마세요.',
             'color: red; font-size: 16px;'
           )
+          /* eslint-enable no-console */
         }
       } else {
         devtools.open = false

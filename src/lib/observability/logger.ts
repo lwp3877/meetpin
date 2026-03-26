@@ -1,5 +1,6 @@
 /* src/lib/observability/logger.ts */
 // 🔍 구조화 로깅 유틸리티 - requestId, userId, 지연시간, PII 스크러빙
+/* eslint-disable no-console */ // 이 파일이 logger 자체이므로 console 직접 사용이 의도됨
 
 import { NextRequest } from 'next/server'
 

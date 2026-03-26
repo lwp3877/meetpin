@@ -41,5 +41,6 @@ if (SENTRY_DSN) {
     }
   })
 } else {
+  // eslint-disable-next-line no-console
   console.log('[Sentry] Server disabled - no SENTRY_DSN environment variable found')
 }

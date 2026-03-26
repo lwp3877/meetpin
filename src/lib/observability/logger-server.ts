@@ -1,5 +1,6 @@
 /* src/lib/observability/logger-server.ts */
 // 🔐 서버 전용 로거 - 순환 의존성 해결 및 API 에러 로깅 복구
+/* eslint-disable no-console */ // 이 파일이 server-side logger 자체이므로 console 직접 사용이 의도됨
 
 import 'server-only'
 import { NextRequest } from 'next/server'

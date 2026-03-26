@@ -59,11 +59,13 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
     // 개발 모드에서는 상세한 에러 정보를 콘솔에 출력
     if (process.env.NODE_ENV === 'development') {
+      /* eslint-disable no-console */
       console.group('🚨 Error Boundary Details')
       logger.error('Error', { error: error instanceof Error ? error.message : String(error) })
       logger.error('Component Stack', { componentStack: errorInfo.componentStack })
       logger.error('Error Stack', { stack: (error as Error).stack })
       console.groupEnd()
+      /* eslint-enable no-console */
     }
 
     // 에러 보고 (실제 운영에서는 외부 서비스로 전송)

@@ -6,8 +6,9 @@
 import { useState, useEffect, createContext, useContext, useCallback, ReactNode } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import * as authService from '@/lib/services/authService'
+import { isDevelopmentMode } from '@/lib/config/flags'
 
-if (authService.isDevelopmentMode()) {
+if (isDevelopmentMode) {
   authService.logAuthState('useAuth hook initialized')
 }
 
@@ -88,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth()
 
-    if (authService.isDevelopmentMode()) {
+    if (isDevelopmentMode) {
       const handleStorageChange = async () => {
         if (!mounted) return
         const currentUser = await authService.getCurrentUser()

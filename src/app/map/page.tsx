@@ -1,11 +1,11 @@
 /* 파일경로: src/app/map/page.tsx */
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/useAuth'
 import DynamicMap from '@/components/map/DynamicMap'
-import { debounce } from '@/lib/utils'
+import { useMapRooms } from '@/hooks/useMapRooms'
 import { ThemeToggle } from '@/components/common/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -38,7 +38,6 @@ import {
 } from '@/components/icons/MapIcons'
 import { isFeatureEnabled } from '@/lib/config/features'
 import toast from 'react-hot-toast'
-import { logger } from '@/lib/observability/logger'
 // 알림 컴포넌트들을 동적 로딩 - 초기 번들 사이즈 감소
 const HostMessageNotifications = dynamic(
   () =>
@@ -56,38 +55,11 @@ const NotificationCenter = dynamic(() => import('@/components/ui/NotificationCen
   loading: () => <div className="h-6 w-6 animate-pulse rounded bg-gray-200" />,
 })
 
-// 서울 기본 영역 상수
-const DEFAULT_BOUNDS = {
-  south: 37.4563,
-  west: 126.8226,
-  north: 37.6761,
-  east: 127.1836,
-}
-
-interface Room {
-  id: string
-  title: string
-  category: 'drink' | 'exercise' | 'other'
-  lat: number
-  lng: number
-  place_text: string
-  start_at: string
-  max_people: number
-  fee: number
-  boost_until?: string
-  profiles: {
-    nickname: string
-    avatar_url?: string
-    age_range: string
-  }
-}
-
 export default function MapPage() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
-  const [rooms, setRooms] = useState<Room[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+
+  // UI 상태 (필터 조건들)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -95,172 +67,14 @@ export default function MapPage() {
   const [maxPeople, setMaxPeople] = useState([20])
   const [timeFilter, setTimeFilter] = useState('all')
 
-  // BBox 타입 정의
-  type BBox = {
-    south: number
-    west: number
-    north: number
-    east: number
-  } | null
+  // 방 목록 로딩·필터링·위치 검색 로직 (훅으로 분리)
+  const { rooms, filteredRooms, isLoading, error, loadRooms, handleBoundsChanged, handleRoomClick, handleNearMe } =
+    useMapRooms({ selectedCategory, searchQuery, priceRange, maxPeople, timeFilter })
 
-  // 방 목록 로드 (재시도 메커니즘 포함)
-  const loadRooms = useCallback(
-    async (bbox?: BBox, retryCount = 0) => {
-      const MAX_RETRIES = 3
-      const RETRY_DELAY = 1000 // 1초
+  const handleCategoryChange = (category: string) => setSelectedCategory(category)
+  const handleSearch = (query: string) => setSearchQuery(query)
+  const handleCreateRoom = () => router.push('/room/new')
 
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        const bounds = bbox || DEFAULT_BOUNDS
-        const bboxParam = `${bounds.south},${bounds.west},${bounds.north},${bounds.east}`
-
-        let url = `/api/rooms?bbox=${bboxParam}&limit=100`
-        if (selectedCategory !== 'all') {
-          url += `&category=${selectedCategory}`
-        }
-
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10초 타임아웃
-
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        clearTimeout(timeoutId)
-
-        if (!response.ok) {
-          if (response.status >= 500 && retryCount < MAX_RETRIES) {
-            // 서버 오류 시 재시도
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)))
-            return loadRooms(bbox, retryCount + 1)
-          }
-          throw new Error(`서버 오류 (${response.status}): 모임을 불러올 수 없습니다`)
-        }
-
-        const result = await response.json()
-
-        if (!result.ok) {
-          throw new Error(result.message || '방 목록을 불러올 수 없습니다')
-        }
-
-        setRooms(result.data.rooms || [])
-        if (result.data.rooms?.length === 0) {
-          toast('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
-        }
-      } catch (err: unknown) {
-        logger.error('Rooms load error:', { error: err instanceof Error ? err.message : String(err) })
-
-        if ((err as Error).name === 'AbortError') {
-          setError('요청 시간이 초과되었습니다')
-          toast.error('네트워크가 느려 요청이 취소되었습니다. 다시 시도해주세요')
-        } else if ((err as Error).message?.includes('fetch')) {
-          setError('인터넷 연결을 확인해주세요')
-          toast.error('인터넷 연결이 불안정합니다. 연결을 확인하고 다시 시도해주세요')
-        } else {
-          setError((err as Error).message || '알 수 없는 오류가 발생했습니다')
-          toast.error(
-            retryCount >= MAX_RETRIES
-              ? '모임을 불러오는데 계속 실패했습니다. 잠시 후 다시 시도해주세요'
-              : '모임을 불러오는 중 오류가 발생했습니다'
-          )
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [selectedCategory]
-  )
-
-  // 지도 영역 변경 시 방 목록 업데이트 (debounced)
-  const debouncedLoadRooms = useMemo(
-    () =>
-      debounce((bbox: BBox) => {
-        if (bbox) {
-          loadRooms(bbox)
-        }
-      }, 500),
-    [loadRooms]
-  )
-
-  const handleBoundsChanged = useCallback(
-    (bbox: BBox) => {
-      if (bbox && bbox.south < bbox.north && bbox.west < bbox.east) {
-        debouncedLoadRooms(bbox)
-      }
-    },
-    [debouncedLoadRooms]
-  )
-
-  // 방 클릭 핸들러
-  const handleRoomClick = (room: Room) => {
-    router.push(`/room/${room.id}`)
-  }
-
-  // 카테고리 변경
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category)
-  }
-
-  // 내 주변 버튼 핸들러
-  const handleNearMe = async () => {
-    if (!navigator.geolocation) {
-      toast.error('이 브라우저는 위치 서비스를 지원하지 않습니다')
-      return
-    }
-
-    toast.loading('현재 위치를 확인하는 중...', { id: 'location-loading' })
-
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 300000, // 5분
-        })
-      })
-
-      const { latitude, longitude } = position.coords
-
-      // 현재 위치 기준 1km 반경 설정
-      const margin = 0.01 // 약 1km
-      const bounds = {
-        south: latitude - margin,
-        west: longitude - margin,
-        north: latitude + margin,
-        east: longitude + margin,
-      }
-
-      await loadRooms(bounds)
-      toast.success('내 주변 모임을 찾았습니다', { id: 'location-loading' })
-    } catch (error: unknown) {
-      logger.error('Location error:', { error: error instanceof Error ? error.message : String(error) })
-      toast.dismiss('location-loading')
-
-      if ((error as any).code === 1) {
-        toast.error('위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요', {
-          duration: 5000,
-        })
-      } else if ((error as any).code === 2) {
-        toast.error('위치를 찾을 수 없습니다. 인터넷 연결과 GPS를 확인해주세요')
-      } else if ((error as any).code === 3) {
-        toast.error('위치 요청 시간이 초과되었습니다. 다시 시도해주세요')
-      } else {
-        toast.error('위치 정보를 가져올 수 없습니다. 브라우저 설정을 확인해주세요')
-      }
-    }
-  }
-
-  // 방 생성 페이지로 이동
-  const handleCreateRoom = () => {
-    router.push('/room/new')
-  }
-
-  // 로그아웃 핸들러
   const handleSignOut = async () => {
     try {
       await signOut()
@@ -270,63 +84,6 @@ export default function MapPage() {
       toast.error('로그아웃 중 오류가 발생했습니다')
     }
   }
-
-  // 검색 핸들러
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
-
-  // 필터링된 방 목록 계산
-  const filteredRooms = rooms.filter(room => {
-    // 카테고리 필터
-    if (selectedCategory !== 'all' && room.category !== selectedCategory) {
-      return false
-    }
-
-    // 검색어 필터
-    if (
-      searchQuery &&
-      !room.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !room.place_text.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false
-    }
-
-    // 가격 필터
-    if (room.fee > priceRange[0]) {
-      return false
-    }
-
-    // 최대 인원 필터
-    if (room.max_people > maxPeople[0]) {
-      return false
-    }
-
-    // 시간 필터
-    const roomDate = new Date(room.start_at)
-    const today = new Date()
-    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000)
-    const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
-
-    switch (timeFilter) {
-      case 'today':
-        if (roomDate.toDateString() !== today.toDateString()) return false
-        break
-      case 'tomorrow':
-        if (roomDate.toDateString() !== tomorrow.toDateString()) return false
-        break
-      case 'week':
-        if (roomDate > weekEnd) return false
-        break
-    }
-
-    return true
-  })
-
-  // 초기 로드
-  useEffect(() => {
-    loadRooms()
-  }, [loadRooms])
 
   if (loading) {
     return (

@@ -103,11 +103,22 @@ const nextConfig: NextConfig = {
     const enforcedCSP = [
       "default-src 'self'",
       "base-uri 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com https://www.googletagmanager.com",
+      // unsafe-eval: Kakao Maps SDK v3가 내부적으로 eval()을 사용하여 제거 불가.
+      //   Kakao 측에서 eval()을 제거한 SDK를 배포하면 이 항목을 삭제할 수 있음.
+      //   참고: https://developers.kakao.com/docs/latest/ko/kakao-map/js
+      // unsafe-inline: Next.js 빌드 시 인라인 스크립트가 생성되어 제거 불가.
+      //   nonce 기반 CSP로 대체하려면 src/middleware.ts에서 nonce 생성 필요.
+      // googletagmanager.com 제거: flags.ts에서 analyticsEnabled=false이므로 불필요.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       `font-src 'self' data: ${fontDomains}`,
-      "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.google-analytics.com",
+      // http: 제거: 모든 이미지 출처(Supabase, dicebear, 소셜 아바타)가 HTTPS를 사용하며,
+      // HTTP 이미지는 브라우저 혼합 콘텐츠 정책으로 이미 차단됨.
+      // 사용자가 HTTP 이미지 URL을 입력한 프로필/방 이미지는 브라우저에서 자동으로 차단됩니다.
+      "img-src 'self' data: blob: https:",
+      // google-analytics.com 제거: analyticsEnabled=false이므로 불필요.
+      // 분석 기능을 활성화하면 https://www.google-analytics.com을 다시 추가해야 함.
+      "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
       "frame-src 'self' https://js.stripe.com",
       "object-src 'none'",
       "form-action 'self'",

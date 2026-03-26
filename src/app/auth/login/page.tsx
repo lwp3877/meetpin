@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { brandMessages } from '@/lib/config/brand'
 import { useAuth } from '@/lib/useAuth'
-import { isDevelopmentMode } from '@/lib/config/flags'
+import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import { SocialLogin } from '@/components/auth/social-login'
 import { SkipLink } from '@/components/ui/AccessibilityProvider'
 import { useKeyboardNavigation, useKeyboardShortcuts } from '@/hooks/useKeyboardNavigation'
@@ -24,6 +24,12 @@ export default function LoginPage() {
   const [isEmailFocused, setIsEmailFocused] = useState(false)
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
   const [formStatus, setFormStatus] = useState('')
+
+  // 비밀번호 재설정 관련 상태
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [isResetLoading, setIsResetLoading] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   // 키보드 네비게이션 설정
   const keyboardNav = useKeyboardNavigation({
@@ -185,6 +191,46 @@ export default function LoginPage() {
     }
   }
 
+  // 비밀번호 재설정 이메일 발송
+  // Supabase가 사용자 이메일로 재설정 링크를 보내줍니다.
+  // 링크를 클릭하면 /auth/callback을 거쳐 비밀번호 변경 페이지로 이동합니다.
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!resetEmail.trim()) {
+      toast.error('이메일을 입력해주세요')
+      return
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(resetEmail)) {
+      toast.error('올바른 이메일 주소를 입력해주세요')
+      return
+    }
+
+    setIsResetLoading(true)
+    try {
+      const supabase = createBrowserSupabaseClient()
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        // 재설정 링크 클릭 후 돌아올 URL
+        // 실제 도메인은 Supabase 대시보드 > Authentication > URL Configuration 에서도 설정 필요
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+      })
+
+      if (error) {
+        logger.error('Password reset error:', { error: error.message })
+        toast.error('재설정 이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.')
+        return
+      }
+
+      setResetSent(true)
+      toast.success('재설정 이메일을 발송했습니다. 받은 편지함을 확인해주세요.')
+    } catch (err) {
+      logger.error('Password reset unexpected error:', { error: err instanceof Error ? err.message : String(err) })
+      toast.error('오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsResetLoading(false)
+    }
+  }
+
   // 로딩 중일 때 스피너 표시
   if (loading) {
     return (
@@ -269,21 +315,6 @@ export default function LoginPage() {
               <span className="mx-4 bg-white px-2 text-sm text-gray-500">또는 이메일로 로그인</span>
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
-
-            {/* 개발자용 임시 로그인 정보 */}
-            {isDevelopmentMode && (
-              <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-                <h4 className="mb-2 font-medium text-blue-900">🔧 개발자용 임시 로그인</h4>
-                <div className="space-y-1 text-sm text-blue-800">
-                  <p>
-                    <strong>관리자:</strong> admin@meetpin.com / 123456
-                  </p>
-                  <p>
-                    <strong>일반유저:</strong> test@test.com / 123456
-                  </p>
-                </div>
-              </div>
-            )}
 
             <form
               onSubmit={handleEmailLogin}
@@ -564,15 +595,77 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* Forgot Password */}
-            <div className="mt-3 text-center">
-              <button
-                type="button"
-                className="hover:text-primary focus:ring-primary touch-manipulation rounded p-1 text-sm text-gray-500 transition-colors focus:ring-2 focus:ring-offset-1 focus:outline-none sm:text-base"
-                aria-label="비밀번호 찾기"
-              >
-                비밀번호를 잊으셨나요?
-              </button>
+            {/* 비밀번호 재설정 */}
+            <div className="mt-3">
+              {!showForgotPassword ? (
+                // 버튼: 클릭하면 재설정 폼이 열립니다
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(true)
+                      setResetSent(false)
+                      setResetEmail(email) // 이미 입력된 이메일이 있으면 자동 채움
+                    }}
+                    className="hover:text-primary focus:ring-primary touch-manipulation rounded p-1 text-sm text-gray-500 transition-colors focus:ring-2 focus:ring-offset-1 focus:outline-none sm:text-base"
+                  >
+                    비밀번호를 잊으셨나요?
+                  </button>
+                </div>
+              ) : resetSent ? (
+                // 발송 완료 메시지
+                <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+                  <p className="font-medium">이메일을 발송했습니다!</p>
+                  <p className="mt-1 text-green-700">
+                    <strong>{resetEmail}</strong>로 비밀번호 재설정 링크를 보냈습니다.
+                    받은 편지함(스팸함도 확인)을 확인해주세요.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForgotPassword(false); setResetSent(false) }}
+                    className="mt-3 text-sm font-medium text-green-700 underline"
+                  >
+                    로그인으로 돌아가기
+                  </button>
+                </div>
+              ) : (
+                // 이메일 입력 폼
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                  <p className="mb-3 text-sm font-medium text-gray-700">
+                    가입한 이메일 주소를 입력하면 비밀번호 재설정 링크를 보내드립니다.
+                  </p>
+                  <form onSubmit={handleForgotPassword} className="space-y-3">
+                    <input
+                      type="email"
+                      value={resetEmail}
+                      onChange={e => setResetEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      disabled={isResetLoading}
+                      autoComplete="email"
+                      aria-label="비밀번호 재설정용 이메일"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="submit"
+                        disabled={isResetLoading}
+                        className="bg-primary hover:bg-primary/90 flex-1 py-2 text-sm"
+                      >
+                        {isResetLoading ? '전송 중...' : '재설정 링크 발송'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowForgotPassword(false)}
+                        disabled={isResetLoading}
+                        className="py-2 text-sm"
+                      >
+                        취소
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
 

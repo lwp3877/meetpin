@@ -1,4 +1,22 @@
 /* src/lib/cache/redis.ts - Redis 캐시 시스템 */
+//
+// ⚠️ 이 파일의 역할과 rateLimit.ts의 차이:
+//
+//   cache/redis.ts  — ioredis (TCP 프로토콜)
+//     → 방 목록, 메시지, 알림, 프로필 등 데이터 캐싱
+//     → 환경변수: REDIS_URL (redis:// 또는 rediss:// 형식)
+//     → 필요한 서비스: Redis 서버 (Upstash의 경우 별도 TCP URL 사용)
+//
+//   rateLimit.ts  — @upstash/redis (HTTP REST 프로토콜)
+//     → IP/사용자 기반 요청 횟수 제한
+//     → 환경변수: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
+//     → 두 라이브러리는 프로토콜이 달라 하나로 통합 불가
+//
+// 무료 배포(Vercel + Upstash 무료)에서는:
+//   - REDIS_URL 없음 → 캐싱 비활성화 (데이터는 DB에서 직접 읽음, 정상 동작)
+//   - UPSTASH_REDIS_REST_URL 있음 → rate limiting 정상 동작
+//
+// 캐싱 활성화가 필요하면 Upstash에서 TCP 연결 URL(rediss://...)을 REDIS_URL에 설정하세요.
 
 import Redis from 'ioredis'
 import { logger } from '@/lib/observability/logger'
@@ -8,18 +26,14 @@ let redis: Redis | null = null
 
 // Redis 연결 설정
 export function getRedisClient(): Redis | null {
-  // 개발 환경에서는 Redis 없이도 동작하도록 설정
-  if (process.env.NODE_ENV === 'development' && !process.env.REDIS_URL) {
-    logger.warn('[Redis] Redis URL not found in development - caching disabled')
-    return null
-  }
-
   if (!redis) {
     try {
-      const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL
+      // REDIS_URL: TCP Redis 연결 URL (redis:// 또는 rediss://)
+      // 주의: UPSTASH_REDIS_REST_URL은 HTTP URL이므로 ioredis에 사용 불가
+      const redisUrl = process.env.REDIS_URL
 
       if (!redisUrl) {
-        logger.warn('[Redis] No Redis URL configured - caching disabled')
+        // REDIS_URL 미설정 시 캐싱 비활성화 — DB에서 직접 조회로 fallback (정상 동작)
         return null
       }
 
@@ -36,10 +50,7 @@ export function getRedisClient(): Redis | null {
 
       redis.on('error', err => {
         logger.error('[Redis] Connection error', { error: (err as Error).message })
-        // 개발 환경에서는 Redis 연결 실패를 허용
-        if (process.env.NODE_ENV === 'development') {
-          redis = null
-        }
+        redis = null // 연결 오류 시 재연결 시도를 위해 초기화
       })
     } catch (error) {
       logger.error('[Redis] Failed to initialize Redis client', { error: error instanceof Error ? error.message : String(error) })

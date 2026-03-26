@@ -122,7 +122,8 @@ export default function AdminDashboard() {
   }
 
   const pendingReports = emergencyReports.filter(r => r.status === 'pending')
-  const pendingVerifications = verifications.filter(v => v.status === 'pending')
+  // verifications는 fetch 시 이미 pending 필터링됨 (그대로 사용)
+  const pendingVerifications = verifications
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-500/10 via-pink-500/5 to-purple-500/10">

@@ -1,7 +1,7 @@
 /* src/app/auth/signup/page.tsx */
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -10,41 +10,25 @@ import { useAuth } from '@/lib/useAuth'
 import { SocialLogin } from '@/components/auth/social-login'
 import { SkipLink } from '@/components/ui/AccessibilityProvider'
 import { useKeyboardNavigation, useKeyboardShortcuts } from '@/hooks/useKeyboardNavigation'
+import { useSignupForm, AGE_RANGES } from '@/hooks/useSignupForm'
 import toast from 'react-hot-toast'
 
 export default function SignUpPage() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    nickname: '',
-    ageRange: '',
-  })
-  const [consents, setConsents] = useState({
-    terms: false,
-    privacy: false,
-    service: false,
-    marketing: false,
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [passwordStrength, setPasswordStrength] = useState({
-    score: 0,
-    label: '',
-    color: '',
-    bgColor: '',
-    barColor: '',
-  })
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    nickname: '',
-    ageRange: '',
-  })
-  const [formStatus, setFormStatus] = useState('')
   const router = useRouter()
-  const { user, loading, signUp } = useAuth()
+  const { user, loading } = useAuth()
+  const {
+    formData,
+    consents,
+    setConsents,
+    isLoading,
+    showPassword,
+    setShowPassword,
+    passwordStrength,
+    errors,
+    formStatus,
+    handleInputChange,
+    handleEmailSignUp,
+  } = useSignupForm()
 
   // Keyboard navigation setup
   const keyboardNav = useKeyboardNavigation({
@@ -76,224 +60,6 @@ export default function SignUpPage() {
       router.push('/map')
     }
   }, [user, loading, router])
-
-  // Real-time validation functions with screen reader announcements
-  const validateEmail = useCallback((email: string) => {
-    if (!email) {
-      setFormStatus('')
-      return ''
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      const errorMsg = '올바른 이메일 주소를 입력해주세요. 예: user@example.com'
-      setFormStatus(`이메일 오류: ${errorMsg}`)
-      return errorMsg
-    }
-    setFormStatus('이메일 주소가 올바릅니다')
-    return ''
-  }, [])
-
-  const getPasswordStrength = useCallback((password: string) => {
-    if (!password) return { score: 0, label: '', color: '', bgColor: '', barColor: '' }
-
-    let score = 0
-    const checks = {
-      length: password.length >= 8,
-      lowercase: /[a-z]/.test(password),
-      uppercase: /[A-Z]/.test(password),
-      numbers: /\d/.test(password),
-      symbols: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    }
-
-    // Calculate score
-    if (checks.length) score += 2
-    if (checks.lowercase) score += 1
-    if (checks.uppercase) score += 1
-    if (checks.numbers) score += 1
-    if (checks.symbols) score += 2
-
-    // Determine strength label and color
-    if (score <= 2)
-      return {
-        score,
-        label: '약함',
-        color: 'text-red-500',
-        bgColor: 'bg-red-100',
-        barColor: 'bg-red-500',
-      }
-    if (score <= 4)
-      return {
-        score,
-        label: '보통',
-        color: 'text-yellow-500',
-        bgColor: 'bg-yellow-100',
-        barColor: 'bg-yellow-500',
-      }
-    if (score <= 6)
-      return {
-        score,
-        label: '양호',
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-100',
-        barColor: 'bg-blue-500',
-      }
-    return {
-      score,
-      label: '매우 강함',
-      color: 'text-green-500',
-      bgColor: 'bg-green-100',
-      barColor: 'bg-green-500',
-    }
-  }, [])
-
-  const validatePassword = useCallback((password: string) => {
-    if (!password) return ''
-    if (password.length < 6) {
-      return '비밀번호는 6자 이상이어야 합니다'
-    }
-    if (password.length > 50) {
-      return '비밀번호는 50자 이하여야 합니다'
-    }
-    return ''
-  }, [])
-
-  const validateConfirmPassword = useCallback((confirmPassword: string, password: string) => {
-    if (!confirmPassword) return ''
-    if (confirmPassword !== password) {
-      return '비밀번호가 일치하지 않습니다'
-    }
-    return ''
-  }, [])
-
-  const validateNickname = useCallback((nickname: string) => {
-    if (!nickname) return ''
-    if (nickname.length < 2) {
-      return '닉네임은 2자 이상이어야 합니다'
-    }
-    if (nickname.length > 20) {
-      return '닉네임은 20자 이하여야 합니다'
-    }
-    if (!/^[a-zA-Z0-9가-힣]*$/.test(nickname)) {
-      return '닉네임은 한글, 영문, 숫자만 사용 가능합니다'
-    }
-    return ''
-  }, [])
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-
-    // Real-time validation
-    let error = ''
-    switch (field) {
-      case 'email':
-        error = validateEmail(value)
-        break
-      case 'password':
-        error = validatePassword(value)
-        setPasswordStrength(getPasswordStrength(value))
-        // Also revalidate confirm password if it exists
-        if (formData.confirmPassword) {
-          setErrors(prev => ({
-            ...prev,
-            confirmPassword: validateConfirmPassword(formData.confirmPassword, value),
-          }))
-        }
-        break
-      case 'confirmPassword':
-        error = validateConfirmPassword(value, formData.password)
-        break
-      case 'nickname':
-        error = validateNickname(value)
-        break
-      case 'ageRange':
-        error = !value ? '연령대를 선택해주세요' : ''
-        break
-    }
-
-    setErrors(prev => ({ ...prev, [field]: error }))
-  }
-
-  const validateForm = () => {
-    const { email, password, confirmPassword, nickname, ageRange } = formData
-
-    // Run all validations
-    const emailError = validateEmail(email)
-    const passwordError = validatePassword(password)
-    const confirmPasswordError = validateConfirmPassword(confirmPassword, password)
-    const nicknameError = validateNickname(nickname)
-    const ageRangeError = !ageRange ? '연령대를 선택해주세요' : ''
-
-    // Update all errors
-    setErrors({
-      email: emailError,
-      password: passwordError,
-      confirmPassword: confirmPasswordError,
-      nickname: nicknameError,
-      ageRange: ageRangeError,
-    })
-
-    // Check if any required field is empty
-    if (!email || !password || !confirmPassword || !nickname || !ageRange) {
-      toast.error('모든 필드를 입력해주세요')
-      return false
-    }
-
-    // Check if any validation error exists
-    if (emailError || passwordError || confirmPasswordError || nicknameError || ageRangeError) {
-      toast.error('입력 정보를 다시 확인해주세요')
-      return false
-    }
-
-    // Check required consents
-    if (!consents.terms) {
-      toast.error('이용약관에 동의해주세요')
-      return false
-    }
-    if (!consents.privacy) {
-      toast.error('개인정보처리방침에 동의해주세요')
-      return false
-    }
-    if (!consents.service) {
-      toast.error('서비스 이용 약관에 동의해주세요')
-      return false
-    }
-
-    return true
-  }
-
-  const handleEmailSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateForm()) return
-
-    setIsLoading(true)
-
-    try {
-      const { email, password, nickname, ageRange } = formData
-      const result = await signUp(email, password, nickname, ageRange)
-
-      if (result.success) {
-        toast.success('회원가입이 완료되었습니다!')
-        toast.success('이제 로그인해주세요')
-        router.push('/auth/login')
-      } else {
-        toast.error(result.error || '회원가입에 실패했습니다')
-      }
-    } catch (error: unknown) {
-      toast.error((error as Error).message || '회원가입 중 오류가 발생했습니다')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const ageRanges = [
-    { value: '20s_early', label: '20대 초반 (20~24세)' },
-    { value: '20s_late', label: '20대 후반 (25~29세)' },
-    { value: '30s_early', label: '30대 초반 (30~34세)' },
-    { value: '30s_late', label: '30대 후반 (35~39세)' },
-    { value: '40s', label: '40대 (40~49세)' },
-    { value: '50s+', label: '50세 이상' },
-  ]
 
   // 로딩 중일 때 스피너 표시
   if (loading) {
@@ -825,7 +591,7 @@ export default function SignUpPage() {
                     <option value="" disabled>
                       연령대를 선택해주세요
                     </option>
-                    {ageRanges.map(range => (
+                    {AGE_RANGES.map(range => (
                       <option key={range.value} value={range.value}>
                         {range.label}
                       </option>

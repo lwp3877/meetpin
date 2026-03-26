@@ -5,7 +5,7 @@
  * 실제 사용자 테스트에서 Mock 데이터가 실제 환경을 정확히 시뮬레이션하는지 확인
  */
 
-import { isDevelopmentMode } from '@/lib/services/authService'
+import { isDevelopmentMode } from '@/lib/config/flags'
 import { logger } from '@/lib/observability/logger'
 
 /**
@@ -32,7 +32,7 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Room',
-      environment: isDevelopmentMode() ? 'mock' : 'production',
+      environment: isDevelopmentMode ? 'mock' : 'production',
     }
 
     // 필수 필드 검증
@@ -181,7 +181,7 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'User',
-      environment: isDevelopmentMode() ? 'mock' : 'production',
+      environment: isDevelopmentMode ? 'mock' : 'production',
     }
 
     // 필수 필드 검증
@@ -235,7 +235,7 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Match',
-      environment: isDevelopmentMode() ? 'mock' : 'production',
+      environment: isDevelopmentMode ? 'mock' : 'production',
     }
 
     const requiredFields = ['id', 'room_id', 'user1_id', 'user2_id', 'status', 'created_at']
@@ -269,7 +269,7 @@ export class APIResponseValidator {
       errors: [],
       warnings: [],
       schema: 'Message',
-      environment: isDevelopmentMode() ? 'mock' : 'production',
+      environment: isDevelopmentMode ? 'mock' : 'production',
     }
 
     const requiredFields = ['id', 'sender_id', 'match_id', 'content', 'created_at']
@@ -464,7 +464,7 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'RoomList',
-          environment: isDevelopmentMode() ? 'mock' : 'production',
+          environment: isDevelopmentMode ? 'mock' : 'production',
         }
 
         data.forEach((room, index) => {
@@ -488,7 +488,7 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'MatchList',
-          environment: isDevelopmentMode() ? 'mock' : 'production',
+          environment: isDevelopmentMode ? 'mock' : 'production',
         }
 
         data.forEach((match, index) => {
@@ -509,7 +509,7 @@ export class DataValidationMonitor {
           errors: [],
           warnings: [],
           schema: 'MessageList',
-          environment: isDevelopmentMode() ? 'mock' : 'production',
+          environment: isDevelopmentMode ? 'mock' : 'production',
         }
 
         data.forEach((message, index) => {
@@ -530,7 +530,7 @@ export class DataValidationMonitor {
         errors: data === null || data === undefined ? ['Data is null or undefined'] : [],
         warnings: [],
         schema: 'Generic',
-        environment: isDevelopmentMode() ? 'mock' : 'production',
+        environment: isDevelopmentMode ? 'mock' : 'production',
       }
     }
 
@@ -542,7 +542,7 @@ export class DataValidationMonitor {
 
     // 에러가 있으면 콘솔에 즉시 출력 (개발 모드에서는 경고로)
     if (!result.isValid) {
-      if (isDevelopmentMode()) {
+      if (isDevelopmentMode) {
         logger.warn(`⚠️ Data validation issues for ${endpoint} (Dev Mode):`, result.errors)
       } else {
         logger.error(`❌ Data validation failed for ${endpoint}:`, result.errors)
@@ -586,7 +586,7 @@ export class DataValidationMonitor {
     })
 
     logger.info(`
-📊 데이터 검증 요약 (환경: ${isDevelopmentMode() ? 'Mock' : 'Production'})
+📊 데이터 검증 요약 (환경: ${isDevelopmentMode ? 'Mock' : 'Production'})
    - 검증된 엔드포인트: ${summary.totalEndpoints}개
    - 총 검증 횟수: ${summary.totalValidations}회
    - 성공: ${summary.successfulValidations}회 (${Math.round((summary.successfulValidations / summary.totalValidations) * 100)}%)
@@ -622,14 +622,14 @@ export function initializeDataValidation() {
   logger.info('🔍 데이터 검증 시스템 초기화')
 
   // 현재 환경 로깅
-  const environment = isDevelopmentMode() ? 'Mock' : 'Production'
+  const environment = isDevelopmentMode ? 'Mock' : 'Production'
   logger.info(`📊 현재 환경: ${environment}`)
 
   // 실시간 모니터링 시작
   const stopMonitoring = DataValidationMonitor.startMonitoring()
 
   // 전역 fetch 인터셉터 설정 (개발 모드에서는 경고만, 실제 에러는 무시)
-  if (isDevelopmentMode() && typeof window !== 'undefined') {
+  if (isDevelopmentMode && typeof window !== 'undefined') {
     const originalFetch = window.fetch
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       const response = await originalFetch(input, init)

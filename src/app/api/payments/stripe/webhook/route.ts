@@ -11,26 +11,27 @@ import { logger } from '@/lib/observability/logger'
 
 // POST /api/payments/stripe/webhook - Stripe 웹훅 처리
 export async function POST(request: NextRequest) {
-  const signature = request.headers.get('stripe-signature')
+  // STRIPE_WEBHOOK_SECRET 없이는 서버 자체를 실행할 수 없도록 차단.
+  // 개발 환경이라도 예외 없음 — 서명 위조 방지가 목적.
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!webhookSecret) {
+    logger.error('CRITICAL: STRIPE_WEBHOOK_SECRET 환경변수가 설정되지 않았습니다')
+    return createErrorResponse(
+      '웹훅 설정 오류: STRIPE_WEBHOOK_SECRET가 없습니다. 관리자에게 문의하세요.',
+      500
+    )
+  }
 
-  // 개발 모드에서는 웹훅 서명 검증 생략
-  if (!isDevelopmentMode && !signature) {
-    return createErrorResponse('Missing Stripe signature', 400)
+  const signature = request.headers.get('stripe-signature')
+  if (!signature) {
+    return createErrorResponse('Stripe 서명 헤더(stripe-signature)가 누락되었습니다', 400)
   }
 
   try {
     const payload = await request.text()
 
-    let event: unknown
-
-    if (isDevelopmentMode) {
-      // 개발 모드에서는 직접 JSON 파싱
-      logger.info('[Mock Webhook] Processing development mode webhook')
-      event = JSON.parse(payload)
-    } else {
-      // 프로덕션 모드에서는 서명 검증
-      event = verifyWebhookSignature(payload, signature!)
-    }
+    // 개발/프로덕션 구분 없이 항상 서명 검증
+    const event: unknown = verifyWebhookSignature(payload, signature)
 
     logger.info('Received Stripe webhook', { eventType: (event as Record<string, unknown>).type })
 
@@ -45,13 +46,12 @@ export async function POST(request: NextRequest) {
       result.days
     ) {
       if (isDevelopmentMode) {
-        // 개발 모드에서는 DB 업데이트 시뮬레이션만 수행
+        // 개발 모드: 서명 검증은 완료되었고, DB 업데이트만 시뮬레이션
         const boostExpiry = calculateBoostExpiry(result.days)
-        logger.info('[Mock DB Update] Room boosted', {
+        logger.info('[Dev] Room boost simulated (DB 업데이트 생략)', {
           roomId: result.roomId,
           days: result.days,
           boostUntil: boostExpiry.toISOString(),
-          mode: 'development'
         })
       } else {
         try {
@@ -79,31 +79,34 @@ export async function POST(request: NextRequest) {
             .eq('id', result.roomId)
 
           if (updateError) {
-            logger.error('CRITICAL: Failed to update boost after payment', {
+            logger.error('CRITICAL: 결제 후 부스트 DB 업데이트 실패', {
               error: updateError.message || String(updateError),
               roomId: result.roomId,
               days: result.days
             })
-            // 결제는 완료되었지만 DB 업데이트 실패 - 관리자 알림 필요
-            return createErrorResponse('Payment completed but boost activation failed', 500)
+            // 결제는 완료되었지만 DB 업데이트 실패 - 관리자 확인 필요
+            return createErrorResponse('결제는 완료되었으나 부스트 활성화에 실패했습니다', 500)
           } else {
-            logger.info('Room boosted successfully', {
+            logger.info('부스트 DB 업데이트 완료', {
               roomId: result.roomId,
               days: result.days,
               boostUntil: boostExpiry.toISOString()
             })
           }
         } catch (error) {
-          logger.error('CRITICAL: DB update error after payment', { error: error instanceof Error ? error.message : String(error) })
+          logger.error('CRITICAL: 결제 후 DB 업데이트 오류', { error: error instanceof Error ? error.message : String(error) })
           // 결제 완료 후 DB 업데이트 실패는 치명적 오류
-          return createErrorResponse('Payment completed but boost activation failed', 500)
+          return createErrorResponse('결제는 완료되었으나 부스트 활성화에 실패했습니다', 500)
         }
       }
     }
 
     return createSuccessResponse({ received: true })
   } catch (error: unknown) {
-    logger.error('Webhook error', { error: (error as Error)?.message || String(error) })
-    return createErrorResponse((error as Error).message || 'Webhook processing failed', 400)
+    logger.error('Webhook 처리 오류', { error: (error as Error)?.message || String(error) })
+    return createErrorResponse(
+      (error as Error).message || '웹훅 처리 중 오류가 발생했습니다',
+      400
+    )
   }
 }

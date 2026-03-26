@@ -1,4 +1,17 @@
-/* src/lib/auth.ts */
+/**
+ * src/lib/services/auth.ts — 서버 전용 인증 유틸리티
+ *
+ * ⚠️  이 파일은 서버(API routes, Server Components)에서만 import하세요.
+ *     클라이언트(브라우저)에서는 src/lib/services/authService.ts를 사용하세요.
+ *
+ * 포함 기능:
+ *  - getAuthenticatedUser(): 현재 로그인 사용자 반환 (Mock/실제 모드 자동 분기)
+ *  - requireAdmin(): 관리자 권한 확인
+ *  - requireRoomOwner(roomId): 방 소유자 확인
+ *  - requireMatchParticipant(matchId): 매치 당사자 확인
+ *  - checkMutualBlocking(otherUid): 상호 차단 확인
+ *  - signOut(), deleteUserAdmin(), updateUserRole() 등 서버 작업
+ */
 import { User } from '@supabase/supabase-js'
 import { logger } from '@/lib/observability/logger'
 import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabaseClient'

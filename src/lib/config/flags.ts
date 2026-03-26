@@ -47,7 +47,9 @@ export const flags = {
 // 환경별 설정
 export const config = {
   // API URLs
-  baseUrl: process.env.SITE_URL || 'http://localhost:3000',
+  // SITE_URL은 .env.local 또는 Vercel 환경변수에서 설정하세요.
+  // 개발 서버는 3001번 포트를 사용합니다 (package.json: "dev": "next dev --port 3001")
+  baseUrl: process.env.SITE_URL || 'http://localhost:3001',
 
   // 지도 기본 설정
   defaultLocation: {
