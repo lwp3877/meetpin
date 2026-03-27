@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MeetPin (밋핀) is a location-based social meeting platform where users create rooms on a map to meet nearby people for drinks, sports, and activities. Korean-language, mobile-first design. Deployed on Vercel at meetpin-weld.vercel.app.
+MeetPin (밋핀) is a location-based social meeting platform where users create rooms on a map to meet nearby people for drinks, sports, and activities. Korean-language, mobile-first design. Deployed on Vercel at meetpin-umber.vercel.app.
 
 **Stack**: Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui, backed by Supabase (PostgreSQL, Auth, Realtime, Storage), with Kakao Maps SDK, Stripe payments, and optional Redis/Upstash caching.
 
@@ -71,13 +71,14 @@ export const POST = withErrorHandling(
 
 ### Authentication
 
-`src/lib/services/auth.ts` — dual-mode authentication:
-- **Production**: Supabase JWT via `createServerSupabaseClient()` with cookie handling
-- **Development (Mock)**: When `NEXT_PUBLIC_USE_MOCK_DATA=true`, returns mock users from cookies or defaults to admin. Test login: `admin@meetpin.com` / `123456`
+Two auth files serve different contexts — do not mix them:
+- **`src/lib/services/auth.ts`** (server-only) — used inside API routes. `getAuthenticatedUser()`, `requireAdmin()`, `requireRoomOwner(roomId)`, `requireMatchParticipant(matchId)`
+- **`src/lib/services/authService.ts`** (client-only) — used inside React components and hooks. Wraps Supabase browser client methods.
 
-Key functions: `getAuthenticatedUser()`, `requireAdmin()`, `requireRoomOwner(roomId)`, `requireMatchParticipant(matchId)`
+In production: Supabase JWT via `createServerSupabaseClient()` with cookie handling.
+In mock mode (`NEXT_PUBLIC_USE_MOCK_DATA=true`): returns mock users; test login `admin@meetpin.com` / `123456`.
 
-The `isDevelopmentMode` flag is exported from `src/lib/config/flags.ts` and controls mock behavior across the app.
+`isDevelopmentMode` is a boolean exported from `src/lib/config/flags.ts` — import it directly, do not wrap in a function.
 
 ### Supabase Clients (`src/lib/supabaseClient.ts`)
 
@@ -111,7 +112,7 @@ Uses BBox (bounding box) instead of PostGIS. API endpoints accept `?bbox=south,w
 ### Middleware (`src/middleware.ts`)
 
 Runs on `/api/:path*` only. Handles:
-- CORS whitelist (meetpin-weld.vercel.app, meetpin.com, localhost in dev)
+- CORS whitelist (meetpin-umber.vercel.app, meetpin.com, localhost in dev)
 - CSRF protection for state-changing methods (POST/PUT/DELETE/PATCH) via referer/origin check
 - Webhook and health endpoints are CSRF-exempt
 
@@ -157,6 +158,11 @@ src/
 │   ├── security/           # CSP utilities
 │   ├── accessibility/      # WCAG utilities
 │   └── design/             # Design system tokens
+├── hooks/                  # Custom React hooks extracted from page components
+│   ├── useMapRooms.ts      # Room loading, filtering, geolocation for map page
+│   ├── useSignupForm.ts    # Signup form state, validation, password strength
+│   ├── useRealtimeChat.ts  # Supabase Realtime subscription for chat
+│   └── useRealtimeNotifications.ts
 └── types/
     └── global.d.ts         # Window/ProcessEnv augmentations (types are co-located with their modules)
 ```
@@ -169,6 +175,9 @@ src/
 - **Font**: Pretendard for Korean text
 - **Type definitions** — all in `src/types/global.d.ts`, organized by domain
 - **App Router only** — CI enforces no `pages/` directory exists (Pages Router guard in quality workflow)
+- **`useSearchParams()` requires Suspense** — wrap the inner component in `<Suspense>` in the default export (Next.js 15 requirement)
+- **Redis clients**: `src/lib/cache/redis.ts` has two separate clients — `ioredis` (TCP, uses `REDIS_URL`) for caching, `@upstash/redis` (HTTP REST, uses `UPSTASH_REDIS_REST_URL`) for rate limiting. They are not interchangeable. Caching gracefully disables when `REDIS_URL` is unset.
+- **`console` usage** — add `/* eslint-disable no-console */` at file top for logger/observability files; use `// eslint-disable-next-line no-console` for one-off intentional console calls in other files
 
 ## Testing
 
