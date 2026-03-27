@@ -1,9 +1,11 @@
 /**
- * Patch the generated service worker to fix broken _async_to_generator patterns.
+ * Patch the generated service worker after next-pwa generates it.
  *
- * @ducanh2912/next-pwa generates an async cacheWillUpdate callback using TypeScript
- * helper functions (_async_to_generator, _ts_generator) that are not defined in
- * the service worker scope. This script replaces it with a synchronous equivalent.
+ * 1. Fix _async_to_generator: next-pwa generates async cacheWillUpdate using
+ *    TypeScript helpers that are not defined in the SW scope.
+ * 2. Remove Kakao Maps caching: the SW intercepts dapi.kakao.com requests and
+ *    may alter the Referer header, causing Kakao to return 401. Kakao Maps SDK
+ *    must be fetched directly by the browser without SW interception.
  */
 
 const fs = require('fs')
@@ -17,17 +19,32 @@ if (!fs.existsSync(swPath)) {
 }
 
 let content = fs.readFileSync(swPath, 'utf8')
+let changed = false
 
-// Find and replace the broken _async_to_generator pattern.
-// The broken pattern uses async generators just to return a value synchronously.
-// We replace it with a plain synchronous function that does exactly the same thing.
+// Patch 1: Fix _async_to_generator
 const broken = '_async_to_generator(function(){return _ts_generator(this,function(e){return[2,s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s]})})()'
 const fixed = 's&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s'
 
 if (content.includes(broken)) {
   content = content.replace(broken, fixed)
-  fs.writeFileSync(swPath, content, 'utf8')
-  console.log('[patch-sw] ✅ Fixed _async_to_generator in sw.js')
+  console.log('[patch-sw] ✅ Fixed _async_to_generator')
+  changed = true
 } else {
-  console.log('[patch-sw] Pattern not found — sw.js may already be correct or format changed')
+  console.log('[patch-sw] _async_to_generator pattern not found (may already be fixed)')
+}
+
+// Patch 2: Remove Kakao Maps caching route
+// The SW intercepting dapi.kakao.com requests causes Referer header issues → 401
+const kakaoRoute = /e\.registerRoute\(\/\^https:\\\/\\\/dapi\\\.kakao\\\.com\\\/\.\*\/i,[^)]+\),"GET"\),/
+if (kakaoRoute.test(content)) {
+  content = content.replace(kakaoRoute, '')
+  console.log('[patch-sw] ✅ Removed Kakao Maps SW caching route')
+  changed = true
+} else {
+  console.log('[patch-sw] Kakao route not found (may already be removed)')
+}
+
+if (changed) {
+  fs.writeFileSync(swPath, content, 'utf8')
+  console.log('[patch-sw] sw.js patched successfully')
 }

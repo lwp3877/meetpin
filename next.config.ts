@@ -394,21 +394,8 @@ const pwaConfig = withPWA({
           },
         },
       },
-      {
-        urlPattern: /^https:\/\/dapi\.kakao\.com\/.*/i,
-        handler: 'NetworkFirst',
-        options: {
-          cacheName: 'kakao-maps-cache',
-          networkTimeoutSeconds: 10,
-          expiration: {
-            maxEntries: 50,
-            maxAgeSeconds: 24 * 60 * 60, // 24시간
-          },
-          cacheableResponse: {
-            statuses: [0, 200],
-          },
-        },
-      },
+      // Kakao Maps SDK는 SW 캐싱 제외: Referer 헤더 변조로 401 발생하므로
+      // 브라우저가 직접 dapi.kakao.com에 요청하도록 함
       {
         urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i,
         handler: 'CacheFirst',
