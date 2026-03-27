@@ -94,7 +94,7 @@ async function getMyRequests(request: NextRequest) {
 
   // 수락된 요청의 match_id를 찾아서 붙임 (requests 테이블에 match_id 컬럼 없음)
   const acceptedRequests = (requests || []).filter((r: any) => r.status === 'accepted')
-  let matchIdMap: Record<string, string> = {}
+  const matchIdMap: Record<string, string> = {}
   if (acceptedRequests.length > 0) {
     const roomIds = acceptedRequests.map((r: any) => r.room_id)
     const requesterIds = acceptedRequests.map((r: any) => r.requester_uid)
