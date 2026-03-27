@@ -78,6 +78,7 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     }
 
     script.onerror = () => {
+      loadPromise = null // 실패 시 초기화해야 다음에 재시도 가능
       reject(new Error('Kakao Maps API 스크립트 로드 실패'))
     }
 

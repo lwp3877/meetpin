@@ -231,8 +231,8 @@ export function useMapRooms(filters: RoomFilters) {
         // 검색어 (제목 또는 장소)
         if (
           filters.searchQuery &&
-          !room.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) &&
-          !room.place_text.toLowerCase().includes(filters.searchQuery.toLowerCase())
+          !room.title?.toLowerCase().includes(filters.searchQuery.toLowerCase()) &&
+          !room.place_text?.toLowerCase().includes(filters.searchQuery.toLowerCase())
         )
           return false
 
