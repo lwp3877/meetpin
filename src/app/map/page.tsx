@@ -304,7 +304,7 @@ export default function MapPage() {
             </CardContent>
           </Card>
         ) : (
-          <div role="region" aria-label="지도 영역">
+          <div role="region" aria-label="지도 영역" className="h-full">
             <DynamicMap
               rooms={filteredRooms}
               center={{ lat: 37.5665, lng: 126.978 }}

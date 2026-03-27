@@ -1,7 +1,7 @@
 /* src/lib/supabaseClient.ts */
 import { createClient } from '@supabase/supabase-js'
 import { logger } from '@/lib/observability/logger'
-import { createServerClient } from '@supabase/ssr'
+import { createBrowserClient, createServerClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -627,29 +627,8 @@ export function createBrowserSupabaseClient(): SupabaseClient {
   try {
     const { supabaseUrl: url, supabaseAnonKey: key } = validateEnvVars()
 
-    _browserClient = createClient<Database>(url, key, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce',
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        storageKey: 'meetpin-supabase-auth-token',
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10, // 초당 이벤트 제한
-        },
-        heartbeatIntervalMs: 30000, // 30초 하트비트
-        reconnectAfterMs: () => Math.floor(Math.random() * 3000) + 1000, // 1-4초 랜덤 재연결
-        timeout: 20000, // 20초 타임아웃
-      },
-      global: {
-        headers: {
-          'X-Client-Info': 'meetpin-web',
-        },
-      },
-    })
+    // @supabase/ssr의 createBrowserClient 사용: 세션을 쿠키에 저장해 서버 API와 공유
+    _browserClient = createBrowserClient<Database>(url, key) as unknown as SupabaseClient
 
     // 연결 상태 모니터링 (개발 모드에서만)
     if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {

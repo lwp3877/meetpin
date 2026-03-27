@@ -625,7 +625,10 @@ export function initializeDataValidation() {
   const environment = isDevelopmentMode ? 'Mock' : 'Production'
   logger.info(`📊 현재 환경: ${environment}`)
 
-  // 실시간 모니터링 시작
+  // 실시간 모니터링 시작 (개발 모드에서만)
+  if (!isDevelopmentMode) {
+    return () => {}
+  }
   const stopMonitoring = DataValidationMonitor.startMonitoring()
 
   // 전역 fetch 인터셉터 설정 (개발 모드에서는 경고만, 실제 에러는 무시)
