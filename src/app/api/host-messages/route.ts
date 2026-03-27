@@ -124,13 +124,15 @@ export async function GET(req: NextRequest) {
 
     const supabase = await createServerSupabaseClient()
 
+    // sender_uid FK는 auth.users를 가리키므로 profiles를 직접 JOIN 불가.
+    // room_id FK는 rooms를 가리키므로 rooms JOIN만 사용하고,
+    // 발신자 프로필은 sender_uid 기준으로 별도 쿼리로 처리한다.
     let query = (supabase as any)
       .from('host_messages')
       .select(
         `
         *,
-        sender:profiles!host_messages_sender_uid_fkey(nickname, avatar_url),
-        room:rooms!host_messages_room_id_fkey(title)
+        room:rooms(title)
       `
       )
       .eq('receiver_uid', user.id)
@@ -148,9 +150,27 @@ export async function GET(req: NextRequest) {
       throw new ApiError('메시지 조회에 실패했습니다', 500)
     }
 
+    // sender 프로필 별도 조회 (sender_uid → profiles.uid)
+    const senderIds = [...new Set((messages || []).map((m: any) => m.sender_uid))]
+    const senderMap: Record<string, { nickname: string; avatar_url: string }> = {}
+    if (senderIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('uid, nickname, avatar_url')
+        .in('uid', senderIds)
+      if (profiles) {
+        for (const p of profiles as Array<{ uid: string; nickname: string; avatar_url: string }>) {
+          senderMap[p.uid] = { nickname: p.nickname, avatar_url: p.avatar_url }
+        }
+      }
+    }
+
     const response: ApiResponse<any[]> = {
       ok: true,
-      data: messages || [],
+      data: (messages || []).map((m: any) => ({
+        ...m,
+        sender: senderMap[m.sender_uid] || null,
+      })),
     }
 
     return Response.json(response)
