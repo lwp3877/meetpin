@@ -42,23 +42,27 @@ interface Request {
   match_id?: string // 승인된 경우 매치 ID
 }
 
+interface MatchProfile {
+  nickname: string
+  avatar_url?: string
+  age_range: string
+}
+
 interface Match {
   id: string
   room_id: string
+  host_uid: string
+  guest_uid: string
   created_at: string
-  room: {
+  rooms: {
     id: string
     title: string
     category: 'drink' | 'exercise' | 'other'
     place_text: string
     start_at: string
   }
-  other_user: {
-    id: string
-    nickname: string
-    avatar_url?: string
-    age_range: string
-  }
+  host_profile: MatchProfile
+  guest_profile: MatchProfile
   last_message?: {
     text: string
     created_at: string
@@ -433,7 +437,9 @@ export default function RequestsPage() {
             ) : (
               <div className="space-y-4">
                 {myMatches.map(match => {
-                  const categoryDisplay = getCategoryDisplay(match.room.category)
+                  const categoryDisplay = getCategoryDisplay(match.rooms?.category)
+                  // 나와 다른 쪽 프로필 계산
+                  const otherUser = match.host_uid === user?.id ? match.guest_profile : match.host_profile
 
                   return (
                     <Card
@@ -468,19 +474,19 @@ export default function RequestsPage() {
                             </div>
 
                             <CardTitle className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                              {match.room.title}
+                              {match.rooms?.title}
                             </CardTitle>
 
                             <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-gray-600 md:grid-cols-2 dark:text-gray-300">
                               <div className="flex items-center space-x-2">
                                 <MapPin className="h-4 w-4" />
-                                <span>{match.room.place_text}</span>
+                                <span>{match.rooms?.place_text}</span>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Clock className="h-4 w-4" />
                                 <span>
-                                  {new Date(match.room.start_at).toLocaleDateString('ko-KR')}{' '}
-                                  {new Date(match.room.start_at).toLocaleTimeString('ko-KR', {
+                                  {match.rooms?.start_at && new Date(match.rooms.start_at).toLocaleDateString('ko-KR')}{' '}
+                                  {match.rooms?.start_at && new Date(match.rooms.start_at).toLocaleTimeString('ko-KR', {
                                     hour: '2-digit',
                                     minute: '2-digit',
                                   })}
@@ -489,15 +495,15 @@ export default function RequestsPage() {
                               <div className="flex items-center space-x-2">
                                 <Avatar className="h-5 w-5">
                                   <AvatarImage
-                                    src={match.other_user.avatar_url}
-                                    alt={match.other_user.nickname}
+                                    src={otherUser?.avatar_url}
+                                    alt={otherUser?.nickname}
                                   />
                                   <AvatarFallback className="text-xs">
-                                    {match.other_user.nickname.charAt(0)}
+                                    {otherUser?.nickname?.charAt(0) ?? '?'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <span>
-                                  {match.other_user.nickname} ({match.other_user.age_range})
+                                  {otherUser?.nickname ?? '알 수 없음'} ({otherUser?.age_range ?? '-'})
                                 </span>
                               </div>
                               <div className="flex items-center space-x-2">
@@ -538,7 +544,7 @@ export default function RequestsPage() {
                             </Button>
 
                             <Button
-                              onClick={() => router.push(`/room/${match.room.id}`)}
+                              onClick={() => router.push(`/room/${match.rooms?.id}`)}
                               size="sm"
                               variant="outline"
                               className="min-w-[100px]"

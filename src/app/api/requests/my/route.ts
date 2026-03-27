@@ -32,13 +32,13 @@ async function getMyRequests(request: NextRequest) {
         max_people,
         fee,
         host_uid,
-        profiles:host_uid (
+        host:host_uid (
           nickname,
           avatar_url,
           age_range
         )
       ),
-      profiles:requester_uid (
+      requester:requester_uid (
         nickname,
         avatar_url,
         age_range
@@ -92,6 +92,30 @@ async function getMyRequests(request: NextRequest) {
     return apiUtils.error('요청 목록을 가져올 수 없습니다', 500)
   }
 
+  // 수락된 요청의 match_id를 찾아서 붙임 (requests 테이블에 match_id 컬럼 없음)
+  const acceptedRequests = (requests || []).filter((r: any) => r.status === 'accepted')
+  let matchIdMap: Record<string, string> = {}
+  if (acceptedRequests.length > 0) {
+    const roomIds = acceptedRequests.map((r: any) => r.room_id)
+    const requesterIds = acceptedRequests.map((r: any) => r.requester_uid)
+    const { data: matchRows } = await supabase
+      .from('matches')
+      .select('id, room_id, guest_uid')
+      .in('room_id', roomIds)
+      .in('guest_uid', requesterIds)
+    if (matchRows) {
+      for (const m of matchRows as Array<{ id: string; room_id: string; guest_uid: string }>) {
+        // key: roomId-guestUid → matchId
+        matchIdMap[`${m.room_id}-${m.guest_uid}`] = m.id
+      }
+    }
+  }
+
+  const requestsWithMatchId = (requests || []).map((r: any) => ({
+    ...r,
+    match_id: matchIdMap[`${r.room_id}-${r.requester_uid}`] || null,
+  }))
+
   // 총 개수 조회
   let countQuery = supabase.from('requests').select('id', { count: 'exact', head: true })
 
@@ -123,7 +147,7 @@ async function getMyRequests(request: NextRequest) {
   }
 
   return apiUtils.success({
-    requests: requests || [],
+    requests: requestsWithMatchId,
     type,
     pagination: {
       page,
