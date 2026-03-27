@@ -36,8 +36,10 @@ export function middleware(request: NextRequest) {
 
     // 허용된 오리진 화이트리스트
     const allowedOrigins = [
+      'https://meetpin-umber.vercel.app',
       'https://meetpin-weld.vercel.app',
       'https://meetpin.com',
+      process.env.SITE_URL || null,
       process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : null,
       process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null,
     ].filter(Boolean) as string[];

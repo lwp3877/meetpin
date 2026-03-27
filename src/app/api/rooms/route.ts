@@ -133,16 +133,7 @@ async function getRooms(request: NextRequest) {
 
     let query = supabase
       .from('rooms')
-      .select(
-        `
-        *,
-        profiles!host_uid (
-          nickname,
-          avatar_url,
-          age_range
-        )
-      `
-      )
+      .select('*')
       .eq('visibility', 'public')
       .gte('start_at', new Date().toISOString()) // 미래 시간만
       .gte('lat', bbox.south)
@@ -169,6 +160,18 @@ async function getRooms(request: NextRequest) {
       throw new Error('방 목록을 가져올 수 없습니다')
     }
 
+    // 호스트 프로필 별도 조회 (profiles!host_uid FK 없이 안전하게 처리)
+    const roomList = (rooms ?? []) as Array<{ host_uid: string; [key: string]: unknown }>
+    const hostUids = [...new Set(roomList.map(r => r.host_uid))]
+    const profileMap = new Map<string, Record<string, unknown>>()
+    if (hostUids.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('uid, nickname, avatar_url, age_range')
+        .in('uid', hostUids)
+      ;(profiles ?? [] as Array<{ uid: string; nickname: string | null; avatar_url: string | null; age_range: string | null }>).forEach(p => profileMap.set(p.uid, p as Record<string, unknown>))
+    }
+
     // 총 개수 조회 (동일한 조건)
     let countQuery = supabase
       .from('rooms')
@@ -190,8 +193,13 @@ async function getRooms(request: NextRequest) {
       logger.error('Count error', { error: countError.message || String(countError) })
     }
 
+    const roomsWithProfiles = roomList.map(r => ({
+      ...r,
+      profiles: profileMap.get(r.host_uid) ?? null,
+    }))
+
     return {
-      rooms: rooms || [],
+      rooms: roomsWithProfiles,
       pagination: {
         page,
         limit,
