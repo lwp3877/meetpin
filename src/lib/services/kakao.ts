@@ -65,6 +65,9 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     // 스크립트 동적 로드 (services와 clusterer 라이브러리 모두 포함)
     const script = document.createElement('script')
     script.type = 'text/javascript'
+    // referrerPolicy='no-referrer': 브라우저가 Referer 헤더를 자동으로 붙이면
+    // Kakao가 도메인 검증을 수행하는데, Referer 없이 요청하면 키 유효성만 확인함.
+    script.referrerPolicy = 'no-referrer'
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services,clusterer&autoload=false`
 
     script.onload = () => {
