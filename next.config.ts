@@ -126,9 +126,17 @@ const nextConfig: NextConfig = {
       'upgrade-insecure-requests',
     ].join('; ')
 
-    // Report-Only: 최소 정책으로 관측용
+    // Report-Only: 강제 정책과 동일하게 유지하되 report-uri만 추가
+    // (강제 정책과 다르게 하면 합법적인 리소스도 false-positive로 기록됨)
     const reportOnlyCSP = [
       "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://dapi.kakao.com https://t1.daumcdn.net https://js.stripe.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `font-src 'self' data: ${fontDomains}`,
+      "img-src 'self' data: blob: https:",
+      "connect-src 'self' https://dapi.kakao.com https://t1.daumcdn.net https://*.supabase.co wss://*.supabase.co https://api.stripe.com",
+      "frame-src 'self' https://js.stripe.com",
+      "object-src 'none'",
       "report-uri /api/security/csp-report",
     ].join('; ')
 
