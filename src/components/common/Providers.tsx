@@ -6,7 +6,6 @@
 import { AuthProvider } from '@/lib/useAuth'
 import { CustomToaster } from '@/components/ui/Toast'
 import { ThemeProvider } from '@/components/common/theme-provider'
-import { BotSchedulerInitializer } from '@/components/common/BotSchedulerInitializer'
 import { GlobalErrorBoundary } from '@/components/error/GlobalErrorBoundary'
 import { useEffect, useState } from 'react'
 import { initializeBrowserCompatibility } from '@/lib/utils/browserCompat'
@@ -99,8 +98,6 @@ export default function Providers({ children }: ProvidersProps) {
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
         <AuthProvider>
           {children}
-          {/* 봇 스케줄러 자동 초기화 */}
-          <BotSchedulerInitializer />
           {/* Enhanced Toast 알림 */}
           <CustomToaster />
         </AuthProvider>

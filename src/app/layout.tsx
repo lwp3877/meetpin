@@ -145,9 +145,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://js.stripe.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://js.stripe.com" />
 
-        {/* LCP 최적화: Kakao Maps SDK preconnect + preload */}
+        {/* LCP 최적화: Kakao Maps preconnect (preload는 appkey 포함 URL과 달라서 제거) */}
         <link rel="preconnect" href="https://dapi.kakao.com" />
-        <link rel="preload" as="script" href="https://dapi.kakao.com/v2/maps/sdk.js" />
         <link rel="dns-prefetch" href="//dapi.kakao.com" />
         <link rel="dns-prefetch" href="//t1.daumcdn.net" />
         {/* Preload critical assets */}
