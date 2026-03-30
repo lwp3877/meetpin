@@ -247,7 +247,7 @@ export default function LoginPage() {
     <>
       <SkipLink href="#main-content">주 콘텐츠로 바로 가기</SkipLink>
       <div
-        className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-4 py-6 sm:px-6 lg:px-8"
+        className="flex min-h-screen items-start justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-4 py-6 sm:items-center sm:px-6 lg:px-8"
         role="main"
       >
         <div

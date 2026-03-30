@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   creator: 'MeetPin Team',
   publisher: 'MeetPin',
   alternates: {
-    canonical: process.env.SITE_URL || 'https://meetpin-weld.vercel.app',
+    canonical: process.env.SITE_URL || 'https://meetpin-umber.vercel.app',
     languages: {
-      'ko-KR': process.env.SITE_URL || 'https://meetpin-weld.vercel.app',
+      'ko-KR': process.env.SITE_URL || 'https://meetpin-umber.vercel.app',
     },
   },
   openGraph: {
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     siteName: brandMessages.appName,
-    url: process.env.SITE_URL || 'https://meetpin-weld.vercel.app',
+    url: process.env.SITE_URL || 'https://meetpin-umber.vercel.app',
     images: [
       {
         url: '/og-image.jpg',
@@ -162,7 +162,7 @@ export default function RootLayout({
               name: brandMessages.appName,
               description:
                 '지도 기반 실시간 모임 플랫폼 - 근처 사람들과 만나고 새로운 인연을 만들어보세요',
-              url: process.env.SITE_URL || 'https://meetpin-weld.vercel.app',
+              url: process.env.SITE_URL || 'https://meetpin-umber.vercel.app',
               applicationCategory: 'SocialNetworkingApplication',
               operatingSystem: 'All',
               offers: {
@@ -182,7 +182,7 @@ export default function RootLayout({
               publisher: {
                 '@type': 'Organization',
                 name: 'MeetPin',
-                url: process.env.SITE_URL || 'https://meetpin-weld.vercel.app',
+                url: process.env.SITE_URL || 'https://meetpin-umber.vercel.app',
               },
             }),
           }}

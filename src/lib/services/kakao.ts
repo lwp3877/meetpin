@@ -65,9 +65,6 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
     // 스크립트 동적 로드 (services와 clusterer 라이브러리 모두 포함)
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    // referrerPolicy='no-referrer': 브라우저가 Referer 헤더를 자동으로 붙이면
-    // Kakao가 도메인 검증을 수행하는데, Referer 없이 요청하면 키 유효성만 확인함.
-    script.referrerPolicy = 'no-referrer'
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&libraries=services,clusterer&autoload=false`
 
     script.onload = () => {
@@ -92,29 +89,22 @@ export function loadKakaoMaps(apiKey?: string): Promise<void> {
 }
 
 /**
- * 좌표를 주소로 변환
+ * 좌표를 주소로 변환 (서버 프록시 경유)
+ * SDK 내부 REST 호출이 Referer 헤더를 전송하여 401이 발생하므로,
+ * 서버 사이드 프록시(/api/kakao/coord2address)를 통해 Referer 없이 요청한다.
  */
-export function coordToAddress(lat: number, lng: number): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (!isKakaoMapsLoaded()) {
-      reject(new Error('Kakao Maps API가 로드되지 않았습니다'))
-      return
+export async function coordToAddress(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(`/api/kakao/coord2address?lat=${lat}&lng=${lng}`)
+    if (!res.ok) throw new Error('proxy error')
+    const data = await res.json()
+    if (data.ok && data.data?.address) {
+      return data.data.address
     }
-
-    const geocoder = new (kakao as any).maps.services.Geocoder()
-    geocoder.coord2Address(lng, lat, (results: any[], status: any) => {
-      if (status === (kakao as any).maps.services.Status.OK) {
-        const address = results[0]?.address
-        if (address) {
-          resolve(address.address_name || address.region_3depth_name || '주소 불명')
-        } else {
-          resolve('주소를 찾을 수 없습니다')
-        }
-      } else {
-        reject(new Error('주소 변환에 실패했습니다'))
-      }
-    })
-  })
+  } catch {
+    // proxy unavailable or no REST key — fall through to coordinate string
+  }
+  return `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`
 }
 
 /**
@@ -186,23 +176,25 @@ export function getCurrentPosition(): Promise<{ lat: number; lng: number }> {
 /**
  * Kakao Maps SDK 로딩 상태를 관리하는 커스텀 훅
  * MapWithCluster, LocationPicker 등에서 공통 사용
+ * @returns { isLoaded, error }
  */
-export function useKakaoMaps(): boolean {
-  const [isLoaded, setIsLoaded] = useState(isKakaoMapsLoaded)
+export function useKakaoMaps(): { isLoaded: boolean; error: string | null } {
+  const [isLoaded, setIsLoaded] = useState(isKakaoMapsLoaded())
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (isLoaded) return
 
     loadKakaoMaps()
       .then(() => setIsLoaded(true))
-      .catch(error => {
-        logger.error('Kakao Maps 로드 실패:', {
-          error: error instanceof Error ? error.message : String(error),
-        })
+      .catch(err => {
+        const msg = err instanceof Error ? err.message : String(err)
+        logger.error('Kakao Maps 로드 실패:', { error: msg })
+        setError('지도를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.')
       })
   }, [isLoaded])
 
-  return isLoaded
+  return { isLoaded, error }
 }
 
 /**

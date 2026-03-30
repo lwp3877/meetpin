@@ -109,7 +109,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && needs.quality.outputs.quality-passed == 'true'
     environment:
       name: production
-      url: https://meetpin-weld.vercel.app
+      url: https://meetpin-umber.vercel.app
     timeout-minutes: 5
     steps:
       - name: Checkout

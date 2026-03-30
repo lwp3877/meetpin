@@ -54,7 +54,7 @@ export default function MapWithCluster({
   const clustererRef = useRef<any>(null)
   const infoWindowRef = useRef<any>(null)
   const markerImageCache = useRef<Map<string, string>>(new Map())
-  const isKakaoLoaded = useKakaoMaps()
+  const { isLoaded: isKakaoLoaded, error: kakaoError } = useKakaoMaps()
 
   // 지도 초기화
   useEffect(() => {
@@ -288,6 +288,17 @@ export default function MapWithCluster({
     const moveLatLng = new kakao.maps.LatLng(selectedRoom.lat, selectedRoom.lng)
     mapRef.current.panTo(moveLatLng)
   }, [selectedRoomId, rooms])
+
+  if (kakaoError) {
+    return (
+      <div className={`${className} flex items-center justify-center rounded-lg bg-gray-100`}>
+        <div className="text-center px-4">
+          <p className="text-sm text-red-600 font-medium">{kakaoError}</p>
+          <p className="text-xs text-gray-500 mt-1">페이지를 새로고침하거나 잠시 후 다시 시도해주세요.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!isKakaoLoaded) {
     return (

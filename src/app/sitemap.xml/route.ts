@@ -1,6 +1,6 @@
 // src/app/sitemap.xml/route.ts
 export async function GET() {
-  const baseUrl = process.env.SITE_URL || 'https://meetpin-weld.vercel.app'
+  const baseUrl = process.env.SITE_URL || 'https://meetpin-umber.vercel.app'
   const currentDate = new Date().toISOString()
 
   const staticPages = [

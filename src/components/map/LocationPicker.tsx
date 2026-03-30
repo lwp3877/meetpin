@@ -27,7 +27,7 @@ export default function LocationPicker({
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const markerRef = useRef<any>(null)
-  const isKakaoLoaded = useKakaoMaps()
+  const { isLoaded: isKakaoLoaded, error: kakaoError } = useKakaoMaps()
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number
     lng: number
@@ -39,12 +39,6 @@ export default function LocationPicker({
     if (!isKakaoLoaded || !mapContainerRef.current) return
 
     const { kakao } = window
-
-    // Geocoder 서비스 사용 가능한지 확인
-    if (!kakao.maps.services || !kakao.maps.services.Geocoder) {
-      logger.warn('Kakao Maps Geocoder service is not available')
-      return
-    }
 
     const mapOption = {
       center: new kakao.maps.LatLng(initialLocation.lat, initialLocation.lng),
@@ -130,30 +124,35 @@ export default function LocationPicker({
         })
         markerRef.current = marker
 
-        // 주소 가져오기
-        const geocoder = new kakao.maps.services.Geocoder()
-        geocoder.coord2Address(lng, lat, (result: any, status: any) => {
-          let place_text = `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`
-
-          if (status === kakao.maps.services.Status.OK && result[0]) {
-            const addr = result[0].address
-            if (addr) {
-              place_text = addr.address_name || place_text
-            }
-          }
-
-          setSelectedLocation({
-            lat,
-            lng,
-            place_text,
+        // 주소 가져오기 (서버 프록시 사용 — SDK 직접 호출은 Referer 401 발생)
+        coordToAddress(lat, lng)
+          .then(place_text => {
+            setSelectedLocation({ lat, lng, place_text })
           })
-        })
+          .catch(() => {
+            setSelectedLocation({
+              lat,
+              lng,
+              place_text: `위도: ${lat.toFixed(6)}, 경도: ${lng.toFixed(6)}`,
+            })
+          })
       },
       error => {
         logger.error('Geolocation error:', { error: error instanceof Error ? error.message : String(error) })
         alert('현재 위치를 가져올 수 없습니다.')
       },
       { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
+  if (kakaoError) {
+    return (
+      <div className={`${className} flex items-center justify-center rounded-lg bg-gray-100`}>
+        <div className="text-center px-4">
+          <p className="text-sm text-red-600 font-medium">{kakaoError}</p>
+          <p className="text-xs text-gray-500 mt-1">페이지를 새로고침하거나 잠시 후 다시 시도해주세요.</p>
+        </div>
+      </div>
     )
   }
 

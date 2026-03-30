@@ -15,7 +15,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: 'https://meetpin-weld.vercel.app',
+    baseURL: 'https://meetpin-umber.vercel.app',
     actionTimeout: 20000,
     navigationTimeout: 30000,
     trace: 'on-first-retry',

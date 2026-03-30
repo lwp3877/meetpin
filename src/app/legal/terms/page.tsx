@@ -37,7 +37,7 @@ export default function TermsPage() {
               <strong>서비스명:</strong> 밋핀 (MeetPin)<br />
               <strong>운영 형태:</strong> 개인 운영 (비상업적 베타 테스트)<br />
               <strong>연락처:</strong> meetpin.beta@gmail.com<br />
-              <strong>서비스 URL:</strong> https://meetpin-weld.vercel.app
+              <strong>서비스 URL:</strong> https://meetpin-umber.vercel.app
             </p>
           </div>
         </section>

@@ -42,7 +42,7 @@ jobs:
 
       - name: Run E2E tests
         env:
-          BASE_URL: https://meetpin-weld.vercel.app
+          BASE_URL: https://meetpin-umber.vercel.app
         run: npx playwright test --project=chromium --project=firefox
 
       - name: Upload Playwright report

@@ -16,7 +16,7 @@ Allow: /map
 Allow: /legal/
 
 # Sitemap
-Sitemap: ${process.env.SITE_URL || 'https://meetpin-weld.vercel.app'}/sitemap.xml
+Sitemap: ${process.env.SITE_URL || 'https://meetpin-umber.vercel.app'}/sitemap.xml
 
 # 크롤링 속도 제한
 Crawl-delay: 1`

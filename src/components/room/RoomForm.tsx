@@ -141,6 +141,7 @@ export default function RoomForm({
 
     await onSubmit({
       ...data,
+      start_at: startTime.toISOString(), // datetime-local → full ISO 8601 with timezone
       lat: selectedLocation.lat,
       lng: selectedLocation.lng,
       place_text: selectedLocation.place_text,

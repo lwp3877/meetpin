@@ -31,7 +31,7 @@ jobs:
           while [ $ATTEMPT -le $MAX_ATTEMPTS ] && [ "$SUCCESS" = false ]; do
             echo "📡 Attempt $ATTEMPT/$MAX_ATTEMPTS..."
 
-            if curl -fsS --max-time 10 --retry 2 --retry-delay 1 https://meetpin-weld.vercel.app/api/healthz; then
+            if curl -fsS --max-time 10 --retry 2 --retry-delay 1 https://meetpin-umber.vercel.app/api/healthz; then
               echo "✅ Health check passed on attempt $ATTEMPT"
               SUCCESS=true
             else
@@ -104,7 +104,7 @@ jobs:
             const issueBody = `## 🚨 Uptime Failure Detected
 
             **Failure Time**: ${failureTime}
-            **Endpoint**: https://meetpin-weld.vercel.app/api/healthz
+            **Endpoint**: https://meetpin-umber.vercel.app/api/healthz
             **Workflow**: [${context.workflow}](${context.payload.repository.html_url}/actions/runs/${context.runId})
 
             ### Automatic Actions Taken
