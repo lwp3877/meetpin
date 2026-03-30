@@ -48,6 +48,12 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
 
         if (controller.signal.aborted) return
 
+        // 로그인 안 된 경우(세션 없음 포함) → 바로 로그인으로 이동
+        if (!user) {
+          router.push(`/auth/login?redirect=/chat/${matchId}`)
+          return
+        }
+
         if (userError) {
           if (userError.message.includes('session_expired')) {
             throw new Error('로그인 세션이 만료되었습니다. 다시 로그인해주세요')
@@ -55,11 +61,6 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
             throw new Error('인증 토큰이 유효하지 않습니다. 다시 로그인해주세요')
           }
           throw new Error('인증 정보를 확인할 수 없습니다')
-        }
-
-        if (!user) {
-          router.push(`/auth/login?redirect=/chat/${matchId}`)
-          return
         }
 
         // 매치 접근 권한 확인 (타임아웃 10초)
