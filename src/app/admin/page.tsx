@@ -37,8 +37,12 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'emergency' | 'verification'>('emergency')
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      router.push('/map')
+    if (!loading) {
+      if (!user) {
+        router.push('/auth/login')
+      } else if (user.role !== 'admin') {
+        router.push('/map')
+      }
     }
   }, [user, loading, router])
 
