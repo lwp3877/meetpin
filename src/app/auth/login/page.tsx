@@ -299,23 +299,6 @@ export default function LoginPage() {
               Ctrl+Enter를 사용하세요. 각 필드는 실시간으로 유효성을 검사합니다.
             </p>
 
-            {/* Social Login */}
-            <SocialLogin
-              type="login"
-              disabled={isLoading}
-              onSuccess={() => {
-                toast.success('소셜 로그인이 완료되었습니다!')
-                router.push('/map')
-              }}
-            />
-
-            {/* Divider */}
-            <div className="relative my-6 flex items-center">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="mx-4 bg-white px-2 text-sm text-gray-500">또는 이메일로 로그인</span>
-              <div className="flex-grow border-t border-gray-300"></div>
-            </div>
-
             <form
               onSubmit={handleEmailLogin}
               className="space-y-5 sm:space-y-6"
@@ -596,6 +579,16 @@ export default function LoginPage() {
             </div>
 
             {/* 비밀번호 재설정 */}
+            {/* Social Login (이메일 폼 아래로 이동 — 뷰포트 내 제출 버튼 노출을 위해) */}
+            <SocialLogin
+              type="login"
+              disabled={isLoading}
+              onSuccess={() => {
+                toast.success('소셜 로그인이 완료되었습니다!')
+                router.push('/map')
+              }}
+            />
+
             <div className="mt-3">
               {!showForgotPassword ? (
                 // 버튼: 클릭하면 재설정 폼이 열립니다
