@@ -68,7 +68,7 @@ export default function MapPage() {
   const [timeFilter, setTimeFilter] = useState('all')
 
   // 방 목록 로딩·필터링·위치 검색 로직 (훅으로 분리)
-  const { rooms, filteredRooms, isLoading, error, loadRooms, handleBoundsChanged, handleRoomClick, handleNearMe } =
+  const { rooms, filteredRooms, isLoading, error, isEmpty, loadRooms, handleBoundsChanged, handleRoomClick, handleNearMe } =
     useMapRooms({ selectedCategory, searchQuery, priceRange, maxPeople, timeFilter })
 
   const handleCategoryChange = (category: string) => setSelectedCategory(category)
@@ -367,6 +367,30 @@ export default function MapPage() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Empty State: 이 지역에 방이 없을 때 */}
+        {isEmpty && (
+          <div className="absolute bottom-6 left-1/2 z-10 w-full max-w-sm -translate-x-1/2 px-4">
+            <Card className="border-0 bg-white/95 shadow-2xl backdrop-blur-xl dark:bg-gray-800/95">
+              <CardContent className="p-5 text-center">
+                <div className="mb-2 text-2xl">🗺️</div>
+                <p className="mb-1 font-semibold text-gray-800 dark:text-gray-200">
+                  이 지역엔 아직 모임이 없어요
+                </p>
+                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                  첫 모임을 만들어 주변 사람들을 불러보세요!
+                </p>
+                <Button
+                  onClick={handleCreateRoom}
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md hover:from-emerald-600 hover:to-teal-600"
+                >
+                  모임 만들기
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Popular Rooms Indicator */}

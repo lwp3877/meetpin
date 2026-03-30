@@ -247,7 +247,7 @@ export default function LoginPage() {
     <>
       <SkipLink href="#main-content">주 콘텐츠로 바로 가기</SkipLink>
       <div
-        className="flex min-h-screen items-start justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-4 py-6 sm:items-center sm:px-6 lg:px-8"
+        className="flex min-h-screen items-start justify-center bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-4 py-3 sm:items-center sm:px-6 lg:px-8"
         role="main"
       >
         <div
@@ -259,7 +259,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="text-center">
             <div
-              className="bg-primary mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 sm:h-20 sm:w-20"
+              className="bg-primary mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 sm:h-16 sm:w-16"
               role="img"
               aria-label="밋핀 로고"
             >
@@ -688,43 +688,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Features Preview */}
-          <div
-            className="grid grid-cols-3 gap-3 text-center sm:gap-4"
-            role="region"
-            aria-label="주요 기능"
-          >
-            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
-              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="지도">
-                🗺️
-              </div>
-              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
-                지도 기반
-                <br />
-                모임
-              </div>
-            </div>
-            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
-              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="채팅">
-                💬
-              </div>
-              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
-                실시간
-                <br />
-                채팅
-              </div>
-            </div>
-            <div className="rounded-lg border border-white/20 bg-white/50 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/70 sm:p-4">
-              <div className="mb-2 text-xl sm:text-2xl" role="img" aria-label="매칭">
-                👥
-              </div>
-              <div className="text-xs leading-tight font-medium text-gray-600 sm:text-sm">
-                쉬운
-                <br />
-                매칭
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>

@@ -58,7 +58,8 @@ export default function ChatPage({ params }: { params: Promise<{ matchId: string
         }
 
         if (!user) {
-          throw new Error('로그인이 필요합니다')
+          router.push(`/auth/login?redirect=/chat/${matchId}`)
+          return
         }
 
         // 매치 접근 권한 확인 (타임아웃 10초)

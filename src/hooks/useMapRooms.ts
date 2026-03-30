@@ -114,9 +114,6 @@ export function useMapRooms(filters: RoomFilters) {
         }
 
         setRooms(result.data.rooms || [])
-        if (result.data.rooms?.length === 0) {
-          toast('이 지역에는 아직 모임이 없습니다. 첫 번째 모임을 만들어보세요! 🎉')
-        }
       } catch (err: unknown) {
         logger.error('Rooms load error:', {
           error: err instanceof Error ? err.message : String(err),
@@ -270,11 +267,15 @@ export function useMapRooms(filters: RoomFilters) {
     loadRooms()
   }, [loadRooms])
 
+  // 방이 없는 상태: API는 성공했지만 이 지역에 방이 하나도 없음
+  const isEmpty = !isLoading && !error && rooms.length === 0
+
   return {
     rooms,
     filteredRooms,
     isLoading,
     error,
+    isEmpty,
     loadRooms,
     handleBoundsChanged,
     handleRoomClick,
