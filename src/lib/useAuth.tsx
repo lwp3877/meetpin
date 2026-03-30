@@ -38,7 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     setLoading(true)
     try {
-      const currentUser = await authService.getCurrentUser()
+      const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000))
+      const currentUser = await Promise.race([authService.getCurrentUser(), timeoutPromise])
       setUser(currentUser)
     } finally {
       setLoading(false)
@@ -76,7 +77,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = async () => {
       setLoading(true)
       try {
-        const currentUser = await authService.getCurrentUser()
+        // 5초 타임아웃: getUser()가 hanging 되면 로딩 스피너가 영원히 표시되는 문제 방지
+        const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000))
+        const currentUser = await Promise.race([authService.getCurrentUser(), timeoutPromise])
         if (mounted) {
           setUser(currentUser)
         }
