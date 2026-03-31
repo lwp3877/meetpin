@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
 
     logger.info('Received Stripe webhook', { eventType: (event as Record<string, unknown>).type })
 
+    // Stripe event ID — 멱등성 키로 사용
+    const eventId = (event as Record<string, unknown>).id as string
+
     // 이벤트 처리
     const result = await handleWebhookEvent(event as any)
 
@@ -72,6 +75,21 @@ export async function POST(request: NextRequest) {
             }
           )
 
+          // ── 멱등성 체크 ──────────────────────────────────────────────
+          // Stripe는 네트워크 오류 시 동일 이벤트를 재전송할 수 있음.
+          // 이미 처리한 event ID이면 부스트 중복 적용 없이 200 반환.
+          const { data: alreadyProcessed } = await supabaseAdmin
+            .from('stripe_webhook_events')
+            .select('event_id')
+            .eq('event_id', eventId)
+            .maybeSingle()
+
+          if (alreadyProcessed) {
+            logger.info('Stripe 중복 이벤트 수신 — 이미 처리됨, 스킵', { eventId })
+            return createSuccessResponse({ received: true })
+          }
+          // ─────────────────────────────────────────────────────────────
+
           const boostExpiry = calculateBoostExpiry(result.days)
           const { error: updateError } = await supabaseAdmin
             .from('rooms')
@@ -86,11 +104,27 @@ export async function POST(request: NextRequest) {
             })
             // 결제는 완료되었지만 DB 업데이트 실패 - 관리자 확인 필요
             return createErrorResponse('결제는 완료되었으나 부스트 활성화에 실패했습니다', 500)
+          }
+
+          // 처리 완료 기록 — 이후 동일 이벤트 재수신 시 중복 처리 방지
+          const { error: idempotencyError } = await supabaseAdmin
+            .from('stripe_webhook_events')
+            .insert({ event_id: eventId, event_type: result.type })
+
+          if (idempotencyError) {
+            // 로그만 남김. 이미 부스트는 성공했으므로 500 반환하지 않음.
+            // 다음 재시도 때 idempotency 체크가 없어 재처리될 수 있지만,
+            // 부스트 중복보다 부스트 누락이 더 치명적이므로 200 반환.
+            logger.error('Stripe idempotency 기록 실패 (부스트는 완료됨)', {
+              eventId,
+              error: idempotencyError.message,
+            })
           } else {
             logger.info('부스트 DB 업데이트 완료', {
               roomId: result.roomId,
               days: result.days,
-              boostUntil: boostExpiry.toISOString()
+              boostUntil: boostExpiry.toISOString(),
+              eventId,
             })
           }
         } catch (error) {

@@ -28,8 +28,14 @@ export function middleware(request: NextRequest) {
         request.nextUrl.pathname.startsWith(path)
       );
 
-      // Strict same-origin check for non-exempt paths
-      if (!isExempt && origin && referer && !referer.startsWith(origin)) {
+      // Strict same-origin check for non-exempt paths.
+      //
+      // 보안 원칙: origin 헤더가 있다는 건 브라우저가 명시적으로 출처를 알린 것.
+      // 이 경우 referer도 반드시 같은 출처여야 함.
+      // - referer 없음(null) + origin 있음: CSRF 공격자가 referer를 제거한 패턴 → 차단
+      // - referer 있음 + origin 불일치: 명백한 크로스오리진 요청 → 차단
+      // - origin 없음: 서버-서버 직접 호출 또는 구형 브라우저 → 허용 (origin 기반 체크만)
+      if (!isExempt && origin && (!referer || !referer.startsWith(origin))) {
         return new NextResponse('CSRF validation failed', { status: 403 });
       }
     }
