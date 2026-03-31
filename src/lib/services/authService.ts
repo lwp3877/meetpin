@@ -16,6 +16,21 @@
 import { createBrowserSupabaseClient } from '@/lib/supabaseClient'
 import { logger } from '@/lib/observability/logger'
 
+// Supabase auth 호출에 타임아웃 적용.
+// signInWithPassword / signUp 은 내부적으로 fetch를 쓰는데
+// 기본 타임아웃이 없어서 Supabase 서버가 느리거나 연결이 끊기면
+// await가 영원히 끝나지 않고 로딩 버튼이 무한 스피닝된다.
+const withTimeout = <T>(promise: Promise<T>, ms = 10000): Promise<T> =>
+  Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(
+        () => reject(new Error('요청 시간이 초과되었습니다. 네트워크 연결을 확인하고 다시 시도해주세요.')),
+        ms
+      )
+    ),
+  ])
+
 // Database types for Supabase operations
 interface ProfileUpdate {
   nickname?: string
@@ -130,10 +145,9 @@ export const signInWithEmail = async (email: string, password: string): Promise<
     } else {
       // 실제 Supabase 모드
       const supabase = createBrowserSupabaseClient()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password })
+      )
 
       if (error) {
         logAuthState('Sign in failed', error as any)
@@ -179,10 +193,9 @@ export const signUpWithEmail = async (
       const supabase = createBrowserSupabaseClient()
 
       // 이메일 회원가입
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      })
+      const { data, error: signUpError } = await withTimeout(
+        supabase.auth.signUp({ email, password })
+      )
 
       if (signUpError) {
         logAuthState('Sign up failed', signUpError as any)
