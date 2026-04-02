@@ -49,7 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, password: string) => {
     const result = await authService.signInWithEmail(email, password)
     if (result.success) {
-      await refreshUser()
+      // refreshUser()를 호출하면 loading=true → 로그인 폼 전체가 스피너로 대체되어
+      // "로그인 중..." 버튼이 사라지고 "로딩 중..." 화면으로 전환됨.
+      // 대신 loading 상태를 건드리지 않고 user만 직접 업데이트.
+      const timeoutPromise = new Promise<null>(resolve => setTimeout(() => resolve(null), 5000))
+      const currentUser = await Promise.race([authService.getCurrentUser(), timeoutPromise])
+      setUser(currentUser)
     }
     return result
   }

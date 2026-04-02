@@ -212,19 +212,19 @@ export const signUpWithEmail = async (
       }
 
       // 프로필 생성 (트리거가 자동으로 처리하지만 nickname, age_range 업데이트 필요)
+      // 5초 타임아웃: 프로필 업데이트가 hanging 되면 버튼이 영원히 "회원가입 중..." 상태로
+      // 고정되는 문제 방지. 실패해도 회원가입 자체는 성공으로 처리.
       const profileUpdate: ProfileUpdate = {
         nickname,
         age_range: ageRange,
       }
-      const { error: profileError } = await (supabase as any)
-        .from('profiles')
-        .update(profileUpdate)
-        .eq('uid', data.user.id)
-
-      if (profileError) {
-        logAuthState('Profile update failed after signup', profileError as any)
+      await Promise.race([
+        (supabase as any).from('profiles').update(profileUpdate).eq('uid', data.user.id),
+        new Promise<void>((_, reject) => setTimeout(() => reject(new Error('profile update timeout')), 5000)),
+      ]).catch((err: unknown) => {
+        logAuthState('Profile update failed or timed out after signup', err as any)
         // 프로필 업데이트 실패해도 회원가입은 성공으로 처리
-      }
+      })
 
       return { success: true }
     }
